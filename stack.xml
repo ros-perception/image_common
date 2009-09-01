@@ -1,0 +1,12 @@
+<stack name="image_common" version="0.1">
+  <description brief="Common code for working with images">
+    Common code for working with images in ROS.
+  </description>
+  <author>Maintained by Patrick Mihelich</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://www.ros.org/wiki/image_common</url>
+  <depend stack="ros"/>
+  <depend stack="common_msgs"/>
+  <depend stack="common"/>
+</stack>

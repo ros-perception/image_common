@@ -1,0 +1,21 @@
+<package>
+  <description brief="image_transport">
+
+     image_transport
+
+  </description>
+  <author>Patrick Mihelich</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://pr.willowgarage.com/wiki/image_transport</url>
+  <depend package="sensor_msgs"/>
+  <depend package="pluginlib"/>
+  <depend package="message_filters"/>
+  <!--depend package="opencv_latest"/-->
+
+  <export>
+    <cpp lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -limage_transport" cflags="-I${prefix}/include"/>
+    <image_transport plugin="${prefix}/default_plugins.xml" />
+  </export>
+
+</package>
