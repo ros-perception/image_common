@@ -1,0 +1,19 @@
+<package>
+  <description brief="camera_calibration_parsers">
+
+     camera_calibration_parsers
+
+  </description>
+  <author>Patrick Mihelich</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://pr.willowgarage.com/wiki/camera_calibration_parsers</url>
+
+  <depend package="roscpp"/>
+  <depend package="yaml-cpp"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lcamera_calibration_parsers" />
+  </export>
+
+</package>
