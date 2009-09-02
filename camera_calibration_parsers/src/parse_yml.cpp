@@ -3,6 +3,7 @@
 #include <fstream>
 #include <ctime>
 #include <cassert>
+#include <cstring>
 
 namespace camera_calibration_parsers {
 
