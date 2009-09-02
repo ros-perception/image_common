@@ -5,8 +5,9 @@
   <author>Maintained by Patrick Mihelich</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://www.ros.org/wiki/image_common</url>
-  <depend stack="ros"/>
-  <depend stack="common_msgs"/>
-  <depend stack="common"/>
+
+  <url>http://ros.org/wiki/image_common</url>
+  <depend stack="ros"/> <!-- message_filters -->
+  <depend stack="common"/> <!-- pluginlib -->
+  <depend stack="common_msgs"/> <!-- sensor_msgs -->
 </stack>
