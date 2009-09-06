@@ -16,7 +16,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
+rosbuild_add_boost_directories()
 rosbuild_add_library(${PROJECT_NAME} src/image_publisher.cpp src/image_subscriber.cpp src/raw_publisher.cpp src/raw_subscriber.cpp src/manifest.cpp)
+rosbuild_link_boost(${PROJECT_NAME} system)
 
 rosbuild_add_executable(encoder src/encoder.cpp)
 target_link_libraries(encoder ${PROJECT_NAME})
