@@ -20,8 +20,8 @@ rosbuild_add_boost_directories()
 rosbuild_add_library(${PROJECT_NAME} src/image_publisher.cpp src/image_subscriber.cpp src/raw_publisher.cpp src/raw_subscriber.cpp src/manifest.cpp)
 rosbuild_link_boost(${PROJECT_NAME} system)
 
-rosbuild_add_executable(encoder src/encoder.cpp)
-target_link_libraries(encoder ${PROJECT_NAME})
+rosbuild_add_executable(transform src/transform.cpp)
+target_link_libraries(transform ${PROJECT_NAME})
 
 #rosbuild_add_executable(test_publisher src/test_publisher.cpp)
 #target_link_libraries(test_publisher ${PROJECT_NAME})

@@ -37,6 +37,7 @@
 #include <pluginlib/class_loader.h>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string/erase.hpp>
 
 namespace image_transport {
 
@@ -57,7 +58,8 @@ ImagePublisher::ImagePublisher()
   : impl_(new Impl)
 {
   // Default behavior: load all plugins and use default topic names.
-  BOOST_FOREACH(const std::string& lookup_name, impl_->loader.getDeclaredClasses()) {
+  BOOST_FOREACH(std::string lookup_name, impl_->loader.getDeclaredClasses()) {
+    boost::erase_last(lookup_name, "_pub");
     impl_->topic_map[lookup_name] = "";
   }
 }
@@ -77,9 +79,10 @@ void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic,
   impl_->topic = nh.resolveName(topic);
   
   BOOST_FOREACH(const TransportTopicMap::value_type& value, impl_->topic_map) {
-    //ROS_INFO("Loading %s", value.first.c_str());
+    std::string lookup_name = value.first + "_pub";
+    //ROS_INFO("Loading %s", lookup_name.c_str());
     try {
-      PublisherPlugin* pub = impl_->loader.createClassInstance(value.first);
+      PublisherPlugin* pub = impl_->loader.createClassInstance(lookup_name);
       impl_->publishers.push_back(pub);
       std::string sub_topic = value.second;
       if (sub_topic.empty())
@@ -89,7 +92,7 @@ void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic,
     }
     catch (const std::runtime_error& e) {
       ROS_WARN("Failed to load plugin %s, error string: %s",
-               value.first.c_str(), e.what());
+               lookup_name.c_str(), e.what());
     }
   }
 }

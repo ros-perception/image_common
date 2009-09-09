@@ -1,7 +1,7 @@
 <package>
   <description brief="image_transport">
 
-     image_transport
+     image_transport provides specialized publisher and subscriber classes for transporting images. These classes use a plugin architecture to provide specialized transport options, such as through a video codec.
 
   </description>
   <author>Patrick Mihelich</author>
