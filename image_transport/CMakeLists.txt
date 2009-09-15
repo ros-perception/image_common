@@ -23,6 +23,9 @@ rosbuild_link_boost(${PROJECT_NAME} system)
 rosbuild_add_executable(transform src/transform.cpp)
 target_link_libraries(transform ${PROJECT_NAME})
 
+rosbuild_add_executable(list_transports src/list_transports.cpp)
+target_link_libraries(list_transports ${PROJECT_NAME})
+
 #rosbuild_add_executable(test_publisher src/test_publisher.cpp)
 #target_link_libraries(test_publisher ${PROJECT_NAME})
 
