@@ -7,6 +7,11 @@
 
 namespace image_transport {
 
+/**
+ * \brief Base class for plugins to ImageSubscriber.
+ *
+ * @todo other subscribe overloads?
+ */
 class SubscriberPlugin : boost::noncopyable
 {
 public:
@@ -15,17 +20,26 @@ public:
   virtual ~SubscriberPlugin() {}
 
   //virtual void subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops);
-  
+
+  /**
+   * \brief Subscribe to an image transport topic.
+   */
   virtual void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                          const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                          const ros::VoidPtr& tracked_object,
                          const ros::TransportHints& transport_hints) = 0;
-  // @todo: other subscribe overloads, which default to calling above version
   
   virtual std::string getTopic() const = 0;
 
+  /**
+   * \brief Unsubscribe the callback associated with this SubscriberPlugin.
+   */
   virtual void shutdown() = 0;
 
+  /**
+   * \brief Return the lookup name of the SubscriberPlugin associated with a specific
+   * transport identifier.
+   */
   static std::string getLookupName(const std::string& transport_type)
   {
     return transport_type + "_sub";

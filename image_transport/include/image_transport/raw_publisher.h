@@ -1,7 +1,16 @@
+#ifndef IMAGE_TRANSPORT_RAW_PUBLISHER_H
+#define IMAGE_TRANSPORT_RAW_PUBLISHER_H
+
 #include "image_transport/publisher_plugin.h"
 
 namespace image_transport {
 
+/**
+ * \brief The default PublisherPlugin.
+ *
+ * RawPublisher is a simple wrapper for ros::Publisher, publishing unaltered Image
+ * messages on the base topic.
+ */
 class RawPublisher : public PublisherPlugin
 {
 public:
@@ -25,3 +34,5 @@ protected:
 };
 
 } //namespace image_transport
+
+#endif

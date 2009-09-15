@@ -2,7 +2,10 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b image_transport is ... 
+When working with images we often want specialized transport strategies,
+such as using image compression or streaming video codecs. \b image_transport
+provides classes and nodes for transporting images in arbitrary over-the-wire
+representations, while hiding this complexity from the developer.
 
 <!-- 
 In addition to providing an overview of your package,
@@ -14,6 +17,21 @@ You can then link to this documentation page from the Wiki.
 
 
 \section codeapi Code API
+When transporting images, you should use image_transport's classes as drop-in
+replacements for ros::Publisher and ros::Subscriber:
+- image_transport::ImagePublisher - advertises subtopics for all available transport options
+- image_transport::ImageSubscriber - subscribes an Image callback to any topic produced by ImagePublisher
+
+Vision applications often require image metadata (camera intrinsics, etc.) published on a
+separate CameraInfo topic, or require special care in sequencing incoming Images. For such
+tasks see:
+- image_transport::CameraImageSubscriber - subscribe a single callback to synchronized image (using any transport) and CameraInfo topics
+- image_transport::ImageSubscriberFilter - a wrapper for ImageSubscriber compatible with message_filters
+
+Finally, if you are an advanced user implementing your own image transport option, you will need to
+implement these interfaces:
+- image_transport::PublisherPlugin - see image_transport::RawPublisher for the simplest possible implementation
+- image_transport::SubscriberPlugin - see image_transport::RawSubscriber for the simplest possible implementation
 
 <!--
 Provide links to specific auto-generated API documentation within your
@@ -27,6 +45,59 @@ example, the roscpp documentation has 'libros' group.
 -->
 
 \section rosapi ROS API
+
+List of nodes:
+- \ref transform
+
+\subsection transform transform
+
+transform pipes an image topic (using any transport type) into another topic
+using a transport of the user's choosing. "raw" is the name of the default transport,
+publishing ROS Image messages. What other transports are available depends on what
+plugins are built.
+
+Uses of transform include:
+- Reduce bandwidth and duplication of effort: Suppose we are publishing camera images from
+a robot using a streaming video transport. On an offboard computer we have
+several nodes listening to the image topic. Rather than let each listener node
+stream from the robot and process the compressed video into still images, we can
+start a transform node on the offboard computer:
+\verbatim
+$ rosrun image_transport transform raw in:=/video_stream_topic out:=/raw_image_topic
+\endverbatim
+This streams the video to one node, which processes it into still Image messages and
+republishes them for use by the other nodes.
+- Compatibility with nodes that do not use the image_transport classes. transform may
+be used as an intermediary to go to/from the "raw" transport type.
+
+\subsubsection Usage
+\verbatim
+$ transform transport_type [standard ROS args]
+\endverbatim
+
+\par Example
+
+\verbatim
+$ transform theora in:=camera/image out:=camera/image_theora           # On robot
+$ transform raw in:=camera/image_theora out:=camera/image_decompressed # Offboard
+\endverbatim
+
+\subsubsection topics ROS topics
+
+Subscribes to:
+- \b "in": the image topic to listen on, may be of any transport type
+
+Publishes to:
+- \b "out": the image topic to publish to using the specified transport type
+
+The datatypes of both topics will depend on which transports are used.
+
+\subsubsection parameters ROS parameters
+
+transform itself does not make use of the parameter server except for normal
+use by the transport classes (checking "in/transport_type" and setting
+"out/transport_type"). Plugins may read or set plugin-specific parameters,
+however.
 
 <!--
 Names are very important in ROS because they can be remapped on the

@@ -1,7 +1,16 @@
+#ifndef IMAGE_TRANSPORT_RAW_SUBSCRIBER_H
+#define IMAGE_TRANSPORT_RAW_SUBSCRIBER_H
+
 #include "image_transport/subscriber_plugin.h"
 
 namespace image_transport {
 
+/**
+ * \brief The default SubscriberPlugin.
+ *
+ * RawSubscriber is a simple wrapper for ros::Subscriber which listens for Image messages
+ * and passes them through to the callback.
+ */
 class RawSubscriber : public SubscriberPlugin
 {
 public:
@@ -23,3 +32,5 @@ private:
 };
 
 } //namespace image_transport
+
+#endif

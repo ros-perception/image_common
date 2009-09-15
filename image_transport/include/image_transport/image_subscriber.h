@@ -37,6 +37,22 @@
 
 namespace image_transport {
 
+/**
+ * \brief Manages a subscription callback on a specific topic that can be interpreted
+ * as an Image topic.
+ *
+ * ImageSubscriber is the client-side counterpart to ImagePublisher. By loading the
+ * appropriate plugin, it can interpret any topic advertised by ImagePublisher as
+ * Image messages passed to the user callback; the complexity of what transport is
+ * actually used is hidden.
+ *
+ * Once all copies of a specific ImageSubscriber go out of scope, the subscription callback
+ * associated with that handle will stop being called. Once all ImageSubscriber for a given
+ * topic go out of scope the topic will be unsubscribed.
+ *
+ * @todo Add either SubscribeOps overload of subscribe() or CallbackQueueInterface arg to
+ * other versions.
+ */
 class ImageSubscriber
 {
 public:
@@ -46,15 +62,19 @@ public:
 
   ~ImageSubscriber();
 
-  // @todo: either add SubscribeOps interface or CallbackQueueInterface arg to other versions
   //void subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops);
-  
+
+  /**
+   * \brief Subscribe to a topic, version for arbitrary boost::function object.
+   */
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                  const ros::VoidPtr& tracked_object = ros::VoidPtr(),
                  const ros::TransportHints& transport_hints = ros::TransportHints());
 
-  // bare function
+  /**
+   * \brief Subscribe to a topic, version for bare function.
+   */
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  void(*fp)(const sensor_msgs::ImageConstPtr&),
                  const ros::TransportHints& transport_hints = ros::TransportHints())
@@ -64,7 +84,9 @@ public:
               ros::VoidPtr(), transport_hints);
   }
 
-  // class member function with bare pointer
+  /**
+   * \brief Subscribe to a topic, version for class member function with bare pointer.
+   */
   template<class T>
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
@@ -73,7 +95,9 @@ public:
     subscribe(nh, topic, queue_size, boost::bind(fp, obj, _1), ros::VoidPtr(), transport_hints);
   }
 
-  // class member function with shared_ptr
+  /**
+   * \brief Subscribe to a topic, version for class member function with shared_ptr.
+   */
   template<class T>
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  void(T::*fp)(const sensor_msgs::ImageConstPtr&),
@@ -85,6 +109,9 @@ public:
 
   std::string getTopic() const;
 
+  /**
+   * \brief Unsubscribe the callback associated with this ImageSubscriber.
+   */
   void shutdown();
 
   operator void*() const;

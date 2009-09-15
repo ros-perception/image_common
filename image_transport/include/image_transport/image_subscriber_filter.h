@@ -40,14 +40,14 @@
 
 #include "image_transport/image_subscriber.h"
 
-namespace image_transport
-{
+namespace image_transport {
 
 /**
  * \brief Image subscription filter.
  *
- * This class acts as a highest-level filter, simply passing messages from an image transport subscription
- * through to the filters which have connected to it.
+ * This class wraps ImageSubscriber as a "filter" compatible with the message_filters
+ * package. It acts as a highest-level filter, simply passing messages from an image
+ * transport subscription through to the filters which have connected to it.
  *
  * When this object is destroyed it will unsubscribe from the ROS subscription.
  *
@@ -113,7 +113,7 @@ public:
 
     if (!topic.empty())
     {
-      // @todo: currently ignoring callback_queue, need SubscribeOptions interface?
+      //! @todo currently ignoring callback_queue, need SubscribeOptions interface?
       /*
       ros::SubscribeOptions ops;
       ops.init<M>(topic, queue_size, boost::bind(&ImageSubscriberFilter::cb, this, _1));

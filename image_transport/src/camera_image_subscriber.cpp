@@ -34,7 +34,7 @@ void CameraImageSubscriber::subscribe(ros::NodeHandle& nh, const std::string& im
   std::string info_topic = image_topic.substr(0, image_topic.rfind('/')) + "/camera_info";
   subscribe(nh, image_topic, info_topic, queue_size, callback, tracked_object, transport_hints);
 }
-  
+
 void CameraImageSubscriber::subscribe(ros::NodeHandle& nh,
                                       const std::string& image_topic, const std::string& info_topic,
                                       uint32_t queue_size, const Callback& callback,

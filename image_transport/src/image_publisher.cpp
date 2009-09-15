@@ -47,6 +47,17 @@ struct ImagePublisher::Impl
     : loader("image_transport", "image_transport::PublisherPlugin")
   {
   }
+
+  ~Impl()
+  {
+    shutdown();
+  }
+  
+  void shutdown()
+  {
+    BOOST_FOREACH(PublisherPlugin& pub, publishers)
+      pub.shutdown();
+  }
   
   std::string topic;
   pluginlib::ClassLoader<PublisherPlugin> loader;
@@ -75,6 +86,7 @@ ImagePublisher::~ImagePublisher()
 
 void ImagePublisher::advertise(ros::NodeHandle& nh, ros::AdvertiseOptions& ops)
 {
+  //! @todo support for subscription callbacks
   impl_->topic = nh.resolveName(ops.topic);
   
   BOOST_FOREACH(const TransportTopicMap::value_type& value, impl_->topic_map) {
@@ -155,8 +167,7 @@ void ImagePublisher::publish(const sensor_msgs::ImageConstPtr& message) const
 
 void ImagePublisher::shutdown()
 {
-  BOOST_FOREACH(PublisherPlugin& pub, impl_->publishers)
-    pub.shutdown();
+  impl_->shutdown();
 }
 
 } //namespace image_transport
