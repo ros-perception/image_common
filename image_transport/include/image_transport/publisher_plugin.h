@@ -1,3 +1,6 @@
+#ifndef IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
+#define IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
+
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <boost/noncopyable.hpp>
@@ -38,3 +41,5 @@ public:
 };
 
 } //namespace image_transport
+
+#endif

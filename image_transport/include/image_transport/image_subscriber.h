@@ -46,7 +46,8 @@ public:
 
   ~ImageSubscriber();
 
-  // void subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops);
+  // @todo: either add SubscribeOps interface or CallbackQueueInterface arg to other versions
+  //void subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops);
   
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,

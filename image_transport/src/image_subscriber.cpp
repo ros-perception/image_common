@@ -63,7 +63,17 @@ ImageSubscriber::ImageSubscriber(const ImageSubscriber& rhs)
 ImageSubscriber::~ImageSubscriber()
 {
 }
-
+/*
+void ImageSubscriber::subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops)
+{
+  std::string transport;
+  nh.param(nh.resolveName(ops.topic) + "/transport_type", transport, std::string("raw"));
+  ROS_INFO("Using transport type '%s'", transport.c_str());
+  std::string lookupName = SubscriberPlugin::getLookupName(transport);
+  impl_->subscriber.reset( impl_->loader.createClassInstance(lookupName) );
+  impl_->subscriber->subscribe(nh, ops.topic, ops.queue_size, callback, tracked_object, transport_hints);
+}
+*/
 void ImageSubscriber::subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                                 const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                                 const ros::VoidPtr& tracked_object,

@@ -1,3 +1,6 @@
+#ifndef IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
+#define IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
+
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <boost/noncopyable.hpp>
@@ -11,6 +14,8 @@ public:
   
   virtual ~SubscriberPlugin() {}
 
+  //virtual void subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops);
+  
   virtual void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                          const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                          const ros::VoidPtr& tracked_object,
@@ -28,3 +33,5 @@ public:
 };
 
 } //namespace image_transport
+
+#endif

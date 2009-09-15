@@ -32,6 +32,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#ifndef IMAGE_TRANSPORT_IMAGE_PUBLISHER_H
+#define IMAGE_TRANSPORT_IMAGE_PUBLISHER_H
+
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <map>
@@ -64,7 +67,14 @@ public:
   
   ~ImagePublisher();
 
-  // @todo: advertise overloads, support for subscription callbacks
+  // @todo: support for subscription callbacks
+  void advertise(ros::NodeHandle& nh, ros::AdvertiseOptions& ops);
+  
+  void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+                 const ros::SubscriberStatusCallback& connect_cb,
+                 const ros::SubscriberStatusCallback& disconnect_cb = ros::SubscriberStatusCallback(),
+                 const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = false);
+  
   void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  bool latch = false);
 
@@ -110,3 +120,5 @@ private:
 };
 
 } //namespace image_transport
+
+#endif

@@ -15,7 +15,7 @@ std::string RawPublisher::getDefaultTopic(const std::string& base_topic) const
 }
 
 void RawPublisher::advertise(ros::NodeHandle& nh, const std::string& topic,
-                                 uint32_t queue_size, bool latch)
+                             uint32_t queue_size, bool latch)
 {
   pub_ = nh.advertise<sensor_msgs::Image>(topic, queue_size, latch);
 }
