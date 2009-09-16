@@ -113,14 +113,7 @@ public:
 
     if (!topic.empty())
     {
-      //! @todo currently ignoring callback_queue, need SubscribeOptions interface?
-      /*
-      ros::SubscribeOptions ops;
-      ops.init<M>(topic, queue_size, boost::bind(&ImageSubscriberFilter::cb, this, _1));
-      ops.callback_queue = callback_queue;
-      ops.transport_hints = transport_hints;
-      sub_.subscribe(nh, ops);
-      */
+      //! @todo currently ignoring callback_queue
       sub_.subscribe(nh, topic, queue_size, boost::bind(&ImageSubscriberFilter::cb, this, _1),
                      ros::VoidPtr(), transport_hints);
     }

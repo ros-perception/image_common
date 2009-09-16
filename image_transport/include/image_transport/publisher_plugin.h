@@ -9,8 +9,6 @@ namespace image_transport {
 
 /**
  * \brief Base class for plugins to ImagePublisher.
- *
- * @todo overloads of advertise? may be unnecessary here.
  */
 class PublisherPlugin : boost::noncopyable
 {

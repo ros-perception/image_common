@@ -50,8 +50,7 @@ namespace image_transport {
  * associated with that handle will stop being called. Once all ImageSubscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  *
- * @todo Add either SubscribeOps overload of subscribe() or CallbackQueueInterface arg to
- * other versions.
+ * @todo Add CallbackQueueInterface arg to subscribe()?
  */
 class ImageSubscriber
 {
@@ -61,8 +60,6 @@ public:
   ImageSubscriber(const ImageSubscriber& rhs);
 
   ~ImageSubscriber();
-
-  //void subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops);
 
   /**
    * \brief Subscribe to a topic, version for arbitrary boost::function object.

@@ -9,8 +9,6 @@ namespace image_transport {
 
 /**
  * \brief Base class for plugins to ImageSubscriber.
- *
- * @todo other subscribe overloads?
  */
 class SubscriberPlugin : boost::noncopyable
 {
@@ -18,8 +16,6 @@ public:
   typedef boost::function<void(const sensor_msgs::ImageConstPtr&)> Callback;
   
   virtual ~SubscriberPlugin() {}
-
-  //virtual void subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops);
 
   /**
    * \brief Subscribe to an image transport topic.
