@@ -71,13 +71,7 @@ public:
   ~ImagePublisher();
 
   /*!
-   * \brief Advertise a topic, with full range of AdvertiseOptions.
-   */
-  void advertise(ros::NodeHandle& nh, ros::AdvertiseOptions& ops);
-
-  /*!
-   * \brief Advertise a topic, with most of the available options, including subcriber
-   * status callbacks.
+   * \brief Advertise a topic with subcriber status callbacks.
    */
   void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  const ros::SubscriberStatusCallback& connect_cb,

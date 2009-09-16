@@ -159,32 +159,18 @@ Sets the following parameters on the parameter server
 END: copy for each node -->
 
 
-<!-- START: Uncomment if you have any command-line tools
-
 \section commandline Command-line tools
 
-This section is a catch-all for any additional tools that your package
-provides or uses that may be of use to the reader. For example:
+\subsection list_transports list_transports
 
-- tools/scripts (e.g. rospack, roscd)
-- roslaunch .launch files
-- xmlparam files
-
-\subsection script_name script_name
-
-Description of what this script/file does.
+\b list_transports lists the declared image transport options across all
+ROS packages and attempts to determine whether they are currently
+available for use (packages built, plugins able to be loaded properly,
+etc.).
 
 \subsubsection Usage
 \verbatim
-$ ./script_name [args]
+$ rosrun image_transport list_transports
 \endverbatim
-
-\par Example
-
-\verbatim
-$ ./script_name foo bar
-\endverbatim
-
-END: Command-Line Tools Section -->
 
 */

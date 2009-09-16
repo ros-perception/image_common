@@ -19,8 +19,10 @@ public:
   virtual std::string getTransportType() const;
   virtual std::string getDefaultTopic(const std::string& base_topic) const;
 
-  virtual void advertise(ros::NodeHandle& nh, const std::string& topic,
-                         uint32_t queue_size, bool latch);
+  virtual void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+                         const ros::SubscriberStatusCallback& connect_cb,
+                         const ros::SubscriberStatusCallback& disconnect_cb,
+                         const ros::VoidPtr& tracked_object, bool latch);
 
   virtual uint32_t getNumSubscribers() const;
   virtual std::string getTopic() const;

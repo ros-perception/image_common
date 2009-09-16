@@ -14,10 +14,13 @@ std::string RawPublisher::getDefaultTopic(const std::string& base_topic) const
   return base_topic;
 }
 
-void RawPublisher::advertise(ros::NodeHandle& nh, const std::string& topic,
-                             uint32_t queue_size, bool latch)
+void RawPublisher::advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+                             const ros::SubscriberStatusCallback& connect_cb,
+                             const ros::SubscriberStatusCallback& disconnect_cb,
+                             const ros::VoidPtr& tracked_object, bool latch)
 {
-  pub_ = nh.advertise<sensor_msgs::Image>(topic, queue_size, latch);
+  pub_ = nh.advertise<sensor_msgs::Image>(topic, queue_size, connect_cb, disconnect_cb,
+                                          tracked_object, latch);
 }
 
 uint32_t RawPublisher::getNumSubscribers() const

@@ -34,8 +34,10 @@ public:
   /**
    * \brief Advertise a topic.
    */
-  virtual void advertise(ros::NodeHandle& nh, const std::string& topic,
-                         uint32_t queue_size, bool latch) = 0;
+  virtual void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+                         const ros::SubscriberStatusCallback& connect_cb,
+                         const ros::SubscriberStatusCallback& disconnect_cb,
+                         const ros::VoidPtr& tracked_object, bool latch) = 0;
 
   /**
    * \brief Returns the number of subscribers that are currently connected to

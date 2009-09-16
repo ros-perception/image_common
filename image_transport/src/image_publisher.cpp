@@ -84,10 +84,12 @@ ImagePublisher::~ImagePublisher()
 {
 }
 
-void ImagePublisher::advertise(ros::NodeHandle& nh, ros::AdvertiseOptions& ops)
+void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+                               const ros::SubscriberStatusCallback& connect_cb,
+                               const ros::SubscriberStatusCallback& disconnect_cb,
+                               const ros::VoidPtr& tracked_object, bool latch)
 {
-  //! @todo support for subscription callbacks
-  impl_->topic = nh.resolveName(ops.topic);
+  impl_->topic = nh.resolveName(topic);
   
   BOOST_FOREACH(const TransportTopicMap::value_type& value, impl_->topic_map) {
     std::string lookup_name = value.first + "_pub";
@@ -99,7 +101,7 @@ void ImagePublisher::advertise(ros::NodeHandle& nh, ros::AdvertiseOptions& ops)
       if (sub_topic.empty())
         sub_topic = pub->getDefaultTopic(impl_->topic);
       nh.setParam(sub_topic + "/transport_type", pub->getTransportType());
-      pub->advertise(nh, sub_topic, ops.queue_size, ops.latch);
+      pub->advertise(nh, sub_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
     }
     catch (const std::runtime_error& e) {
       ROS_WARN("Failed to load plugin %s, error string: %s",
@@ -108,25 +110,11 @@ void ImagePublisher::advertise(ros::NodeHandle& nh, ros::AdvertiseOptions& ops)
   }
 }
 
-void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                               const ros::SubscriberStatusCallback& connect_cb,
-                               const ros::SubscriberStatusCallback& disconnect_cb,
-                               const ros::VoidPtr& tracked_object, bool latch)
-{
-  ros::AdvertiseOptions ops;
-  ops.init<sensor_msgs::Image>(topic, queue_size, connect_cb, disconnect_cb);
-  ops.tracked_object = tracked_object;
-  ops.latch = latch;
-  advertise(nh, ops);
-}
-
 void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic,
                                uint32_t queue_size, bool latch)
 {
-  ros::AdvertiseOptions ops;
-  ops.init<sensor_msgs::Image>(topic, queue_size);
-  ops.latch = latch;
-  advertise(nh, ops);
+  advertise(nh, topic, queue_size, ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(),
+            ros::VoidPtr(), latch);
 }
 
 uint32_t ImagePublisher::getNumSubscribers() const
