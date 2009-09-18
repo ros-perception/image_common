@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "test_publisher");
   ros::NodeHandle n;
-  image_transport::ImagePublisher image_pub;
+  image_transport::Publisher image_pub;
   image_pub.advertise(n, "raw_image", 1, boost::bind(subscriber_cb, _1, "Connection"),
                       boost::bind(subscriber_cb, _1, "Disconnection"));
 

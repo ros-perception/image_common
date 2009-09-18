@@ -5,7 +5,7 @@
 
 namespace image_transport {
 
-struct CameraImageSubscriber::Impl
+struct CameraSubscriber::Impl
 {
   Impl(uint32_t queue_size)
     : sync_(queue_size)
@@ -13,33 +13,33 @@ struct CameraImageSubscriber::Impl
   
   std::string image_topic_;
   std::string info_topic_;
-  ImageSubscriberFilter image_sub_;
+  SubscriberFilter image_sub_;
   message_filters::Subscriber<sensor_msgs::CameraInfo> info_sub_;
   message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::CameraInfo> sync_;
 };
 
-CameraImageSubscriber::CameraImageSubscriber()
+CameraSubscriber::CameraSubscriber()
 {
 }
 
-CameraImageSubscriber::~CameraImageSubscriber()
+CameraSubscriber::~CameraSubscriber()
 {
 }
 
-void CameraImageSubscriber::subscribe(ros::NodeHandle& nh, const std::string& image_topic,
-                                      uint32_t queue_size, const Callback& callback,
-                                      const ros::VoidPtr& tracked_object,
-                                      const ros::TransportHints& transport_hints)
+void CameraSubscriber::subscribe(ros::NodeHandle& nh, const std::string& image_topic,
+                                 uint32_t queue_size, const Callback& callback,
+                                 const ros::VoidPtr& tracked_object,
+                                 const ros::TransportHints& transport_hints)
 {
   std::string info_topic = image_topic.substr(0, image_topic.rfind('/')) + "/camera_info";
   subscribe(nh, image_topic, info_topic, queue_size, callback, tracked_object, transport_hints);
 }
 
-void CameraImageSubscriber::subscribe(ros::NodeHandle& nh,
-                                      const std::string& image_topic, const std::string& info_topic,
-                                      uint32_t queue_size, const Callback& callback,
-                                      const ros::VoidPtr& tracked_object,
-                                      const ros::TransportHints& transport_hints)
+void CameraSubscriber::subscribe(ros::NodeHandle& nh,
+                                 const std::string& image_topic, const std::string& info_topic,
+                                 uint32_t queue_size, const Callback& callback,
+                                 const ros::VoidPtr& tracked_object,
+                                 const ros::TransportHints& transport_hints)
 {
   shutdown();
 
@@ -51,17 +51,17 @@ void CameraImageSubscriber::subscribe(ros::NodeHandle& nh,
   impl_->sync_.registerCallback(boost::bind(callback, _1, _2));
 }
 
-std::string CameraImageSubscriber::getImageTopic() const
+std::string CameraSubscriber::getImageTopic() const
 {
   return impl_->image_topic_;
 }
 
-std::string CameraImageSubscriber::getInfoTopic() const
+std::string CameraSubscriber::getInfoTopic() const
 {
   return impl_->info_topic_;
 }
 
-void CameraImageSubscriber::shutdown()
+void CameraSubscriber::shutdown()
 {
   impl_.reset();
 }

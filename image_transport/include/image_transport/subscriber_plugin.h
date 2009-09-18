@@ -18,6 +18,12 @@ public:
   virtual ~SubscriberPlugin() {}
 
   /**
+   * \brief Get a string identifier for the transport provided by
+   * this plugin.
+   */
+  virtual std::string getTransportName() const = 0;
+  
+  /**
    * \brief Subscribe to an image transport topic.
    */
   virtual void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,

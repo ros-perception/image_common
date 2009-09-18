@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_IMAGE_PUBLISHER_H
-#define IMAGE_TRANSPORT_IMAGE_PUBLISHER_H
+#ifndef IMAGE_TRANSPORT_PUBLISHER_H
+#define IMAGE_TRANSPORT_PUBLISHER_H
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
@@ -44,19 +44,19 @@ namespace image_transport {
 /**
  * \brief Manages advertisements of multiple transport options on an Image topic.
  *
- * ImagePublisher is a (nearly) drop-in replacement for ros::Publisher when publishing
+ * Publisher is a (nearly) drop-in replacement for ros::Publisher when publishing
  * Image topics. In a minimally built environment, they behave the same; however,
- * ImagePublisher is extensible via plugins to publish alternative representations of
+ * Publisher is extensible via plugins to publish alternative representations of
  * the image on related subtopics. This is especially useful for limiting bandwidth and
  * latency over a network connection, when you might (for example) use the theora plugin
  * to transport the images as streamed video. All topics are published only on demand
  * (i.e. if there are subscribers).
  * 
- * Once all copies of a specific ImagePublisher go out of scope, any subscriber callbacks
- * associated with that handle will stop being called. Once all ImagePublisher for a
+ * Once all copies of a specific Publisher go out of scope, any subscriber callbacks
+ * associated with that handle will stop being called. Once all Publisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
-class ImagePublisher
+class Publisher
 {
 public:
   typedef std::map<std::string, std::string> TransportTopicMap;
@@ -64,11 +64,11 @@ public:
   /*!
    * \brief Empty constructor, use advertise() to advertise a set of topics.
    */
-  ImagePublisher();
+  Publisher();
 
-  ImagePublisher(const ImagePublisher& rhs);
+  Publisher(const Publisher& rhs);
   
-  ~ImagePublisher();
+  ~Publisher();
 
   /*!
    * \brief Advertise a topic with subcriber status callbacks.
@@ -86,14 +86,14 @@ public:
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to
-   * this ImagePublisher.
+   * this Publisher.
    *
    * Returns the total number of subscribers to all advertised topics.
    */
   uint32_t getNumSubscribers() const;
 
   /*!
-   * \brief Returns the base topic of this ImagePublisher.
+   * \brief Returns the base topic of this Publisher.
    */
   std::string getTopic() const;
 
@@ -111,24 +111,24 @@ public:
   const TransportTopicMap& getTopicMap() const;
 
   /*!
-   * \brief Publish an image on the topics associated with this ImagePublisher.
+   * \brief Publish an image on the topics associated with this Publisher.
    */
   void publish(const sensor_msgs::Image& message) const;
 
   /*!
-   * \brief Publish an image on the topics associated with this ImagePublisher.
+   * \brief Publish an image on the topics associated with this Publisher.
    */
   void publish(const sensor_msgs::ImageConstPtr& message) const;
 
   /*!
-   * \brief Shutdown the advertisements associated with this ImagePublisher.
+   * \brief Shutdown the advertisements associated with this Publisher.
    */
   void shutdown();
 
   operator void*() const { return impl_ ? (void*)1 : (void*)0; }
-  bool operator< (const ImagePublisher& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const ImagePublisher& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const ImagePublisher& rhs) const { return impl_ == rhs.impl_; }
+  bool operator< (const Publisher& rhs) const { return impl_ <  rhs.impl_; }
+  bool operator!=(const Publisher& rhs) const { return impl_ != rhs.impl_; }
+  bool operator==(const Publisher& rhs) const { return impl_ == rhs.impl_; }
 
 private:
   struct Impl;

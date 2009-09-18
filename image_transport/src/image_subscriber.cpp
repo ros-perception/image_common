@@ -39,7 +39,7 @@
 
 namespace image_transport {
 
-struct ImageSubscriber::Impl
+struct Subscriber::Impl
 {
   Impl()
     : loader("image_transport", "image_transport::SubscriberPlugin")
@@ -50,34 +50,24 @@ struct ImageSubscriber::Impl
   boost::scoped_ptr<SubscriberPlugin> subscriber;
 };
 
-ImageSubscriber::ImageSubscriber()
+Subscriber::Subscriber()
   : impl_(new Impl)
 {
 }
 
-ImageSubscriber::ImageSubscriber(const ImageSubscriber& rhs)
+Subscriber::Subscriber(const Subscriber& rhs)
   : impl_(rhs.impl_)
 {
 }
 
-ImageSubscriber::~ImageSubscriber()
+Subscriber::~Subscriber()
 {
 }
-/*
-void ImageSubscriber::subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops)
-{
-  std::string transport;
-  nh.param(nh.resolveName(ops.topic) + "/transport_type", transport, std::string("raw"));
-  ROS_INFO("Using transport type '%s'", transport.c_str());
-  std::string lookupName = SubscriberPlugin::getLookupName(transport);
-  impl_->subscriber.reset( impl_->loader.createClassInstance(lookupName) );
-  impl_->subscriber->subscribe(nh, ops.topic, ops.queue_size, callback, tracked_object, transport_hints);
-}
-*/
-void ImageSubscriber::subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                                const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                                const ros::VoidPtr& tracked_object,
-                                const ros::TransportHints& transport_hints)
+
+void Subscriber::subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+                           const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+                           const ros::VoidPtr& tracked_object,
+                           const ros::TransportHints& transport_hints)
 {
   std::string transport;
   nh.param(nh.resolveName(topic) + "/transport_type", transport, std::string("raw"));
@@ -87,18 +77,18 @@ void ImageSubscriber::subscribe(ros::NodeHandle& nh, const std::string& topic, u
   impl_->subscriber->subscribe(nh, topic, queue_size, callback, tracked_object, transport_hints);
 }
 
-std::string ImageSubscriber::getTopic() const
+std::string Subscriber::getTopic() const
 {
   return impl_->subscriber->getTopic();
 }
 
-void ImageSubscriber::shutdown()
+void Subscriber::shutdown()
 {
   impl_->subscriber->shutdown();
   impl_->subscriber.reset();
 }
 
-ImageSubscriber::operator void*() const
+Subscriber::operator void*() const
 {
   return (impl_ && impl_->subscriber) ? (void*)1 : (void*)0;
 }

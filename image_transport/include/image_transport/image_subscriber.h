@@ -32,6 +32,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#ifndef IMAGE_TRANSPORT_SUBSCRIBER_H
+#define IMAGE_TRANSPORT_SUBSCRIBER_H
+
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 
@@ -41,25 +44,25 @@ namespace image_transport {
  * \brief Manages a subscription callback on a specific topic that can be interpreted
  * as an Image topic.
  *
- * ImageSubscriber is the client-side counterpart to ImagePublisher. By loading the
- * appropriate plugin, it can interpret any topic advertised by ImagePublisher as
+ * Subscriber is the client-side counterpart to Publisher. By loading the
+ * appropriate plugin, it can interpret any topic advertised by Publisher as
  * Image messages passed to the user callback; the complexity of what transport is
  * actually used is hidden.
  *
- * Once all copies of a specific ImageSubscriber go out of scope, the subscription callback
- * associated with that handle will stop being called. Once all ImageSubscriber for a given
+ * Once all copies of a specific Subscriber go out of scope, the subscription callback
+ * associated with that handle will stop being called. Once all Subscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  *
  * @todo Add CallbackQueueInterface arg to subscribe()?
  */
-class ImageSubscriber
+class Subscriber
 {
 public:
-  ImageSubscriber();
+  Subscriber();
 
-  ImageSubscriber(const ImageSubscriber& rhs);
+  Subscriber(const Subscriber& rhs);
 
-  ~ImageSubscriber();
+  ~Subscriber();
 
   /**
    * \brief Subscribe to a topic, version for arbitrary boost::function object.
@@ -107,14 +110,14 @@ public:
   std::string getTopic() const;
 
   /**
-   * \brief Unsubscribe the callback associated with this ImageSubscriber.
+   * \brief Unsubscribe the callback associated with this Subscriber.
    */
   void shutdown();
 
   operator void*() const;
-  bool operator< (const ImageSubscriber& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const ImageSubscriber& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const ImageSubscriber& rhs) const { return impl_ == rhs.impl_; }
+  bool operator< (const Subscriber& rhs) const { return impl_ <  rhs.impl_; }
+  bool operator!=(const Subscriber& rhs) const { return impl_ != rhs.impl_; }
+  bool operator==(const Subscriber& rhs) const { return impl_ == rhs.impl_; }
   
 private:
   struct Impl;
@@ -122,3 +125,5 @@ private:
 };
 
 } //namespace image_transport
+
+#endif

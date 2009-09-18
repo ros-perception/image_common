@@ -1,5 +1,5 @@
-#ifndef IMAGE_TRANSPORT_CAMERA_IMAGE_SUBSCRIBER_H
-#define IMAGE_TRANSPORT_CAMERA_IMAGE_SUBSCRIBER_H
+#ifndef IMAGE_TRANSPORT_CAMERA_SUBSCRIBER_H
+#define IMAGE_TRANSPORT_CAMERA_SUBSCRIBER_H
 
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -10,21 +10,21 @@ namespace image_transport {
 /**
  * \brief Subscribes to synchronized Image and CameraInfo topics.
  *
- * The image topic may be anything produced by ImagePublisher. The callback
+ * The image topic may be anything produced by Publisher. The callback
  * is of type:
 \verbatim
 void callback(const sensor_msgs::ImageConstPtr&, const sensor_msgs::CameraInfoConstPtr&);
 \endverbatim
  */
-class CameraImageSubscriber
+class CameraSubscriber
 {
 public:
   typedef boost::function<void(const sensor_msgs::ImageConstPtr&,
                                const sensor_msgs::CameraInfoConstPtr&)> Callback;
   
-  CameraImageSubscriber();
+  CameraSubscriber();
 
-  ~CameraImageSubscriber();
+  ~CameraSubscriber();
 
   /**
    * \brief Subscribe to an image topic, inferring the camera info topic name.
@@ -50,7 +50,7 @@ public:
   std::string getInfoTopic() const;
 
   /**
-   * \brief Unsubscribe the callback associated with this CameraImageSubscriber.
+   * \brief Unsubscribe the callback associated with this CameraSubscriber.
    */
   void shutdown();
   

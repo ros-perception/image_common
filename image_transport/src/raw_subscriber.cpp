@@ -10,6 +10,11 @@ RawSubscriber::~RawSubscriber()
 {
 }
 
+std::string RawSubscriber::getTransportName() const
+{
+  return "raw";
+}
+
 void RawSubscriber::subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                               const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                               const ros::VoidPtr& tracked_object,

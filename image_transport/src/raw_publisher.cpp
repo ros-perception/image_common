@@ -4,7 +4,7 @@ namespace image_transport {
 
 RawPublisher::~RawPublisher() {}
 
-std::string RawPublisher::getTransportType() const
+std::string RawPublisher::getTransportName() const
 {
   return "raw";
 }

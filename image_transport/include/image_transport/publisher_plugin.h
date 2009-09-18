@@ -16,17 +16,17 @@ public:
   virtual ~PublisherPlugin() {}
 
   /**
-   * \brief Get a string identifier for the transport type provided by
+   * \brief Get a string identifier for the transport provided by
    * this plugin.
    */
-  virtual std::string getTransportType() const = 0;
+  virtual std::string getTransportName() const = 0;
 
   /**
    * \brief Given a base topic, return the default subtopic for this transport.
    */
   virtual std::string getDefaultTopic(const std::string& base_topic) const
   {
-    return base_topic + "_" + getTransportType();
+    return base_topic + "_" + getTransportName();
   }
 
   /**

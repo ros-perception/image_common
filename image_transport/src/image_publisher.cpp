@@ -41,7 +41,7 @@
 
 namespace image_transport {
 
-struct ImagePublisher::Impl
+struct Publisher::Impl
 {
   Impl()
     : loader("image_transport", "image_transport::PublisherPlugin")
@@ -65,7 +65,7 @@ struct ImagePublisher::Impl
   TransportTopicMap topic_map;
 };
 
-ImagePublisher::ImagePublisher()
+Publisher::Publisher()
   : impl_(new Impl)
 {
   // Default behavior: load all plugins and use default topic names.
@@ -75,19 +75,19 @@ ImagePublisher::ImagePublisher()
   }
 }
 
-ImagePublisher::ImagePublisher(const ImagePublisher& rhs)
+Publisher::Publisher(const Publisher& rhs)
   : impl_(rhs.impl_)
 {
 }
 
-ImagePublisher::~ImagePublisher()
+Publisher::~Publisher()
 {
 }
 
-void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                               const ros::SubscriberStatusCallback& connect_cb,
-                               const ros::SubscriberStatusCallback& disconnect_cb,
-                               const ros::VoidPtr& tracked_object, bool latch)
+void Publisher::advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+                          const ros::SubscriberStatusCallback& connect_cb,
+                          const ros::SubscriberStatusCallback& disconnect_cb,
+                          const ros::VoidPtr& tracked_object, bool latch)
 {
   impl_->topic = nh.resolveName(topic);
   
@@ -100,7 +100,7 @@ void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic, ui
       std::string sub_topic = value.second;
       if (sub_topic.empty())
         sub_topic = pub->getDefaultTopic(impl_->topic);
-      nh.setParam(sub_topic + "/transport_type", pub->getTransportType());
+      nh.setParam(sub_topic + "/transport_type", pub->getTransportName());
       pub->advertise(nh, sub_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
     }
     catch (const std::runtime_error& e) {
@@ -110,14 +110,14 @@ void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic, ui
   }
 }
 
-void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic,
-                               uint32_t queue_size, bool latch)
+void Publisher::advertise(ros::NodeHandle& nh, const std::string& topic,
+                          uint32_t queue_size, bool latch)
 {
   advertise(nh, topic, queue_size, ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(),
             ros::VoidPtr(), latch);
 }
 
-uint32_t ImagePublisher::getNumSubscribers() const
+uint32_t Publisher::getNumSubscribers() const
 {
   uint32_t count = 0;
   BOOST_FOREACH(const PublisherPlugin& pub, impl_->publishers)
@@ -125,22 +125,22 @@ uint32_t ImagePublisher::getNumSubscribers() const
   return count;
 }
 
-std::string ImagePublisher::getTopic() const
+std::string Publisher::getTopic() const
 {
   return impl_->topic;
 }
 
-ImagePublisher::TransportTopicMap& ImagePublisher::getTopicMap()
+Publisher::TransportTopicMap& Publisher::getTopicMap()
 {
   return impl_->topic_map;
 }
 
-const ImagePublisher::TransportTopicMap& ImagePublisher::getTopicMap() const
+const Publisher::TransportTopicMap& Publisher::getTopicMap() const
 {
   return impl_->topic_map;
 }
 
-void ImagePublisher::publish(const sensor_msgs::Image& message) const
+void Publisher::publish(const sensor_msgs::Image& message) const
 {
   BOOST_FOREACH(const PublisherPlugin& pub, impl_->publishers) {
     if (pub.getNumSubscribers() > 0)
@@ -148,12 +148,12 @@ void ImagePublisher::publish(const sensor_msgs::Image& message) const
   }
 }
 
-void ImagePublisher::publish(const sensor_msgs::ImageConstPtr& message) const
+void Publisher::publish(const sensor_msgs::ImageConstPtr& message) const
 {
   publish(*message);
 }
 
-void ImagePublisher::shutdown()
+void Publisher::shutdown()
 {
   impl_->shutdown();
 }

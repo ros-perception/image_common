@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_IMAGE_SUBSCRIBER_FILTER_H
-#define IMAGE_TRANSPORT_IMAGE_SUBSCRIBER_FILTER_H
+#ifndef IMAGE_TRANSPORT_SUBSCRIBER_FILTER_H
+#define IMAGE_TRANSPORT_SUBSCRIBER_FILTER_H
 
 #include <ros/ros.h>
 #include <message_filters/simple_filter.h>
@@ -45,7 +45,7 @@ namespace image_transport {
 /**
  * \brief Image subscription filter.
  *
- * This class wraps ImageSubscriber as a "filter" compatible with the message_filters
+ * This class wraps Subscriber as a "filter" compatible with the message_filters
  * package. It acts as a highest-level filter, simply passing messages from an image
  * transport subscription through to the filters which have connected to it.
  *
@@ -53,15 +53,15 @@ namespace image_transport {
  *
  * \section connections CONNECTIONS
  *
- * ImageSubscriberFilter has no input connection.
+ * SubscriberFilter has no input connection.
  *
- * The output connection for the ImageSubscriberFilter object is the same signature as for roscpp
+ * The output connection for the SubscriberFilter object is the same signature as for roscpp
  * subscription callbacks, ie.
 \verbatim
 void callback(const boost::shared_ptr<const sensor_msgs::Image>&);
 \endverbatim
  */
-class ImageSubscriberFilter : public message_filters::SimpleFilter<sensor_msgs::Image>
+class SubscriberFilter : public message_filters::SimpleFilter<sensor_msgs::Image>
 {
 public:
   /**
@@ -73,23 +73,21 @@ public:
    * \param topic The topic to subscribe to.
    * \param queue_size The subscription queue size
    * \param transport_hints The transport hints to pass along
-   * \param callback_queue The callback queue to pass along
    */
-  ImageSubscriberFilter(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                        const ros::TransportHints& transport_hints = ros::TransportHints(),
-                        ros::CallbackQueueInterface* callback_queue = 0)
+  SubscriberFilter(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+                   const ros::TransportHints& transport_hints = ros::TransportHints())
   {
-    subscribe(nh, topic, queue_size, transport_hints, callback_queue);
+    subscribe(nh, topic, queue_size, transport_hints);
   }
 
   /**
    * \brief Empty constructor, use subscribe() to subscribe to a topic
    */
-  ImageSubscriberFilter()
+  SubscriberFilter()
   {
   }
 
-  ~ImageSubscriberFilter()
+  ~SubscriberFilter()
   {
     unsubscribe();
   }
@@ -103,18 +101,15 @@ public:
    * \param topic The topic to subscribe to.
    * \param queue_size The subscription queue size
    * \param transport_hints The transport hints to pass along
-   * \param callback_queue The callback queue to pass along
    */
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                 const ros::TransportHints& transport_hints = ros::TransportHints(),
-                 ros::CallbackQueueInterface* callback_queue = 0)
+                 const ros::TransportHints& transport_hints = ros::TransportHints())
   {
     unsubscribe();
 
     if (!topic.empty())
     {
-      //! @todo currently ignoring callback_queue
-      sub_.subscribe(nh, topic, queue_size, boost::bind(&ImageSubscriberFilter::cb, this, _1),
+      sub_.subscribe(nh, topic, queue_size, boost::bind(&SubscriberFilter::cb, this, _1),
                      ros::VoidPtr(), transport_hints);
     }
   }
@@ -134,7 +129,7 @@ private:
     signalMessage(m);
   }
 
-  ImageSubscriber sub_;
+  Subscriber sub_;
 };
 
 }
