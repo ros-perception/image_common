@@ -38,7 +38,7 @@
 #include <ros/ros.h>
 #include <message_filters/simple_filter.h>
 
-#include "image_transport/image_subscriber.h"
+#include "image_transport/subscriber.h"
 
 namespace image_transport {
 

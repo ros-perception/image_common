@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "image_transport/image_publisher.h"
+#include "image_transport/publisher.h"
 #include "image_transport/publisher_plugin.h"
 #include <pluginlib/class_loader.h>
 #include <boost/ptr_container/ptr_vector.hpp>

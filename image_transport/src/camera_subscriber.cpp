@@ -1,5 +1,5 @@
-#include "image_transport/camera_image_subscriber.h"
-#include "image_transport/image_subscriber_filter.h"
+#include "image_transport/camera_subscriber.h"
+#include "image_transport/subscriber_filter.h"
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 

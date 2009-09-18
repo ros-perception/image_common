@@ -1,4 +1,4 @@
-#include <image_transport/image_publisher.h>
+#include <image_transport/publisher.h>
 #include <opencv/cvwimage.h>
 #include <opencv/highgui.h>
 #include <opencv_latest/CvBridge.h>

@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "image_transport/image_subscriber.h"
+#include "image_transport/subscriber.h"
 #include "image_transport/subscriber_plugin.h"
 #include <pluginlib/class_loader.h>
 #include <boost/scoped_ptr.hpp>
