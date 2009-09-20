@@ -17,7 +17,6 @@ public:
   virtual ~RawPublisher();
 
   virtual std::string getTransportName() const;
-  virtual std::string getDefaultTopic(const std::string& base_topic) const;
 
   virtual void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                          const ros::SubscriberStatusCallback& connect_cb,

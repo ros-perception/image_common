@@ -19,14 +19,15 @@ You can then link to this documentation page from the Wiki.
 \section codeapi Code API
 When transporting images, you should use image_transport's classes as drop-in
 replacements for ros::Publisher and ros::Subscriber:
-- image_transport::ImagePublisher - advertises subtopics for all available transport options
-- image_transport::ImageSubscriber - subscribes an Image callback to any topic produced by ImagePublisher
+- image_transport::ImageTransport - use this to create a Publisher or Subscriber
+- image_transport::Publisher - advertises subtopics for all available transport options
+- image_transport::Subscriber - subscribes an Image callback to any topic produced by ImagePublisher
 
 Vision applications often require image metadata (camera intrinsics, etc.) published on a
 separate CameraInfo topic, or require special care in sequencing incoming Images. For such
 tasks see:
-- image_transport::CameraImageSubscriber - subscribe a single callback to synchronized image (using any transport) and CameraInfo topics
-- image_transport::ImageSubscriberFilter - a wrapper for ImageSubscriber compatible with message_filters
+- image_transport::CameraSubscriber - subscribe a single callback to synchronized image (using any transport) and CameraInfo topics
+- image_transport::SubscriberFilter - a wrapper for ImageSubscriber compatible with message_filters
 
 Finally, if you are an advanced user implementing your own image transport option, you will need to
 implement these interfaces:
@@ -94,10 +95,8 @@ The datatypes of both topics will depend on which transports are used.
 
 \subsubsection parameters ROS parameters
 
-transform itself does not make use of the parameter server except for normal
-use by the transport classes (checking "in/transport_type" and setting
-"out/transport_type"). Plugins may read or set plugin-specific parameters,
-however.
+transform itself does not make use of the parameter server.
+Plugins may read or set plugin-specific parameters, however.
 
 <!--
 Names are very important in ROS because they can be remapped on the
