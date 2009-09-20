@@ -1,4 +1,4 @@
-#include <image_transport/publisher.h>
+#include <image_transport/image_transport.h>
 #include <opencv/cvwimage.h>
 #include <opencv/highgui.h>
 #include <opencv_latest/CvBridge.h>
@@ -12,9 +12,10 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "test_publisher");
   ros::NodeHandle n;
-  image_transport::Publisher image_pub;
-  image_pub.advertise(n, "raw_image", 1, boost::bind(subscriber_cb, _1, "Connection"),
-                      boost::bind(subscriber_cb, _1, "Disconnection"));
+  image_transport::ImageTransport it(n);
+  image_transport::Publisher pub = it.advertise("raw_image", 1,
+                                                boost::bind(subscriber_cb, _1, "Connection"),
+                                                boost::bind(subscriber_cb, _1, "Disconnection"));
 
   //cv::WImageBuffer3_b image( cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR) );
   cv::WImageBuffer1_b image( cvLoadImage(argv[1], CV_LOAD_IMAGE_GRAYSCALE) );
@@ -25,7 +26,7 @@ int main(int argc, char** argv)
   
   ros::Rate loop_rate(5);
   while (n.ok()) {
-    image_pub.publish(msg);
+    pub.publish(msg);
     ros::spinOnce();
     loop_rate.sleep();
   }

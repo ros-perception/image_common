@@ -22,17 +22,9 @@ public:
   virtual std::string getTransportName() const = 0;
 
   /**
-   * \brief Given a base topic, return the default subtopic for this transport.
-   */
-  virtual std::string getDefaultTopic(const std::string& base_topic) const
-  {
-    return base_topic + "_" + getTransportName();
-  }
-
-  /**
    * \brief Advertise a topic.
    */
-  virtual void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+  virtual void advertise(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                          const ros::SubscriberStatusCallback& connect_cb,
                          const ros::SubscriberStatusCallback& disconnect_cb,
                          const ros::VoidPtr& tracked_object, bool latch) = 0;

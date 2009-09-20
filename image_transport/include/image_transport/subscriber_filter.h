@@ -38,7 +38,7 @@
 #include <ros/ros.h>
 #include <message_filters/simple_filter.h>
 
-#include "image_transport/subscriber.h"
+#include "image_transport/image_transport.h"
 
 namespace image_transport {
 
@@ -75,7 +75,7 @@ public:
    * \param transport_hints The transport hints to pass along
    */
   SubscriberFilter(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                   const ros::TransportHints& transport_hints = ros::TransportHints())
+                   const TransportHints& transport_hints = TransportHints())
   {
     subscribe(nh, topic, queue_size, transport_hints);
   }
@@ -102,16 +102,14 @@ public:
    * \param queue_size The subscription queue size
    * \param transport_hints The transport hints to pass along
    */
-  void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                 const ros::TransportHints& transport_hints = ros::TransportHints())
+  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                 const TransportHints& transport_hints = TransportHints())
   {
     unsubscribe();
 
-    if (!topic.empty())
-    {
-      sub_.subscribe(nh, topic, queue_size, boost::bind(&SubscriberFilter::cb, this, _1),
-                     ros::VoidPtr(), transport_hints);
-    }
+    ImageTransport it(nh);
+    sub_ = it.subscribe(base_topic, queue_size, boost::bind(&SubscriberFilter::cb, this, _1),
+                        ros::VoidPtr(), transport_hints);
   }
 
   /**

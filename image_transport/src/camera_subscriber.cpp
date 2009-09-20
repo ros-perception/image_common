@@ -26,26 +26,26 @@ CameraSubscriber::~CameraSubscriber()
 {
 }
 
-void CameraSubscriber::subscribe(ros::NodeHandle& nh, const std::string& image_topic,
+void CameraSubscriber::subscribe(ros::NodeHandle& nh, const std::string& base_topic,
                                  uint32_t queue_size, const Callback& callback,
                                  const ros::VoidPtr& tracked_object,
-                                 const ros::TransportHints& transport_hints)
+                                 const TransportHints& transport_hints)
 {
-  std::string info_topic = image_topic.substr(0, image_topic.rfind('/')) + "/camera_info";
-  subscribe(nh, image_topic, info_topic, queue_size, callback, tracked_object, transport_hints);
+  std::string info_topic = base_topic.substr(0, base_topic.rfind('/')) + "/camera_info";
+  subscribe(nh, base_topic, info_topic, queue_size, callback, tracked_object, transport_hints);
 }
 
 void CameraSubscriber::subscribe(ros::NodeHandle& nh,
-                                 const std::string& image_topic, const std::string& info_topic,
+                                 const std::string& base_topic, const std::string& info_topic,
                                  uint32_t queue_size, const Callback& callback,
                                  const ros::VoidPtr& tracked_object,
-                                 const ros::TransportHints& transport_hints)
+                                 const TransportHints& transport_hints)
 {
   shutdown();
 
   impl_.reset(new Impl(queue_size));
-  impl_->image_sub_.subscribe(nh, image_topic, queue_size, transport_hints);
-  impl_->info_sub_.subscribe(nh, info_topic, queue_size, transport_hints);
+  impl_->image_sub_.subscribe(nh, base_topic, queue_size, transport_hints);
+  impl_->info_sub_.subscribe(nh, info_topic, queue_size, transport_hints.getRosHints());
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
   /// @todo: need for Boost.Bind here is pretty broken
   impl_->sync_.registerCallback(boost::bind(callback, _1, _2));

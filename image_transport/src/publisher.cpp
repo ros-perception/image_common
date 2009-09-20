@@ -50,6 +50,7 @@ struct Publisher::Impl
 
   ~Impl()
   {
+    /// @todo Is this necessary & correct?
     shutdown();
   }
   
@@ -59,20 +60,13 @@ struct Publisher::Impl
       pub.shutdown();
   }
   
-  std::string topic;
+  std::string base_topic;
   pluginlib::ClassLoader<PublisherPlugin> loader;
   boost::ptr_vector<PublisherPlugin> publishers;
-  TransportTopicMap topic_map;
 };
 
 Publisher::Publisher()
-  : impl_(new Impl)
 {
-  // Default behavior: load all plugins and use default topic names.
-  BOOST_FOREACH(std::string lookup_name, impl_->loader.getDeclaredClasses()) {
-    boost::erase_last(lookup_name, "_pub");
-    impl_->topic_map[lookup_name] = "";
-  }
 }
 
 Publisher::Publisher(const Publisher& rhs)
@@ -84,37 +78,26 @@ Publisher::~Publisher()
 {
 }
 
-void Publisher::advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                          const ros::SubscriberStatusCallback& connect_cb,
-                          const ros::SubscriberStatusCallback& disconnect_cb,
-                          const ros::VoidPtr& tracked_object, bool latch)
+Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                     const ros::SubscriberStatusCallback& connect_cb,
+                     const ros::SubscriberStatusCallback& disconnect_cb,
+                     const ros::VoidPtr& tracked_object, bool latch)
+  : impl_(new Impl)
 {
-  impl_->topic = nh.resolveName(topic);
+  impl_->base_topic = nh.resolveName(base_topic);
   
-  BOOST_FOREACH(const TransportTopicMap::value_type& value, impl_->topic_map) {
-    std::string lookup_name = value.first + "_pub";
-    //ROS_INFO("Loading %s", lookup_name.c_str());
+  BOOST_FOREACH(const std::string& lookup_name, impl_->loader.getDeclaredClasses()) {
     try {
       PublisherPlugin* pub = impl_->loader.createClassInstance(lookup_name);
       impl_->publishers.push_back(pub);
-      std::string sub_topic = value.second;
-      if (sub_topic.empty())
-        sub_topic = pub->getDefaultTopic(impl_->topic);
-      nh.setParam(sub_topic + "/transport_type", pub->getTransportName());
-      pub->advertise(nh, sub_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
+      pub->advertise(nh, impl_->base_topic, queue_size, connect_cb,
+                     disconnect_cb, tracked_object, latch);
     }
     catch (const std::runtime_error& e) {
       ROS_WARN("Failed to load plugin %s, error string: %s",
                lookup_name.c_str(), e.what());
     }
   }
-}
-
-void Publisher::advertise(ros::NodeHandle& nh, const std::string& topic,
-                          uint32_t queue_size, bool latch)
-{
-  advertise(nh, topic, queue_size, ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(),
-            ros::VoidPtr(), latch);
 }
 
 uint32_t Publisher::getNumSubscribers() const
@@ -127,17 +110,7 @@ uint32_t Publisher::getNumSubscribers() const
 
 std::string Publisher::getTopic() const
 {
-  return impl_->topic;
-}
-
-Publisher::TransportTopicMap& Publisher::getTopicMap()
-{
-  return impl_->topic_map;
-}
-
-const Publisher::TransportTopicMap& Publisher::getTopicMap() const
-{
-  return impl_->topic_map;
+  return impl_->base_topic;
 }
 
 void Publisher::publish(const sensor_msgs::Image& message) const

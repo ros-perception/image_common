@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
+#include "image_transport/transport_hints.h"
 
 namespace image_transport {
 
@@ -24,27 +25,31 @@ public:
   
   CameraSubscriber();
 
+  CameraSubscriber(const CameraSubscriber& rhs);
+
   ~CameraSubscriber();
 
   /**
-   * \brief Subscribe to an image topic, inferring the camera info topic name.
+   * \brief Subscribe to a synchronized image & camera info topic pair.
    *
-   * The info topic is assumed to be named "camera_info" in the same namespace
-   * as the image topic.
+   * This version assumes the standard topic naming scheme, where the info topic is
+   * named "camera_info" in the same namespace as the base image topic.
    */
-  void subscribe(ros::NodeHandle& nh, const std::string& image_topic,
+  void subscribe(ros::NodeHandle& nh, const std::string& base_topic,
                  uint32_t queue_size, const Callback& callback,
                  const ros::VoidPtr& tracked_object = ros::VoidPtr(),
-                 const ros::TransportHints& transport_hints = ros::TransportHints());
+                 const TransportHints& transport_hints = TransportHints());
 
   /**
    * \brief Subscribe to a synchronized image & camera info topic pair.
+   *
+   * Specify the info topic explicitly, for non-standard use cases.
    */
   void subscribe(ros::NodeHandle& nh,
-                 const std::string& image_topic, const std::string& info_topic,
+                 const std::string& base_topic, const std::string& info_topic,
                  uint32_t queue_size, const Callback& callback,
                  const ros::VoidPtr& tracked_object = ros::VoidPtr(),
-                 const ros::TransportHints& transport_hints = ros::TransportHints());
+                 const TransportHints& transport_hints = TransportHints());
 
   std::string getImageTopic() const;
   std::string getInfoTopic() const;

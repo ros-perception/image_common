@@ -37,6 +37,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
+#include "image_transport/transport_hints.h"
 
 namespace image_transport {
 
@@ -49,6 +50,8 @@ namespace image_transport {
  * Image messages passed to the user callback; the complexity of what transport is
  * actually used is hidden.
  *
+ * A Subscriber should always be created through a call to ImageTransport::subscribe(),
+ * or copied from one that was.
  * Once all copies of a specific Subscriber go out of scope, the subscription callback
  * associated with that handle will stop being called. Once all Subscriber for a given
  * topic go out of scope the topic will be unsubscribed.
@@ -64,49 +67,6 @@ public:
 
   ~Subscriber();
 
-  /**
-   * \brief Subscribe to a topic, version for arbitrary boost::function object.
-   */
-  void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                 const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                 const ros::VoidPtr& tracked_object = ros::VoidPtr(),
-                 const ros::TransportHints& transport_hints = ros::TransportHints());
-
-  /**
-   * \brief Subscribe to a topic, version for bare function.
-   */
-  void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                 void(*fp)(const sensor_msgs::ImageConstPtr&),
-                 const ros::TransportHints& transport_hints = ros::TransportHints())
-  {
-    subscribe(nh, topic, queue_size,
-              boost::function<void(const sensor_msgs::ImageConstPtr&)>(fp),
-              ros::VoidPtr(), transport_hints);
-  }
-
-  /**
-   * \brief Subscribe to a topic, version for class member function with bare pointer.
-   */
-  template<class T>
-  void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                 void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
-                 const ros::TransportHints& transport_hints = ros::TransportHints())
-  {
-    subscribe(nh, topic, queue_size, boost::bind(fp, obj, _1), ros::VoidPtr(), transport_hints);
-  }
-
-  /**
-   * \brief Subscribe to a topic, version for class member function with shared_ptr.
-   */
-  template<class T>
-  void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                 void(T::*fp)(const sensor_msgs::ImageConstPtr&),
-                 const boost::shared_ptr<T>& obj,
-                 const ros::TransportHints& transport_hints = ros::TransportHints())
-  {
-    subscribe(nh, topic, queue_size, boost::bind(fp, obj.get(), _1), obj, transport_hints);
-  }
-
   std::string getTopic() const;
 
   /**
@@ -120,8 +80,14 @@ public:
   bool operator==(const Subscriber& rhs) const { return impl_ == rhs.impl_; }
   
 private:
+  Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+             const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+             const ros::VoidPtr& tracked_object, const TransportHints& transport_hints);
+  
   struct Impl;
   boost::shared_ptr<Impl> impl_;
+
+  friend class ImageTransport;
 };
 
 } //namespace image_transport

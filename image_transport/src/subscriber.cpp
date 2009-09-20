@@ -64,17 +64,14 @@ Subscriber::~Subscriber()
 {
 }
 
-void Subscriber::subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                           const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                           const ros::VoidPtr& tracked_object,
-                           const ros::TransportHints& transport_hints)
+Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                       const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+                       const ros::VoidPtr& tracked_object, const TransportHints& transport_hints)
 {
-  std::string transport;
-  nh.param(nh.resolveName(topic) + "/transport_type", transport, std::string("raw"));
-  ROS_INFO("Using transport type '%s'", transport.c_str());
-  std::string lookupName = SubscriberPlugin::getLookupName(transport);
+  std::string lookupName = SubscriberPlugin::getLookupName(transport_hints.getTransport());
   impl_->subscriber.reset( impl_->loader.createClassInstance(lookupName) );
-  impl_->subscriber->subscribe(nh, topic, queue_size, callback, tracked_object, transport_hints);
+  impl_->subscriber->subscribe(nh, base_topic, queue_size, callback, tracked_object,
+                               transport_hints.getRosHints());
 }
 
 std::string Subscriber::getTopic() const
