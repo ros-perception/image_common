@@ -55,8 +55,6 @@ namespace image_transport {
  * Once all copies of a specific Subscriber go out of scope, the subscription callback
  * associated with that handle will stop being called. Once all Subscriber for a given
  * topic go out of scope the topic will be unsubscribed.
- *
- * @todo Add CallbackQueueInterface arg to subscribe()?
  */
 class Subscriber
 {

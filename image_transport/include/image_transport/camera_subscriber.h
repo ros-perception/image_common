@@ -30,38 +30,35 @@ public:
   ~CameraSubscriber();
 
   /**
-   * \brief Subscribe to a synchronized image & camera info topic pair.
-   *
-   * This version assumes the standard topic naming scheme, where the info topic is
-   * named "camera_info" in the same namespace as the base image topic.
+   * \brief Get the base topic (on which the raw image is published).
    */
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic,
-                 uint32_t queue_size, const Callback& callback,
-                 const ros::VoidPtr& tracked_object = ros::VoidPtr(),
-                 const TransportHints& transport_hints = TransportHints());
+  std::string getTopic() const;
 
   /**
-   * \brief Subscribe to a synchronized image & camera info topic pair.
-   *
-   * Specify the info topic explicitly, for non-standard use cases.
+   * \brief Get the camera info topic.
    */
-  void subscribe(ros::NodeHandle& nh,
-                 const std::string& base_topic, const std::string& info_topic,
-                 uint32_t queue_size, const Callback& callback,
-                 const ros::VoidPtr& tracked_object = ros::VoidPtr(),
-                 const TransportHints& transport_hints = TransportHints());
-
-  std::string getImageTopic() const;
   std::string getInfoTopic() const;
 
   /**
    * \brief Unsubscribe the callback associated with this CameraSubscriber.
    */
   void shutdown();
+
+  operator void*() const;
+  bool operator< (const CameraSubscriber& rhs) const { return impl_ <  rhs.impl_; }
+  bool operator!=(const CameraSubscriber& rhs) const { return impl_ != rhs.impl_; }
+  bool operator==(const CameraSubscriber& rhs) const { return impl_ == rhs.impl_; }
   
 private:
+  CameraSubscriber(ros::NodeHandle& nh, const std::string& base_topic,
+                   uint32_t queue_size, const Callback& callback,
+                   const ros::VoidPtr& tracked_object = ros::VoidPtr(),
+                   const TransportHints& transport_hints = TransportHints());
+  
   struct Impl;
   boost::shared_ptr<Impl> impl_;
+
+  friend class ImageTransport;
 };
 
 } //namespace image_transport

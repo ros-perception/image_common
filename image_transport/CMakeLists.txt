@@ -17,11 +17,11 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_boost_directories()
-rosbuild_add_library(${PROJECT_NAME} src/publisher.cpp src/subscriber.cpp src/image_transport.cpp src/camera_subscriber.cpp src/raw_publisher.cpp src/raw_subscriber.cpp src/manifest.cpp)
+rosbuild_add_library(${PROJECT_NAME} src/publisher.cpp src/subscriber.cpp src/image_transport.cpp src/camera_publisher.cpp src/camera_subscriber.cpp src/raw_publisher.cpp src/raw_subscriber.cpp src/manifest.cpp)
 rosbuild_link_boost(${PROJECT_NAME} system)
 
-#rosbuild_add_executable(transform src/transform.cpp)
-#target_link_libraries(transform ${PROJECT_NAME})
+rosbuild_add_executable(republish src/republish.cpp)
+target_link_libraries(republish ${PROJECT_NAME})
 
 rosbuild_add_executable(list_transports src/list_transports.cpp)
 target_link_libraries(list_transports ${PROJECT_NAME})

@@ -120,6 +120,11 @@ public:
     sub_.shutdown();
   }
 
+  std::string getTopic() const
+  {
+    return sub_.getTopic();
+  }
+
 private:
 
   void cb(const sensor_msgs::ImageConstPtr& m)

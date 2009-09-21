@@ -32,11 +32,12 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_PUBLISHER_H
-#define IMAGE_TRANSPORT_PUBLISHER_H
+#ifndef IMAGE_TRANSPORT_CAMERA_PUBLISHER_H
+#define IMAGE_TRANSPORT_CAMERA_PUBLISHER_H
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/CameraInfo.h>
 
 namespace image_transport {
 
@@ -57,37 +58,51 @@ namespace image_transport {
  * associated with that handle will stop being called. Once all Publisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
-class Publisher
+class CameraPublisher
 {
 public:
-  Publisher();
+  CameraPublisher();
 
-  Publisher(const Publisher& rhs);
+  CameraPublisher(const CameraPublisher& rhs);
   
-  ~Publisher();
+  ~CameraPublisher();
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to
-   * this Publisher.
+   * this CameraPublisher.
    *
    * Returns the total number of subscribers to all advertised topics.
    */
   uint32_t getNumSubscribers() const;
 
   /*!
-   * \brief Returns the base topic of this Publisher.
+   * \brief Returns the base (image) topic of this CameraPublisher.
    */
   std::string getTopic() const;
 
-  /*!
-   * \brief Publish an image on the topics associated with this Publisher.
+  /**
+   * \brief Returns the camera info topic of this CameraPublisher.
    */
-  void publish(const sensor_msgs::Image& message) const;
+  std::string getInfoTopic() const;
 
   /*!
-   * \brief Publish an image on the topics associated with this Publisher.
+   * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  void publish(const sensor_msgs::ImageConstPtr& message) const;
+  void publish(const sensor_msgs::Image& image, const sensor_msgs::CameraInfo& info) const;
+
+  /*!
+   * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
+   */
+  void publish(const sensor_msgs::ImageConstPtr& image,
+               const sensor_msgs::CameraInfoConstPtr& info) const;
+
+  /*!
+   * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
+   *
+   * Convenience version, which sets the timestamps of both image and info to stamp before
+   * publishing.
+   */
+  void publish(sensor_msgs::Image& image, sensor_msgs::CameraInfo& info, ros::Time stamp) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
@@ -95,15 +110,19 @@ public:
   void shutdown();
 
   operator void*() const { return impl_ ? (void*)1 : (void*)0; }
-  bool operator< (const Publisher& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const Publisher& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const Publisher& rhs) const { return impl_ == rhs.impl_; }
+  bool operator< (const CameraPublisher& rhs) const { return impl_ <  rhs.impl_; }
+  bool operator!=(const CameraPublisher& rhs) const { return impl_ != rhs.impl_; }
+  bool operator==(const CameraPublisher& rhs) const { return impl_ == rhs.impl_; }
 
 private:
-  Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-            const ros::SubscriberStatusCallback& connect_cb,
-            const ros::SubscriberStatusCallback& disconnect_cb,
-            const ros::VoidPtr& tracked_object, bool latch);
+  /*
+  CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                  const ros::SubscriberStatusCallback& connect_cb,
+                  const ros::SubscriberStatusCallback& disconnect_cb,
+                  const ros::VoidPtr& tracked_object, bool latch);
+  */
+  CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic,
+                  uint32_t queue_size, bool latch);
   
   struct Impl;
   boost::shared_ptr<Impl> impl_;
