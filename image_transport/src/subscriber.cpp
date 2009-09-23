@@ -82,8 +82,10 @@ std::string Subscriber::getTopic() const
 
 void Subscriber::shutdown()
 {
-  impl_->subscriber->shutdown();
-  impl_->subscriber.reset();
+  if (impl_->subscriber) {
+    impl_->subscriber->shutdown();
+    impl_->subscriber.reset();
+  }
 }
 
 Subscriber::operator void*() const
