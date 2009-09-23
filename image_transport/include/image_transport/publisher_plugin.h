@@ -18,13 +18,34 @@ public:
   /**
    * \brief Get a string identifier for the transport provided by
    * this plugin.
+   *
+   * @todo Make pure virtual when removing 0.1-compatibility.
    */
-  virtual std::string getTransportName() const = 0;
+  virtual std::string getTransportName() const
+  {
+    return "unknown";
+  }
+
+  /**
+   * \brief Get a string identifier for the transport provided by
+   * this plugin.
+   *
+   * @deprecated Use getTransportName() instead.
+   */
+  ROSCPP_DEPRECATED virtual std::string getTransportType() const { return getTransportName(); }
+
+  //! @deprecated For 0.1 compatibility only.
+  ROSCPP_DEPRECATED virtual std::string getDefaultTopic(const std::string& base_topic) const
+  {
+    return base_topic + "/" + getTransportType();
+  }
 
   /**
    * \brief Advertise a topic, simple version.
+   *
+   * @todo Make non-virtual when removing 0.1-compatibility.
    */
-  void advertise(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+  virtual void advertise(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                  bool latch = true)
   {
     advertiseImpl(nh, base_topic, queue_size, SubscriberStatusCallback(),
@@ -75,19 +96,27 @@ public:
    * \brief Return the lookup name of the PublisherPlugin associated with a specific
    * transport identifier.
    */
-  static std::string getLookupName(const std::string& transport_type)
+  static std::string getLookupName(const std::string& transport_name)
   {
-    return transport_type + "_pub";
+    return transport_name + "_pub";
   }
 
 protected:
   /**
    * \brief Advertise a topic. Must be implemented by the subclass.
+   *
+   * @todo Make pure virtual when removing 0.1-compatibility.
    */
   virtual void advertiseImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                              const SubscriberStatusCallback& connect_cb,
                              const SubscriberStatusCallback& disconnect_cb,
-                             const ros::VoidPtr& tracked_object, bool latch) = 0;
+                             const ros::VoidPtr& tracked_object, bool latch)
+  {
+    ROS_ERROR("Publisher plugin for '%s' is incompatible with Publisher. It may work with ImagePublisher "
+              "(deprecated), but should be updated to the image_transport 0.2 interface.",
+              getTransportType().c_str());
+    //ROS_BREAK();
+  }
 };
 
 } //namespace image_transport
