@@ -94,8 +94,8 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
                      rebindCB(disconnect_cb), tracked_object, latch);
     }
     catch (const std::runtime_error& e) {
-      ROS_WARN("Failed to load plugin %s, error string: %s",
-               lookup_name.c_str(), e.what());
+      ROS_DEBUG("Failed to load plugin %s, error string: %s",
+                lookup_name.c_str(), e.what());
     }
   }
 }
