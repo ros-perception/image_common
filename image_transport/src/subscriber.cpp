@@ -67,9 +67,10 @@ Subscriber::~Subscriber()
 Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                        const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                        const ros::VoidPtr& tracked_object, const TransportHints& transport_hints)
+  : impl_(new Impl)
 {
-  std::string lookupName = SubscriberPlugin::getLookupName(transport_hints.getTransport());
-  impl_->subscriber.reset( impl_->loader.createClassInstance(lookupName) );
+  std::string lookup_name = SubscriberPlugin::getLookupName(transport_hints.getTransport());
+  impl_->subscriber.reset( impl_->loader.createClassInstance(lookup_name) );
   impl_->subscriber->subscribe(nh, base_topic, queue_size, callback, tracked_object,
                                transport_hints.getRosHints());
 }
