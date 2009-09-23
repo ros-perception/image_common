@@ -69,14 +69,20 @@ CameraPublisher::~CameraPublisher()
 {
 }
 
-CameraPublisher::CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic,
-                                 uint32_t queue_size, bool latch)
+CameraPublisher::CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                                 const SubscriberStatusCallback& image_connect_cb,
+                                 const SubscriberStatusCallback& image_disconnect_cb,
+                                 const ros::SubscriberStatusCallback& info_connect_cb,
+                                 const ros::SubscriberStatusCallback& info_disconnect_cb,
+                                 const ros::VoidPtr& tracked_object, bool latch)
   : impl_(new Impl)
 {
   std::string info_topic = base_topic.substr(0, base_topic.rfind('/')) + "/camera_info";
   ImageTransport it(nh);
-  impl_->image_pub_ = it.advertise(base_topic, queue_size, latch);
-  impl_->info_pub_ = nh.advertise<sensor_msgs::CameraInfo>(info_topic, queue_size, latch);
+  impl_->image_pub_ = it.advertise(base_topic, queue_size, image_connect_cb,
+                                   image_disconnect_cb, tracked_object, latch);
+  impl_->info_pub_ = nh.advertise<sensor_msgs::CameraInfo>(info_topic, queue_size, info_connect_cb,
+                                                           info_disconnect_cb, tracked_object, latch);
 }
 
 uint32_t CameraPublisher::getNumSubscribers() const

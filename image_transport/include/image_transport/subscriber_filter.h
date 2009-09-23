@@ -70,14 +70,14 @@ public:
    * See the ros::NodeHandle::subscribe() variants for more information on the parameters
    *
    * \param nh The ros::NodeHandle to use to subscribe.
-   * \param topic The topic to subscribe to.
+   * \param base_topic The topic to subscribe to.
    * \param queue_size The subscription queue size
    * \param transport_hints The transport hints to pass along
    */
-  SubscriberFilter(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+  SubscriberFilter(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                    const TransportHints& transport_hints = TransportHints())
   {
-    subscribe(nh, topic, queue_size, transport_hints);
+    subscribe(nh, base_topic, queue_size, transport_hints);
   }
 
   /**
@@ -98,7 +98,7 @@ public:
    * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
    *
    * \param nh The ros::NodeHandle to use to subscribe.
-   * \param topic The topic to subscribe to.
+   * \param base_topic The topic to subscribe to.
    * \param queue_size The subscription queue size
    * \param transport_hints The transport hints to pass along
    */

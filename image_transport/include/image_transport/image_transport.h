@@ -8,6 +8,14 @@
 
 namespace image_transport {
 
+/**
+ * \brief Advertise and subscribe to image topics.
+ *
+ * ImageTransport is analogous to ros::NodeHandle in that it contains advertise() and
+ * subscribe() functions for creating advertisements and subscriptions of image topics.
+ *
+ * @todo Move class loaders into ImageTransport? At least only get rospack warnings once...
+ */
 class ImageTransport
 {
 public:
@@ -22,8 +30,8 @@ public:
    * \brief Advertise an image topic with subcriber status callbacks.
    */
   Publisher advertise(const std::string& base_topic, uint32_t queue_size,
-                      const ros::SubscriberStatusCallback& connect_cb,
-                      const ros::SubscriberStatusCallback& disconnect_cb = ros::SubscriberStatusCallback(),
+                      const SubscriberStatusCallback& connect_cb,
+                      const SubscriberStatusCallback& disconnect_cb = SubscriberStatusCallback(),
                       const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = false);
 
   /**
@@ -70,9 +78,20 @@ public:
   }
 
   /*!
-   * \brief Advertise a synchronized camera raw image + info topic pair.
+   * \brief Advertise a synchronized camera raw image + info topic pair, simple version.
    */
   CameraPublisher advertiseCamera(const std::string& base_topic, uint32_t queue_size, bool latch = false);
+
+  /*!
+   * \brief Advertise a synchronized camera raw image + info topic pair with subscriber status
+   * callbacks.
+   */
+  CameraPublisher advertiseCamera(const std::string& base_topic, uint32_t queue_size,
+                                  const SubscriberStatusCallback& image_connect_cb,
+                                  const SubscriberStatusCallback& image_disconnect_cb = SubscriberStatusCallback(),
+                                  const ros::SubscriberStatusCallback& info_connect_cb = ros::SubscriberStatusCallback(),
+                                  const ros::SubscriberStatusCallback& info_disconnect_cb = ros::SubscriberStatusCallback(),
+                                  const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = false);
 
   /**
    * \brief Subscribe to a synchronized image & camera info topic pair, version for arbitrary

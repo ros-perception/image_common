@@ -18,11 +18,6 @@ public:
 
   virtual std::string getTransportName() const;
 
-  virtual void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                         const ros::SubscriberStatusCallback& connect_cb,
-                         const ros::SubscriberStatusCallback& disconnect_cb,
-                         const ros::VoidPtr& tracked_object, bool latch);
-
   virtual uint32_t getNumSubscribers() const;
   virtual std::string getTopic() const;
 
@@ -32,6 +27,16 @@ public:
 
 protected:
   ros::Publisher pub_;
+
+  virtual void advertiseImpl(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
+                             const SubscriberStatusCallback& connect_cb,
+                             const SubscriberStatusCallback& disconnect_cb,
+                             const ros::VoidPtr& tracked_object, bool latch);
+
+  ros::SubscriberStatusCallback bindCB(const SubscriberStatusCallback& user_cb);
+  
+  void subscriberCB(const ros::SingleSubscriberPublisher& ros_pub,
+                    const SubscriberStatusCallback& user_cb);
 };
 
 } //namespace image_transport

@@ -38,24 +38,23 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
+#include "image_transport/single_subscriber_publisher.h"
 
 namespace image_transport {
 
 /**
- * \brief Manages advertisements of multiple transport options on an Image topic.
+ * \brief Manages advertisements for publishing camera images.
  *
- * Publisher is a drop-in replacement for ros::Publisher when publishing
- * Image topics. In a minimally built environment, they behave the same; however,
- * Publisher is extensible via plugins to publish alternative representations of
- * the image on related subtopics. This is especially useful for limiting bandwidth and
- * latency over a network connection, when you might (for example) use the theora plugin
- * to transport the images as streamed video. All topics are published only on demand
- * (i.e. if there are subscribers).
+ * CameraPublisher is a convenience class for publishing synchronized image and
+ * camera info topics using the standard topic naming convention, where the info
+ * topic name is "camera_info" in the namespace of the base image topic.
  *
- * A Publisher should always be created through a call to ImageTransport::advertise(),
- * or copied from one that was.
- * Once all copies of a specific Publisher go out of scope, any subscriber callbacks
- * associated with that handle will stop being called. Once all Publisher for a
+ * On the client side, CameraSubscriber simplifies subscribing to camera images.
+ *
+ * A CameraPublisher should always be created through a call to
+ * ImageTransport::advertiseCamera(), or copied from one that was.
+ * Once all copies of a specific CameraPublisher go out of scope, any subscriber callbacks
+ * associated with that handle will stop being called. Once all CameraPublisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
 class CameraPublisher
@@ -71,7 +70,7 @@ public:
    * \brief Returns the number of subscribers that are currently connected to
    * this CameraPublisher.
    *
-   * Returns the total number of subscribers to all advertised topics.
+   * Returns max(image topic subscribers, info topic subscribers).
    */
   uint32_t getNumSubscribers() const;
 
@@ -115,14 +114,12 @@ public:
   bool operator==(const CameraPublisher& rhs) const { return impl_ == rhs.impl_; }
 
 private:
-  /*
   CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                  const ros::SubscriberStatusCallback& connect_cb,
-                  const ros::SubscriberStatusCallback& disconnect_cb,
+                  const SubscriberStatusCallback& image_connect_cb,
+                  const SubscriberStatusCallback& image_disconnect_cb,
+                  const ros::SubscriberStatusCallback& info_connect_cb,
+                  const ros::SubscriberStatusCallback& info_disconnect_cb,
                   const ros::VoidPtr& tracked_object, bool latch);
-  */
-  CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic,
-                  uint32_t queue_size, bool latch);
   
   struct Impl;
   boost::shared_ptr<Impl> impl_;

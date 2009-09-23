@@ -37,6 +37,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
+#include "image_transport/single_subscriber_publisher.h"
 
 namespace image_transport {
 
@@ -101,9 +102,14 @@ public:
 
 private:
   Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-            const ros::SubscriberStatusCallback& connect_cb,
-            const ros::SubscriberStatusCallback& disconnect_cb,
+            const SubscriberStatusCallback& connect_cb,
+            const SubscriberStatusCallback& disconnect_cb,
             const ros::VoidPtr& tracked_object, bool latch);
+
+  SubscriberStatusCallback rebindCB(const SubscriberStatusCallback& user_cb);
+  
+  void subscriberCB(const SingleSubscriberPublisher& plugin_pub,
+                    const SubscriberStatusCallback& user_cb);
   
   struct Impl;
   boost::shared_ptr<Impl> impl_;

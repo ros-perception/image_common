@@ -19,16 +19,16 @@ public:
   virtual ~RawSubscriber();
 
   virtual std::string getTransportName() const;
-
-  virtual void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                         const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                         const ros::VoidPtr& tracked_object,
-                         const ros::TransportHints& transport_hints);
   
   virtual std::string getTopic() const;
 
   virtual void shutdown();
 
+protected:
+  virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                             const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+                             const ros::VoidPtr& tracked_object, const ros::TransportHints& transport_hints);
+  
 private:
   ros::Subscriber sub_;
 };

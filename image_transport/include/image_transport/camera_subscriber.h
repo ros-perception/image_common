@@ -9,13 +9,19 @@
 namespace image_transport {
 
 /**
- * \brief Subscribes to synchronized Image and CameraInfo topics.
+ * \brief Manages a subscription callback on synchronized Image and CameraInfo topics.
  *
- * The image topic may be anything produced by Publisher. The callback
- * is of type:
+ * CameraSubscriber is the client-side counterpart to CameraPublisher, and assumes the
+ * same topic naming convention. The callback is of type:
 \verbatim
 void callback(const sensor_msgs::ImageConstPtr&, const sensor_msgs::CameraInfoConstPtr&);
 \endverbatim
+ *
+ * A CameraSubscriber should always be created through a call to
+ * ImageTransport::subscribeCamera(), or copied from one that was.
+ * Once all copies of a specific CameraSubscriber go out of scope, the subscription callback
+ * associated with that handle will stop being called. Once all CameraSubscriber for a given
+ * topic go out of scope the topic will be unsubscribed.
  */
 class CameraSubscriber
 {

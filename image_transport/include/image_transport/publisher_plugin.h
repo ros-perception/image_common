@@ -3,7 +3,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
-#include <boost/noncopyable.hpp>
+#include "image_transport/single_subscriber_publisher.h"
 
 namespace image_transport {
 
@@ -22,12 +22,25 @@ public:
   virtual std::string getTransportName() const = 0;
 
   /**
-   * \brief Advertise a topic.
+   * \brief Advertise a topic, simple version.
    */
-  virtual void advertise(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                         const ros::SubscriberStatusCallback& connect_cb,
-                         const ros::SubscriberStatusCallback& disconnect_cb,
-                         const ros::VoidPtr& tracked_object, bool latch) = 0;
+  void advertise(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                 bool latch = true)
+  {
+    advertiseImpl(nh, base_topic, queue_size, SubscriberStatusCallback(),
+                  SubscriberStatusCallback(), ros::VoidPtr(), latch);
+  }
+  
+  /**
+   * \brief Advertise a topic with subscriber status callbacks.
+   */
+  void advertise(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                 const SubscriberStatusCallback& connect_cb,
+                 const SubscriberStatusCallback& disconnect_cb = SubscriberStatusCallback(),
+                 const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = true)
+  {
+    advertiseImpl(nh, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
+  }
 
   /**
    * \brief Returns the number of subscribers that are currently connected to
@@ -66,6 +79,15 @@ public:
   {
     return transport_type + "_pub";
   }
+
+protected:
+  /**
+   * \brief Advertise a topic. Must be implemented by the subclass.
+   */
+  virtual void advertiseImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                             const SubscriberStatusCallback& connect_cb,
+                             const SubscriberStatusCallback& disconnect_cb,
+                             const ros::VoidPtr& tracked_object, bool latch) = 0;
 };
 
 } //namespace image_transport

@@ -37,8 +37,8 @@ int main(int argc, char** argv)
     pluginlib::ClassLoader<Plugin> loader("image_transport", "image_transport::PublisherPlugin");
     std::string lookup_name = Plugin::getLookupName(out_transport);
     boost::shared_ptr<Plugin> pub( loader.createClassInstance(lookup_name) );
-    pub->advertise(nh, out_topic, 1, ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(),
-                   ros::VoidPtr(), false);
+    pub->advertise(nh, out_topic, 1, image_transport::SubscriberStatusCallback(),
+                   image_transport::SubscriberStatusCallback(), ros::VoidPtr(), false);
 
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;

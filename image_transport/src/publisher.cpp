@@ -79,8 +79,8 @@ Publisher::~Publisher()
 }
 
 Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                     const ros::SubscriberStatusCallback& connect_cb,
-                     const ros::SubscriberStatusCallback& disconnect_cb,
+                     const SubscriberStatusCallback& connect_cb,
+                     const SubscriberStatusCallback& disconnect_cb,
                      const ros::VoidPtr& tracked_object, bool latch)
   : impl_(new Impl)
 {
@@ -90,8 +90,8 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
     try {
       PublisherPlugin* pub = impl_->loader.createClassInstance(lookup_name);
       impl_->publishers.push_back(pub);
-      pub->advertise(nh, impl_->base_topic, queue_size, connect_cb,
-                     disconnect_cb, tracked_object, latch);
+      pub->advertise(nh, impl_->base_topic, queue_size, rebindCB(connect_cb),
+                     rebindCB(disconnect_cb), tracked_object, latch);
     }
     catch (const std::runtime_error& e) {
       ROS_WARN("Failed to load plugin %s, error string: %s",
@@ -129,6 +129,23 @@ void Publisher::publish(const sensor_msgs::ImageConstPtr& message) const
 void Publisher::shutdown()
 {
   impl_->shutdown();
+}
+
+SubscriberStatusCallback Publisher::rebindCB(const SubscriberStatusCallback& user_cb)
+{
+  if (user_cb)
+    return boost::bind(&Publisher::subscriberCB, this, _1, user_cb);
+  else
+    return SubscriberStatusCallback();
+}
+
+void Publisher::subscriberCB(const SingleSubscriberPublisher& plugin_pub,
+                             const SubscriberStatusCallback& user_cb)
+{
+  SingleSubscriberPublisher ssp(plugin_pub.getSubscriberCallerID(), getTopic(),
+                                boost::bind(&Publisher::getNumSubscribers, this),
+                                plugin_pub.publish_fn_);
+  user_cb(ssp);
 }
 
 } //namespace image_transport
