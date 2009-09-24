@@ -13,8 +13,6 @@ namespace image_transport {
  *
  * ImageTransport is analogous to ros::NodeHandle in that it contains advertise() and
  * subscribe() functions for creating advertisements and subscriptions of image topics.
- *
- * @todo Move class loaders into ImageTransport? At least only get rospack warnings once...
  */
 class ImageTransport
 {
@@ -147,6 +145,7 @@ public:
   }
 
 private:
+  /// @todo Move class loaders into ImageTransport to be shared among subscribers and publishers.
   ros::NodeHandle nh_;
 };
 

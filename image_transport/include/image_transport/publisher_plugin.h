@@ -70,7 +70,7 @@ public:
   virtual uint32_t getNumSubscribers() const = 0;
 
   /**
-   * \brief Returns the topic that this PublisherPlugin will publish on.
+   * \brief Returns the communication topic that this PublisherPlugin will publish on.
    */
   virtual std::string getTopic() const = 0;
 

@@ -46,9 +46,9 @@ namespace image_transport {
  * as an Image topic.
  *
  * Subscriber is the client-side counterpart to Publisher. By loading the
- * appropriate plugin, it can interpret any topic advertised by Publisher as
- * Image messages passed to the user callback; the complexity of what transport is
- * actually used is hidden.
+ * appropriate plugin, it can subscribe to a base image topic using any available
+ * transport. The complexity of what transport is actually used is hidden from the user,
+ * who sees only a normal Image callback.
  *
  * A Subscriber should always be created through a call to ImageTransport::subscribe(),
  * or copied from one that was.

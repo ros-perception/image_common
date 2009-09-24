@@ -31,11 +31,17 @@ publish (image, info) message pairs and re-synchronize them on the client side:
 For other synchronization or filtering needs, see the low-level filter class:
 - image_transport::SubscriberFilter - a wrapper for image_transport::Subscriber compatible with message_filters
 
-Finally, if you are an advanced user implementing your own image transport option, you will need to
-implement these interfaces:
-- image_transport::PublisherPlugin - see image_transport::RawPublisher for the simplest possible implementation
-- image_transport::SubscriberPlugin - see image_transport::RawSubscriber for the simplest possible implementation
+\subsection writing_plugin Writing a plugin
+If you are an advanced user implementing your own image transport option, you will need to
+implement these base-level interfaces:
+- image_transport::PublisherPlugin
+- image_transport::SubscriberPlugin
 
+In the common case that all communication between PublisherPlugin and SubscriberPlugin happens
+over a single ROS topic using a transport-specific message type, writing the plugins is vastly
+simplified by using these base classes instead:
+- image_transport::SimplePublisherPlugin - see image_transport::RawPublisher for a trivial example
+- image_transport::SimpleSubscriberPlugin - see image_transport::RawSubscriber for a trivial example
 
 \section rosapi ROS API
 

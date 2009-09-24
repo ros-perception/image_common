@@ -10,6 +10,7 @@ using namespace pluginlib;
 
 enum PluginStatus {SUCCESS, CREATE_FAILURE, LIB_LOAD_FAILURE, DOES_NOT_EXIST};
 
+/// \cond
 struct TransportDesc
 {
   TransportDesc()
@@ -21,6 +22,7 @@ struct TransportDesc
   std::string sub_name;
   PluginStatus sub_status;
 };
+/// \endcond
 
 template< typename Loader >
 void printPluginStatus(Loader& loader, const std::string& name, PluginStatus status)

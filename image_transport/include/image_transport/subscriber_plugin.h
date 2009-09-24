@@ -77,9 +77,7 @@ public:
   }
 
   /**
-   * \brief Get the transport-specific topic.
-   *
-   * @todo Or should this be the base topic as everywhere else? Separate getTransportTopic()?
+   * \brief Get the transport-specific communication topic.
    */
   virtual std::string getTopic() const = 0;
 

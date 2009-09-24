@@ -47,7 +47,7 @@ namespace image_transport {
  *
  * CameraPublisher is a convenience class for publishing synchronized image and
  * camera info topics using the standard topic naming convention, where the info
- * topic name is "camera_info" in the namespace of the base image topic.
+ * topic name is "camera_info" in the same namespace as the base image topic.
  *
  * On the client side, CameraSubscriber simplifies subscribing to camera images.
  *
@@ -96,7 +96,8 @@ public:
                const sensor_msgs::CameraInfoConstPtr& info) const;
 
   /*!
-   * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
+   * \brief Publish an (image, info) pair with given timestamp on the topics associated with
+   * this CameraPublisher.
    *
    * Convenience version, which sets the timestamps of both image and info to stamp before
    * publishing.
