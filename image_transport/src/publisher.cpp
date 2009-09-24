@@ -92,6 +92,7 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
       impl_->publishers.push_back(pub);
       pub->advertise(nh, impl_->base_topic, queue_size, rebindCB(connect_cb),
                      rebindCB(disconnect_cb), tracked_object, latch);
+      /// @todo Get rid of parameter setting when dropping 0.1-compatibility
       nh.setParam(pub->getTopic() + "/transport_type", pub->getTransportName());
     }
     catch (const std::runtime_error& e) {

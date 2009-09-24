@@ -1,7 +1,7 @@
 #ifndef IMAGE_TRANSPORT_RAW_PUBLISHER_H
 #define IMAGE_TRANSPORT_RAW_PUBLISHER_H
 
-#include "image_transport/publisher_plugin.h"
+#include "image_transport/simple_publisher_plugin.h"
 
 namespace image_transport {
 
@@ -11,35 +11,32 @@ namespace image_transport {
  * RawPublisher is a simple wrapper for ros::Publisher, publishing unaltered Image
  * messages on the base topic.
  */
-class RawPublisher : public PublisherPlugin
+class RawPublisher : public SimplePublisherPlugin<sensor_msgs::Image>
 {
 public:
-  virtual ~RawPublisher();
+  virtual ~RawPublisher() {}
 
-  virtual std::string getTransportName() const;
+  virtual std::string getTransportName() const
+  {
+    return "raw";
+  }
 
   //! @todo remove when dropping 0.1-compatibility.
-  virtual std::string getDefaultTopic(const std::string& base_topic) const { return base_topic; }
-
-  virtual uint32_t getNumSubscribers() const;
-  virtual std::string getTopic() const;
-
-  virtual void publish(const sensor_msgs::Image& message) const;
-
-  virtual void shutdown();
+  virtual std::string getDefaultTopic(const std::string& base_topic) const
+  {
+    return base_topic;
+  }
 
 protected:
-  ros::Publisher pub_;
+  virtual void publish(const sensor_msgs::Image& message, const PublishFn& publish_fn) const
+  {
+    publish_fn(message);
+  }
 
-  virtual void advertiseImpl(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                             const SubscriberStatusCallback& connect_cb,
-                             const SubscriberStatusCallback& disconnect_cb,
-                             const ros::VoidPtr& tracked_object, bool latch);
-
-  ros::SubscriberStatusCallback bindCB(const SubscriberStatusCallback& user_cb);
-  
-  void subscriberCB(const ros::SingleSubscriberPublisher& ros_pub,
-                    const SubscriberStatusCallback& user_cb);
+  virtual std::string getTopicToAdvertise(const std::string& base_topic) const
+  {
+    return base_topic;
+  }
 };
 
 } //namespace image_transport

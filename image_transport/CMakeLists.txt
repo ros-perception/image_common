@@ -17,7 +17,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_boost_directories()
-rosbuild_add_library(${PROJECT_NAME} src/publisher.cpp src/subscriber.cpp src/single_subscriber_publisher.cpp src/image_transport.cpp src/camera_publisher.cpp src/camera_subscriber.cpp src/raw_publisher.cpp src/raw_subscriber.cpp src/manifest.cpp src/image_publisher.cpp src/image_subscriber.cpp)
+rosbuild_add_library(${PROJECT_NAME} src/publisher.cpp src/subscriber.cpp src/single_subscriber_publisher.cpp src/image_transport.cpp src/camera_publisher.cpp src/camera_subscriber.cpp src/raw_subscriber.cpp src/manifest.cpp src/image_publisher.cpp src/image_subscriber.cpp)
 rosbuild_link_boost(${PROJECT_NAME} system)
 
 rosbuild_add_executable(republish src/republish.cpp)
@@ -26,11 +26,11 @@ target_link_libraries(republish ${PROJECT_NAME})
 rosbuild_add_executable(list_transports src/list_transports.cpp)
 target_link_libraries(list_transports ${PROJECT_NAME})
 
-#rosbuild_add_executable(test_publisher src/test_publisher.cpp)
-#target_link_libraries(test_publisher ${PROJECT_NAME})
+rosbuild_add_executable(test_publisher src/test_publisher.cpp)
+target_link_libraries(test_publisher ${PROJECT_NAME})
 
-#rosbuild_add_executable(test_image_publisher src/test_image_publisher.cpp)
-#target_link_libraries(test_image_publisher ${PROJECT_NAME})
+rosbuild_add_executable(test_image_publisher src/test_image_publisher.cpp)
+target_link_libraries(test_image_publisher ${PROJECT_NAME})
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
