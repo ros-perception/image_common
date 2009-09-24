@@ -18,6 +18,9 @@ public:
 
   virtual std::string getTransportName() const;
 
+  //! @todo remove when dropping 0.1-compatibility.
+  virtual std::string getDefaultTopic(const std::string& base_topic) const { return base_topic; }
+
   virtual uint32_t getNumSubscribers() const;
   virtual std::string getTopic() const;
 

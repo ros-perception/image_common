@@ -91,8 +91,8 @@ void ImagePublisher::advertise(ros::NodeHandle& nh, const std::string& topic,
       pub->advertise(nh, sub_topic, queue_size, latch);
     }
     catch (const std::runtime_error& e) {
-      ROS_WARN("Failed to load plugin %s, error string: %s",
-               lookup_name.c_str(), e.what());
+      ROS_DEBUG("Failed to load plugin %s, error string: %s",
+                lookup_name.c_str(), e.what());
     }
   }
 }
