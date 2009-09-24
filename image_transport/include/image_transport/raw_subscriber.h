@@ -1,7 +1,7 @@
 #ifndef IMAGE_TRANSPORT_RAW_SUBSCRIBER_H
 #define IMAGE_TRANSPORT_RAW_SUBSCRIBER_H
 
-#include "image_transport/subscriber_plugin.h"
+#include "image_transport/simple_subscriber_plugin.h"
 
 namespace image_transport {
 
@@ -11,26 +11,26 @@ namespace image_transport {
  * RawSubscriber is a simple wrapper for ros::Subscriber which listens for Image messages
  * and passes them through to the callback.
  */
-class RawSubscriber : public SubscriberPlugin
+class RawSubscriber : public SimpleSubscriberPlugin<sensor_msgs::Image>
 {
 public:
-  RawSubscriber();
-  
-  virtual ~RawSubscriber();
+  virtual ~RawSubscriber() {}
 
-  virtual std::string getTransportName() const;
-  
-  virtual std::string getTopic() const;
-
-  virtual void shutdown();
+  virtual std::string getTransportName() const
+  {
+    return "raw";
+  }
 
 protected:
-  virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                             const ros::VoidPtr& tracked_object, const ros::TransportHints& transport_hints);
-  
-private:
-  ros::Subscriber sub_;
+  virtual void internalCallback(const sensor_msgs::ImageConstPtr& message, const Callback& user_cb)
+  {
+    user_cb(message);
+  }
+
+  virtual std::string getTopicToSubscribe(const std::string& base_topic) const
+  {
+    return base_topic;
+  }
 };
 
 } //namespace image_transport

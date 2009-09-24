@@ -35,8 +35,7 @@ public:
    */
   virtual
   void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                 const ros::VoidPtr& tracked_object = ros::VoidPtr(),
+                 const Callback& callback, const ros::VoidPtr& tracked_object = ros::VoidPtr(),
                  const ros::TransportHints& transport_hints = ros::TransportHints())
   {
     return subscribeImpl(nh, base_topic, queue_size, callback, tracked_object, transport_hints);
@@ -105,8 +104,7 @@ protected:
    * @todo Make pure virtual when removing 0.1-compatibility.
    */
   virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                             const ros::VoidPtr& tracked_object,
+                             const Callback& callback, const ros::VoidPtr& tracked_object,
                              const ros::TransportHints& transport_hints)
   {
     ROS_ERROR("Subscriber plugin for '%s' is incompatible with Subscriber. It may work with ImageSubscriber "
