@@ -32,52 +32,65 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
-#include <map>
+#include "image_transport/subscriber.h"
+#include "image_transport/subscriber_plugin.h"
+#include <pluginlib/class_loader.h>
+#include <boost/scoped_ptr.hpp>
 
 namespace image_transport {
 
-/**
- * \brief DEPRECATED, use Publisher instead.
- *
- * \deprecated Use Publisher.
- */
-class ROSCPP_DEPRECATED ImagePublisher
+struct Subscriber::Impl
 {
-public:
-  typedef std::map<std::string, std::string> TransportTopicMap;
-
-  ImagePublisher();
-
-  ImagePublisher(const ImagePublisher& rhs);
+  Impl()
+    : loader("image_transport", "image_transport::SubscriberPlugin")
+  {
+  }
   
-  ~ImagePublisher();
-
-  void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                 bool latch = false);
-
-  uint32_t getNumSubscribers() const;
-
-  std::string getTopic() const;
-
-  TransportTopicMap& getTopicMap();
-  const TransportTopicMap& getTopicMap() const;
-
-  void publish(const sensor_msgs::Image& message) const;
-
-  void publish(const sensor_msgs::ImageConstPtr& message) const;
-
-  void shutdown();
-
-  operator void*() const { return impl_ ? (void*)1 : (void*)0; }
-  bool operator< (const ImagePublisher& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const ImagePublisher& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const ImagePublisher& rhs) const { return impl_ == rhs.impl_; }
-
-private:
-  struct Impl;
-  boost::shared_ptr<Impl> impl_;
+  pluginlib::ClassLoader<SubscriberPlugin> loader;
+  boost::scoped_ptr<SubscriberPlugin> subscriber;
 };
+
+Subscriber::Subscriber()
+  : impl_(new Impl)
+{
+}
+
+Subscriber::Subscriber(const Subscriber& rhs)
+  : impl_(rhs.impl_)
+{
+}
+
+Subscriber::~Subscriber()
+{
+}
+
+Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+                       const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+                       const ros::VoidPtr& tracked_object, const TransportHints& transport_hints)
+  : impl_(new Impl)
+{
+  std::string lookup_name = SubscriberPlugin::getLookupName(transport_hints.getTransport());
+  impl_->subscriber.reset( impl_->loader.createClassInstance(lookup_name) );
+  impl_->subscriber->subscribe(nh, base_topic, queue_size, callback, tracked_object,
+                               transport_hints.getRosHints());
+}
+
+std::string Subscriber::getTopic() const
+{
+  return impl_->subscriber->getTopic();
+}
+
+void Subscriber::shutdown()
+{
+  if (impl_->subscriber) {
+    impl_->subscriber->shutdown();
+    impl_->subscriber.reset();
+  }
+}
+
+Subscriber::operator void*() const
+{
+  return (impl_ && impl_->subscriber) ? (void*)1 : (void*)0;
+}
 
 } //namespace image_transport

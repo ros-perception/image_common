@@ -37,7 +37,12 @@
 
 namespace image_transport {
 
-class ImageSubscriber
+/**
+ * \brief DEPRECATED, use Subscriber instead.
+ *
+ * \deprecated Use Subscriber.
+ */
+class ROSCPP_DEPRECATED ImageSubscriber
 {
 public:
   ImageSubscriber();
@@ -45,15 +50,12 @@ public:
   ImageSubscriber(const ImageSubscriber& rhs);
 
   ~ImageSubscriber();
-
-  // void subscribe(ros::NodeHandle& nh, ros::SubscribeOptions& ops);
   
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                  const ros::VoidPtr& tracked_object = ros::VoidPtr(),
                  const ros::TransportHints& transport_hints = ros::TransportHints());
 
-  // bare function
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  void(*fp)(const sensor_msgs::ImageConstPtr&),
                  const ros::TransportHints& transport_hints = ros::TransportHints())
@@ -63,7 +65,6 @@ public:
               ros::VoidPtr(), transport_hints);
   }
 
-  // class member function with bare pointer
   template<class T>
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
@@ -72,7 +73,6 @@ public:
     subscribe(nh, topic, queue_size, boost::bind(fp, obj, _1), ros::VoidPtr(), transport_hints);
   }
 
-  // class member function with shared_ptr
   template<class T>
   void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
                  void(T::*fp)(const sensor_msgs::ImageConstPtr&),

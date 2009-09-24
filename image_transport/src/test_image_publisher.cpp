@@ -1,21 +1,14 @@
-#include <image_transport/image_transport.h>
+#include <image_transport/image_publisher.h>
 #include <opencv/cvwimage.h>
 #include <opencv/highgui.h>
 #include <opencv_latest/CvBridge.h>
-
-void subscriberCB(const image_transport::SingleSubscriberPublisher& pub, const std::string& event)
-{
-  ROS_INFO("%s: %s", event.c_str(), pub.getSubscriberName().c_str());
-}
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "test_publisher");
   ros::NodeHandle nh;
-  image_transport::ImageTransport it(nh);
-  image_transport::Publisher pub = it.advertise("raw_image", 1,
-                                                boost::bind(subscriberCB, _1, "   Connection"),
-                                                boost::bind(subscriberCB, _1, "Disconnection"));
+  image_transport::ImagePublisher pub;
+  pub.advertise(nh, "raw_image", 1);
 
   //cv::WImageBuffer3_b image( cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR) );
   cv::WImageBuffer1_b image( cvLoadImage(argv[1], CV_LOAD_IMAGE_GRAYSCALE) );

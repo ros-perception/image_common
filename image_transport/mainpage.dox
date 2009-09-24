@@ -2,31 +2,152 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b image_transport is ... 
+When working with images we often want specialized transport strategies,
+such as using image compression or streaming video codecs. image_transport
+provides classes and nodes for transporting images in arbitrary over-the-wire
+representations, while abstracting this complexity so that the developer only
+sees sensor_msgs/Image messages.
 
-<!-- 
-In addition to providing an overview of your package,
-this is the section where the specification and design/architecture 
-should be detailed. While the original specification may be done on the
-wiki, it should be transferred here once your package starts to take shape.
-You can then link to this documentation page from the Wiki. 
--->
+Specialized transports are provided by plugins. image_transport itself provides
+only "raw" transport so as not to not impose unnecessary dependencies on client
+packages. To make other transports available, you must explicitly build their
+packages. Use \ref list_transports to see what transports are available and
+diagnose issues.
 
 
 \section codeapi Code API
+When transporting images, you should use image_transport's classes as drop-in
+replacements for ros::Publisher and ros::Subscriber.
+- image_transport::ImageTransport - use this to create a Publisher or Subscriber
+- image_transport::Publisher - manage advertisements for an image topic, using all available transport options
+- image_transport::Subscriber - manage an Image subscription callback using a particular transport
 
-<!--
-Provide links to specific auto-generated API documentation within your
-package that is of particular interest to a reader. Doxygen will
-document pretty much every part of your code, so do your best here to
-point the reader to the actual API.
+Camera drivers publish a "camera_info" sibling topic containing important metadata on how to
+interpret an image for vision applications. image_transport included helper classes to
+publish (image, info) message pairs and re-synchronize them on the client side:
+- image_transport::CameraPublisher - manage advertisements for camera images
+- image_transport::CameraSubscriber - manage a single subscription callback to synchronized image (using any transport) and CameraInfo topics
 
-If your codebase is fairly large or has different sets of APIs, you
-should use the doxygen 'group' tag to keep these APIs together. For
-example, the roscpp documentation has 'libros' group.
--->
+For other synchronization or filtering needs, see the low-level filter class:
+- image_transport::SubscriberFilter - a wrapper for image_transport::Subscriber compatible with message_filters
+
+\subsection writing_plugin Writing a plugin
+If you are an advanced user implementing your own image transport option, you will need to
+implement these base-level interfaces:
+- image_transport::PublisherPlugin
+- image_transport::SubscriberPlugin
+
+In the common case that all communication between PublisherPlugin and SubscriberPlugin happens
+over a single ROS topic using a transport-specific message type, writing the plugins is vastly
+simplified by using these base classes instead:
+- image_transport::SimplePublisherPlugin - see image_transport::RawPublisher for a trivial example
+- image_transport::SimpleSubscriberPlugin - see image_transport::RawSubscriber for a trivial example
 
 \section rosapi ROS API
+
+\subsection pub_sub_rosapi Publishers and Subscribers
+
+Because they encapsulate complicated communication behavior, image_transport publisher
+and subscriber classes have a public ROS API as well as a code API.
+
+\subsubsection pub_sub_topics ROS topics
+
+The image_transport classes use a standard naming convention for
+topics. All interfaces take only a "base topic"
+name, on which the raw Image is published (just as with ros::Publisher).
+If additional plugins are available, they advertise subtopics of the base topic
+treated as a namespace. For example, if the base topic is "/stereo/left/image",
+the topic structure looks like:
+\verbatim
+# Base topic, advertised just as if we used ros::Publisher:
+/stereo/left/image            # type sensor_msgs/Image
+
+# Additionally advertised by image_transport::Publisher, if plugins are available:
+/stereo/left/image/           # namespace of other image transport options
+                   compressed # Each plugin publishes to <base topic>/<transport name>,
+                   theora     # using a plugin-specific message data type.
+                   ...
+
+# Additionally published by image_transport::CameraPublisher:
+/stereo/left/camera_info      # info topic, type sensor_msgs/CameraInfo
+\endverbatim
+
+\subsubsection pub_sub_parameters ROS parameters
+
+image_transport::Subscriber reads from the parameter server:
+
+- \b "~image_transport" : \b [string] name of the transport to use
+
+If this parameter is not set, the transport from the image_transport::TransportHints
+argument of image_transport::ImageTransport::subscribe() is used.
+
+image_transport::TransportHints may be used to specify a different namespace for
+parameter lookup. This is useful to push "image_transport" into separate namespaces
+to allow different transports for different image subscriptions. The node writer may
+even specify a parameter name other than "image_transport", although this is
+discouraged for the sake of consistency. Nodes that subscribe to image topics should
+document what parameter(s) control transport, especially if different from
+"~image_transport".
+
+Publisher and subscriber plugins are permitted to make use of the parameter server for
+configuration options, e.g. bit rate, compression level, etc. See the plugin package
+documentation.
+
+@todo example launch file
+
+\subsection nodes Nodes
+
+List of nodes:
+- \ref republish
+
+\subsection republish republish
+
+republish listens on one base image topic (using any transport type, "raw" by default)
+and republishes the
+images to another base topic. By default it uses all available publishing plugins;
+you may optionally specify a single out transport type. "raw" is the name of the default
+transport, publishing ROS Image messages. What other transports are available depends on
+which plugins are built.
+
+\subsubsection Usage
+\verbatim
+$ republish [in_transport] in:=<in_base_topic> [out_transport] out:=<out_base_topic>
+\endverbatim
+
+\par Examples
+
+Suppose we are publishing images from a robot using the streaming video transport "theora".
+On an offboard computer we have several nodes listening to the image topic. This setup
+wastes bandwidth and computation, as each node processes the compressed video into
+still images independently. Instead we can start a republish node on the offboard computer,
+streaming the video only to that node for processing into still Image messages republished
+to the other nodes:
+\verbatim
+$ republish theora in:=camera/image raw out:=camera/image_decompressed
+\endverbatim
+
+If a node publishes images using ros::Publisher, we can republish it using the full range of
+transports. Note however that the base topic must be different from the original topic,
+and this approach entails a slight overhead over using image_transport::Publisher in the
+offending node.
+\verbatim
+$ republish in:=camera/image out:=camera/image_repub
+\endverbatim
+
+\subsubsection republish_topics ROS topics
+
+Subscribes to:
+- \b "in": the base image topic to listen on (may actually subscribe to a subtopic)
+
+Publishes to:
+- \b "out": the image base topic to publish to (may also publish subtopics)
+
+The topic datatypes will depend on which transports are used.
+
+\subsubsection republish_parameters ROS parameters
+
+republish itself does not make use of the parameter server.
+Plugins may read or set plugin-specific parameters, however.
 
 <!--
 Names are very important in ROS because they can be remapped on the
@@ -88,32 +209,18 @@ Sets the following parameters on the parameter server
 END: copy for each node -->
 
 
-<!-- START: Uncomment if you have any command-line tools
-
 \section commandline Command-line tools
 
-This section is a catch-all for any additional tools that your package
-provides or uses that may be of use to the reader. For example:
+\subsection list_transports list_transports
 
-- tools/scripts (e.g. rospack, roscd)
-- roslaunch .launch files
-- xmlparam files
-
-\subsection script_name script_name
-
-Description of what this script/file does.
+\b list_transports lists the declared image transport options across all
+ROS packages and attempts to determine whether they are currently
+available for use (packages built, plugins able to be loaded properly,
+etc.).
 
 \subsubsection Usage
 \verbatim
-$ ./script_name [args]
+$ rosrun image_transport list_transports
 \endverbatim
-
-\par Example
-
-\verbatim
-$ ./script_name foo bar
-\endverbatim
-
-END: Command-Line Tools Section -->
 
 */

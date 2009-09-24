@@ -10,9 +10,10 @@
 
 namespace camera_calibration_parsers {
 
-// @todo: move to new spirit
+/// @todo Move to new spirit
 using namespace BOOST_SPIRIT_CLASSIC_NS;
 
+/// \cond
 static void printMatrix(FILE* file, const double* M, int rows, int cols, const char* endline = "\n")
 {
   for (int i = 0; i < rows; ++i) {
@@ -21,6 +22,36 @@ static void printMatrix(FILE* file, const double* M, int rows, int cols, const c
     }
     fprintf(file, endline);
   }
+}
+/// \endcond
+
+bool writeCalibrationIni(const std::string& file_name, const std::string& camera_name,
+                         const sensor_msgs::CameraInfo& cam_info)
+{
+  return writeCalibrationIni(file_name, camera_name, cam_info.width, cam_info.height,
+                             &cam_info.K[0], &cam_info.D[0], &cam_info.R[0], &cam_info.P[0]);
+}
+
+bool readCalibrationIni(const std::string& file_name, std::string& camera_name,
+                        sensor_msgs::CameraInfo& cam_info)
+{
+  int width, height;
+  bool success = readCalibrationIni(file_name, camera_name, width, height,
+                                    &cam_info.K[0], &cam_info.D[0], &cam_info.R[0], &cam_info.P[0]);
+  cam_info.width = width;
+  cam_info.height = height;
+  return success;
+}
+
+bool parseCalibrationIni(const std::string& buffer, std::string& camera_name,
+                         sensor_msgs::CameraInfo& cam_info)
+{
+  int width, height;
+  bool success = parseCalibrationIni(buffer, camera_name, width, height,
+                                     &cam_info.K[0], &cam_info.D[0], &cam_info.R[0], &cam_info.P[0]);
+  cam_info.width = width;
+  cam_info.height = height;
+  return success;
 }
 
 bool writeCalibrationIni(const std::string& file_name, const std::string& camera_name,
@@ -69,6 +100,7 @@ bool writeCalibrationIni(const std::string& file_name, const std::string& camera
   return true;
 }
 
+/// \cond
 // Semantic action to store a sequence of values in an array
 template <typename T>
 struct ArrayAssignActor
@@ -155,6 +187,7 @@ bool parseCalibrationIniRange(Iterator first, Iterator last,
   /** @todo: do anything with externals? */
   return info.hit;
 }
+/// \endcond
 
 bool readCalibrationIni(const std::string& file_name, std::string& camera_name,
                         int &width, int &height,

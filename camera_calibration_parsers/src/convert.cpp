@@ -12,13 +12,12 @@ int main(int argc, char** argv)
   }
 
   std::string name;
-  int width, height;
-  double K[9], D[5], R[9], P[12];
-  if (!readCalibration(argv[1], name, width, height, K, D, R, P)) {
+  sensor_msgs::CameraInfo cam_info;
+  if (!readCalibration(argv[1], name, cam_info)) {
     ROS_ERROR("Failed to load camera model from file %s", argv[1]);
     return -1;
   }
-  if (!writeCalibration(argv[2], name, width, height, K, D, R, P)) {
+  if (!writeCalibration(argv[2], name, cam_info)) {
     ROS_ERROR("Failed to save camera model to file %s", argv[2]);
   }
   

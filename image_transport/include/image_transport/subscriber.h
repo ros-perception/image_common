@@ -32,52 +32,62 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#ifndef IMAGE_TRANSPORT_SUBSCRIBER_H
+#define IMAGE_TRANSPORT_SUBSCRIBER_H
+
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
-#include <map>
+#include "image_transport/transport_hints.h"
 
 namespace image_transport {
 
 /**
- * \brief DEPRECATED, use Publisher instead.
+ * \brief Manages a subscription callback on a specific topic that can be interpreted
+ * as an Image topic.
  *
- * \deprecated Use Publisher.
+ * Subscriber is the client-side counterpart to Publisher. By loading the
+ * appropriate plugin, it can subscribe to a base image topic using any available
+ * transport. The complexity of what transport is actually used is hidden from the user,
+ * who sees only a normal Image callback.
+ *
+ * A Subscriber should always be created through a call to ImageTransport::subscribe(),
+ * or copied from one that was.
+ * Once all copies of a specific Subscriber go out of scope, the subscription callback
+ * associated with that handle will stop being called. Once all Subscriber for a given
+ * topic go out of scope the topic will be unsubscribed.
  */
-class ROSCPP_DEPRECATED ImagePublisher
+class Subscriber
 {
 public:
-  typedef std::map<std::string, std::string> TransportTopicMap;
+  Subscriber();
 
-  ImagePublisher();
+  Subscriber(const Subscriber& rhs);
 
-  ImagePublisher(const ImagePublisher& rhs);
-  
-  ~ImagePublisher();
-
-  void advertise(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size,
-                 bool latch = false);
-
-  uint32_t getNumSubscribers() const;
+  ~Subscriber();
 
   std::string getTopic() const;
 
-  TransportTopicMap& getTopicMap();
-  const TransportTopicMap& getTopicMap() const;
-
-  void publish(const sensor_msgs::Image& message) const;
-
-  void publish(const sensor_msgs::ImageConstPtr& message) const;
-
+  /**
+   * \brief Unsubscribe the callback associated with this Subscriber.
+   */
   void shutdown();
 
-  operator void*() const { return impl_ ? (void*)1 : (void*)0; }
-  bool operator< (const ImagePublisher& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const ImagePublisher& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const ImagePublisher& rhs) const { return impl_ == rhs.impl_; }
-
+  operator void*() const;
+  bool operator< (const Subscriber& rhs) const { return impl_ <  rhs.impl_; }
+  bool operator!=(const Subscriber& rhs) const { return impl_ != rhs.impl_; }
+  bool operator==(const Subscriber& rhs) const { return impl_ == rhs.impl_; }
+  
 private:
+  Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+             const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+             const ros::VoidPtr& tracked_object, const TransportHints& transport_hints);
+  
   struct Impl;
   boost::shared_ptr<Impl> impl_;
+
+  friend class ImageTransport;
 };
 
 } //namespace image_transport
+
+#endif
