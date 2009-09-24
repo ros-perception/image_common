@@ -8,7 +8,7 @@
 namespace image_transport {
 
 /**
- * \brief Base class for plugins to ImageSubscriber.
+ * \brief Base class for plugins to Subscriber.
  */
 class SubscriberPlugin : boost::noncopyable
 {

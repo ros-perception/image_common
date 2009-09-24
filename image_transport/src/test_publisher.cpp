@@ -5,7 +5,7 @@
 
 void subscriberCB(const image_transport::SingleSubscriberPublisher& pub, const std::string& event)
 {
-  ROS_INFO("%s: %s", event.c_str(), pub.getSubscriberCallerID().c_str());
+  ROS_INFO("%s: %s", event.c_str(), pub.getSubscriberName().c_str());
 }
 
 int main(int argc, char** argv)

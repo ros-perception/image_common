@@ -12,7 +12,7 @@ SingleSubscriberPublisher::SingleSubscriberPublisher(const std::string& caller_i
 {
 }
 
-std::string SingleSubscriberPublisher::getSubscriberCallerID() const
+std::string SingleSubscriberPublisher::getSubscriberName() const
 {
   return caller_id_;
 }

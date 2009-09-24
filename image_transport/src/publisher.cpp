@@ -144,7 +144,7 @@ SubscriberStatusCallback Publisher::rebindCB(const SubscriberStatusCallback& use
 void Publisher::subscriberCB(const SingleSubscriberPublisher& plugin_pub,
                              const SubscriberStatusCallback& user_cb)
 {
-  SingleSubscriberPublisher ssp(plugin_pub.getSubscriberCallerID(), getTopic(),
+  SingleSubscriberPublisher ssp(plugin_pub.getSubscriberName(), getTopic(),
                                 boost::bind(&Publisher::getNumSubscribers, this),
                                 plugin_pub.publish_fn_);
   user_cb(ssp);

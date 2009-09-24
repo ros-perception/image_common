@@ -8,7 +8,7 @@
 namespace image_transport {
 
 /**
- * \brief Base class for plugins to ImagePublisher.
+ * \brief Base class for plugins to Publisher.
  */
 class PublisherPlugin : boost::noncopyable
 {

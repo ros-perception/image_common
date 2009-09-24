@@ -21,7 +21,7 @@ public:
                             const GetNumSubscribersFn& num_subscribers_fn,
                             const PublishFn& publish_fn);
   
-  std::string getSubscriberCallerID() const;
+  std::string getSubscriberName() const;
 
   std::string getTopic() const;
 
