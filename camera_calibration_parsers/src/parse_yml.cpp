@@ -7,6 +7,8 @@
 
 namespace camera_calibration_parsers {
 
+/// \cond
+
 static const char CAM_YML_NAME[]    = "camera_name";
 static const char WIDTH_YML_NAME[]  = "image_width";
 static const char HEIGHT_YML_NAME[] = "image_height";
@@ -58,6 +60,8 @@ void operator >> (const YAML::Node& node, SimpleMatrix& m)
   for (int i = 0; i < rows*cols; ++i)
     data[i] >> m.data[i];
 }
+
+/// \endcond
 
 bool writeCalibrationYml(const std::string& file_name, const std::string& camera_name,
                          const sensor_msgs::CameraInfo& cam_info)
