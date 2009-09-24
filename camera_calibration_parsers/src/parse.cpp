@@ -7,6 +7,35 @@
 namespace camera_calibration_parsers {
 
 bool writeCalibration(const std::string& file_name, const std::string& camera_name,
+                      const sensor_msgs::CameraInfo& cam_info)
+{
+  return writeCalibration(file_name, camera_name, cam_info.width, cam_info.height,
+                          &cam_info.K[0], &cam_info.D[0], &cam_info.R[0], &cam_info.P[0]);
+}
+
+bool readCalibration(const std::string& file_name, std::string& camera_name,
+                     sensor_msgs::CameraInfo& cam_info)
+{
+  int width, height;
+  bool success = readCalibration(file_name, camera_name, width, height,
+                                 &cam_info.K[0], &cam_info.D[0], &cam_info.R[0], &cam_info.P[0]);
+  cam_info.width = width;
+  cam_info.height = height;
+  return success;
+}
+
+bool parseCalibration(const std::string& buffer, const std::string& format,
+                      std::string& camera_name, sensor_msgs::CameraInfo& cam_info)
+{
+  int width, height;
+  bool success = parseCalibration(buffer, format, camera_name, width, height,
+                                  &cam_info.K[0], &cam_info.D[0], &cam_info.R[0], &cam_info.P[0]);
+  cam_info.width = width;
+  cam_info.height = height;
+  return success;
+}
+
+bool writeCalibration(const std::string& file_name, const std::string& camera_name,
                      int width, int height,
                      const double* K, const double* D,
                      const double* R, const double* P)

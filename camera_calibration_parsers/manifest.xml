@@ -11,6 +11,7 @@
 
   <depend package="roscpp"/>
   <depend package="yaml-cpp"/>
+  <depend package="sensor_msgs"/>
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lcamera_calibration_parsers" />

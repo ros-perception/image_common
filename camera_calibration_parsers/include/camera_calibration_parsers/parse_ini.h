@@ -4,8 +4,18 @@
 #define CAMERA_CALIBRATION_PARSERS_PARSE_INI_H
 
 #include <string>
+#include <sensor_msgs/CameraInfo.h>
 
 namespace camera_calibration_parsers {
+
+bool writeCalibrationIni(const std::string& file_name, const std::string& camera_name,
+                         const sensor_msgs::CameraInfo& cam_info);
+
+bool readCalibrationIni(const std::string& file_name, std::string& camera_name,
+                        sensor_msgs::CameraInfo& cam_info);
+
+bool parseCalibrationIni(const std::string& buffer, std::string& camera_name,
+                         sensor_msgs::CameraInfo& cam_info);
 
 /**
  * \brief Write calibration parameters to a file in INI format.
