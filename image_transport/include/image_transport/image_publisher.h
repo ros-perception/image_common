@@ -40,6 +40,8 @@ namespace image_transport {
 
 /**
  * \brief DEPRECATED, use Publisher instead.
+ *
+ * \deprecated Use Publisher.
  */
 class ROSCPP_DEPRECATED ImagePublisher
 {

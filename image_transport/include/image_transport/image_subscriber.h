@@ -39,6 +39,8 @@ namespace image_transport {
 
 /**
  * \brief DEPRECATED, use Subscriber instead.
+ *
+ * \deprecated Use Subscriber.
  */
 class ROSCPP_DEPRECATED ImageSubscriber
 {
