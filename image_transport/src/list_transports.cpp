@@ -51,36 +51,32 @@ int main(int argc, char** argv)
   BOOST_FOREACH(const std::string& lookup_name, pub_loader.getDeclaredClasses()) {
     std::string transport_name = boost::erase_last_copy(lookup_name, "_pub");
     transports[transport_name].pub_name = lookup_name;
-    if (pub_loader.loadLibraryForClass(lookup_name)) {
-      try {
-        PublisherPlugin* pub = pub_loader.createClassInstance(lookup_name);
-        transports[transport_name].pub_status = SUCCESS;
-        delete pub;
-      }
-      catch (const std::runtime_error& e) {
-        transports[transport_name].pub_status = CREATE_FAILURE;
-      }
+    try {
+      PublisherPlugin* pub = pub_loader.createClassInstance(lookup_name);
+      transports[transport_name].pub_status = SUCCESS;
+      delete pub;
     }
-    else {
+    catch (const LibraryLoadException& e) {
       transports[transport_name].pub_status = LIB_LOAD_FAILURE;
+    }
+    catch (const CreateClassException& e) {
+      transports[transport_name].pub_status = CREATE_FAILURE;
     }
   }
 
   BOOST_FOREACH(const std::string& lookup_name, sub_loader.getDeclaredClasses()) {
     std::string transport_name = boost::erase_last_copy(lookup_name, "_sub");
     transports[transport_name].sub_name = lookup_name;
-    if (sub_loader.loadLibraryForClass(lookup_name)) {
-      try {
-        SubscriberPlugin* sub = sub_loader.createClassInstance(lookup_name);
-        transports[transport_name].sub_status = SUCCESS;
-        delete sub;
-      }
-      catch (const std::runtime_error& e) {
-        transports[transport_name].sub_status = CREATE_FAILURE;
-      }
+    try {
+      SubscriberPlugin* sub = sub_loader.createClassInstance(lookup_name);
+      transports[transport_name].sub_status = SUCCESS;
+      delete sub;
     }
-    else {
+    catch (const LibraryLoadException& e) {
       transports[transport_name].sub_status = LIB_LOAD_FAILURE;
+    }
+    catch (const CreateClassException& e) {
+      transports[transport_name].sub_status = CREATE_FAILURE;
     }
   }
 
