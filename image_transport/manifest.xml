@@ -9,7 +9,7 @@
   <author>Patrick Mihelich</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://pr.willowgarage.com/wiki/image_transport</url>
+  <url>http://ros.org/wiki/image_transport</url>
   <depend package="sensor_msgs"/>
   <depend package="pluginlib"/>
   <depend package="message_filters"/>
