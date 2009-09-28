@@ -7,7 +7,7 @@
   <author>Patrick Mihelich</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://pr.willowgarage.com/wiki/camera_calibration_parsers</url>
+  <url>http://ros.org/wiki/camera_calibration_parsers</url>
 
   <depend package="roscpp"/>
   <depend package="yaml-cpp"/>
