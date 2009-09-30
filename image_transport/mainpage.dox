@@ -2,19 +2,6 @@
 \mainpage
 \htmlinclude manifest.html
 
-When working with images we often want specialized transport strategies,
-such as using image compression or streaming video codecs. image_transport
-provides classes and nodes for transporting images in arbitrary over-the-wire
-representations, while abstracting this complexity so that the developer only
-sees sensor_msgs/Image messages.
-
-Specialized transports are provided by plugins. image_transport itself provides
-only "raw" transport so as not to not impose unnecessary dependencies on client
-packages. To make other transports available, you must explicitly build their
-packages. Use \ref list_transports to see what transports are available and
-diagnose issues.
-
-
 \section codeapi Code API
 When transporting images, you should use image_transport's classes as drop-in
 replacements for ros::Publisher and ros::Subscriber.
@@ -48,51 +35,11 @@ simplified by using these base classes instead:
 \subsection pub_sub_rosapi Publishers and Subscribers
 
 Because they encapsulate complicated communication behavior, image_transport publisher
-and subscriber classes have a public ROS API as well as a code API.
+and subscriber classes have a public ROS API as well as a code API. See the wiki
+documentation for details.
 
-\subsubsection pub_sub_topics ROS topics
-
-The image_transport classes use a standard naming convention for
-topics. All interfaces take only a "base topic"
-name, on which the raw Image is published (just as with ros::Publisher).
-If additional plugins are available, they advertise subtopics of the base topic
-treated as a namespace. For example, if the base topic is "/stereo/left/image",
-the topic structure looks like:
-\verbatim
-# Base topic, advertised just as if we used ros::Publisher:
-/stereo/left/image            # type sensor_msgs/Image
-
-# Additionally advertised by image_transport::Publisher, if plugins are available:
-/stereo/left/image/           # namespace of other image transport options
-                   compressed # Each plugin publishes to <base topic>/<transport name>,
-                   theora     # using a plugin-specific message data type.
-                   ...
-
-# Additionally published by image_transport::CameraPublisher:
-/stereo/left/camera_info      # info topic, type sensor_msgs/CameraInfo
-\endverbatim
-
-\subsubsection pub_sub_parameters ROS parameters
-
-image_transport::Subscriber reads from the parameter server:
-
-- \b "~image_transport" : \b [string] name of the transport to use
-
-If this parameter is not set, the transport from the image_transport::TransportHints
-argument of image_transport::ImageTransport::subscribe() is used.
-
-image_transport::TransportHints may be used to specify a different namespace for
-parameter lookup. This is useful to push "image_transport" into separate namespaces
-to allow different transports for different image subscriptions. The node writer may
-even specify a parameter name other than "image_transport", although this is
-discouraged for the sake of consistency. Nodes that subscribe to image topics should
-document what parameter(s) control transport, especially if different from
-"~image_transport".
-
-Publisher and subscriber plugins are permitted to make use of the parameter server for
-configuration options, e.g. bit rate, compression level, etc. See the plugin package
-documentation.
-
-@todo example launch file
+Although image_transport::Publisher may publish many topics, in all code interfaces you should
+use only the name of the "base topic." The image transport classes will figure out the name of
+the dedicated ROS topic to use for the desired transport.
 
 */

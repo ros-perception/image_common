@@ -51,13 +51,14 @@ public:
 
 protected:
   virtual void advertiseImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const SubscriberStatusCallback& connect_cb,
-                             const SubscriberStatusCallback& disconnect_cb,
+                             const SubscriberStatusCallback& user_connect_cb,
+                             const SubscriberStatusCallback& user_disconnect_cb,
                              const ros::VoidPtr& tracked_object, bool latch)
   {
     simple_impl_.reset(new SimplePublisherPluginImpl(nh));
     simple_impl_->pub_ = nh.advertise<M>(getTopicToAdvertise(base_topic), queue_size,
-                                         bindCB(connect_cb), bindCB(disconnect_cb),
+                                         bindCB(user_connect_cb, &SimplePublisherPlugin::connectCallback),
+                                         bindCB(user_disconnect_cb, &SimplePublisherPlugin::disconnectCallback),
                                          tracked_object, latch);
   }
 
@@ -85,6 +86,20 @@ protected:
   }
 
   /**
+   * \brief Function called when a subscriber connects to the internal publisher.
+   *
+   * Defaults to noop.
+   */
+  virtual void connectCallback(const ros::SingleSubscriberPublisher& pub) {}
+
+  /**
+   * \brief Function called when a subscriber disconnects from the internal publisher.
+   *
+   * Defaults to noop.
+   */
+  virtual void disconnectCallback(const ros::SingleSubscriberPublisher& pub) {}
+
+  /**
    * \brief Returns the ros::NodeHandle to be used for parameter lookup.
    */
   const ros::NodeHandle& nh() const
@@ -106,26 +121,34 @@ private:
   
   boost::scoped_ptr<SimplePublisherPluginImpl> simple_impl_;
 
+  typedef void (SimplePublisherPlugin::*SubscriberStatusMemFn)(const ros::SingleSubscriberPublisher& pub);
+  
   /**
    * Binds the user callback to subscriberCB(), which acts as an intermediary to expose
    * a publish(Image) interface to the user while publishing to an internal topic.
    */
-  ros::SubscriberStatusCallback bindCB(const SubscriberStatusCallback& user_cb)
+  ros::SubscriberStatusCallback bindCB(const SubscriberStatusCallback& user_cb,
+                                       SubscriberStatusMemFn internal_cb_fn)
   {
+    ros::SubscriberStatusCallback internal_cb = boost::bind(internal_cb_fn, this, _1);
     if (user_cb)
-      return boost::bind(&SimplePublisherPlugin::subscriberCB, this, _1, user_cb);
+      return boost::bind(&SimplePublisherPlugin::subscriberCB, this, _1, user_cb, internal_cb);
     else
-      return ros::SubscriberStatusCallback();
+      return internal_cb;
   }
-
+  
   /**
    * Forms the ros::SingleSubscriberPublisher for the internal communication topic into
    * an image_transport::SingleSubscriberPublisher for Image messages and passes it
    * to the user subscriber status callback.
    */
   void subscriberCB(const ros::SingleSubscriberPublisher& ros_ssp,
-                    const SubscriberStatusCallback& user_cb)
+                    const SubscriberStatusCallback& user_cb,
+                    const ros::SubscriberStatusCallback& internal_cb)
   {
+    // First call the internal callback (for sending setup headers, etc.)
+    internal_cb(ros_ssp);
+    
     // Construct a function object for publishing sensor_msgs::Image through the
     // subclass-implemented publish() using the ros::SingleSubscriberPublisher to send
     // messages of the transport-specific type.
