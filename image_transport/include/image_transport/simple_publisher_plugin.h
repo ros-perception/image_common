@@ -126,33 +126,34 @@ private:
   void subscriberCB(const ros::SingleSubscriberPublisher& ros_ssp,
                     const SubscriberStatusCallback& user_cb)
   {
+    // Construct a function object for publishing sensor_msgs::Image through the
+    // subclass-implemented publish() using the ros::SingleSubscriberPublisher to send
+    // messages of the transport-specific type.
+    typedef void (SimplePublisherPlugin::*PublishMemFn)(const sensor_msgs::Image&, const PublishFn&) const;
+    PublishMemFn pub_mem_fn = &SimplePublisherPlugin::publish;
+    ImagePublishFn image_publish_fn = boost::bind(pub_mem_fn, this, _1, bindInternalPublisher(ros_ssp));
+    
     SingleSubscriberPublisher ssp(ros_ssp.getSubscriberCallerID(), getTopic(),
                                   boost::bind(&SimplePublisherPlugin::getNumSubscribers, this),
-                                  bindInternalPublisher(ros_ssp));
+                                  image_publish_fn);
     user_cb(ssp);
   }
 
   typedef boost::function<void(const sensor_msgs::Image&)> ImagePublishFn;
 
   /**
-   * Returns a function object for publishing sensor_msgs::Image through the
-   * subclass-implemented publish() using the given publisher to the internal communication
-   * topic.
+   * Returns a function object for publishing the transport-specific message type
+   * through some ROS publisher type.
    *
    * @param pub An object with method void publish(const M&)
    */
   template <class PubT>
-  ImagePublishFn bindInternalPublisher(const PubT& pub) const
+  PublishFn bindInternalPublisher(const PubT& pub) const
   {
     // Bind PubT::publish(const Message&) as PublishFn
     typedef void (PubT::*InternalPublishMemFn)(const ros::Message&) const;
     InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
-    PublishFn publish_fn = boost::bind(internal_pub_mem_fn, &pub, _1);
-    
-    // Bind publish_fn to the subclass-implemented this->publish(Image, PublishFn)
-    typedef void (SimplePublisherPlugin::*PublishMemFn)(const sensor_msgs::Image&, const PublishFn&) const;
-    PublishMemFn pub_mem_fn = &SimplePublisherPlugin::publish;
-    return boost::bind(pub_mem_fn, this, _1, publish_fn);
+    return boost::bind(internal_pub_mem_fn, &pub, _1);
   }
 };
 
