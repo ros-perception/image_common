@@ -26,12 +26,6 @@ target_link_libraries(republish ${PROJECT_NAME})
 rosbuild_add_executable(list_transports src/list_transports.cpp)
 target_link_libraries(list_transports ${PROJECT_NAME})
 
-#rosbuild_add_executable(test_publisher src/test_publisher.cpp)
-#target_link_libraries(test_publisher ${PROJECT_NAME})
-
-#rosbuild_add_executable(test_image_publisher src/test_image_publisher.cpp)
-#target_link_libraries(test_image_publisher ${PROJECT_NAME})
-
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
