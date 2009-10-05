@@ -10,7 +10,7 @@
   <url>http://ros.org/wiki/camera_calibration_parsers</url>
 
   <depend package="roscpp"/>
-  <depend package="yaml-cpp"/>
+  <depend package="yaml_cpp"/>
   <depend package="sensor_msgs"/>
 
   <export>
