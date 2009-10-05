@@ -1,4 +1,4 @@
-<stack name="image_common" version="0.3.0">
+<stack name="image_common" version="0.3.1">
   <description brief="Common code for working with images">
     Common code for working with images in ROS.
   </description>
@@ -7,7 +7,7 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/image_common</url>
   <depend stack="ros"/> <!-- roscpp, message_filters --> 
-  <depend stack="common"/> <!-- yaml-cpp, pluginlib --> 
+  <depend stack="common"/> <!-- yaml_cpp, pluginlib --> 
   <depend stack="common_msgs"/> <!-- sensor_msgs --> 
 
 </stack>
