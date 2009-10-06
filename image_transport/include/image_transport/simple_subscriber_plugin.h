@@ -11,7 +11,7 @@ namespace image_transport {
  *
  * The base class simplifies implementing a SubscriberPlugin in the common case that
  * all communication with the matching PublisherPlugin happens over a single ROS
- * topic using a transport-specific message type. SimpleSubscriberPlugin in templated
+ * topic using a transport-specific message type. SimpleSubscriberPlugin is templated
  * on the transport-specific message type.
  *
  * A subclass need implement only two methods:
