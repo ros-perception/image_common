@@ -71,8 +71,7 @@ Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint3
 {
   std::string lookup_name = SubscriberPlugin::getLookupName(transport_hints.getTransport());
   impl_->subscriber.reset( impl_->loader.createClassInstance(lookup_name) );
-  impl_->subscriber->subscribe(nh, base_topic, queue_size, callback, tracked_object,
-                               transport_hints.getRosHints());
+  impl_->subscriber->subscribe(nh, base_topic, queue_size, callback, tracked_object, transport_hints);
 }
 
 std::string Subscriber::getTopic() const
