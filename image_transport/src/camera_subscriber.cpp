@@ -35,7 +35,7 @@ CameraSubscriber::CameraSubscriber(ros::NodeHandle& nh, const std::string& base_
   impl_->image_sub_.subscribe(nh, base_topic, queue_size, transport_hints);
   impl_->info_sub_.subscribe(nh, impl_->info_topic_, queue_size, transport_hints.getRosHints());
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
-  /// @todo: need for Boost.Bind here is pretty broken
+  // need for Boost.Bind here is kind of broken
   impl_->sync_.registerCallback(boost::bind(callback, _1, _2));
 }
 

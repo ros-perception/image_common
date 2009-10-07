@@ -104,18 +104,18 @@ protected:
    */
   const ros::NodeHandle& nh() const
   {
-    return simple_impl_->nh_;
+    return simple_impl_->param_nh_;
   }
 
 private:
   struct SimplePublisherPluginImpl
   {
-    SimplePublisherPluginImpl(ros::NodeHandle& nh)
-      : nh_(nh)
+    SimplePublisherPluginImpl(const ros::NodeHandle& nh)
+      : param_nh_(nh)
     {
     }
     
-    ros::NodeHandle nh_;
+    const ros::NodeHandle param_nh_;
     ros::Publisher pub_;
   };
   
