@@ -107,7 +107,7 @@ public:
    * \brief Subscribe to a synchronized image & camera info topic pair, version for bare function.
    */
   CameraSubscriber subscribeCamera(const std::string& base_topic, uint32_t queue_size,
-                                   void(*fp)(const sensor_msgs::ImageConstPtr,
+                                   void(*fp)(const sensor_msgs::ImageConstPtr&,
                                              const sensor_msgs::CameraInfoConstPtr&),
                                    const TransportHints& transport_hints = TransportHints())
   {
@@ -121,11 +121,11 @@ public:
    */
   template<class T>
   CameraSubscriber subscribeCamera(const std::string& base_topic, uint32_t queue_size,
-                                   void(T::*fp)(const sensor_msgs::ImageConstPtr,
+                                   void(T::*fp)(const sensor_msgs::ImageConstPtr&,
                                                 const sensor_msgs::CameraInfoConstPtr&), T* obj,
                                    const TransportHints& transport_hints = TransportHints())
   {
-    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj, _1), ros::VoidPtr(),
+    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj, _1, _2), ros::VoidPtr(),
                            transport_hints);
   }
 
@@ -135,12 +135,12 @@ public:
    */
   template<class T>
   CameraSubscriber subscribeCamera(const std::string& base_topic, uint32_t queue_size,
-                                   void(T::*fp)(const sensor_msgs::ImageConstPtr,
+                                   void(T::*fp)(const sensor_msgs::ImageConstPtr&,
                                                 const sensor_msgs::CameraInfoConstPtr&),
                                    const boost::shared_ptr<T>& obj,
                                    const TransportHints& transport_hints = TransportHints())
   {
-    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj.get(), _1), obj,
+    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj.get(), _1, _2), obj,
                            transport_hints);
   }
 
