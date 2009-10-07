@@ -29,9 +29,18 @@ public:
                  const ros::TransportHints& ros_hints = ros::TransportHints(),
                  const ros::NodeHandle& parameter_nh = ros::NodeHandle("~"),
                  const std::string& parameter_name = "image_transport")
-    : ros_hints_(ros_hints)
+    : ros_hints_(ros_hints), parameter_nh_(parameter_nh)
   {
-    parameter_nh.param(parameter_name, transport_, default_transport);
+    parameter_nh_.param(parameter_name, transport_, default_transport);
+  }
+
+  /**
+   * @todo Remove this? Added for backwards compatibility in SubscriberPlugin.
+   */
+  TransportHints(const ros::TransportHints& ros_hints)
+    : ros_hints_(ros_hints), parameter_nh_("~")
+  {
+    parameter_nh_.param("image_transport", transport_, std::string("raw"));
   }
 
   const std::string& getTransport() const
@@ -43,10 +52,16 @@ public:
   {
     return ros_hints_;
   }
+
+  const ros::NodeHandle& getParameterNH() const
+  {
+    return parameter_nh_;
+  }
   
 private:
   std::string transport_;
   ros::TransportHints ros_hints_;
+  ros::NodeHandle parameter_nh_;
 };
 
 } //namespace image_transport

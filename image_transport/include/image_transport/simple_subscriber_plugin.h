@@ -11,7 +11,7 @@ namespace image_transport {
  *
  * The base class simplifies implementing a SubscriberPlugin in the common case that
  * all communication with the matching PublisherPlugin happens over a single ROS
- * topic using a transport-specific message type. SimpleSubscriberPlugin in templated
+ * topic using a transport-specific message type. SimpleSubscriberPlugin is templated
  * on the transport-specific message type.
  *
  * A subclass need implement only two methods:
@@ -61,13 +61,13 @@ protected:
   
   virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                              const Callback& callback, const ros::VoidPtr& tracked_object,
-                             const ros::TransportHints& transport_hints)
+                             const TransportHints& transport_hints)
   {
-    simple_impl_.reset(new SimpleSubscriberPluginImpl(nh));
+    simple_impl_.reset(new SimpleSubscriberPluginImpl(transport_hints.getParameterNH()));
 
     simple_impl_->sub_ = nh.subscribe<M>(getTopicToSubscribe(base_topic), queue_size,
                                          boost::bind(&SimpleSubscriberPlugin::internalCallback, this, _1, callback),
-                                         tracked_object, transport_hints);
+                                         tracked_object, transport_hints.getRosHints());
   }
 
   /**
@@ -75,20 +75,19 @@ protected:
    */
   const ros::NodeHandle& nh() const
   {
-    return simple_impl_->nh_;
+    return simple_impl_->param_nh_;
   }
 
 private:
   struct SimpleSubscriberPluginImpl
   {
-    SimpleSubscriberPluginImpl(ros::NodeHandle& nh)
-      : nh_(nh)
+    SimpleSubscriberPluginImpl(const ros::NodeHandle& nh)
+      : param_nh_(nh)
     {
     }
     
-    ros::NodeHandle nh_;
+    const ros::NodeHandle param_nh_;
     ros::Subscriber sub_;
-    //boost::function<void(const sensor_msgs::ImageConstPtr&)> user_cb_;
   };
   
   boost::scoped_ptr<SimpleSubscriberPluginImpl> simple_impl_;
