@@ -34,15 +34,6 @@ public:
     parameter_nh_.param(parameter_name, transport_, default_transport);
   }
 
-  /**
-   * @todo Remove this? Added for backwards compatibility in SubscriberPlugin.
-   */
-  TransportHints(const ros::TransportHints& ros_hints)
-    : ros_hints_(ros_hints), parameter_nh_("~")
-  {
-    parameter_nh_.param("image_transport", transport_, std::string("raw"));
-  }
-
   const std::string& getTransport() const
   {
     return transport_;

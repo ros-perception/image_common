@@ -17,11 +17,6 @@ static const char D_YML_NAME[]      = "distortion_coefficients";
 static const char R_YML_NAME[]      = "rectification_matrix";
 static const char P_YML_NAME[]      = "projection_matrix";
 
-static const double D_default[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
-static const double R_default[9] = {1.0, 0.0, 0.0,
-                                    0.0, 1.0, 0.0,
-                                    0.0, 0.0, 1.0};
-
 struct SimpleMatrix
 {
   int rows;
@@ -66,44 +61,12 @@ void operator >> (const YAML::Node& node, SimpleMatrix& m)
 bool writeCalibrationYml(const std::string& file_name, const std::string& camera_name,
                          const sensor_msgs::CameraInfo& cam_info)
 {
-  return writeCalibrationYml(file_name, camera_name, cam_info.width, cam_info.height,
-                             &cam_info.K[0], &cam_info.D[0], &cam_info.R[0], &cam_info.P[0]);
-}
-
-bool readCalibrationYml(const std::string& file_name, std::string& camera_name,
-                        sensor_msgs::CameraInfo& cam_info)
-{
-  int width, height;
-  bool success = readCalibrationYml(file_name, camera_name, width, height,
-                                    &cam_info.K[0], &cam_info.D[0], &cam_info.R[0], &cam_info.P[0]);
-  cam_info.width = width;
-  cam_info.height = height;
-  return success;
-}
-
-bool writeCalibrationYml(const std::string& file_name, const std::string& camera_name,
-                         int width, int height,
-                         const double* K, const double* D,
-                         const double* R, const double* P)
-{
-  // Set up default matrices if needed
-  if (!D) D = D_default;
-  if (!R) R = R_default;
-  double P_default[12];
-  if (!P) {
-    for (int i = 0; i < 3; ++i) {
-      memcpy(P_default + 4*i, K + 3*i, 3*sizeof(double));
-      P_default[4*i + 3] = 0.0;
-    }
-    P = P_default;
-  }
-
   YAML::Emitter out;
   out << YAML::BeginMap;
 
+#if 0
   // Calibration time
   // FIXME: this breaks yaml-cpp on reading for some reason
-#if 0
   time_t raw_time;
   time( &raw_time );
   out << YAML::Key << "calibration_time";
@@ -111,15 +74,15 @@ bool writeCalibrationYml(const std::string& file_name, const std::string& camera
 #endif
 
   // Image dimensions
-  out << YAML::Key << WIDTH_YML_NAME << YAML::Value << width;
-  out << YAML::Key << HEIGHT_YML_NAME << YAML::Value << height;
+  out << YAML::Key << WIDTH_YML_NAME << YAML::Value << (int)cam_info.width;
+  out << YAML::Key << HEIGHT_YML_NAME << YAML::Value << (int)cam_info.height;
   
   // Camera name and intrinsics
   out << YAML::Key << CAM_YML_NAME << YAML::Value << camera_name;
-  out << YAML::Key << K_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(K));
-  out << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(1, 5, const_cast<double*>(D));
-  out << YAML::Key << R_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(R));
-  out << YAML::Key << P_YML_NAME << YAML::Value << SimpleMatrix(3, 4, const_cast<double*>(P));
+  out << YAML::Key << K_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(&cam_info.K[0]));
+  out << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(1, 5, const_cast<double*>(&cam_info.D[0]));
+  out << YAML::Key << R_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(&cam_info.R[0]));
+  out << YAML::Key << P_YML_NAME << YAML::Value << SimpleMatrix(3, 4, const_cast<double*>(&cam_info.P[0]));
 
   out << YAML::EndMap;
 
@@ -134,8 +97,7 @@ bool writeCalibrationYml(const std::string& file_name, const std::string& camera
 }
 
 bool readCalibrationYml(const std::string& file_name, std::string& camera_name,
-                        int &width, int &height,
-                        double* K, double* D, double* R, double* P)
+                        sensor_msgs::CameraInfo& cam_info)
 {
   std::ifstream fin(file_name.c_str());
   YAML::Parser parser(fin);
@@ -149,26 +111,17 @@ bool readCalibrationYml(const std::string& file_name, std::string& camera_name,
   } catch(...) {
     camera_name = "unknown";
   }
-  doc[WIDTH_YML_NAME] >> width;
-  doc[HEIGHT_YML_NAME] >> height;
+  doc[WIDTH_YML_NAME] >> cam_info.width;
+  doc[HEIGHT_YML_NAME] >> cam_info.height;
   
-  SimpleMatrix K_(3, 3, K);
+  SimpleMatrix K_(3, 3, &cam_info.K[0]);
   doc[K_YML_NAME] >> K_;
-  
-  if (D) {
-    SimpleMatrix D_(1, 5, D);
-    doc[D_YML_NAME] >> D_;
-  }
-
-  if (R) {
-    SimpleMatrix R_(3, 3, R);
-    doc[R_YML_NAME] >> R_;
-  }
-
-  if (P) {
-    SimpleMatrix P_(3, 4, P);
-    doc[P_YML_NAME] >> P_;
-  }
+  SimpleMatrix D_(1, 5, &cam_info.D[0]);
+  doc[D_YML_NAME] >> D_;
+  SimpleMatrix R_(3, 3, &cam_info.R[0]);
+  doc[R_YML_NAME] >> R_;
+  SimpleMatrix P_(3, 4, &cam_info.P[0]);
+  doc[P_YML_NAME] >> P_;
   
   return true;
 }

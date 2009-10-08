@@ -21,20 +21,12 @@ public:
   /**
    * \brief Get a string identifier for the transport provided by
    * this plugin.
-   *
-   * @todo Make pure virtual when removing 0.1-compatibility.
    */
-  virtual std::string getTransportName() const
-  {
-    return "unknown";
-  }
+  virtual std::string getTransportName() const = 0;
 
   /**
    * \brief Subscribe to an image topic, version for arbitrary boost::function object.
-   *
-   * @todo Make non-virtual when removing 0.1-compatibility.
    */
-  virtual
   void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                  const Callback& callback, const ros::VoidPtr& tracked_object = ros::VoidPtr(),
                  const TransportHints& transport_hints = TransportHints())
@@ -98,31 +90,11 @@ public:
 
 protected:
   /**
-   * \brief @deprecated, use the version taking image_transport::TransportHints
-   */
-  ROSCPP_DEPRECATED
-  virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const Callback& callback, const ros::VoidPtr& tracked_object,
-                             const ros::TransportHints& transport_hints)
-  {
-    ROS_ERROR("Subscriber plugin for '%s' is incompatible with Subscriber. It may work with ImageSubscriber "
-              "(deprecated), but should be updated to the image_transport 0.2 interface.",
-              getTransportName().c_str());
-    //ROS_BREAK();
-  }
-
-  /**
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
-   *
-   * @todo Make pure virtual when removing 0.1-compatibility.
    */
   virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                              const Callback& callback, const ros::VoidPtr& tracked_object,
-                             const TransportHints& transport_hints)
-  {
-    ROS_WARN("Subscriber plugin for '%s' invoking deprecated version of subscribeImpl.", getTransportName().c_str());
-    subscribeImpl(nh, base_topic, queue_size, callback, tracked_object, transport_hints.getRosHints());
-  }
+                             const TransportHints& transport_hints) = 0;
 };
 
 } //namespace image_transport

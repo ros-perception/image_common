@@ -21,12 +21,6 @@ public:
     return "raw";
   }
 
-  //! @todo remove when dropping 0.1-compatibility.
-  virtual std::string getDefaultTopic(const std::string& base_topic) const
-  {
-    return base_topic;
-  }
-
 protected:
   virtual void publish(const sensor_msgs::Image& message, const PublishFn& publish_fn) const
   {
