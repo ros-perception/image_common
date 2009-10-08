@@ -8,7 +8,7 @@
   </description>
   <author>Patrick Mihelich</author>
   <license>BSD</license>
-  <review status="API cleared" notes=""/>
+  <review status="doc reviewed" notes=""/>
   <url>http://ros.org/wiki/image_transport</url>
   <depend package="sensor_msgs"/>
   <depend package="pluginlib"/>
