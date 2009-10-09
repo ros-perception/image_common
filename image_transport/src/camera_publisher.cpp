@@ -33,6 +33,7 @@
 *********************************************************************/
 
 #include "image_transport/image_transport.h"
+#include "image_transport/camera_common.h"
 
 namespace image_transport {
 
@@ -77,7 +78,9 @@ CameraPublisher::CameraPublisher(ros::NodeHandle& nh, const std::string& base_to
                                  const ros::VoidPtr& tracked_object, bool latch)
   : impl_(new Impl)
 {
-  std::string info_topic = base_topic.substr(0, base_topic.rfind('/')) + "/camera_info";
+  std::string info_topic = getCameraInfoTopic(base_topic);
+
+  /// @todo Why doesn't ImageTransport just pass in *this?
   ImageTransport it(nh);
   impl_->image_pub_ = it.advertise(base_topic, queue_size, image_connect_cb,
                                    image_disconnect_cb, tracked_object, latch);
