@@ -1,5 +1,6 @@
 #include "image_transport/camera_subscriber.h"
 #include "image_transport/subscriber_filter.h"
+#include "image_transport/camera_common.h"
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 
@@ -31,7 +32,7 @@ CameraSubscriber::CameraSubscriber(ros::NodeHandle& nh, const std::string& base_
                                    const TransportHints& transport_hints)
   : impl_(new Impl(queue_size))
 {
-  impl_->info_topic_ = base_topic.substr(0, base_topic.rfind('/')) + "/camera_info";
+  impl_->info_topic_ = getCameraInfoTopic(base_topic);
   impl_->image_sub_.subscribe(nh, base_topic, queue_size, transport_hints);
   impl_->info_sub_.subscribe(nh, impl_->info_topic_, queue_size, transport_hints.getRosHints());
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
