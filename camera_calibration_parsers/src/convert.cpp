@@ -1,5 +1,6 @@
 #include "camera_calibration_parsers/parse.h"
 #include <ros/console.h>
+#include <cstdio>
 
 using namespace camera_calibration_parsers;
 
