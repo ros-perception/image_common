@@ -97,6 +97,10 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
                 lookup_name.c_str(), e.what());
     }
   }
+
+  if (impl_->publishers.empty())
+    throw std::runtime_error("No plugins found! Does `rospack plugins --attrib=plugin "
+                             "image_transport` find any packages?");
 }
 
 uint32_t Publisher::getNumSubscribers() const
