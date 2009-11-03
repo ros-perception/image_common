@@ -108,9 +108,6 @@ private:
 
   SubscriberStatusCallback rebindCB(const SubscriberStatusCallback& user_cb);
   
-  void subscriberCB(const SingleSubscriberPublisher& plugin_pub,
-                    const SubscriberStatusCallback& user_cb);
-  
   struct Impl;
   boost::shared_ptr<Impl> impl_;
 

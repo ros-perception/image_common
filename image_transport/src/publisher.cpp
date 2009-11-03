@@ -52,11 +52,33 @@ struct Publisher::Impl
   {
     shutdown();
   }
+
+  uint32_t getNumSubscribers() const
+  {
+    uint32_t count = 0;
+    BOOST_FOREACH(const PublisherPlugin& pub, publishers)
+      count += pub.getNumSubscribers();
+    return count;
+  }
+
+  std::string getTopic() const
+  {
+    return base_topic;
+  }
   
   void shutdown()
   {
     BOOST_FOREACH(PublisherPlugin& pub, publishers)
       pub.shutdown();
+  }
+
+  void subscriberCB(const SingleSubscriberPublisher& plugin_pub,
+                    const SubscriberStatusCallback& user_cb)
+  {
+    SingleSubscriberPublisher ssp(plugin_pub.getSubscriberName(), getTopic(),
+                                  boost::bind(&Publisher::Impl::getNumSubscribers, this),
+                                  plugin_pub.publish_fn_);
+    user_cb(ssp);
   }
   
   std::string base_topic;
@@ -105,15 +127,12 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
 
 uint32_t Publisher::getNumSubscribers() const
 {
-  uint32_t count = 0;
-  BOOST_FOREACH(const PublisherPlugin& pub, impl_->publishers)
-    count += pub.getNumSubscribers();
-  return count;
+  return impl_->getNumSubscribers();
 }
 
 std::string Publisher::getTopic() const
 {
-  return impl_->base_topic;
+  return impl_->getTopic();
 }
 
 void Publisher::publish(const sensor_msgs::Image& message) const
@@ -136,19 +155,12 @@ void Publisher::shutdown()
 
 SubscriberStatusCallback Publisher::rebindCB(const SubscriberStatusCallback& user_cb)
 {
+  // Note: the subscriber callback must be bound to the internal Impl object, not
+  // 'this'. Due to copying behavior the Impl object may outlive this.
   if (user_cb)
-    return boost::bind(&Publisher::subscriberCB, this, _1, user_cb);
+    return boost::bind(&Publisher::Impl::subscriberCB, impl_, _1, user_cb);
   else
     return SubscriberStatusCallback();
-}
-
-void Publisher::subscriberCB(const SingleSubscriberPublisher& plugin_pub,
-                             const SubscriberStatusCallback& user_cb)
-{
-  SingleSubscriberPublisher ssp(plugin_pub.getSubscriberName(), getTopic(),
-                                boost::bind(&Publisher::getNumSubscribers, this),
-                                plugin_pub.publish_fn_);
-  user_cb(ssp);
 }
 
 } //namespace image_transport
