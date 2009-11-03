@@ -156,7 +156,7 @@ private:
     PublishMemFn pub_mem_fn = &SimplePublisherPlugin::publish;
     ImagePublishFn image_publish_fn = boost::bind(pub_mem_fn, this, _1, bindInternalPublisher(ros_ssp));
     
-    SingleSubscriberPublisher ssp(ros_ssp.getSubscriberCallerID(), getTopic(),
+    SingleSubscriberPublisher ssp(ros_ssp.getSubscriberName(), getTopic(),
                                   boost::bind(&SimplePublisherPlugin::getNumSubscribers, this),
                                   image_publish_fn);
     user_cb(ssp);

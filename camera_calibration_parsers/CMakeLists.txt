@@ -9,15 +9,15 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
 
-rospack(camera_calibration_parsers)
+rosbuild_init()
 
 #set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-rospack_add_boost_directories()
+rosbuild_add_boost_directories()
 
-rospack_add_library(${PROJECT_NAME} src/parse.cpp src/parse_ini.cpp src/parse_yml.cpp)
-rospack_add_executable(convert src/convert.cpp)
+rosbuild_add_library(${PROJECT_NAME} src/parse.cpp src/parse_ini.cpp src/parse_yml.cpp)
+rosbuild_add_executable(convert src/convert.cpp)
 target_link_libraries(convert ${PROJECT_NAME})
