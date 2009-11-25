@@ -1,12 +1,12 @@
 #include "camera_calibration_parsers/parse_ini.h"
 
-#include <boost/shared_ptr.hpp>
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/spirit/include/classic_file_iterator.hpp>
 #include <boost/spirit/include/classic_confix.hpp>
 #include <boost/spirit/include/classic_loops.hpp>
 #include <boost/typeof/typeof.hpp>
-#include <cstdio>
+#include <iterator>
+#include <fstream>
 
 namespace camera_calibration_parsers {
 
@@ -14,45 +14,57 @@ namespace camera_calibration_parsers {
 using namespace BOOST_SPIRIT_CLASSIC_NS;
 
 /// \cond
-static void printMatrix(FILE* file, const double* M, int rows, int cols, const char* endline = "\n")
+
+struct SimpleMatrix
 {
-  for (int i = 0; i < rows; ++i) {
-    for (int j = 0; j < cols; ++j) {
-      fprintf(file, "%.5f ", M[cols*i+j]);
+  int rows;
+  int cols;
+  const double* data;
+
+  SimpleMatrix(int rows, int cols, const double* data)
+    : rows(rows), cols(cols), data(data)
+  {}
+};
+
+std::ostream& operator << (std::ostream& out, const SimpleMatrix& m)
+{
+  for (int i = 0; i < m.rows; ++i) {
+    for (int j = 0; j < m.cols; ++j) {
+      out << m.data[m.cols*i+j] << " ";
     }
-    fprintf(file, endline);
+    out << std::endl;
   }
+  return out;
 }
+
 /// \endcond
+
+bool writeCalibrationIni(std::ostream& out, const std::string& camera_name,
+                         const sensor_msgs::CameraInfo& cam_info)
+{
+  out.precision(5);
+  out << std::fixed;
+  
+  out << "# Camera intrinsics\n\n";
+  /// @todo time?
+  out << "[image]\n\n";
+  out << "width\n" << cam_info.width << "\n\n";
+  out << "height\n" << cam_info.height << "\n\n";
+  out << "[" << camera_name << "]\n\n";
+
+  out << "camera matrix\n"     << SimpleMatrix(3, 3, &cam_info.K[0]);
+  out << "\ndistortion\n"      << SimpleMatrix(1, 5, &cam_info.D[0]);
+  out << "\n\nrectification\n" << SimpleMatrix(3, 3, &cam_info.R[0]);
+  out << "\nprojection\n"      << SimpleMatrix(3, 4, &cam_info.P[0]);
+
+  return true;
+}
 
 bool writeCalibrationIni(const std::string& file_name, const std::string& camera_name,
                          const sensor_msgs::CameraInfo& cam_info)
 {
-  FILE* file = fopen(file_name.c_str(), "w");
-  if (!file)
-    return false;
-  boost::shared_ptr<FILE> guard(file, fclose);
-
-  fprintf(file, "# Camera intrinsics\n\n");
-  /// @todo time?
-  fprintf(file, "[image]\n\n");
-  fprintf(file, "width\n%d\n\n", cam_info.width);
-  fprintf(file, "height\n%d\n\n", cam_info.height);
-  fprintf(file, "[%s]\n\n", camera_name.c_str());
-
-  fprintf(file, "camera matrix\n");
-  printMatrix(file, &cam_info.K[0], 3, 3);
-
-  fprintf(file, "\ndistortion\n");
-  printMatrix(file, &cam_info.D[0], 1, 5);
-  
-  fprintf(file, "\n\nrectification\n");
-  printMatrix(file, &cam_info.R[0], 3, 3);
-
-  fprintf(file, "\nprojection\n");
-  printMatrix(file, &cam_info.P[0], 3, 4);
-
-  return true;
+  std::ofstream out(file_name.c_str());
+  return writeCalibrationIni(out, camera_name, cam_info);
 }
 
 /// \cond
@@ -136,6 +148,12 @@ bool parseCalibrationIniRange(Iterator first, Iterator last,
   return info.hit;
 }
 /// \endcond
+
+bool readCalibrationIni(std::istream& in, std::string& camera_name, sensor_msgs::CameraInfo& cam_info)
+{
+  std::istream_iterator<char> first(in), last;
+  return parseCalibrationIniRange(first, last, camera_name, cam_info);
+}
 
 bool readCalibrationIni(const std::string& file_name, std::string& camera_name,
                         sensor_msgs::CameraInfo& cam_info)

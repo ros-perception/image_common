@@ -58,49 +58,48 @@ void operator >> (const YAML::Node& node, SimpleMatrix& m)
 
 /// \endcond
 
-bool writeCalibrationYml(const std::string& file_name, const std::string& camera_name,
+bool writeCalibrationYml(std::ostream& out, const std::string& camera_name,
                          const sensor_msgs::CameraInfo& cam_info)
 {
-  YAML::Emitter out;
-  out << YAML::BeginMap;
+  YAML::Emitter emitter;
+  emitter << YAML::BeginMap;
 
 #if 0
   // Calibration time
   // FIXME: this breaks yaml-cpp on reading for some reason
   time_t raw_time;
   time( &raw_time );
-  out << YAML::Key << "calibration_time";
-  out << YAML::Value << asctime(localtime(&raw_time));
+  emitter << YAML::Key << "calibration_time";
+  emitter << YAML::Value << asctime(localtime(&raw_time));
 #endif
 
   // Image dimensions
-  out << YAML::Key << WIDTH_YML_NAME << YAML::Value << (int)cam_info.width;
-  out << YAML::Key << HEIGHT_YML_NAME << YAML::Value << (int)cam_info.height;
+  emitter << YAML::Key << WIDTH_YML_NAME << YAML::Value << (int)cam_info.width;
+  emitter << YAML::Key << HEIGHT_YML_NAME << YAML::Value << (int)cam_info.height;
   
   // Camera name and intrinsics
-  out << YAML::Key << CAM_YML_NAME << YAML::Value << camera_name;
-  out << YAML::Key << K_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(&cam_info.K[0]));
-  out << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(1, 5, const_cast<double*>(&cam_info.D[0]));
-  out << YAML::Key << R_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(&cam_info.R[0]));
-  out << YAML::Key << P_YML_NAME << YAML::Value << SimpleMatrix(3, 4, const_cast<double*>(&cam_info.P[0]));
+  emitter << YAML::Key << CAM_YML_NAME << YAML::Value << camera_name;
+  emitter << YAML::Key << K_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(&cam_info.K[0]));
+  emitter << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(1, 5, const_cast<double*>(&cam_info.D[0]));
+  emitter << YAML::Key << R_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(&cam_info.R[0]));
+  emitter << YAML::Key << P_YML_NAME << YAML::Value << SimpleMatrix(3, 4, const_cast<double*>(&cam_info.P[0]));
 
-  out << YAML::EndMap;
+  emitter << YAML::EndMap;
 
-  // Write to file
-  FILE* file = fopen(file_name.c_str(), "w");
-  if (!file)
-    return false;
-  fprintf(file, "%s\n", out.c_str());
-  fclose(file);
-  
+  out << emitter.c_str();
   return true;
 }
 
-bool readCalibrationYml(const std::string& file_name, std::string& camera_name,
-                        sensor_msgs::CameraInfo& cam_info)
+bool writeCalibrationYml(const std::string& file_name, const std::string& camera_name,
+                         const sensor_msgs::CameraInfo& cam_info)
 {
-  std::ifstream fin(file_name.c_str());
-  YAML::Parser parser(fin);
+  std::ofstream out(file_name.c_str());
+  return writeCalibrationYml(out, camera_name, cam_info);
+}
+
+bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs::CameraInfo& cam_info)
+{
+  YAML::Parser parser(in);
   if (!parser)
     printf("Parser not OK!\n");
   YAML::Node doc;
@@ -124,6 +123,13 @@ bool readCalibrationYml(const std::string& file_name, std::string& camera_name,
   doc[P_YML_NAME] >> P_;
   
   return true;
+}
+
+bool readCalibrationYml(const std::string& file_name, std::string& camera_name,
+                        sensor_msgs::CameraInfo& cam_info)
+{
+  std::ifstream fin(file_name.c_str());
+  return readCalibrationYml(fin, camera_name, cam_info);
 }
 
 } //namespace camera_calibration_parsers
