@@ -55,7 +55,10 @@ protected:
                              const SubscriberStatusCallback& user_disconnect_cb,
                              const ros::VoidPtr& tracked_object, bool latch)
   {
-    simple_impl_.reset(new SimplePublisherPluginImpl(nh));
+    //simple_impl_.reset(new SimplePublisherPluginImpl(nh));
+    /// @todo: Is this even correct? Maybe need to resolve base_topic against nh to handle /foo topics?
+    ros::NodeHandle param_nh(nh, base_topic);
+    simple_impl_.reset(new SimplePublisherPluginImpl(param_nh));
     simple_impl_->pub_ = nh.advertise<M>(getTopicToAdvertise(base_topic), queue_size,
                                          bindCB(user_connect_cb, &SimplePublisherPlugin::connectCallback),
                                          bindCB(user_disconnect_cb, &SimplePublisherPlugin::disconnectCallback),

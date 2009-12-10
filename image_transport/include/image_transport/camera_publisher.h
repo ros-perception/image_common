@@ -60,11 +60,7 @@ namespace image_transport {
 class CameraPublisher
 {
 public:
-  CameraPublisher();
-
-  CameraPublisher(const CameraPublisher& rhs);
-  
-  ~CameraPublisher();
+  CameraPublisher() {}
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to
@@ -109,7 +105,7 @@ public:
    */
   void shutdown();
 
-  operator void*() const { return impl_ ? (void*)1 : (void*)0; }
+  operator void*() const;
   bool operator< (const CameraPublisher& rhs) const { return impl_ <  rhs.impl_; }
   bool operator!=(const CameraPublisher& rhs) const { return impl_ != rhs.impl_; }
   bool operator==(const CameraPublisher& rhs) const { return impl_ == rhs.impl_; }

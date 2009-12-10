@@ -61,11 +61,7 @@ namespace image_transport {
 class Publisher
 {
 public:
-  Publisher();
-
-  Publisher(const Publisher& rhs);
-  
-  ~Publisher();
+  Publisher() {}
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to
@@ -95,7 +91,7 @@ public:
    */
   void shutdown();
 
-  operator void*() const { return impl_ ? (void*)1 : (void*)0; }
+  operator void*() const;
   bool operator< (const Publisher& rhs) const { return impl_ <  rhs.impl_; }
   bool operator!=(const Publisher& rhs) const { return impl_ != rhs.impl_; }
   bool operator==(const Publisher& rhs) const { return impl_ == rhs.impl_; }
