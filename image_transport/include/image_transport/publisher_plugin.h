@@ -13,10 +13,7 @@ namespace image_transport {
 class PublisherPlugin : boost::noncopyable
 {
 public:
-  virtual ~PublisherPlugin()
-  {
-    shutdown();
-  }
+  virtual ~PublisherPlugin() {}
 
   /**
    * \brief Get a string identifier for the transport provided by
