@@ -32,12 +32,13 @@ public:
 
   virtual std::string getTopic() const
   {
-    return simple_impl_->sub_.getTopic();
+    if (simple_impl_) return simple_impl_->sub_.getTopic();
+    return std::string();
   }
 
   virtual void shutdown()
   {
-    simple_impl_->sub_.shutdown();
+    if (simple_impl_) simple_impl_->sub_.shutdown();
   }
 
 protected:
