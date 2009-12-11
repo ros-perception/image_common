@@ -29,11 +29,7 @@ public:
   typedef boost::function<void(const sensor_msgs::ImageConstPtr&,
                                const sensor_msgs::CameraInfoConstPtr&)> Callback;
   
-  CameraSubscriber();
-
-  CameraSubscriber(const CameraSubscriber& rhs);
-
-  ~CameraSubscriber();
+  CameraSubscriber() {}
 
   /**
    * \brief Get the base topic (on which the raw image is published).

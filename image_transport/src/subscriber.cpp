@@ -42,27 +42,34 @@ namespace image_transport {
 struct Subscriber::Impl
 {
   Impl()
-    : loader("image_transport", "image_transport::SubscriberPlugin")
+    : loader_("image_transport", "image_transport::SubscriberPlugin"),
+      unsubscribed_(false)
   {
   }
+
+  ~Impl()
+  {
+    unsubscribe();
+  }
+
+  bool isValid() const
+  {
+    return !unsubscribed_;
+  }
+
+  void unsubscribe()
+  {
+    if (!unsubscribed_) {
+      unsubscribed_ = true;
+      subscriber_->shutdown();
+    }
+  }
   
-  pluginlib::ClassLoader<SubscriberPlugin> loader;
-  boost::scoped_ptr<SubscriberPlugin> subscriber;
+  pluginlib::ClassLoader<SubscriberPlugin> loader_;
+  boost::scoped_ptr<SubscriberPlugin> subscriber_;
+  bool unsubscribed_;
+  //double constructed_;
 };
-
-Subscriber::Subscriber()
-  : impl_(new Impl)
-{
-}
-
-Subscriber::Subscriber(const Subscriber& rhs)
-  : impl_(rhs.impl_)
-{
-}
-
-Subscriber::~Subscriber()
-{
-}
 
 Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                        const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
@@ -70,26 +77,24 @@ Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint3
   : impl_(new Impl)
 {
   std::string lookup_name = SubscriberPlugin::getLookupName(transport_hints.getTransport());
-  impl_->subscriber.reset( impl_->loader.createClassInstance(lookup_name) );
-  impl_->subscriber->subscribe(nh, base_topic, queue_size, callback, tracked_object, transport_hints);
+  impl_->subscriber_.reset( impl_->loader_.createClassInstance(lookup_name) );
+  impl_->subscriber_->subscribe(nh, base_topic, queue_size, callback, tracked_object, transport_hints);
 }
 
 std::string Subscriber::getTopic() const
 {
-  return impl_->subscriber->getTopic();
+  if (impl_ && impl_->subscriber_) return impl_->subscriber_->getTopic();
+  return std::string();
 }
 
 void Subscriber::shutdown()
 {
-  if (impl_->subscriber) {
-    impl_->subscriber->shutdown();
-    impl_->subscriber.reset();
-  }
+  if (impl_) impl_->unsubscribe();
 }
 
 Subscriber::operator void*() const
 {
-  return (impl_ && impl_->subscriber) ? (void*)1 : (void*)0;
+  return (impl_ && impl_->isValid()) ? (void*)1 : (void*)0;
 }
 
 } //namespace image_transport

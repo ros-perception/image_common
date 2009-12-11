@@ -59,11 +59,7 @@ namespace image_transport {
 class Subscriber
 {
 public:
-  Subscriber();
-
-  Subscriber(const Subscriber& rhs);
-
-  ~Subscriber();
+  Subscriber() {}
 
   std::string getTopic() const;
 

@@ -9,22 +9,34 @@ namespace image_transport {
 struct CameraSubscriber::Impl
 {
   Impl(uint32_t queue_size)
-    : sync_(queue_size)
+    : sync_(queue_size),
+      unsubscribed_(false)
   {}
+
+  ~Impl()
+  {
+    unsubscribe();
+  }
+
+  bool isValid() const
+  {
+    return !unsubscribed_;
+  }
   
-  std::string info_topic_;
+  void unsubscribe()
+  {
+    if (!unsubscribed_) {
+      unsubscribed_ = true;
+      image_sub_.unsubscribe();
+      info_sub_.unsubscribe();
+    }
+  }
+  
   SubscriberFilter image_sub_;
   message_filters::Subscriber<sensor_msgs::CameraInfo> info_sub_;
   message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::CameraInfo> sync_;
+  bool unsubscribed_;
 };
-
-CameraSubscriber::CameraSubscriber()
-{
-}
-
-CameraSubscriber::~CameraSubscriber()
-{
-}
 
 CameraSubscriber::CameraSubscriber(ros::NodeHandle& nh, const std::string& base_topic,
                                    uint32_t queue_size, const Callback& callback,
@@ -32,9 +44,9 @@ CameraSubscriber::CameraSubscriber(ros::NodeHandle& nh, const std::string& base_
                                    const TransportHints& transport_hints)
   : impl_(new Impl(queue_size))
 {
-  impl_->info_topic_ = getCameraInfoTopic(base_topic);
+  std::string info_topic = getCameraInfoTopic(base_topic);
   impl_->image_sub_.subscribe(nh, base_topic, queue_size, transport_hints);
-  impl_->info_sub_.subscribe(nh, impl_->info_topic_, queue_size, transport_hints.getRosHints());
+  impl_->info_sub_ .subscribe(nh, info_topic, queue_size, transport_hints.getRosHints());
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
   // need for Boost.Bind here is kind of broken
   impl_->sync_.registerCallback(boost::bind(callback, _1, _2));
@@ -42,17 +54,24 @@ CameraSubscriber::CameraSubscriber(ros::NodeHandle& nh, const std::string& base_
 
 std::string CameraSubscriber::getTopic() const
 {
-  return impl_->image_sub_.getTopic();
+  if (impl_) return impl_->image_sub_.getTopic();
+  return std::string();
 }
 
 std::string CameraSubscriber::getInfoTopic() const
 {
-  return impl_->info_topic_;
+  if (impl_) return impl_->info_sub_.getTopic();
+  return std::string();
 }
 
 void CameraSubscriber::shutdown()
 {
-  impl_.reset();
+  if (impl_) impl_->unsubscribe();
+}
+
+CameraSubscriber::operator void*() const
+{
+  return (impl_ && impl_->isValid()) ? (void*)1 : (void*)0;
 }
 
 } //namespace image_transport
