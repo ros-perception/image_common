@@ -16,7 +16,10 @@ class SubscriberPlugin : boost::noncopyable
 public:
   typedef boost::function<void(const sensor_msgs::ImageConstPtr&)> Callback;
   
-  virtual ~SubscriberPlugin() {}
+  virtual ~SubscriberPlugin()
+  {
+    shutdown();
+  }
 
   /**
    * \brief Get a string identifier for the transport provided by
