@@ -107,6 +107,7 @@ public:
   {
     unsubscribe();
 
+    /// @todo Should pass in ImageTransport instead of NodeHandle to avoid creating one.
     ImageTransport it(nh);
     sub_ = it.subscribe(base_topic, queue_size, boost::bind(&SubscriberFilter::cb, this, _1),
                         ros::VoidPtr(), transport_hints);

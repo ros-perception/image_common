@@ -2,9 +2,48 @@
 
 namespace image_transport {
 
-ImageTransport::ImageTransport(const ros::NodeHandle& nh)
-  : nh_(nh)
+/*
+struct Shutdownable
 {
+  virtual void shutdown() = 0;
+};
+
+template<class T>
+struct ShutdownableT : Shutdownable
+{
+  ShutdownableT(boost::shared_ptr<T>& obj)
+    : obj_(obj)
+  {}
+
+  virtual void shutdown()
+  {
+    if (boost::shared_ptr<T> ptr = obj_.lock())
+      ptr->shutdown();
+  }
+
+  boost::weak_ptr<T> obj_;
+};
+*/
+
+struct ImageTransport::Impl
+{
+  ros::NodeHandle nh_;
+  
+  Impl(const ros::NodeHandle& nh)
+    : nh_(nh)
+  {
+  }
+};
+
+ImageTransport::ImageTransport(const ros::NodeHandle& nh)
+  : impl_(new Impl(nh))
+{
+}
+
+ImageTransport::~ImageTransport()
+{
+  /// @todo Should call shutdown() in the next release (breaking behavior).
+  //shutdown();
 }
 
 Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queue_size, bool latch)
@@ -18,14 +57,14 @@ Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queu
                                     const SubscriberStatusCallback& disconnect_cb,
                                     const ros::VoidPtr& tracked_object, bool latch)
 {
-  return Publisher(nh_, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
+  return Publisher(impl_->nh_, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
 }
 
 Subscriber ImageTransport::subscribe(const std::string& base_topic, uint32_t queue_size,
                                      const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                                      const ros::VoidPtr& tracked_object, const TransportHints& transport_hints)
 {
-  return Subscriber(nh_, base_topic, queue_size, callback, tracked_object, transport_hints);
+  return Subscriber(impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints);
 }
 
 CameraPublisher ImageTransport::advertiseCamera(const std::string& base_topic, uint32_t queue_size, bool latch)
@@ -43,7 +82,7 @@ CameraPublisher ImageTransport::advertiseCamera(const std::string& base_topic, u
                                                 const ros::SubscriberStatusCallback& info_disconnect_cb,
                                                 const ros::VoidPtr& tracked_object, bool latch)
 {
-  return CameraPublisher(nh_, base_topic, queue_size, image_connect_cb, image_disconnect_cb,
+  return CameraPublisher(impl_->nh_, base_topic, queue_size, image_connect_cb, image_disconnect_cb,
                          info_connect_cb, info_disconnect_cb, tracked_object, latch);
 }
 
@@ -52,7 +91,12 @@ CameraSubscriber ImageTransport::subscribeCamera(const std::string& base_topic, 
                                                  const ros::VoidPtr& tracked_object,
                                                  const TransportHints& transport_hints)
 {
-  return CameraSubscriber(nh_, base_topic, queue_size, callback, tracked_object, transport_hints);
+  return CameraSubscriber(impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints);
+}
+
+void ImageTransport::shutdown()
+{
+
 }
 
 } //namespace image_transport

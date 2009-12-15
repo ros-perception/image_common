@@ -46,6 +46,7 @@ struct CameraPublisher::Impl
 
   ~Impl()
   {
+    shutdown();
   }
 
   bool isValid() const
@@ -53,7 +54,7 @@ struct CameraPublisher::Impl
     return !unadvertised_;
   }
   
-  void unadvertise()
+  void shutdown()
   {
     if (!unadvertised_) {
       unadvertised_ = true;
@@ -144,7 +145,7 @@ void CameraPublisher::publish(sensor_msgs::Image& image, sensor_msgs::CameraInfo
 void CameraPublisher::shutdown()
 {
   if (impl_) {
-    impl_->unadvertise();
+    impl_->shutdown();
     impl_.reset();
   }
 }

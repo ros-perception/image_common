@@ -51,7 +51,7 @@ struct Publisher::Impl
 
   ~Impl()
   {
-    unadvertise();
+    shutdown();
   }
 
   uint32_t getNumSubscribers() const
@@ -72,7 +72,7 @@ struct Publisher::Impl
     return !unadvertised_;
   }
   
-  void unadvertise()
+  void shutdown()
   {
     if (!unadvertised_) {
       unadvertised_ = true;
@@ -166,7 +166,7 @@ void Publisher::publish(const sensor_msgs::ImageConstPtr& message) const
 void Publisher::shutdown()
 {
   if (impl_) {
-    impl_->unadvertise();
+    impl_->shutdown();
     impl_.reset();
   }
 }

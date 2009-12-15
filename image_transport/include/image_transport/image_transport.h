@@ -17,7 +17,9 @@ namespace image_transport {
 class ImageTransport
 {
 public:
-  ImageTransport(const ros::NodeHandle& nh);
+  explicit ImageTransport(const ros::NodeHandle& nh);
+
+  ~ImageTransport();
 
   /*!
    * \brief Advertise an image topic, simple version.
@@ -144,9 +146,17 @@ public:
                            transport_hints);
   }
 
+  void shutdown();
+
 private:
   /// @todo Move class loaders into ImageTransport to be shared among subscribers and publishers.
-  ros::NodeHandle nh_;
+  //ros::NodeHandle nh_;
+
+  struct Impl;
+  typedef boost::shared_ptr<Impl> ImplPtr;
+  typedef boost::weak_ptr<Impl> ImplWPtr;
+
+  ImplPtr impl_;
 };
 
 } //namespace image_transport

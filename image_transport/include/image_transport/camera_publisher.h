@@ -119,7 +119,10 @@ private:
                   const ros::VoidPtr& tracked_object, bool latch);
   
   struct Impl;
-  boost::shared_ptr<Impl> impl_;
+  typedef boost::shared_ptr<Impl> ImplPtr;
+  typedef boost::weak_ptr<Impl> ImplWPtr;
+  
+  ImplPtr impl_;
 
   friend class ImageTransport;
 };

@@ -49,7 +49,7 @@ struct Subscriber::Impl
 
   ~Impl()
   {
-    unsubscribe();
+    shutdown();
   }
 
   bool isValid() const
@@ -57,7 +57,7 @@ struct Subscriber::Impl
     return !unsubscribed_;
   }
 
-  void unsubscribe()
+  void shutdown()
   {
     if (!unsubscribed_) {
       unsubscribed_ = true;
@@ -89,7 +89,7 @@ std::string Subscriber::getTopic() const
 
 void Subscriber::shutdown()
 {
-  if (impl_) impl_->unsubscribe();
+  if (impl_) impl_->shutdown();
 }
 
 Subscriber::operator void*() const

@@ -15,7 +15,7 @@ struct CameraSubscriber::Impl
 
   ~Impl()
   {
-    unsubscribe();
+    shutdown();
   }
 
   bool isValid() const
@@ -23,7 +23,7 @@ struct CameraSubscriber::Impl
     return !unsubscribed_;
   }
   
-  void unsubscribe()
+  void shutdown()
   {
     if (!unsubscribed_) {
       unsubscribed_ = true;
@@ -66,7 +66,7 @@ std::string CameraSubscriber::getInfoTopic() const
 
 void CameraSubscriber::shutdown()
 {
-  if (impl_) impl_->unsubscribe();
+  if (impl_) impl_->shutdown();
 }
 
 CameraSubscriber::operator void*() const
