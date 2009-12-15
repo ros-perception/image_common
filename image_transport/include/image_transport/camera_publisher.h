@@ -42,6 +42,8 @@
 
 namespace image_transport {
 
+class ImageTransport;
+
 /**
  * \brief Manages advertisements for publishing camera images.
  *
@@ -111,7 +113,8 @@ public:
   bool operator==(const CameraPublisher& rhs) const { return impl_ == rhs.impl_; }
 
 private:
-  CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+  CameraPublisher(ImageTransport& image_it, ros::NodeHandle& info_nh,
+                  const std::string& base_topic, uint32_t queue_size,
                   const SubscriberStatusCallback& image_connect_cb,
                   const SubscriberStatusCallback& image_disconnect_cb,
                   const ros::SubscriberStatusCallback& info_connect_cb,

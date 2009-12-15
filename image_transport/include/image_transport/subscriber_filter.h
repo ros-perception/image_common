@@ -80,7 +80,8 @@ public:
   SubscriberFilter(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                    const TransportHints& transport_hints = TransportHints())
   {
-    subscribe(nh, base_topic, queue_size, transport_hints);
+    ImageTransport it(nh);
+    subscribe(it, base_topic, queue_size, transport_hints);
   }
 
   /**

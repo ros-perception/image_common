@@ -69,7 +69,8 @@ struct CameraPublisher::Impl
   //double constructed_;
 };
 
-CameraPublisher::CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+CameraPublisher::CameraPublisher(ImageTransport& image_it, ros::NodeHandle& info_nh,
+                                 const std::string& base_topic, uint32_t queue_size,
                                  const SubscriberStatusCallback& image_connect_cb,
                                  const SubscriberStatusCallback& image_disconnect_cb,
                                  const ros::SubscriberStatusCallback& info_connect_cb,
@@ -79,12 +80,10 @@ CameraPublisher::CameraPublisher(ros::NodeHandle& nh, const std::string& base_to
 {
   std::string info_topic = getCameraInfoTopic(base_topic);
 
-  /// @todo Why doesn't ImageTransport just pass in *this?
-  ImageTransport it(nh);
-  impl_->image_pub_ = it.advertise(base_topic, queue_size, image_connect_cb,
-                                   image_disconnect_cb, tracked_object, latch);
-  impl_->info_pub_ = nh.advertise<sensor_msgs::CameraInfo>(info_topic, queue_size, info_connect_cb,
-                                                           info_disconnect_cb, tracked_object, latch);
+  impl_->image_pub_ = image_it.advertise(base_topic, queue_size, image_connect_cb,
+                                         image_disconnect_cb, tracked_object, latch);
+  impl_->info_pub_ = info_nh.advertise<sensor_msgs::CameraInfo>(info_topic, queue_size, info_connect_cb,
+                                                                info_disconnect_cb, tracked_object, latch);
 }
 
 uint32_t CameraPublisher::getNumSubscribers() const
