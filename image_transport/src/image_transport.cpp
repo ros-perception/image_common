@@ -2,32 +2,10 @@
 
 namespace image_transport {
 
-/*
-struct Shutdownable
-{
-  virtual void shutdown() = 0;
-};
-
-template<class T>
-struct ShutdownableT : Shutdownable
-{
-  ShutdownableT(boost::shared_ptr<T>& obj)
-    : obj_(obj)
-  {}
-
-  virtual void shutdown()
-  {
-    if (boost::shared_ptr<T> ptr = obj_.lock())
-      ptr->shutdown();
-  }
-
-  boost::weak_ptr<T> obj_;
-};
-*/
-
 struct ImageTransport::Impl
 {
   ros::NodeHandle nh_;
+  /// @todo Move class loaders here to be shared among subscribers and publishers.
   
   Impl(const ros::NodeHandle& nh)
     : nh_(nh)

@@ -149,9 +149,6 @@ public:
   void shutdown();
 
 private:
-  /// @todo Move class loaders into ImageTransport to be shared among subscribers and publishers.
-  //ros::NodeHandle nh_;
-
   struct Impl;
   typedef boost::shared_ptr<Impl> ImplPtr;
   typedef boost::weak_ptr<Impl> ImplWPtr;
