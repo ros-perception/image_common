@@ -72,9 +72,10 @@ CameraSubscriber ImageTransport::subscribeCamera(const std::string& base_topic, 
   return CameraSubscriber(*this, impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints);
 }
 
+/*
 void ImageTransport::shutdown()
 {
-
 }
+*/
 
 } //namespace image_transport

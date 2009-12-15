@@ -146,7 +146,8 @@ public:
                            transport_hints);
   }
 
-  void shutdown();
+  /// @todo Implement shutdown() of all handles opened with this ImageTransport.
+  //void shutdown();
 
 private:
   struct Impl;
