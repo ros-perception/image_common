@@ -20,6 +20,8 @@ rosbuild_gensrv()
 
 rosbuild_add_library(${PROJECT_NAME} src/publication_server.cpp)
 
+rosbuild_add_executable(poller src/poller.cpp)
+
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
