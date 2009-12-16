@@ -44,7 +44,8 @@ namespace image_transport {
 struct Publisher::Impl
 {
   Impl()
-    : loader("image_transport", "image_transport::PublisherPlugin")
+    : loader_("image_transport", "image_transport::PublisherPlugin"),
+      unadvertised_(false)
   {
   }
 
@@ -56,20 +57,29 @@ struct Publisher::Impl
   uint32_t getNumSubscribers() const
   {
     uint32_t count = 0;
-    BOOST_FOREACH(const PublisherPlugin& pub, publishers)
+    BOOST_FOREACH(const PublisherPlugin& pub, publishers_)
       count += pub.getNumSubscribers();
     return count;
   }
 
   std::string getTopic() const
   {
-    return base_topic;
+    return base_topic_;
+  }
+
+  bool isValid() const
+  {
+    return !unadvertised_;
   }
   
   void shutdown()
   {
-    BOOST_FOREACH(PublisherPlugin& pub, publishers)
-      pub.shutdown();
+    if (!unadvertised_) {
+      unadvertised_ = true;
+      BOOST_FOREACH(PublisherPlugin& pub, publishers_)
+        pub.shutdown();
+      publishers_.clear();
+    }
   }
 
   void subscriberCB(const SingleSubscriberPublisher& plugin_pub,
@@ -81,23 +91,13 @@ struct Publisher::Impl
     user_cb(ssp);
   }
   
-  std::string base_topic;
-  pluginlib::ClassLoader<PublisherPlugin> loader;
-  boost::ptr_vector<PublisherPlugin> publishers;
+  std::string base_topic_;
+  pluginlib::ClassLoader<PublisherPlugin> loader_;
+  boost::ptr_vector<PublisherPlugin> publishers_;
+  bool unadvertised_;
+  //double constructed_;
 };
 
-Publisher::Publisher()
-{
-}
-
-Publisher::Publisher(const Publisher& rhs)
-  : impl_(rhs.impl_)
-{
-}
-
-Publisher::~Publisher()
-{
-}
 
 Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                      const SubscriberStatusCallback& connect_cb,
@@ -105,13 +105,13 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
                      const ros::VoidPtr& tracked_object, bool latch)
   : impl_(new Impl)
 {
-  impl_->base_topic = nh.resolveName(base_topic);
+  impl_->base_topic_ = base_topic;
   
-  BOOST_FOREACH(const std::string& lookup_name, impl_->loader.getDeclaredClasses()) {
+  BOOST_FOREACH(const std::string& lookup_name, impl_->loader_.getDeclaredClasses()) {
     try {
-      PublisherPlugin* pub = impl_->loader.createClassInstance(lookup_name);
-      impl_->publishers.push_back(pub);
-      pub->advertise(nh, impl_->base_topic, queue_size, rebindCB(connect_cb),
+      PublisherPlugin* pub = impl_->loader_.createClassInstance(lookup_name);
+      impl_->publishers_.push_back(pub);
+      pub->advertise(nh, impl_->base_topic_, queue_size, rebindCB(connect_cb),
                      rebindCB(disconnect_cb), tracked_object, latch);
     }
     catch (const std::runtime_error& e) {
@@ -120,24 +120,31 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
     }
   }
 
-  if (impl_->publishers.empty())
+  if (impl_->publishers_.empty())
     throw std::runtime_error("No plugins found! Does `rospack plugins --attrib=plugin "
                              "image_transport` find any packages?");
 }
 
 uint32_t Publisher::getNumSubscribers() const
 {
-  return impl_->getNumSubscribers();
+  if (impl_ && impl_->isValid()) return impl_->getNumSubscribers();
+  return 0;
 }
 
 std::string Publisher::getTopic() const
 {
-  return impl_->getTopic();
+  if (impl_) return impl_->getTopic();
+  return std::string();
 }
 
 void Publisher::publish(const sensor_msgs::Image& message) const
 {
-  BOOST_FOREACH(const PublisherPlugin& pub, impl_->publishers) {
+  if (!impl_ || !impl_->isValid()) {
+    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::Publisher");
+    return;
+  }
+  
+  BOOST_FOREACH(const PublisherPlugin& pub, impl_->publishers_) {
     if (pub.getNumSubscribers() > 0)
       pub.publish(message);
   }
@@ -145,12 +152,28 @@ void Publisher::publish(const sensor_msgs::Image& message) const
 
 void Publisher::publish(const sensor_msgs::ImageConstPtr& message) const
 {
-  publish(*message);
+  if (!impl_ || !impl_->isValid()) {
+    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::Publisher");
+    return;
+  }
+  
+  BOOST_FOREACH(const PublisherPlugin& pub, impl_->publishers_) {
+    if (pub.getNumSubscribers() > 0)
+      pub.publish(message);
+  }
 }
 
 void Publisher::shutdown()
 {
-  impl_->shutdown();
+  if (impl_) {
+    impl_->shutdown();
+    impl_.reset();
+  }
+}
+
+Publisher::operator void*() const
+{
+  return (impl_ && impl_->isValid()) ? (void*)1 : (void*)0;
 }
 
 SubscriberStatusCallback Publisher::rebindCB(const SubscriberStatusCallback& user_cb)

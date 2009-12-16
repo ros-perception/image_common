@@ -31,22 +31,29 @@ public:
 
   virtual uint32_t getNumSubscribers() const
   {
-    return simple_impl_->pub_.getNumSubscribers();
+    if (simple_impl_) return simple_impl_->pub_.getNumSubscribers();
+    return 0;
   }
 
   virtual std::string getTopic() const
   {
-    return simple_impl_->pub_.getTopic();
+    if (simple_impl_) return simple_impl_->pub_.getTopic();
+    return std::string();
   }
 
   virtual void publish(const sensor_msgs::Image& message) const
   {
+    if (!simple_impl_ || !simple_impl_->pub_) {
+      ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
+      return;
+    }
+    
     publish(message, bindInternalPublisher(simple_impl_->pub_));
   }
 
   virtual void shutdown()
   {
-    simple_impl_->pub_.shutdown();
+    if (simple_impl_) simple_impl_->pub_.shutdown();
   }
 
 protected:
@@ -55,7 +62,9 @@ protected:
                              const SubscriberStatusCallback& user_disconnect_cb,
                              const ros::VoidPtr& tracked_object, bool latch)
   {
-    simple_impl_.reset(new SimplePublisherPluginImpl(nh));
+    /// @todo This does not work if base_topic is a global name.
+    ros::NodeHandle param_nh(nh, base_topic);
+    simple_impl_.reset(new SimplePublisherPluginImpl(param_nh));
     simple_impl_->pub_ = nh.advertise<M>(getTopicToAdvertise(base_topic), queue_size,
                                          bindCB(user_connect_cb, &SimplePublisherPlugin::connectCallback),
                                          bindCB(user_disconnect_cb, &SimplePublisherPlugin::disconnectCallback),

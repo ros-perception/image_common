@@ -42,6 +42,8 @@
 
 namespace image_transport {
 
+class ImageTransport;
+
 /**
  * \brief Manages advertisements for publishing camera images.
  *
@@ -60,11 +62,7 @@ namespace image_transport {
 class CameraPublisher
 {
 public:
-  CameraPublisher();
-
-  CameraPublisher(const CameraPublisher& rhs);
-  
-  ~CameraPublisher();
+  CameraPublisher() {}
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to
@@ -109,13 +107,14 @@ public:
    */
   void shutdown();
 
-  operator void*() const { return impl_ ? (void*)1 : (void*)0; }
+  operator void*() const;
   bool operator< (const CameraPublisher& rhs) const { return impl_ <  rhs.impl_; }
   bool operator!=(const CameraPublisher& rhs) const { return impl_ != rhs.impl_; }
   bool operator==(const CameraPublisher& rhs) const { return impl_ == rhs.impl_; }
 
 private:
-  CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+  CameraPublisher(ImageTransport& image_it, ros::NodeHandle& info_nh,
+                  const std::string& base_topic, uint32_t queue_size,
                   const SubscriberStatusCallback& image_connect_cb,
                   const SubscriberStatusCallback& image_disconnect_cb,
                   const ros::SubscriberStatusCallback& info_connect_cb,
@@ -123,7 +122,10 @@ private:
                   const ros::VoidPtr& tracked_object, bool latch);
   
   struct Impl;
-  boost::shared_ptr<Impl> impl_;
+  typedef boost::shared_ptr<Impl> ImplPtr;
+  typedef boost::weak_ptr<Impl> ImplWPtr;
+  
+  ImplPtr impl_;
 
   friend class ImageTransport;
 };

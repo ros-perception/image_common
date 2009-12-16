@@ -59,11 +59,7 @@ namespace image_transport {
 class Subscriber
 {
 public:
-  Subscriber();
-
-  Subscriber(const Subscriber& rhs);
-
-  ~Subscriber();
+  Subscriber() {}
 
   std::string getTopic() const;
 
@@ -83,7 +79,10 @@ private:
              const ros::VoidPtr& tracked_object, const TransportHints& transport_hints);
   
   struct Impl;
-  boost::shared_ptr<Impl> impl_;
+  typedef boost::shared_ptr<Impl> ImplPtr;
+  typedef boost::weak_ptr<Impl> ImplWPtr;
+  
+  ImplPtr impl_;
 
   friend class ImageTransport;
 };

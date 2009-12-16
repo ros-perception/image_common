@@ -11,6 +11,25 @@ namespace camera_calibration_parsers {
 /**
  * \brief Write calibration parameters to a file in INI format.
  *
+ * \param out Output stream to write to
+ * \param camera_name Name of the camera
+ * \param cam_info Camera parameters
+ */
+bool writeCalibrationIni(std::ostream& out, const std::string& camera_name,
+                         const sensor_msgs::CameraInfo& cam_info);
+
+/**
+ * \brief Read calibration parameters from an INI file.
+ *
+ * \param in Input stream to read from
+ * \param[out] camera_name Name of the camera
+ * \param[out] cam_info Camera parameters
+ */
+bool readCalibrationIni(std::istream& in, std::string& camera_name, sensor_msgs::CameraInfo& cam_info);
+
+/**
+ * \brief Write calibration parameters to a file in INI format.
+ *
  * \param file_name File to write
  * \param camera_name Name of the camera
  * \param cam_info Camera parameters
@@ -37,6 +56,8 @@ bool readCalibrationIni(const std::string& file_name, std::string& camera_name,
  */
 bool parseCalibrationIni(const std::string& buffer, std::string& camera_name,
                          sensor_msgs::CameraInfo& cam_info);
+
+//bool readCalibrationIni
 
 } //namespace camera_calibration_parsers
 

@@ -40,37 +40,37 @@ namespace image_transport {
 struct CameraPublisher::Impl
 {
   Impl()
+    : unadvertised_(false)
   {
   }
 
   ~Impl()
   {
+    shutdown();
+  }
+
+  bool isValid() const
+  {
+    return !unadvertised_;
   }
   
   void shutdown()
   {
-    image_pub_.shutdown();
-    info_pub_.shutdown();
+    if (!unadvertised_) {
+      unadvertised_ = true;
+      image_pub_.shutdown();
+      info_pub_.shutdown();
+    }
   }
 
   Publisher image_pub_;
   ros::Publisher info_pub_;
+  bool unadvertised_;
+  //double constructed_;
 };
 
-CameraPublisher::CameraPublisher()
-{
-}
-
-CameraPublisher::CameraPublisher(const CameraPublisher& rhs)
-  : impl_(rhs.impl_)
-{
-}
-
-CameraPublisher::~CameraPublisher()
-{
-}
-
-CameraPublisher::CameraPublisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+CameraPublisher::CameraPublisher(ImageTransport& image_it, ros::NodeHandle& info_nh,
+                                 const std::string& base_topic, uint32_t queue_size,
                                  const SubscriberStatusCallback& image_connect_cb,
                                  const SubscriberStatusCallback& image_disconnect_cb,
                                  const ros::SubscriberStatusCallback& info_connect_cb,
@@ -80,31 +80,38 @@ CameraPublisher::CameraPublisher(ros::NodeHandle& nh, const std::string& base_to
 {
   std::string info_topic = getCameraInfoTopic(base_topic);
 
-  /// @todo Why doesn't ImageTransport just pass in *this?
-  ImageTransport it(nh);
-  impl_->image_pub_ = it.advertise(base_topic, queue_size, image_connect_cb,
-                                   image_disconnect_cb, tracked_object, latch);
-  impl_->info_pub_ = nh.advertise<sensor_msgs::CameraInfo>(info_topic, queue_size, info_connect_cb,
-                                                           info_disconnect_cb, tracked_object, latch);
+  impl_->image_pub_ = image_it.advertise(base_topic, queue_size, image_connect_cb,
+                                         image_disconnect_cb, tracked_object, latch);
+  impl_->info_pub_ = info_nh.advertise<sensor_msgs::CameraInfo>(info_topic, queue_size, info_connect_cb,
+                                                                info_disconnect_cb, tracked_object, latch);
 }
 
 uint32_t CameraPublisher::getNumSubscribers() const
 {
-  return std::max(impl_->image_pub_.getNumSubscribers(), impl_->info_pub_.getNumSubscribers());
+  if (impl_ && impl_->isValid())
+    return std::max(impl_->image_pub_.getNumSubscribers(), impl_->info_pub_.getNumSubscribers());
+  return 0;
 }
 
 std::string CameraPublisher::getTopic() const
 {
-  return impl_->image_pub_.getTopic();
+  if (impl_) return impl_->image_pub_.getTopic();
+  return std::string();
 }
 
 std::string CameraPublisher::getInfoTopic() const
 {
-  return impl_->info_pub_.getTopic();
+  if (impl_) return impl_->info_pub_.getTopic();
+  return std::string();
 }
 
 void CameraPublisher::publish(const sensor_msgs::Image& image, const sensor_msgs::CameraInfo& info) const
 {
+  if (!impl_ || !impl_->isValid()) {
+    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
+    return;
+  }
+  
   impl_->image_pub_.publish(image);
   impl_->info_pub_.publish(info);
 }
@@ -112,6 +119,11 @@ void CameraPublisher::publish(const sensor_msgs::Image& image, const sensor_msgs
 void CameraPublisher::publish(const sensor_msgs::ImageConstPtr& image,
                               const sensor_msgs::CameraInfoConstPtr& info) const
 {
+  if (!impl_ || !impl_->isValid()) {
+    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
+    return;
+  }
+  
   impl_->image_pub_.publish(image);
   impl_->info_pub_.publish(info);
 }
@@ -119,6 +131,11 @@ void CameraPublisher::publish(const sensor_msgs::ImageConstPtr& image,
 void CameraPublisher::publish(sensor_msgs::Image& image, sensor_msgs::CameraInfo& info,
                               ros::Time stamp) const
 {
+  if (!impl_ || !impl_->isValid()) {
+    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
+    return;
+  }
+  
   image.header.stamp = stamp;
   info.header.stamp = stamp;
   publish(image, info);
@@ -126,7 +143,15 @@ void CameraPublisher::publish(sensor_msgs::Image& image, sensor_msgs::CameraInfo
 
 void CameraPublisher::shutdown()
 {
-  impl_->shutdown();
+  if (impl_) {
+    impl_->shutdown();
+    impl_.reset();
+  }
+}
+
+CameraPublisher::operator void*() const
+{
+  return (impl_ && impl_->isValid()) ? (void*)1 : (void*)0;
 }
 
 } //namespace image_transport

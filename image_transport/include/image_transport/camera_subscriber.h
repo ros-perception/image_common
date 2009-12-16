@@ -8,6 +8,8 @@
 
 namespace image_transport {
 
+class ImageTransport;
+
 /**
  * \brief Manages a subscription callback on synchronized Image and CameraInfo topics.
  *
@@ -29,11 +31,7 @@ public:
   typedef boost::function<void(const sensor_msgs::ImageConstPtr&,
                                const sensor_msgs::CameraInfoConstPtr&)> Callback;
   
-  CameraSubscriber();
-
-  CameraSubscriber(const CameraSubscriber& rhs);
-
-  ~CameraSubscriber();
+  CameraSubscriber() {}
 
   /**
    * \brief Get the base topic (on which the raw image is published).
@@ -56,13 +54,17 @@ public:
   bool operator==(const CameraSubscriber& rhs) const { return impl_ == rhs.impl_; }
   
 private:
-  CameraSubscriber(ros::NodeHandle& nh, const std::string& base_topic,
-                   uint32_t queue_size, const Callback& callback,
+  CameraSubscriber(ImageTransport& image_it, ros::NodeHandle& info_nh,
+                   const std::string& base_topic, uint32_t queue_size,
+                   const Callback& callback,
                    const ros::VoidPtr& tracked_object = ros::VoidPtr(),
                    const TransportHints& transport_hints = TransportHints());
   
   struct Impl;
-  boost::shared_ptr<Impl> impl_;
+  typedef boost::shared_ptr<Impl> ImplPtr;
+  typedef boost::weak_ptr<Impl> ImplWPtr;
+  
+  ImplPtr impl_;
 
   friend class ImageTransport;
 };

@@ -1,0 +1,18 @@
+<package>
+  <description brief="polled_camera">
+
+     polled_camera
+
+  </description>
+  <author>Patrick Mihelich</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/polled_camera</url>
+  <depend package="image_transport"/>
+  <depend package="sensor_msgs"/>
+
+  <export>
+    <cpp lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lpolled_camera" cflags="-I${prefix}/include -I${prefix}/srv/cpp"/>
+  </export>
+
+</package>
