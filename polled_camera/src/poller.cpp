@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <ros/ros.h>
 #include <boost/lexical_cast.hpp>
 #include "polled_camera/GetPolledImage.h"
