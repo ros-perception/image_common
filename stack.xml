@@ -1,4 +1,4 @@
-<stack name="image_common" version="0.6.0">
+<stack name="image_common" version="0.6.1">
   <description brief="Common code for working with images">
     Common code for working with images in ROS.
   </description>
