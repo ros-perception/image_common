@@ -8,6 +8,21 @@
 
 namespace polled_camera {
 
+/**
+ * \brief Manage image requests from one or more clients.
+ *
+ * Instances of polled_camera::PublicationServer should be created using one of
+ * the overloads of polled_camera::advertise(). You must specify a driver callback
+ * that populates the requested data:
+\code
+bool callback(polled_camera::GetPolledImage::Request& req,
+              sensor_msgs::Image& image, sensor_msgs::CameraInfo& info)
+{
+  // Capture an image and fill in the Image and CameraInfo messages here.
+  // Return true on success.
+}
+\endcode
+ */
 class PublicationServer
 {
 public:
@@ -16,7 +31,10 @@ public:
                                 sensor_msgs::CameraInfo&)> DriverCallback;
   
   PublicationServer() {}
-  
+
+  /**
+   * \brief Unadvertise the request service and shut down all published topics.
+   */
   void shutdown();
 
   std::string getService() const;
@@ -38,10 +56,16 @@ private:
   PublicationServer advertise(ros::NodeHandle&, const std::string&, const DriverCallback&, const ros::VoidPtr&);
 };
 
+/**
+ * \brief Advertise a polled image service, version for arbitrary boost::function object.
+ */
 PublicationServer advertise(ros::NodeHandle& nh, const std::string& service,
                             const PublicationServer::DriverCallback& cb,
                             const ros::VoidPtr& tracked_object = ros::VoidPtr());
 
+/**
+ * \brief Advertise a polled image service, version for class member function with bare pointer.
+ */
 template<class T>
 PublicationServer advertise(ros::NodeHandle& nh, const std::string& service,
                             bool(T::*fp)(polled_camera::GetPolledImage::Request&,
@@ -51,6 +75,9 @@ PublicationServer advertise(ros::NodeHandle& nh, const std::string& service,
   return advertise(nh, service, boost::bind(fp, obj, _1, _2, _3));
 }
 
+/**
+ * \brief Advertise a polled image service, version for class member function with bare pointer.
+ */
 template<class T>
 PublicationServer advertise(ros::NodeHandle& nh, const std::string& service,
                             bool(T::*fp)(polled_camera::GetPolledImage::Request&,
