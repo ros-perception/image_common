@@ -1,5 +1,5 @@
 <package>
-  <description brief="polled_camera">
+  <description brief="Library for polled camera drivers">
 
      polled_camera contains a service and C++ helper classes for implementing a polled
      camera driver node and requesting images from it. The package is currently for
@@ -8,7 +8,7 @@
   </description>
   <author>Patrick Mihelich</author>
   <license>BSD</license>
-  <review status="unreviewed" notes=""/>
+  <review status="Doc reviewed" notes="2010/01/11"/>
   <url>http://ros.org/wiki/polled_camera</url>
   <depend package="image_transport"/>
   <depend package="sensor_msgs"/>
