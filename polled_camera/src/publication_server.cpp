@@ -3,6 +3,8 @@
 
 namespace polled_camera {
 
+/// \cond
+
 class PublicationServer::Impl
 {
 public:
@@ -78,6 +80,8 @@ public:
     }
   }
 };
+
+/// \endcond
 
 PublicationServer::PublicationServer(const std::string& service, ros::NodeHandle& nh,
                                      const DriverCallback& cb, const ros::VoidPtr& tracked_object)
