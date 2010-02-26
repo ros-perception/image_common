@@ -164,6 +164,14 @@ public:
     return sub_.getTopic();
   }
 
+  /**
+   * \brief Returns the number of publishers this subscriber is connected to.
+   */
+  uint32_t getNumPublishers() const
+  {
+    return sub_.getNumPublishers();
+  }
+
 private:
 
   void cb(const sensor_msgs::ImageConstPtr& m)
