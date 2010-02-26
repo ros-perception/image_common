@@ -75,6 +75,11 @@ public:
   virtual std::string getTopic() const = 0;
 
   /**
+   * \brief Returns the number of publishers this subscriber is connected to.
+   */
+  virtual uint32_t getNumPublishers() const = 0;
+
+  /**
    * \brief Unsubscribe the callback associated with this SubscriberPlugin.
    */
   virtual void shutdown() = 0;

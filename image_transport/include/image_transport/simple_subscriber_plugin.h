@@ -36,6 +36,12 @@ public:
     return std::string();
   }
 
+  virtual uint32_t getNumPublishers() const
+  {
+    if (simple_impl_) return simple_impl_->sub_.getNumPublishers();
+    return 0;
+  }
+
   virtual void shutdown()
   {
     if (simple_impl_) simple_impl_->sub_.shutdown();

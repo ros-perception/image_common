@@ -44,6 +44,11 @@ public:
   std::string getInfoTopic() const;
 
   /**
+   * \brief Returns the number of publishers this subscriber is connected to.
+   */
+  uint32_t getNumPublishers() const;
+
+  /**
    * \brief Unsubscribe the callback associated with this CameraSubscriber.
    */
   void shutdown();
