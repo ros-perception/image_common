@@ -64,6 +64,14 @@ std::string CameraSubscriber::getInfoTopic() const
   return std::string();
 }
 
+uint32_t CameraSubscriber::getNumPublishers() const
+{
+  /// @todo Fix this when message_filters::Subscriber has getNumPublishers()
+  //if (impl_) return std::max(impl_->image_sub_.getNumPublishers(), impl_->info_sub_.getNumPublishers());
+  if (impl_) return impl_->image_sub_.getNumPublishers();
+  return 0;
+}
+
 void CameraSubscriber::shutdown()
 {
   if (impl_) impl_->shutdown();

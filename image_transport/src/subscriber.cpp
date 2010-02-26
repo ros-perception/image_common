@@ -105,8 +105,14 @@ Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint3
 
 std::string Subscriber::getTopic() const
 {
-  if (impl_ && impl_->subscriber_) return impl_->subscriber_->getTopic();
+  if (impl_) return impl_->subscriber_->getTopic();
   return std::string();
+}
+
+uint32_t Subscriber::getNumPublishers() const
+{
+  if (impl_) return impl_->subscriber_->getNumPublishers();
+  return 0;
 }
 
 void Subscriber::shutdown()
