@@ -4,6 +4,7 @@
 #include <ctime>
 #include <cassert>
 #include <cstring>
+#include <ros/console.h>
 
 namespace camera_calibration_parsers {
 
@@ -99,37 +100,52 @@ bool writeCalibrationYml(const std::string& file_name, const std::string& camera
 
 bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs::CameraInfo& cam_info)
 {
-  YAML::Parser parser(in);
-  if (!parser)
-    printf("Parser not OK!\n");
-  YAML::Node doc;
-  parser.GetNextDocument(doc);
-
   try {
-    doc[CAM_YML_NAME] >> camera_name;
-  } catch(...) {
-    camera_name = "unknown";
+    YAML::Parser parser(in);
+    if (!parser) {
+      ROS_ERROR("Unable to create YAML parser for camera calibration");
+      return false;
+    }
+    YAML::Node doc;
+    parser.GetNextDocument(doc);
+
+    if (const YAML::Node* name_node = doc.FindValue(CAM_YML_NAME))
+      *name_node >> camera_name;
+    else
+      camera_name = "unknown";
+  
+    doc[WIDTH_YML_NAME] >> cam_info.width;
+    doc[HEIGHT_YML_NAME] >> cam_info.height;
+  
+    SimpleMatrix K_(3, 3, &cam_info.K[0]);
+    doc[K_YML_NAME] >> K_;
+    SimpleMatrix D_(1, 5, &cam_info.D[0]);
+    doc[D_YML_NAME] >> D_;
+    SimpleMatrix R_(3, 3, &cam_info.R[0]);
+    doc[R_YML_NAME] >> R_;
+    SimpleMatrix P_(3, 4, &cam_info.P[0]);
+    doc[P_YML_NAME] >> P_;
+  
+    return true;
   }
-  doc[WIDTH_YML_NAME] >> cam_info.width;
-  doc[HEIGHT_YML_NAME] >> cam_info.height;
-  
-  SimpleMatrix K_(3, 3, &cam_info.K[0]);
-  doc[K_YML_NAME] >> K_;
-  SimpleMatrix D_(1, 5, &cam_info.D[0]);
-  doc[D_YML_NAME] >> D_;
-  SimpleMatrix R_(3, 3, &cam_info.R[0]);
-  doc[R_YML_NAME] >> R_;
-  SimpleMatrix P_(3, 4, &cam_info.P[0]);
-  doc[P_YML_NAME] >> P_;
-  
-  return true;
+  catch (YAML::Exception& e) {
+    ROS_ERROR("Exception parsing YAML camera calibration:\n%s", e.what());
+    return false;
+  }
 }
 
 bool readCalibrationYml(const std::string& file_name, std::string& camera_name,
                         sensor_msgs::CameraInfo& cam_info)
 {
   std::ifstream fin(file_name.c_str());
-  return readCalibrationYml(fin, camera_name, cam_info);
+  if (!fin.good()) {
+    ROS_ERROR("Unable to open camera calibration file [%s]", file_name.c_str());
+    return false;
+  }
+  bool success = readCalibrationYml(fin, camera_name, cam_info);
+  if (!success)
+    ROS_ERROR("Failed to parse camera calibration from file [%s]", file_name.c_str());
+  return success;
 }
 
 } //namespace camera_calibration_parsers
