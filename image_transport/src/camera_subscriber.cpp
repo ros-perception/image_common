@@ -44,8 +44,11 @@ CameraSubscriber::CameraSubscriber(ImageTransport& image_it, ros::NodeHandle& in
                                    const TransportHints& transport_hints)
   : impl_(new Impl(queue_size))
 {
-  std::string info_topic = getCameraInfoTopic(base_topic);
-  impl_->image_sub_.subscribe(image_it, base_topic, queue_size, transport_hints);
+  // Must explicitly remap the image topic since we then do some string manipulation on it
+  // to figure out the sibling camera_info topic.
+  std::string image_topic = info_nh.resolveName(base_topic);
+  std::string info_topic = getCameraInfoTopic(image_topic);
+  impl_->image_sub_.subscribe(image_it, image_topic, queue_size, transport_hints);
   impl_->info_sub_ .subscribe(info_nh, info_topic, queue_size, transport_hints.getRosHints());
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
   // need for Boost.Bind here is kind of broken
