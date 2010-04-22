@@ -39,6 +39,7 @@
 #include <sensor_msgs/Image.h>
 #include "image_transport/transport_hints.h"
 #include "image_transport/exception.h"
+#include "image_transport/loader_fwds.h"
 
 namespace image_transport {
 
@@ -82,7 +83,8 @@ public:
 private:
   Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
              const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-             const ros::VoidPtr& tracked_object, const TransportHints& transport_hints);
+             const ros::VoidPtr& tracked_object, const TransportHints& transport_hints,
+             const SubLoaderPtr& loader);
   
   struct Impl;
   typedef boost::shared_ptr<Impl> ImplPtr;

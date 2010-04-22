@@ -44,8 +44,7 @@ namespace image_transport {
 struct Publisher::Impl
 {
   Impl()
-    : loader_("image_transport", "image_transport::PublisherPlugin"),
-      unadvertised_(false)
+    : unadvertised_(false)
   {
   }
 
@@ -92,7 +91,7 @@ struct Publisher::Impl
   }
   
   std::string base_topic_;
-  pluginlib::ClassLoader<PublisherPlugin> loader_;
+  PubLoaderPtr loader_;
   boost::ptr_vector<PublisherPlugin> publishers_;
   bool unadvertised_;
   //double constructed_;
@@ -102,16 +101,18 @@ struct Publisher::Impl
 Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                      const SubscriberStatusCallback& connect_cb,
                      const SubscriberStatusCallback& disconnect_cb,
-                     const ros::VoidPtr& tracked_object, bool latch)
+                     const ros::VoidPtr& tracked_object, bool latch,
+                     const PubLoaderPtr& loader)
   : impl_(new Impl)
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
   impl_->base_topic_ = nh.resolveName(base_topic);
+  impl_->loader_ = loader;
   
-  BOOST_FOREACH(const std::string& lookup_name, impl_->loader_.getDeclaredClasses()) {
+  BOOST_FOREACH(const std::string& lookup_name, loader->getDeclaredClasses()) {
     try {
-      PublisherPlugin* pub = impl_->loader_.createClassInstance(lookup_name);
+      PublisherPlugin* pub = loader->createClassInstance(lookup_name);
       impl_->publishers_.push_back(pub);
       pub->advertise(nh, impl_->base_topic_, queue_size, rebindCB(connect_cb),
                      rebindCB(disconnect_cb), tracked_object, latch);

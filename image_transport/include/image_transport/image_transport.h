@@ -146,9 +146,6 @@ public:
                            transport_hints);
   }
 
-  /// @todo Implement shutdown() of all handles opened with this ImageTransport.
-  //void shutdown();
-
 private:
   struct Impl;
   typedef boost::shared_ptr<Impl> ImplPtr;

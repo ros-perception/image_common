@@ -1,14 +1,21 @@
 #include "image_transport/image_transport.h"
+#include "image_transport/publisher_plugin.h"
+#include "image_transport/subscriber_plugin.h"
+#include <pluginlib/class_loader.h>
+#include <boost/make_shared.hpp>
 
 namespace image_transport {
 
 struct ImageTransport::Impl
 {
   ros::NodeHandle nh_;
-  /// @todo Move class loaders here to be shared among subscribers and publishers.
+  PubLoaderPtr pub_loader_;
+  SubLoaderPtr sub_loader_;
   
   Impl(const ros::NodeHandle& nh)
-    : nh_(nh)
+    : nh_(nh),
+      pub_loader_( boost::make_shared<PubLoader>("image_transport", "image_transport::PublisherPlugin") ),
+      sub_loader_( boost::make_shared<SubLoader>("image_transport", "image_transport::SubscriberPlugin") )
   {
   }
 };
@@ -20,8 +27,6 @@ ImageTransport::ImageTransport(const ros::NodeHandle& nh)
 
 ImageTransport::~ImageTransport()
 {
-  /// @todo Should call shutdown() in the next release (breaking behavior).
-  //shutdown();
 }
 
 Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queue_size, bool latch)
@@ -35,14 +40,14 @@ Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queu
                                     const SubscriberStatusCallback& disconnect_cb,
                                     const ros::VoidPtr& tracked_object, bool latch)
 {
-  return Publisher(impl_->nh_, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
+  return Publisher(impl_->nh_, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch, impl_->pub_loader_);
 }
 
 Subscriber ImageTransport::subscribe(const std::string& base_topic, uint32_t queue_size,
                                      const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                                      const ros::VoidPtr& tracked_object, const TransportHints& transport_hints)
 {
-  return Subscriber(impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints);
+  return Subscriber(impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints, impl_->sub_loader_);
 }
 
 CameraPublisher ImageTransport::advertiseCamera(const std::string& base_topic, uint32_t queue_size, bool latch)
@@ -71,11 +76,5 @@ CameraSubscriber ImageTransport::subscribeCamera(const std::string& base_topic, 
 {
   return CameraSubscriber(*this, impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints);
 }
-
-/*
-void ImageTransport::shutdown()
-{
-}
-*/
 
 } //namespace image_transport

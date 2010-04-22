@@ -43,8 +43,7 @@ namespace image_transport {
 struct Subscriber::Impl
 {
   Impl()
-    : loader_("image_transport", "image_transport::SubscriberPlugin"),
-      unsubscribed_(false)
+    : unsubscribed_(false)
   {
   }
 
@@ -67,7 +66,7 @@ struct Subscriber::Impl
     }
   }
   
-  pluginlib::ClassLoader<SubscriberPlugin> loader_;
+  SubLoaderPtr loader_;
   boost::scoped_ptr<SubscriberPlugin> subscriber_;
   bool unsubscribed_;
   //double constructed_;
@@ -75,17 +74,20 @@ struct Subscriber::Impl
 
 Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                        const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                       const ros::VoidPtr& tracked_object, const TransportHints& transport_hints)
+                       const ros::VoidPtr& tracked_object, const TransportHints& transport_hints,
+                       const SubLoaderPtr& loader)
   : impl_(new Impl)
 {
   // Load the plugin for the chosen transport.
   std::string lookup_name = SubscriberPlugin::getLookupName(transport_hints.getTransport());
   try {
-    impl_->subscriber_.reset( impl_->loader_.createClassInstance(lookup_name) );
+    impl_->subscriber_.reset( loader->createClassInstance(lookup_name) );
   }
   catch (pluginlib::PluginlibException& e) {
     throw TransportLoadException(transport_hints.getTransport(), e.what());
   }
+  // Hang on to the class loader so our shared library doesn't disappear from under us.
+  impl_->loader_ = loader;
 
   // Try to catch if user passed in a transport-specific topic as base_topic.
   std::string clean_topic = ros::names::clean(base_topic);
@@ -93,7 +95,7 @@ Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint3
   if (found != std::string::npos) {
     std::string transport = clean_topic.substr(found+1);
     std::string plugin_name = SubscriberPlugin::getLookupName(transport);
-    std::vector<std::string> plugins = impl_->loader_.getDeclaredClasses();
+    std::vector<std::string> plugins = loader->getDeclaredClasses();
     if (std::find(plugins.begin(), plugins.end(), plugin_name) != plugins.end()) {
       std::string real_base_topic = clean_topic.substr(0, found);
       ROS_WARN("[image_transport] It looks like you are trying to subscribe directly to a "
