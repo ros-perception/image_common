@@ -62,7 +62,8 @@ struct Subscriber::Impl
   {
     if (!unsubscribed_) {
       unsubscribed_ = true;
-      subscriber_->shutdown();
+      if (subscriber_)
+        subscriber_->shutdown();
     }
   }
   
