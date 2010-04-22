@@ -105,7 +105,9 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
                      const ros::VoidPtr& tracked_object, bool latch)
   : impl_(new Impl)
 {
-  impl_->base_topic_ = base_topic;
+  // Resolve the name explicitly because otherwise the compressed topics don't remap
+  // properly (#3652).
+  impl_->base_topic_ = nh.resolveName(base_topic);
   
   BOOST_FOREACH(const std::string& lookup_name, impl_->loader_.getDeclaredClasses()) {
     try {
