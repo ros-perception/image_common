@@ -65,26 +65,6 @@ class SubscriberFilter : public message_filters::SimpleFilter<sensor_msgs::Image
 {
 public:
   /**
-   * \deprecated Use the version taking ImageTransport instead of NodeHandle.
-   *
-   * \brief Constructor
-   *
-   * See the ros::NodeHandle::subscribe() variants for more information on the parameters
-   *
-   * \param nh The ros::NodeHandle to use to subscribe.
-   * \param base_topic The topic to subscribe to.
-   * \param queue_size The subscription queue size
-   * \param transport_hints The transport hints to pass along
-   */
-  ROSCPP_DEPRECATED
-  SubscriberFilter(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                   const TransportHints& transport_hints = TransportHints())
-  {
-    ImageTransport it(nh);
-    subscribe(it, base_topic, queue_size, transport_hints);
-  }
-
-  /**
    * \brief Constructor
    *
    * See the ros::NodeHandle::subscribe() variants for more information on the parameters
@@ -110,26 +90,6 @@ public:
   ~SubscriberFilter()
   {
     unsubscribe();
-  }
-
-  /**
-   * \deprecated Use the version taking ImageTransport instead of NodeHandle.
-   *
-   * \brief Subscribe to a topic.
-   *
-   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
-   *
-   * \param nh The ros::NodeHandle to use to subscribe.
-   * \param base_topic The topic to subscribe to.
-   * \param queue_size The subscription queue size
-   * \param transport_hints The transport hints to pass along
-   */
-  ROSCPP_DEPRECATED
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 const TransportHints& transport_hints = TransportHints())
-  {
-    ImageTransport it(nh);
-    subscribe(it, base_topic, queue_size, transport_hints);
   }
 
   /**
