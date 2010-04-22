@@ -123,8 +123,8 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
   }
 
   if (impl_->publishers_.empty())
-    throw std::runtime_error("No plugins found! Does `rospack plugins --attrib=plugin "
-                             "image_transport` find any packages?");
+    throw Exception("No plugins found! Does `rospack plugins --attrib=plugin "
+                    "image_transport` find any packages?");
 }
 
 uint32_t Publisher::getNumSubscribers() const

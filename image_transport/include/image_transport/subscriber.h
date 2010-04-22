@@ -38,6 +38,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include "image_transport/transport_hints.h"
+#include "image_transport/exception.h"
 
 namespace image_transport {
 

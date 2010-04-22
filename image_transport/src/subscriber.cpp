@@ -80,7 +80,12 @@ Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint3
 {
   // Load the plugin for the chosen transport.
   std::string lookup_name = SubscriberPlugin::getLookupName(transport_hints.getTransport());
-  impl_->subscriber_.reset( impl_->loader_.createClassInstance(lookup_name) );
+  try {
+    impl_->subscriber_.reset( impl_->loader_.createClassInstance(lookup_name) );
+  }
+  catch (pluginlib::PluginlibException& e) {
+    throw TransportLoadException(transport_hints.getTransport(), e.what());
+  }
 
   // Try to catch if user passed in a transport-specific topic as base_topic.
   std::string clean_topic = ros::names::clean(base_topic);
