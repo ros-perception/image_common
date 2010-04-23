@@ -75,6 +75,12 @@ uint32_t CameraSubscriber::getNumPublishers() const
   return 0;
 }
 
+std::string CameraSubscriber::getTransport() const
+{
+  if (impl_) return impl_->image_sub_.getTransport();
+  return std::string();
+}
+
 void CameraSubscriber::shutdown()
 {
   if (impl_) impl_->shutdown();

@@ -49,6 +49,11 @@ public:
   uint32_t getNumPublishers() const;
 
   /**
+   * \brief Returns the name of the transport being used.
+   */
+  std::string getTransport() const;
+
+  /**
    * \brief Unsubscribe the callback associated with this CameraSubscriber.
    */
   void shutdown();

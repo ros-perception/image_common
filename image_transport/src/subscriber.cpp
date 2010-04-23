@@ -123,6 +123,12 @@ uint32_t Subscriber::getNumPublishers() const
   return 0;
 }
 
+std::string Subscriber::getTransport() const
+{
+  if (impl_) return impl_->subscriber_->getTransportName();
+  return std::string();
+}
+
 void Subscriber::shutdown()
 {
   if (impl_) impl_->shutdown();

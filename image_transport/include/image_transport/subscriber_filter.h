@@ -132,6 +132,22 @@ public:
     return sub_.getNumPublishers();
   }
 
+  /**
+   * \brief Returns the name of the transport being used.
+   */
+  std::string getTransport() const
+  {
+    return sub_.getTransport();
+  }
+
+  /**
+   * \brief Returns the internal image_transport::Subscriber object.
+   */
+  const Subscriber& getSubscriber() const
+  {
+    return sub_;
+  }
+
 private:
 
   void cb(const sensor_msgs::ImageConstPtr& m)

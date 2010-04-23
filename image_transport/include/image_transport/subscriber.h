@@ -63,6 +63,12 @@ class Subscriber
 public:
   Subscriber() {}
 
+  /**
+   * \brief Returns the base image topic.
+   *
+   * The Subscriber may actually be subscribed to some transport-specific topic that
+   * differs from the base topic.
+   */
   std::string getTopic() const;
 
   /**
@@ -70,6 +76,11 @@ public:
    */
   uint32_t getNumPublishers() const;
 
+  /**
+   * \brief Returns the name of the transport being used.
+   */
+  std::string getTransport() const;
+  
   /**
    * \brief Unsubscribe the callback associated with this Subscriber.
    */
