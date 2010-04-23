@@ -146,6 +146,8 @@ public:
                            transport_hints);
   }
 
+  std::vector<std::string> getDeclaredTransports() const;
+
 private:
   struct Impl;
   typedef boost::shared_ptr<Impl> ImplPtr;

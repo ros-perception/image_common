@@ -3,6 +3,7 @@
 #include "image_transport/subscriber_plugin.h"
 #include <pluginlib/class_loader.h>
 #include <boost/make_shared.hpp>
+#include <boost/foreach.hpp>
 
 namespace image_transport {
 
@@ -75,6 +76,16 @@ CameraSubscriber ImageTransport::subscribeCamera(const std::string& base_topic, 
                                                  const TransportHints& transport_hints)
 {
   return CameraSubscriber(*this, impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints);
+}
+
+std::vector<std::string> ImageTransport::getDeclaredTransports() const
+{
+  std::vector<std::string> transports = impl_->sub_loader_->getDeclaredClasses();
+  // Remove the "_sub" at the end of each class name.
+  BOOST_FOREACH(std::string& transport, transports) {
+    transport = transport.substr(0, transport.size() - 4);
+  }
+  return transports;
 }
 
 } //namespace image_transport
