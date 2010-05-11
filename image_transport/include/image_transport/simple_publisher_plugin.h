@@ -116,6 +116,18 @@ protected:
     return simple_impl_->param_nh_;
   }
 
+  /**
+   * \brief Returns the internal ros::Publisher.
+   *
+   * This really only exists so RawPublisher can implement no-copy intraprocess message
+   * passing easily.
+   */
+  const ros::Publisher& getPublisher() const
+  {
+    ROS_ASSERT(simple_impl_);
+    return simple_impl_->pub_;
+  }
+
 private:
   struct SimplePublisherPluginImpl
   {

@@ -146,8 +146,11 @@ public:
                            transport_hints);
   }
 
-  /// @todo Implement shutdown() of all handles opened with this ImageTransport.
-  //void shutdown();
+  /**
+   * \brief Returns the names of all transports declared available in the system. Declared
+   * transports are not necessarily built or loadable.
+   */
+  std::vector<std::string> getDeclaredTransports() const;
 
 private:
   struct Impl;

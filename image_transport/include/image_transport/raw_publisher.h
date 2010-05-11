@@ -21,6 +21,13 @@ public:
     return "raw";
   }
 
+  // Override the default implementation because publishing the message pointer allows
+  // the no-copy intraprocess optimization.
+  virtual void publish(const sensor_msgs::ImageConstPtr& message) const
+  {
+    getPublisher().publish(message);
+  }
+
 protected:
   virtual void publish(const sensor_msgs::Image& message, const PublishFn& publish_fn) const
   {
