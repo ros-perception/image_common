@@ -22,11 +22,12 @@ int main(int argc, char** argv)
 
   ros::Rate loop_rate(hz);
   while (nh.ok()) {
-    if (client.call(req, rsp))
+    if (client.call(req, rsp)) {
       std::cout << "Timestamp: " << rsp.stamp << std::endl;
+      loop_rate.sleep();
+    }
     else {
       ROS_ERROR("Service call failed");
-      ros::Duration(0.2).sleep();
       client.waitForExistence();
     }
   }
