@@ -62,9 +62,8 @@ protected:
                              const SubscriberStatusCallback& user_disconnect_cb,
                              const ros::VoidPtr& tracked_object, bool latch)
   {
-    /// @todo This does not work if base_topic is a global name.
     std::string transport_topic = getTopicToAdvertise(base_topic);
-    ros::NodeHandle param_nh(nh, transport_topic);
+    ros::NodeHandle param_nh(transport_topic);
     simple_impl_.reset(new SimplePublisherPluginImpl(param_nh));
     simple_impl_->pub_ = nh.advertise<M>(transport_topic, queue_size,
                                          bindCB(user_connect_cb, &SimplePublisherPlugin::connectCallback),
