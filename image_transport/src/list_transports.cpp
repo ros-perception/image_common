@@ -70,7 +70,7 @@ int main(int argc, char** argv)
   printf("Declared transports:\n");
   BOOST_FOREACH(const StatusMap::value_type& value, transports) {
     const TransportDesc& td = value.second;
-    printf(value.first.c_str());
+    printf("%s", value.first.c_str());
     if ((td.pub_status == CREATE_FAILURE || td.pub_status == LIB_LOAD_FAILURE) ||
         (td.sub_status == CREATE_FAILURE || td.sub_status == LIB_LOAD_FAILURE)) {
       printf(" (*): Not available. Try 'rosmake %s'.", td.package_name.c_str());

@@ -70,7 +70,9 @@ protected:
                              const Callback& callback, const ros::VoidPtr& tracked_object,
                              const TransportHints& transport_hints)
   {
-    simple_impl_.reset(new SimpleSubscriberPluginImpl(transport_hints.getParameterNH()));
+    // Push each group of transport-specific parameters into a separate sub-namespace
+    ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
+    simple_impl_.reset(new SimpleSubscriberPluginImpl(param_nh));
 
     simple_impl_->sub_ = nh.subscribe<M>(getTopicToSubscribe(base_topic), queue_size,
                                          boost::bind(&SimpleSubscriberPlugin::internalCallback, this, _1, callback),
