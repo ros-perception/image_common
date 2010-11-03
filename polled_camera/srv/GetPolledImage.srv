@@ -3,8 +3,14 @@
 #   <response_namespace>/camera_info
 string response_namespace
 
+# Binning settings, if supported by the camera.
+uint32 binning_x
+uint32 binning_y
+
 # Region of interest, if supported by the camera.
 sensor_msgs/RegionOfInterest roi
 ---
-# Timestamp of the captured image. Can be matched against incoming sensor_msgs/Image header.
-time stamp
+bool success          # Could the image be captured?
+string status_message # Error message in case of failure
+time stamp            # Timestamp of the captured image. Can be matched against
+                      # incoming sensor_msgs/Image header.
