@@ -51,8 +51,6 @@ public:
     image_transport::CameraPublisher& pub = client_map_[image_topic];
     if (!pub) {
       // Create a latching camera publisher.
-      //typedef image_transport::SubscriberStatusCallback StatusCallback;
-      //StatusCallback disconnectCb = boost::bind(&Impl::disconnectCallback, this, _1);
       pub = it_.advertiseCamera(image_topic, 1, image_transport::SubscriberStatusCallback(),
                                 boost::bind(&Impl::disconnectCallback, this, _1),
                                 ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(),
@@ -60,15 +58,26 @@ public:
       ROS_INFO("Advertising %s", pub.getTopic().c_str());
     }
 
+    // Correct zero binning values to one for convenience
+    req.binning_x = std::max(req.binning_x, (uint32_t)1);
+    req.binning_y = std::max(req.binning_y, (uint32_t)1);
+
+    /// @todo Use pointers in prep for nodelet drivers?
     sensor_msgs::Image image;
     sensor_msgs::CameraInfo info;
-    /// @todo Check tracked_object before calling
-    bool success = driver_cb_(req, image, info);
-    if (success) {
+    driver_cb_(req, rsp, image, info);
+    
+    if (rsp.success) {
+      assert(image.header.stamp == info.header.stamp);
       rsp.stamp = image.header.stamp;
       pub.publish(image, info);
     }
-    return success;
+    else {
+      ROS_ERROR("Failed to capture requested image, status message: '%s'",
+                rsp.status_message.c_str());
+    }
+    
+    return true; // Success/failure indicated by rsp.success
   }
 
   void disconnectCallback(const image_transport::SingleSubscriberPublisher& ssp)
