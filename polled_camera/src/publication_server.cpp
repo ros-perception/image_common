@@ -58,11 +58,15 @@ public:
       ROS_INFO("Advertising %s", pub.getTopic().c_str());
     }
 
+    // Correct zero binning values to one for convenience
+    req.binning_x = std::max(req.binning_x, (uint32_t)1);
+    req.binning_y = std::max(req.binning_y, (uint32_t)1);
+
     /// @todo Use pointers in prep for nodelet drivers?
     sensor_msgs::Image image;
     sensor_msgs::CameraInfo info;
-    /// @todo Check tracked_object before calling
     driver_cb_(req, rsp, image, info);
+    
     if (rsp.success) {
       assert(image.header.stamp == info.header.stamp);
       rsp.stamp = image.header.stamp;
