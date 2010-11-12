@@ -8,6 +8,6 @@
   <url>http://ros.org/wiki/image_common</url>
   <depend stack="common" /> <!-- yaml_cpp, pluginlib -->
   <depend stack="common_msgs" /> <!-- sensor_msgs -->
-  <depend stack="ros" /> <!-- roscpp, message_filters -->
+  <depend stack="ros" /> <!-- rostest, roslib, roscpp, message_filters -->
 
 </stack>

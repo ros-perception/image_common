@@ -1,4 +1,5 @@
 #include "camera_calibration_parsers/parse_yml.h"
+#include <sensor_msgs/distortion_models.h>
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 #include <ctime>
@@ -17,6 +18,7 @@ static const char K_YML_NAME[]      = "camera_matrix";
 static const char D_YML_NAME[]      = "distortion_coefficients";
 static const char R_YML_NAME[]      = "rectification_matrix";
 static const char P_YML_NAME[]      = "projection_matrix";
+static const char DMODEL_YML_NAME[] = "distortion_model";
 
 struct SimpleMatrix
 {
@@ -67,7 +69,7 @@ bool writeCalibrationYml(std::ostream& out, const std::string& camera_name,
 
 #if 0
   // Calibration time
-  // FIXME: this breaks yaml-cpp on reading for some reason
+  /// @todo Emitting the time breaks yaml-cpp on reading for some reason
   time_t raw_time;
   time( &raw_time );
   emitter << YAML::Key << "calibration_time";
@@ -81,7 +83,9 @@ bool writeCalibrationYml(std::ostream& out, const std::string& camera_name,
   // Camera name and intrinsics
   emitter << YAML::Key << CAM_YML_NAME << YAML::Value << camera_name;
   emitter << YAML::Key << K_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(&cam_info.K[0]));
-  emitter << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(1, 5, const_cast<double*>(&cam_info.D[0]));
+  emitter << YAML::Key << DMODEL_YML_NAME << YAML::Value << cam_info.distortion_model;
+  emitter << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(1, cam_info.D.size(),
+                                                                    const_cast<double*>(&cam_info.D[0]));
   emitter << YAML::Key << R_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(&cam_info.R[0]));
   emitter << YAML::Key << P_YML_NAME << YAML::Value << SimpleMatrix(3, 4, const_cast<double*>(&cam_info.P[0]));
 
@@ -116,15 +120,32 @@ bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs:
   
     doc[WIDTH_YML_NAME] >> cam_info.width;
     doc[HEIGHT_YML_NAME] >> cam_info.height;
-  
+
+    // Read in fixed-size matrices
     SimpleMatrix K_(3, 3, &cam_info.K[0]);
     doc[K_YML_NAME] >> K_;
-    SimpleMatrix D_(1, 5, &cam_info.D[0]);
-    doc[D_YML_NAME] >> D_;
     SimpleMatrix R_(3, 3, &cam_info.R[0]);
     doc[R_YML_NAME] >> R_;
     SimpleMatrix P_(3, 4, &cam_info.P[0]);
     doc[P_YML_NAME] >> P_;
+
+    // Different distortion models may have different numbers of parameters
+    if (const YAML::Node* model_node = doc.FindValue(DMODEL_YML_NAME)) {
+      *model_node >> cam_info.distortion_model;
+    }
+    else {
+      // Assume plumb bob for backwards compatibility
+      cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
+      ROS_WARN("Camera calibration file did not specify distortion model, assuming plumb bob");
+    }
+    const YAML::Node& D_node = doc[D_YML_NAME];
+    int D_rows, D_cols;
+    D_node["rows"] >> D_rows;
+    D_node["cols"] >> D_cols;
+    const YAML::Node& D_data = D_node["data"];
+    cam_info.D.resize(D_rows*D_cols);
+    for (int i = 0; i < D_rows*D_cols; ++i)
+      D_data[i] >> cam_info.D[i];
   
     return true;
   }

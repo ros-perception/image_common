@@ -1,4 +1,5 @@
 #include "camera_calibration_parsers/parse_ini.h"
+#include <sensor_msgs/distortion_models.h>
 
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/spirit/include/classic_file_iterator.hpp>
@@ -42,6 +43,14 @@ std::ostream& operator << (std::ostream& out, const SimpleMatrix& m)
 bool writeCalibrationIni(std::ostream& out, const std::string& camera_name,
                          const sensor_msgs::CameraInfo& cam_info)
 {
+  // Videre INI format is legacy, only supports plumb bob distortion model.
+  if (cam_info.distortion_model != sensor_msgs::distortion_models::PLUMB_BOB ||
+      cam_info.D.size() != 5) {
+    ROS_ERROR("Videre INI format can only save calibrations using the plumb bob distortion model. "
+              "Use the YAML format instead.");
+    return false;
+  }
+  
   out.precision(5);
   out << std::fixed;
   
@@ -95,6 +104,11 @@ template <typename Iterator>
 bool parseCalibrationIniRange(Iterator first, Iterator last,
                               std::string& camera_name, sensor_msgs::CameraInfo& cam_info)
 {
+  // Assume plumb bob model
+  cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
+  cam_info.D.resize(5);
+  
+  // We don't actually use the [externals] info, but it's part of the format
   bool have_externals = false;
   double trans[3], rot[3];
 
@@ -144,7 +158,6 @@ bool parseCalibrationIniRange(Iterator first, Iterator last,
   BOOST_AUTO(skip, space_p | comment_p('#'));
 
   parse_info<Iterator> info = parse(first, last, ini_grammar, skip);
-  /// @todo Do something with externals?
   return info.hit;
 }
 /// \endcond

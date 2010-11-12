@@ -37,6 +37,7 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 #include "camera_info_manager/camera_info_manager.h"
+#include <sensor_msgs/distortion_models.h>
 #include <string>
 #include <gtest/gtest.h>
 
@@ -52,6 +53,8 @@ void compare_calibration(const sensor_msgs::CameraInfo &exp, const sensor_msgs::
   EXPECT_EQ(exp.height, ci.height);
 
   // check distortion coefficients
+  EXPECT_EQ(exp.distortion_model, ci.distortion_model);
+  EXPECT_EQ(exp.D.size(), ci.D.size());
   for (unsigned i = 0; i < ci.D.size(); ++i)
     {
       EXPECT_EQ(exp.D[i], ci.D[i]);
@@ -85,6 +88,8 @@ sensor_msgs::CameraInfo expected_calibration(void)
   ci.height = 480u;
 
   // set distortion coefficients
+  ci.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
+  ci.D.resize(5);
   ci.D[0] = -1.04482;
   ci.D[1] = 1.59252;
   ci.D[2] = -0.0196308;
