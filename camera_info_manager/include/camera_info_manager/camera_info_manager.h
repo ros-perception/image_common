@@ -66,6 +66,8 @@
 
     - file:///full/path/to/local/file.yaml
 
+    - package://ros_package_name/calibrations/camera3.yaml
+
     - flash:///1 (not yet implemented)
 
     If the URL is empty, no calibration data are loaded, and any data
@@ -121,13 +123,14 @@ class CameraInfoManager
       // supported URLs
       URL_empty = 0,             // empty string
       URL_file,                  // file:
+      URL_package,               // package: 
       // URLs not supported
       URL_invalid,               // anything >= is invalid
       URL_flash,                 // flash: 
-      URL_package,               // package: 
     } url_type_t;
 
   // private methods
+  std::string getPackageFileName(const std::string &url);
   bool loadCalibration(const std::string &url,
                        const std::string &cname);
   bool loadCalibrationFile(const std::string &filename,
