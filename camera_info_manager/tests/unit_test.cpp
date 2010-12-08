@@ -49,8 +49,7 @@
 namespace
 {
   const std::string g_package_name("camera_info_manager");
-  const std::string g_package_filename("/test/test_calibration.yaml");
-  //const std::string g_package_url("package://camera_info_manager/test/test_calibration.yaml");
+  const std::string g_package_filename("/tests/test_calibration.yaml");
   const std::string g_package_url("package://" + g_package_name
                                   + "/" + g_package_filename);
   const std::string g_camera_name("08144361026320a0");
@@ -258,7 +257,7 @@ TEST(getInfo, calibrated)
 
   EXPECT_FALSE(cinfo.isCalibrated());
   std::string pkgPath(ros::package::getPath(g_package_name));
-  std::string url("file://" + pkgPath + "/test/test_calibration.yaml");
+  std::string url("file://" + pkgPath + "/tests/test_calibration.yaml");
   EXPECT_TRUE(cinfo.loadCameraInfo(url));
   EXPECT_TRUE(cinfo.isCalibrated());
 
