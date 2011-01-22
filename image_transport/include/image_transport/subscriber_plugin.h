@@ -90,7 +90,7 @@ public:
    */
   static std::string getLookupName(const std::string& transport_type)
   {
-    return transport_type + "_sub";
+    return "image_transport/" + transport_type + "_sub";
   }
 
 protected:
