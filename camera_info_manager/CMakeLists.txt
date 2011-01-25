@@ -19,8 +19,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 rosbuild_add_library(${PROJECT_NAME} src/camera_info_manager.cpp)
 
 # unit test uses gtest, but needs rostest to create a ROS environment
-rosbuild_add_executable(unit_test test/unit_test.cpp)
+rosbuild_add_executable(unit_test tests/unit_test.cpp)
 target_link_libraries(unit_test camera_info_manager)
 rosbuild_add_gtest_build_flags(unit_test)
 
-rosbuild_add_rostest(test/unit_test.test)
+rosbuild_add_rostest(tests/unit_test.test)

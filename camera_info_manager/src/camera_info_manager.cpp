@@ -37,6 +37,7 @@
 #include <string>
 #include <locale>
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <camera_calibration_parsers/parse.h>
 
 #include "camera_info_manager/camera_info_manager.h"
@@ -65,11 +66,10 @@ using namespace camera_calibration_parsers;
  */
 CameraInfoManager::CameraInfoManager(ros::NodeHandle nh,
                                      const std::string &cname,
-                                     const std::string &url)
+                                     const std::string &url):
+  nh_(nh),
+  camera_name_(cname)
 {
-  nh_ = nh;                             // save copy of node handle
-  camera_name_ = cname;
-
   // Set the URL and load camera calibration data (if any).
   loadCameraInfo(url);
 
@@ -78,13 +78,42 @@ CameraInfoManager::CameraInfoManager(ros::NodeHandle nh,
                                        &CameraInfoManager::setCameraInfo, this);
 }
 
+/** get file name corresponding to a "package://" URL
+ *
+ * @param url a copy of the Uniform Resource Locator
+ * @return file name if package found, "" otherwise
+ */
+std::string CameraInfoManager::getPackageFileName(const std::string &url)
+{
+  ROS_DEBUG_STREAM("camera calibration URL: " << url);
+
+  // Scan URL from after "package://" until next '/' and extract
+  // package name.  The parseURL() already checked that it's present.
+  size_t prefix_len = std::string("package://").length();
+  size_t rest = url.find('/', prefix_len);
+  std::string package(url.substr(prefix_len, rest - prefix_len));
+
+  // Look up the ROS package path name.
+  std::string pkgPath(ros::package::getPath(package));
+  if (pkgPath.empty())                  // package not found?
+    {
+      ROS_WARN_STREAM("unknown package: " << package << " (ignored)");
+      return pkgPath;
+    }
+  else
+    {
+      // Construct file name from package location and remainder of URL.
+      return pkgPath + url.substr(rest);
+    }
+}
+
 /** load CameraInfo calibration data (if any)
  *
  * @pre mutex_ unlocked
  *
  * @param url a copy of the Uniform Resource Locator
  * @param cname is a copy of the camera_name_
- * @return true, if successful
+ * @return true if URL contains calibration data.
  *
  * sets cam_info_, if successful
  */
@@ -119,7 +148,9 @@ bool CameraInfoManager::loadCalibration(const std::string &url,
       }
     case URL_package:
       {
-        ROS_WARN("[CameraInfoManager] reading from ROS package not implemented yet");
+        std::string filename(getPackageFileName(url));
+        if (!filename.empty())
+          success = loadCalibrationFile(filename, cname);
         break;
       }
     default:
@@ -138,7 +169,7 @@ bool CameraInfoManager::loadCalibration(const std::string &url,
  *
  * @param filename containing CameraInfo to read
  * @param cname is a copy of the camera_name_
- * @return true, if successful
+ * @return true if URL contains calibration data.
  *
  * Sets cam_info_, if successful
  */
@@ -217,7 +248,11 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string &url
     }
   if (url.substr(0, 10) == "package://")
     {
-      return URL_package;
+      // look for a '/' following the package name, make sure it is
+      // there, the name is not empty, and something follows it
+      size_t rest = url.find('/', 10);
+      if (rest < url.length()-1 && rest > 10)
+        return URL_package;
     }
   return URL_invalid;
 }
@@ -244,13 +279,20 @@ CameraInfoManager::saveCalibration(const sensor_msgs::CameraInfo &new_info,
     case URL_empty:
       {
         // store using default file name
-        std::string filename = "/tmp/calibration_" + cname + ".yaml";
+        std::string filename("/tmp/calibration_" + cname + ".yaml");
         success = saveCalibrationFile(new_info, filename, cname);
         break;
       }
     case URL_file:
       {
         success = saveCalibrationFile(new_info, url.substr(7), cname);
+        break;
+      }
+    case URL_package:
+      {
+        std::string filename(getPackageFileName(url));
+        if (!filename.empty())
+          success = saveCalibrationFile(new_info, filename, cname);
         break;
       }
     default:

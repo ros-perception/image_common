@@ -34,6 +34,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include <unistd.h>
 #include <ros/ros.h>
 #include <ros/package.h>
 #include "camera_info_manager/camera_info_manager.h"
@@ -42,11 +43,25 @@
 #include <gtest/gtest.h>
 
 ///////////////////////////////////////////////////////////////
+// global test data
+///////////////////////////////////////////////////////////////
+
+namespace
+{
+  const std::string g_package_name("camera_info_manager");
+  const std::string g_package_filename("/tests/test_calibration.yaml");
+  const std::string g_package_url("package://" + g_package_name
+                                  + "/" + g_package_filename);
+  const std::string g_camera_name("08144361026320a0");
+}
+
+///////////////////////////////////////////////////////////////
 // utility functions
 ///////////////////////////////////////////////////////////////
 
 // compare CameraInfo fields that are saved and loaded for calibration
-void compare_calibration(const sensor_msgs::CameraInfo &exp, const sensor_msgs::CameraInfo &ci)
+void compare_calibration(const sensor_msgs::CameraInfo &exp,
+                         const sensor_msgs::CameraInfo &ci)
 {
   // check image size
   EXPECT_EQ(exp.width, ci.width);
@@ -76,6 +91,16 @@ void compare_calibration(const sensor_msgs::CameraInfo &exp, const sensor_msgs::
   for (unsigned i = 0; i < ci.P.size(); ++i)
     {
       EXPECT_EQ(exp.P[i], ci.P[i]);
+    }
+}
+
+// make sure this file does not exist
+void delete_file(std::string filename)
+{
+  int rc = unlink(filename.c_str());
+  if (rc != 0)
+    {
+      EXPECT_EQ(errno, ENOENT);
     }
 }
 
@@ -191,6 +216,9 @@ TEST(CameraName, validURLs)
   EXPECT_TRUE(cinfo.validateURL(std::string("file:///")));
   EXPECT_TRUE(cinfo.validateURL(std::string("file:///tmp/url.yaml")));
   EXPECT_TRUE(cinfo.validateURL(std::string("file:///tmp/url.ini")));
+  EXPECT_TRUE(cinfo.validateURL(g_package_url));
+  EXPECT_TRUE(cinfo.validateURL(std::string("package://no_such_package/calibration.yaml")));
+  EXPECT_TRUE(cinfo.validateURL(std::string("package://camera_info_manager/x")));
 }
 
 // Test that invalid URLs are rejected
@@ -199,9 +227,13 @@ TEST(CameraName, invalidURLs)
   ros::NodeHandle node;
   CameraInfoManager cinfo(node);
 
+  EXPECT_FALSE(cinfo.validateURL(std::string("file://")));
   EXPECT_FALSE(cinfo.validateURL(std::string("flash:///")));
   EXPECT_FALSE(cinfo.validateURL(std::string("html://ros.org/wiki/camera_info_manager")));
-  EXPECT_FALSE(cinfo.validateURL(std::string("package://camera_info_manager/test/test_calibration.yaml")));
+  EXPECT_FALSE(cinfo.validateURL(std::string("package://")));
+  EXPECT_FALSE(cinfo.validateURL(std::string("package:///")));
+  EXPECT_FALSE(cinfo.validateURL(std::string("package://calibration.yaml")));
+  EXPECT_FALSE(cinfo.validateURL(std::string("package://camera_info_manager/")));
 }
 
 // Test ability to provide uncalibrated CameraInfo
@@ -212,7 +244,7 @@ TEST(getInfo, uncalibrated)
 
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  sensor_msgs::CameraInfo ci = cinfo.getCameraInfo();
+  sensor_msgs::CameraInfo ci(cinfo.getCameraInfo());
   sensor_msgs::CameraInfo exp;
   compare_calibration(exp, ci);
 }
@@ -224,17 +256,49 @@ TEST(getInfo, calibrated)
   CameraInfoManager cinfo(node);
 
   EXPECT_FALSE(cinfo.isCalibrated());
-
-  std::string pkgPath = ros::package::getPath("camera_info_manager");
-  std::string url = "file:///" + pkgPath + "/test/test_calibration.yaml";
-  cinfo.loadCameraInfo(url);
-
+  std::string pkgPath(ros::package::getPath(g_package_name));
+  std::string url("file://" + pkgPath + "/tests/test_calibration.yaml");
+  EXPECT_TRUE(cinfo.loadCameraInfo(url));
   EXPECT_TRUE(cinfo.isCalibrated());
 
-  sensor_msgs::CameraInfo ci = cinfo.getCameraInfo();
-  sensor_msgs::CameraInfo exp = expected_calibration();
-
+  sensor_msgs::CameraInfo ci(cinfo.getCameraInfo());
+  sensor_msgs::CameraInfo exp(expected_calibration());
   compare_calibration(exp, ci);
+}
+
+// Test ability to load calibrated CameraInfo from package
+TEST(getInfo, fromPackage)
+{
+  ros::NodeHandle node;
+  CameraInfoManager cinfo(node);
+
+  EXPECT_FALSE(cinfo.isCalibrated());
+  EXPECT_TRUE(cinfo.loadCameraInfo(g_package_url));
+  EXPECT_TRUE(cinfo.isCalibrated());
+
+  sensor_msgs::CameraInfo ci(cinfo.getCameraInfo());
+  sensor_msgs::CameraInfo exp(expected_calibration());
+  compare_calibration(exp, ci);
+}
+
+// Test load of unresolved "package:" URL files
+TEST(getInfo, unresolvedLoads)
+{
+  ros::NodeHandle node;
+  CameraInfoManager cinfo(node);
+  EXPECT_FALSE(cinfo.isCalibrated());
+
+  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://")));
+  EXPECT_FALSE(cinfo.isCalibrated());
+
+  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package:///calibration.yaml")));
+  EXPECT_FALSE(cinfo.isCalibrated());
+
+  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://no_such_package/calibration.yaml")));
+  EXPECT_FALSE(cinfo.isCalibrated());
+
+  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://camera_info_manager/no_such_file.yaml")));
+  EXPECT_FALSE(cinfo.isCalibrated());
 }
 
 // Test load of invalid CameraInfo URLs
@@ -253,10 +317,7 @@ TEST(getInfo, invalidLoads)
   EXPECT_FALSE(cinfo.loadCameraInfo(std::string("html://ros.org/wiki/camera_info_manager")));
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://camera_info_manager/test/test_calibration.yaml")));
-  EXPECT_FALSE(cinfo.isCalibrated());
-
-  sensor_msgs::CameraInfo ci = cinfo.getCameraInfo();
+  sensor_msgs::CameraInfo ci(cinfo.getCameraInfo());
   sensor_msgs::CameraInfo exp;
   compare_calibration(exp, ci);
 }
@@ -269,7 +330,7 @@ TEST(setInfo, setCalibration)
   EXPECT_FALSE(cinfo.isCalibrated());
 
   // issue calibration service request
-  sensor_msgs::CameraInfo exp = expected_calibration();
+  sensor_msgs::CameraInfo exp(expected_calibration());
   bool success = set_calibration(node, exp);
 
   // only check results if the service succeeded, avoiding confusing
@@ -287,8 +348,12 @@ TEST(setInfo, setCalibration)
 TEST(setInfo, saveCalibrationTmp)
 {
   ros::NodeHandle node;
-  sensor_msgs::CameraInfo exp = expected_calibration();
+  sensor_msgs::CameraInfo exp(expected_calibration());
   bool success;
+  std::string tmpFile("/tmp/calibration_camera.yaml");
+
+  // first, delete the file
+  delete_file(tmpFile);
 
   {
     // create instance to save calibrated data
@@ -307,10 +372,14 @@ TEST(setInfo, saveCalibrationTmp)
       // create a new instance to load saved calibration
       CameraInfoManager cinfo2(node);
       EXPECT_FALSE(cinfo2.isCalibrated());
-      cinfo2.loadCameraInfo(std::string("file:///tmp/calibration_camera.yaml"));
+      std::string url = "file://" + tmpFile;
+      cinfo2.loadCameraInfo(url);
       EXPECT_TRUE(cinfo2.isCalibrated());
-      sensor_msgs::CameraInfo ci = cinfo2.getCameraInfo();
-      compare_calibration(exp, ci);
+      if (cinfo2.isCalibrated())
+        {
+          sensor_msgs::CameraInfo ci(cinfo2.getCameraInfo());
+          compare_calibration(exp, ci);
+        }
     }
 }
 
@@ -318,14 +387,16 @@ TEST(setInfo, saveCalibrationTmp)
 TEST(setInfo, saveCalibrationCameraName)
 {
   ros::NodeHandle node;
-  sensor_msgs::CameraInfo exp = expected_calibration();
-  std::string cname("08144361026320a0");
-  std::string url = "file:///tmp/calibration_" + cname + ".yaml";
+  sensor_msgs::CameraInfo exp(expected_calibration());
+  std::string tmpFile("/tmp/calibration_" + g_camera_name + ".yaml");
   bool success;
+
+  // first, delete the file
+  delete_file(tmpFile);
 
   {
     // create instance to save calibrated data
-    CameraInfoManager cinfo(node, cname);
+    CameraInfoManager cinfo(node, g_camera_name);
     success = set_calibration(node, exp);
     EXPECT_TRUE(cinfo.isCalibrated());
   }
@@ -336,10 +407,14 @@ TEST(setInfo, saveCalibrationCameraName)
     {
       // create a new instance to load saved calibration
       CameraInfoManager cinfo2(node);
+      std::string url = "file://" + tmpFile;
       cinfo2.loadCameraInfo(std::string(url));
       EXPECT_TRUE(cinfo2.isCalibrated());
-      sensor_msgs::CameraInfo ci = cinfo2.getCameraInfo();
-      compare_calibration(exp, ci);
+      if (cinfo2.isCalibrated())
+        {
+          sensor_msgs::CameraInfo ci(cinfo2.getCameraInfo());
+          compare_calibration(exp, ci);
+        }
     }
 }
 
@@ -347,10 +422,14 @@ TEST(setInfo, saveCalibrationCameraName)
 TEST(setInfo, saveCalibrationFile)
 {
   ros::NodeHandle node;
-  sensor_msgs::CameraInfo exp = expected_calibration();
+  sensor_msgs::CameraInfo exp(expected_calibration());
   std::string cname("camera");
-  std::string url("file:///tmp/camera_info_manager_calibration_test.yaml");
+  std::string tmpFile("/tmp/camera_info_manager_calibration_test.yaml");
+  std::string url = "file://" + tmpFile;
   bool success;
+
+  // first, delete the file
+  delete_file(tmpFile);
 
   {
     // create instance to save calibrated data
@@ -366,8 +445,46 @@ TEST(setInfo, saveCalibrationFile)
       // create a new instance to load saved calibration
       CameraInfoManager cinfo2(node, cname, url);
       EXPECT_TRUE(cinfo2.isCalibrated());
-      sensor_msgs::CameraInfo ci = cinfo2.getCameraInfo();
-      compare_calibration(exp, ci);
+      if (cinfo2.isCalibrated())
+        {
+          sensor_msgs::CameraInfo ci(cinfo2.getCameraInfo());
+          compare_calibration(exp, ci);
+        }
+    }
+}
+
+// Test ability to save calibrated CameraInfo in a package
+// (needs write access).
+TEST(setInfo, saveCalibrationPackage)
+{
+  ros::NodeHandle node;
+  sensor_msgs::CameraInfo exp(expected_calibration());
+  std::string pkgPath(ros::package::getPath(g_package_name));
+  std::string filename(pkgPath + g_package_filename);
+  bool success;
+
+  // first, delete the file
+  delete_file(filename);
+
+  {
+    // create instance to save calibrated data
+    CameraInfoManager cinfo(node, g_camera_name, g_package_url);
+    success = set_calibration(node, exp);
+    EXPECT_TRUE(cinfo.isCalibrated());
+  }
+
+  // only check results if the service succeeded, avoiding confusing
+  // and redundant failure messages
+  if (success)
+    {
+      // create a new instance to load saved calibration
+      CameraInfoManager cinfo2(node, g_camera_name, g_package_url);
+      EXPECT_TRUE(cinfo2.isCalibrated());
+      if (cinfo2.isCalibrated())
+        {
+          sensor_msgs::CameraInfo ci(cinfo2.getCameraInfo());
+          compare_calibration(exp, ci);
+        }
     }
 }
 
