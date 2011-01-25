@@ -14,7 +14,7 @@
   <depend package="sensor_msgs"/>
 
   <export>
-    <cpp lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lpolled_camera" cflags="-I${prefix}/include -I${prefix}/srv/cpp"/>
+    <cpp lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lpolled_camera" cflags="-I${prefix}/include"/>
   </export>
 
   <platform os="ubuntu" version="9.04"/>
