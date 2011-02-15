@@ -81,6 +81,10 @@
    information
 
 */
+
+namespace camera_info_manager
+{
+
 class CameraInfoManager
 {
  public:
@@ -158,6 +162,13 @@ class CameraInfoManager
   std::string camera_name_;             ///< camera name
   std::string url_;                     ///< URL for calibration data
   sensor_msgs::CameraInfo cam_info_;    ///< current CameraInfo
-};
+
+}; // class CameraInfoManager
+
+}; // namespace camera_info_manager
+
+// Declare bare class name for backwards compatibility
+// (to be deprecated in the future).
+using camera_info_manager::CameraInfoManager;
 
 #endif // _CAMERA_INFO_MANAGER_H_
