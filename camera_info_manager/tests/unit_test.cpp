@@ -181,7 +181,7 @@ bool set_calibration(ros::NodeHandle node,
 TEST(CameraName, validNames)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
 
   EXPECT_TRUE(cinfo.setCameraName(std::string("a")));
   EXPECT_TRUE(cinfo.setCameraName(std::string("1")));
@@ -198,7 +198,7 @@ TEST(CameraName, validNames)
 TEST(CameraName, invalidNames)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
 
   EXPECT_FALSE(cinfo.setCameraName(std::string("")));
   EXPECT_FALSE(cinfo.setCameraName(std::string("-21")));
@@ -210,7 +210,7 @@ TEST(CameraName, invalidNames)
 TEST(CameraName, validURLs)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
 
   EXPECT_TRUE(cinfo.validateURL(std::string("")));
   EXPECT_TRUE(cinfo.validateURL(std::string("file:///")));
@@ -225,7 +225,7 @@ TEST(CameraName, validURLs)
 TEST(CameraName, invalidURLs)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
 
   EXPECT_FALSE(cinfo.validateURL(std::string("file://")));
   EXPECT_FALSE(cinfo.validateURL(std::string("flash:///")));
@@ -240,7 +240,7 @@ TEST(CameraName, invalidURLs)
 TEST(getInfo, uncalibrated)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
 
   EXPECT_FALSE(cinfo.isCalibrated());
 
@@ -253,7 +253,7 @@ TEST(getInfo, uncalibrated)
 TEST(getInfo, calibrated)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
 
   EXPECT_FALSE(cinfo.isCalibrated());
   std::string pkgPath(ros::package::getPath(g_package_name));
@@ -270,7 +270,7 @@ TEST(getInfo, calibrated)
 TEST(getInfo, fromPackage)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
 
   EXPECT_FALSE(cinfo.isCalibrated());
   EXPECT_TRUE(cinfo.loadCameraInfo(g_package_url));
@@ -285,7 +285,7 @@ TEST(getInfo, fromPackage)
 TEST(getInfo, unresolvedLoads)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
   EXPECT_FALSE(cinfo.isCalibrated());
 
   EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://")));
@@ -305,7 +305,7 @@ TEST(getInfo, unresolvedLoads)
 TEST(getInfo, invalidLoads)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
   EXPECT_FALSE(cinfo.isCalibrated());
 
   EXPECT_FALSE(cinfo.loadCameraInfo(std::string("")));
@@ -326,7 +326,7 @@ TEST(getInfo, invalidLoads)
 TEST(setInfo, setCalibration)
 {
   ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
+  camera_info_manager::CameraInfoManager cinfo(node);
   EXPECT_FALSE(cinfo.isCalibrated());
 
   // issue calibration service request
@@ -357,7 +357,7 @@ TEST(setInfo, saveCalibrationTmp)
 
   {
     // create instance to save calibrated data
-    CameraInfoManager cinfo(node);
+    camera_info_manager::CameraInfoManager cinfo(node);
     EXPECT_FALSE(cinfo.isCalibrated());
 
     // issue calibration service request
@@ -370,7 +370,7 @@ TEST(setInfo, saveCalibrationTmp)
   if (success)
     {
       // create a new instance to load saved calibration
-      CameraInfoManager cinfo2(node);
+      camera_info_manager::CameraInfoManager cinfo2(node);
       EXPECT_FALSE(cinfo2.isCalibrated());
       std::string url = "file://" + tmpFile;
       cinfo2.loadCameraInfo(url);
@@ -396,7 +396,7 @@ TEST(setInfo, saveCalibrationCameraName)
 
   {
     // create instance to save calibrated data
-    CameraInfoManager cinfo(node, g_camera_name);
+    camera_info_manager::CameraInfoManager cinfo(node, g_camera_name);
     success = set_calibration(node, exp);
     EXPECT_TRUE(cinfo.isCalibrated());
   }
@@ -406,7 +406,7 @@ TEST(setInfo, saveCalibrationCameraName)
   if (success)
     {
       // create a new instance to load saved calibration
-      CameraInfoManager cinfo2(node);
+      camera_info_manager::CameraInfoManager cinfo2(node);
       std::string url = "file://" + tmpFile;
       cinfo2.loadCameraInfo(std::string(url));
       EXPECT_TRUE(cinfo2.isCalibrated());
@@ -433,7 +433,7 @@ TEST(setInfo, saveCalibrationFile)
 
   {
     // create instance to save calibrated data
-    CameraInfoManager cinfo(node, cname, url);
+    camera_info_manager::CameraInfoManager cinfo(node, cname, url);
     success = set_calibration(node, exp);
     EXPECT_TRUE(cinfo.isCalibrated());
   }
@@ -443,7 +443,7 @@ TEST(setInfo, saveCalibrationFile)
   if (success)
     {
       // create a new instance to load saved calibration
-      CameraInfoManager cinfo2(node, cname, url);
+      camera_info_manager::CameraInfoManager cinfo2(node, cname, url);
       EXPECT_TRUE(cinfo2.isCalibrated());
       if (cinfo2.isCalibrated())
         {
@@ -468,7 +468,8 @@ TEST(setInfo, saveCalibrationPackage)
 
   {
     // create instance to save calibrated data
-    CameraInfoManager cinfo(node, g_camera_name, g_package_url);
+    camera_info_manager::CameraInfoManager cinfo(node, g_camera_name,
+                                                 g_package_url);
     success = set_calibration(node, exp);
     EXPECT_TRUE(cinfo.isCalibrated());
   }
@@ -478,7 +479,8 @@ TEST(setInfo, saveCalibrationPackage)
   if (success)
     {
       // create a new instance to load saved calibration
-      CameraInfoManager cinfo2(node, g_camera_name, g_package_url);
+      camera_info_manager::CameraInfoManager cinfo2(node, g_camera_name,
+                                                    g_package_url);
       EXPECT_TRUE(cinfo2.isCalibrated());
       if (cinfo2.isCalibrated())
         {
@@ -486,6 +488,14 @@ TEST(setInfo, saveCalibrationPackage)
           compare_calibration(exp, ci);
         }
     }
+}
+
+// Test that the bare class name still compiles, with a warning.
+// Remove this test in F-turtle, when it will no longer work.
+TEST(DeprecatedClass, compileWarning)
+{
+  ros::NodeHandle node;
+  CameraInfoManager cinfo(node);
 }
 
 // Run all the tests that were declared with TEST()

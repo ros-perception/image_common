@@ -167,8 +167,7 @@ class CameraInfoManager
 
 }; // namespace camera_info_manager
 
-// Declare bare class name for backwards compatibility
-// (to be deprecated in the future).
-using camera_info_manager::CameraInfoManager;
+// Declare (deprecated) bare class name for backwards compatibility.
+typedef camera_info_manager::CameraInfoManager __attribute__((deprecated)) CameraInfoManager;
 
 #endif // _CAMERA_INFO_MANAGER_H_
