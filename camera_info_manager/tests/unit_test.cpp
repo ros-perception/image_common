@@ -544,9 +544,8 @@ TEST(UrlSubstitution, doubleDollarSigns)
 
 TEST(UrlSubstitution, emptyURL)
 {
+  // test that empty URL is handled correctly
   ros::NodeHandle node;
-
-  // test for that empty URL is handled correctly
   std::string empty_url("");
   check_url_substitution(node, empty_url, empty_url, g_camera_name);
 }
@@ -562,6 +561,14 @@ TEST(UrlSubstitution, invalidVariables)
 
   // invalid substitution variable name
   name_url = "file:///tmp/${INVALID}/calibration.yaml";
+  check_url_substitution(node, name_url, name_url, g_camera_name);
+
+  // truncated substitution variable
+  name_url = "file:///tmp/${NAME";
+  check_url_substitution(node, name_url, name_url, g_camera_name);
+
+  // missing substitution variable
+  name_url = "file:///tmp/${}";
   check_url_substitution(node, name_url, name_url, g_camera_name);
 
   // no exception thrown for single "$" at end of string (but error is logged)
