@@ -542,6 +542,15 @@ TEST(UrlSubstitution, doubleDollarSigns)
   check_url_substitution(node, name_url, exp_url, g_camera_name);
 }
 
+TEST(UrlSubstitution, emptyURL)
+{
+  ros::NodeHandle node;
+
+  // test for that empty URL is handled correctly
+  std::string empty_url("");
+  check_url_substitution(node, empty_url, empty_url, g_camera_name);
+}
+
 TEST(UrlSubstitution, invalidVariables)
 {
   ros::NodeHandle node;
