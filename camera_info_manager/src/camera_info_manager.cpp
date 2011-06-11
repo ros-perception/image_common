@@ -192,7 +192,7 @@ bool CameraInfoManager::loadCalibrationFile(const std::string &filename,
       success = true;
       {
         // lock only while updating cam_info_
-        boost::mutex::scoped_lock lock(mutex_);
+        boost::recursive_mutex::scoped_lock lock(mutex_);
         cam_info_ = cam_info;
       }
     }
@@ -215,7 +215,7 @@ bool CameraInfoManager::loadCameraInfo(const std::string &url)
 {
   std::string cname;
   {
-    boost::mutex::scoped_lock lock(mutex_);
+    boost::recursive_mutex::scoped_lock lock(mutex_);
     url_ = url;
     cname = camera_name_;
   }
@@ -224,6 +224,68 @@ bool CameraInfoManager::loadCameraInfo(const std::string &url)
   return loadCalibration(url, cname);
 }
 
+
+/** resolve Uniform Resource Locator string.
+ *
+ *  Make a single pass through the URL string.  Variable values
+ *  containing substitutable strings are only resolved once, not
+ *  recursively.  Unrecognized variable names are copied literally
+ *  with no substitution, and an error is logged.
+ *
+ * @return a copy of the URL with any variable information resolved.
+ */
+std::string CameraInfoManager::resolveURL(void)
+{
+  {
+    // do not allow class state to change during resolution
+    boost::recursive_mutex::scoped_lock lock(mutex_);
+
+    std::string resolved;
+    size_t rest = 0;
+
+    while (true)
+      {
+        // find the next '$' in the URL string
+        size_t dollar  = url_.find('$', rest);
+
+        if (dollar >= url_.length())
+          {
+            // no more '$'s left in the URL
+            resolved += url_.substr(rest);
+            break;
+          }
+
+        // copy characters up to the next '$'
+        resolved += url_.substr(rest, dollar);
+
+        if (url_.substr(dollar+1, 1) == "$")
+          {
+            // have consecutive "$$" string
+            resolved += "$";            // substitute single '$'
+            dollar++;
+          }
+        else if (url_.substr(dollar+1, 6) == "{NAME}")
+          {
+            // substitute camera name
+            resolved += camera_name_;
+            dollar += 6;
+          }
+        else
+          {
+            // not a valid substitution variable
+            ROS_ERROR_STREAM("[CameraInfoManager]"
+                             " invalid URL substitution (not resolved): "
+                             << url_);
+            resolved += "$";            // keep the bogus '$'
+          }
+
+        // look for next '$'
+        rest = dollar + 1;
+      }
+
+    return resolved;
+  }
+}
 
 /** parse calibration Uniform Resource Locator
  *
@@ -341,7 +403,7 @@ CameraInfoManager::setCameraInfo(sensor_msgs::SetCameraInfo::Request &req,
   std::string url_copy;
   std::string cname;
   {
-    boost::mutex::scoped_lock lock(mutex_);
+    boost::recursive_mutex::scoped_lock lock(mutex_);
     cam_info_ = req.camera_info;
     url_copy = url_;
     cname = camera_name_;
@@ -385,7 +447,7 @@ bool CameraInfoManager::setCameraName(const std::string &cname)
     }
 
   // the name is valid, update our private copy
-  boost::mutex::scoped_lock lock(mutex_);
+  boost::recursive_mutex::scoped_lock lock(mutex_);
   camera_name_ = cname;
   return true;
 }

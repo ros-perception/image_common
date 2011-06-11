@@ -39,7 +39,7 @@
 #define _CAMERA_INFO_MANAGER_H_
 
 #include <ros/ros.h>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
 
@@ -104,18 +104,19 @@ class CameraInfoManager
    */
   sensor_msgs::CameraInfo getCameraInfo(void)
   {
-    boost::mutex::scoped_lock lock_(mutex_);
+    boost::recursive_mutex::scoped_lock lock_(mutex_);
     return cam_info_;
   }
 
   /** Returns true if the current CameraInfo is calibrated. */
   bool isCalibrated(void)
   {
-    boost::mutex::scoped_lock lock_(mutex_);
+    boost::recursive_mutex::scoped_lock lock_(mutex_);
     return (cam_info_.K[0] != 0.0);
   }
 
   bool loadCameraInfo(const std::string &url);
+  std::string resolveURL(void);
   bool setCameraName(const std::string &cname);
   bool validateURL(const std::string &url);
 
@@ -149,12 +150,12 @@ class CameraInfoManager
   bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req,
                      sensor_msgs::SetCameraInfo::Response &rsp);
 
-  /** This non-recursive mutex is only held for a short time while
+  /** This recursive mutex is only held for a short time while
    *  accessing or changing private class variables.  To avoid
    *  deadlocks, it is never held during I/O or while invoking a
    *  callback.
    */
-  boost::mutex mutex_;
+  boost::recursive_mutex mutex_;
 
   // private data
   ros::NodeHandle nh_;                  ///< node handle for service

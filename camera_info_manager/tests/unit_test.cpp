@@ -51,7 +51,7 @@ namespace
   const std::string g_package_name("camera_info_manager");
   const std::string g_package_filename("/tests/test_calibration.yaml");
   const std::string g_package_url("package://" + g_package_name
-                                  + "/" + g_package_filename);
+                                  + g_package_filename);
   const std::string g_camera_name("08144361026320a0");
 }
 
@@ -171,6 +171,17 @@ bool set_calibration(ros::NodeHandle node,
   bool success;
   EXPECT_TRUE((success = client.call(set_camera_info)));
   return success;
+}
+
+// resolve URL string, result should be as expected
+void check_url_substitution(ros::NodeHandle node,
+                            const std::string &url,
+                            const std::string &exp_url,
+                            const std::string &camera_name)
+{
+  camera_info_manager::CameraInfoManager cinfo(node, camera_name, url);
+  std::string sub_url = cinfo.resolveURL();
+  EXPECT_EQ(sub_url, exp_url);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -488,6 +499,65 @@ TEST(setInfo, saveCalibrationPackage)
           compare_calibration(exp, ci);
         }
     }
+}
+
+TEST(UrlSubstitution, cameraName)
+{
+  ros::NodeHandle node;
+  std::string name_url;
+  std::string exp_url;
+
+  // resolve a GUID camera name
+  name_url = "package://" + g_package_name + "/tests/${NAME}.yaml";
+  exp_url = "package://" + g_package_name + "/tests/" + g_camera_name + ".yaml";
+  check_url_substitution(node, name_url, exp_url, g_camera_name);
+
+  // substitute camera name "test"
+  name_url = "package://" + g_package_name + "/tests/${NAME}_calibration.yaml";
+  std::string test_name("test");
+  exp_url = "package://" + g_package_name + "/tests/" + test_name
+    + "_calibration.yaml";
+  check_url_substitution(node, name_url, exp_url, test_name);
+
+  // substitute empty camera name
+  name_url = "package://" + g_package_name + "/tests/${NAME}_calibration.yaml";
+  std::string empty_name("");
+  exp_url = "package://" + g_package_name + "/tests/" + empty_name
+    + "_calibration.yaml";
+  check_url_substitution(node, name_url, exp_url, empty_name);
+}
+
+TEST(UrlSubstitution, doubleDollarSigns)
+{
+  ros::NodeHandle node;
+
+  // test for "$$" in the URL (NAME not resolved)
+  std::string name_url("file:///tmp/$${NAME}.yaml");
+  std::string exp_url("file:///tmp/${NAME}.yaml");
+  check_url_substitution(node, name_url, exp_url, g_camera_name);
+
+  // test for "$$" at end of string
+  name_url = "file:///$$";
+  exp_url = "file:///$";
+  check_url_substitution(node, name_url, exp_url, g_camera_name);
+}
+
+TEST(UrlSubstitution, invalidVariables)
+{
+  ros::NodeHandle node;
+  std::string name_url;
+
+  // missing "{...}"
+  name_url = "file:///tmp/$NAME.yaml";
+  check_url_substitution(node, name_url, name_url, g_camera_name);
+
+  // invalid substitution variable name
+  name_url = "file:///tmp/${INVALID}/calibration.yaml";
+  check_url_substitution(node, name_url, name_url, g_camera_name);
+
+  // no exception thrown for single "$" at end of string (but error is logged)
+  name_url = "file:///$";
+  check_url_substitution(node, name_url, name_url, g_camera_name);
 }
 
 // Test that the bare class name still compiles, with a warning.
