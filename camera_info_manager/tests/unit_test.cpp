@@ -226,10 +226,11 @@ TEST(CameraName, validURLs)
   EXPECT_TRUE(cinfo.validateURL(std::string("")));
   EXPECT_TRUE(cinfo.validateURL(std::string("file:///")));
   EXPECT_TRUE(cinfo.validateURL(std::string("file:///tmp/url.yaml")));
-  EXPECT_TRUE(cinfo.validateURL(std::string("file:///tmp/url.ini")));
+  EXPECT_TRUE(cinfo.validateURL(std::string("File:///tmp/url.ini")));
+  EXPECT_TRUE(cinfo.validateURL(std::string("FILE:///tmp/url.yaml")));
   EXPECT_TRUE(cinfo.validateURL(g_package_url));
   EXPECT_TRUE(cinfo.validateURL(std::string("package://no_such_package/calibration.yaml")));
-  EXPECT_TRUE(cinfo.validateURL(std::string("package://camera_info_manager/x")));
+  EXPECT_TRUE(cinfo.validateURL(std::string("packAge://camera_info_manager/x")));
 }
 
 // Test that invalid URLs are rejected
@@ -515,6 +516,12 @@ TEST(UrlSubstitution, cameraName)
   // substitute camera name "test"
   name_url = "package://" + g_package_name + "/tests/${NAME}_calibration.yaml";
   std::string test_name("test");
+  exp_url = "package://" + g_package_name + "/tests/" + test_name
+    + "_calibration.yaml";
+  check_url_substitution(node, name_url, exp_url, test_name);
+
+  // with an '_' in the name
+  test_name = "camera_1024x768";
   exp_url = "package://" + g_package_name + "/tests/" + test_name
     + "_calibration.yaml";
   check_url_substitution(node, name_url, exp_url, test_name);

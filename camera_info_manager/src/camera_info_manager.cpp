@@ -38,6 +38,7 @@
 #include <locale>
 #include <ros/ros.h>
 #include <ros/package.h>
+#include <boost/algorithm/string.hpp>
 #include <camera_calibration_parsers/parse.h>
 
 #include "camera_info_manager/camera_info_manager.h"
@@ -232,6 +233,10 @@ bool CameraInfoManager::loadCameraInfo(const std::string &url)
  *  recursively.  Unrecognized variable names are copied literally
  *  with no substitution, and an error is logged.
  *
+ *  This method locks the class mutex, ensuring that the URL and other
+ *  substitution values are consistent.  That mutex is recursive, so
+ *  the caller may already hold it, if needed.
+ *
  * @return a copy of the URL with any variable information resolved.
  */
 std::string CameraInfoManager::resolveURL(void)
@@ -300,15 +305,15 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string &url
     {
       return URL_empty;
     }
-  if (url.substr(0, 8) == "file:///")
+  if (boost::iequals(url.substr(0, 8), "file:///"))
     {
       return URL_file;
     }
-  if (url.substr(0, 9) == "flash:///")
+  if (boost::iequals(url.substr(0, 9), "flash:///"))
     {
       return URL_flash;
     }
-  if (url.substr(0, 10) == "package://")
+  if (boost::iequals(url.substr(0, 10), "package://"))
     {
       // look for a '/' following the package name, make sure it is
       // there, the name is not empty, and something follows it
