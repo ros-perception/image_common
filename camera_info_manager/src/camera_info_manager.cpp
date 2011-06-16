@@ -36,6 +36,7 @@
 
 #include <string>
 #include <locale>
+#include <stdlib.h>
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <boost/algorithm/string.hpp>
@@ -255,25 +256,44 @@ std::string CameraInfoManager::resolveURL(void)
 
         if (dollar >= url_.length())
           {
-            // no more '$'s left in the URL
+            // no more variables left in the URL
             resolved += url_.substr(rest);
+            //ROS_ERROR_STREAM("final resolved: " << resolved);
             break;
           }
 
         // copy characters up to the next '$'
-        resolved += url_.substr(rest, dollar);
+        resolved += url_.substr(rest, dollar-rest);
 
-        if (url_.substr(dollar+1, 1) == "$")
+        if (url_.substr(dollar+1, 1) != "{")
           {
-            // have consecutive "$$" string
-            resolved += "$";            // substitute single '$'
-            dollar++;
+            // no '{' follows, so keep the '$'
+            resolved += "$";
           }
         else if (url_.substr(dollar+1, 6) == "{NAME}")
           {
             // substitute camera name
             resolved += camera_name_;
             dollar += 6;
+          }
+        else if (url_.substr(dollar+1, 10) == "{ROS_HOME}")
+          {
+            // substitute $ROS_HOME
+            std::string ros_home;
+            char *ros_home_env;
+            if ((ros_home_env = getenv("ROS_HOME")))
+              {
+                // use environment variable
+                ros_home = ros_home_env;
+              }
+            else if ((ros_home_env = getenv("HOME")))
+              {
+                // use "$HOME/.ros"
+                ros_home = ros_home_env;
+                ros_home += "/.ros";
+              }
+            resolved += ros_home;
+            dollar += 10;
           }
         else
           {
@@ -283,6 +303,8 @@ std::string CameraInfoManager::resolveURL(void)
                              << url_);
             resolved += "$";            // keep the bogus '$'
           }
+
+        //ROS_ERROR_STREAM("resolved: " << resolved);
 
         // look for next '$'
         rest = dollar + 1;

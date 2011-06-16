@@ -35,6 +35,7 @@
 *********************************************************************/
 
 #include <unistd.h>
+#include <stdlib.h>
 #include <ros/ros.h>
 #include <ros/package.h>
 #include "camera_info_manager/camera_info_manager.h"
@@ -534,19 +535,47 @@ TEST(UrlSubstitution, cameraName)
   check_url_substitution(node, name_url, exp_url, empty_name);
 }
 
-TEST(UrlSubstitution, doubleDollarSigns)
+TEST(UrlSubstitution, rosHome)
+{
+  ros::NodeHandle node;
+  std::string name_url;
+  std::string exp_url;
+  char *home_env = getenv("HOME");
+  std::string home(home_env);
+
+  // resolve ${ROS_HOME} with environment variable undefined
+  unsetenv("ROS_HOME");
+  name_url = "file://${ROS_HOME}/camera_info/test_camera.yaml";
+  exp_url = "file://" + home + "/.ros/camera_info/test_camera.yaml";
+  check_url_substitution(node, name_url, exp_url, g_camera_name);
+
+  // resolve ${ROS_HOME} with environment variable defined
+  setenv("ROS_HOME", "/my/ros/home", true);
+  name_url = "file://${ROS_HOME}/camera_info/test_camera.yaml";
+  exp_url = "file:///my/ros/home/camera_info/test_camera.yaml";
+  check_url_substitution(node, name_url, exp_url, g_camera_name);
+}
+
+TEST(UrlSubstitution, unmatchedDollarSigns)
 {
   ros::NodeHandle node;
 
-  // test for "$$" in the URL (NAME not resolved)
+  // test for "$$" in the URL (NAME should be resolved)
   std::string name_url("file:///tmp/$${NAME}.yaml");
-  std::string exp_url("file:///tmp/${NAME}.yaml");
+  std::string exp_url("file:///tmp/$" + g_camera_name + ".yaml");
   check_url_substitution(node, name_url, exp_url, g_camera_name);
+
+  // test for "$" in middle of string
+  name_url = "file:///$whatever.yaml";
+  check_url_substitution(node, name_url, name_url, g_camera_name);
+
+  // test for "$$" in middle of string
+  name_url = "file:///something$$whatever.yaml";
+  check_url_substitution(node, name_url, name_url, g_camera_name);
 
   // test for "$$" at end of string
   name_url = "file:///$$";
-  exp_url = "file:///$";
-  check_url_substitution(node, name_url, exp_url, g_camera_name);
+  check_url_substitution(node, name_url, name_url, g_camera_name);
 }
 
 TEST(UrlSubstitution, emptyURL)
@@ -578,7 +607,7 @@ TEST(UrlSubstitution, invalidVariables)
   name_url = "file:///tmp/${}";
   check_url_substitution(node, name_url, name_url, g_camera_name);
 
-  // no exception thrown for single "$" at end of string (but error is logged)
+  // no exception thrown for single "$" at end of string
   name_url = "file:///$";
   check_url_substitution(node, name_url, name_url, g_camera_name);
 }
