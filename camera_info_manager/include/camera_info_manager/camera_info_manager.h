@@ -116,7 +116,8 @@ class CameraInfoManager
   }
 
   bool loadCameraInfo(const std::string &url);
-  std::string resolveURL(void);
+  std::string resolveURL(const std::string &url,
+                         const std::string &cname);
   bool setCameraName(const std::string &cname);
   bool validateURL(const std::string &url);
 

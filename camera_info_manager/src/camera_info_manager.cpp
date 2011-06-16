@@ -234,84 +234,77 @@ bool CameraInfoManager::loadCameraInfo(const std::string &url)
  *  recursively.  Unrecognized variable names are copied literally
  *  with no substitution, and an error is logged.
  *
- *  This method locks the class mutex, ensuring that the URL and other
- *  substitution values are consistent.  That mutex is recursive, so
- *  the caller may already hold it, if needed.
+ * @param url a copy of the Uniform Resource Locator, which may
+ *            include ${...} substitution variables.
+ * @param cname is a copy of the camera_name_
  *
  * @return a copy of the URL with any variable information resolved.
  */
-std::string CameraInfoManager::resolveURL(void)
+std::string CameraInfoManager::resolveURL(const std::string &url,
+                                          const std::string &cname)
 {
-  {
-    // do not allow class state to change during resolution
-    boost::recursive_mutex::scoped_lock lock(mutex_);
+  std::string resolved;
+  size_t rest = 0;
 
-    std::string resolved;
-    size_t rest = 0;
+  while (true)
+    {
+      // find the next '$' in the URL string
+      size_t dollar  = url.find('$', rest);
 
-    while (true)
-      {
-        // find the next '$' in the URL string
-        size_t dollar  = url_.find('$', rest);
+      if (dollar >= url.length())
+        {
+          // no more variables left in the URL
+          resolved += url.substr(rest);
+          break;
+        }
 
-        if (dollar >= url_.length())
-          {
-            // no more variables left in the URL
-            resolved += url_.substr(rest);
-            //ROS_ERROR_STREAM("final resolved: " << resolved);
-            break;
-          }
+      // copy characters up to the next '$'
+      resolved += url.substr(rest, dollar-rest);
 
-        // copy characters up to the next '$'
-        resolved += url_.substr(rest, dollar-rest);
+      if (url.substr(dollar+1, 1) != "{")
+        {
+          // no '{' follows, so keep the '$'
+          resolved += "$";
+        }
+      else if (url.substr(dollar+1, 6) == "{NAME}")
+        {
+          // substitute camera name
+          resolved += cname;
+          dollar += 6;
+        }
+      else if (url.substr(dollar+1, 10) == "{ROS_HOME}")
+        {
+          // substitute $ROS_HOME
+          std::string ros_home;
+          char *ros_home_env;
+          if ((ros_home_env = getenv("ROS_HOME")))
+            {
+              // use environment variable
+              ros_home = ros_home_env;
+            }
+          else if ((ros_home_env = getenv("HOME")))
+            {
+              // use "$HOME/.ros"
+              ros_home = ros_home_env;
+              ros_home += "/.ros";
+            }
+          resolved += ros_home;
+          dollar += 10;
+        }
+      else
+        {
+          // not a valid substitution variable
+          ROS_ERROR_STREAM("[CameraInfoManager]"
+                           " invalid URL substitution (not resolved): "
+                           << url);
+          resolved += "$";            // keep the bogus '$'
+        }
 
-        if (url_.substr(dollar+1, 1) != "{")
-          {
-            // no '{' follows, so keep the '$'
-            resolved += "$";
-          }
-        else if (url_.substr(dollar+1, 6) == "{NAME}")
-          {
-            // substitute camera name
-            resolved += camera_name_;
-            dollar += 6;
-          }
-        else if (url_.substr(dollar+1, 10) == "{ROS_HOME}")
-          {
-            // substitute $ROS_HOME
-            std::string ros_home;
-            char *ros_home_env;
-            if ((ros_home_env = getenv("ROS_HOME")))
-              {
-                // use environment variable
-                ros_home = ros_home_env;
-              }
-            else if ((ros_home_env = getenv("HOME")))
-              {
-                // use "$HOME/.ros"
-                ros_home = ros_home_env;
-                ros_home += "/.ros";
-              }
-            resolved += ros_home;
-            dollar += 10;
-          }
-        else
-          {
-            // not a valid substitution variable
-            ROS_ERROR_STREAM("[CameraInfoManager]"
-                             " invalid URL substitution (not resolved): "
-                             << url_);
-            resolved += "$";            // keep the bogus '$'
-          }
+      // look for next '$'
+      rest = dollar + 1;
+    }
 
-        //ROS_ERROR_STREAM("resolved: " << resolved);
-
-        // look for next '$'
-        rest = dollar + 1;
-      }
-
-    return resolved;
-  }
+  return resolved;
 }
 
 /** parse calibration Uniform Resource Locator

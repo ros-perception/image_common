@@ -181,7 +181,7 @@ void check_url_substitution(ros::NodeHandle node,
                             const std::string &camera_name)
 {
   camera_info_manager::CameraInfoManager cinfo(node, camera_name, url);
-  std::string sub_url = cinfo.resolveURL();
+  std::string sub_url = cinfo.resolveURL(url, camera_name);
   EXPECT_EQ(sub_url, exp_url);
 }
 
