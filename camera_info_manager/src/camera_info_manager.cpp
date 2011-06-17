@@ -476,8 +476,17 @@ bool CameraInfoManager::setCameraName(const std::string &cname)
     }
 
   // the name is valid, update our private copy
-  boost::recursive_mutex::scoped_lock lock(mutex_);
-  camera_name_ = cname;
+  std::string url;
+  {
+    boost::recursive_mutex::scoped_lock lock(mutex_);
+    camera_name_ = cname;
+    url = url_;
+  }
+
+  // Attempt to reload the camera info, the new name might cause the
+  // existing URL to resolve somewhere else.
+  loadCalibration(url, cname);
+
   return true;
 }
 

@@ -50,9 +50,12 @@
 namespace
 {
   const std::string g_package_name("camera_info_manager");
-  const std::string g_package_filename("/tests/test_calibration.yaml");
+  const std::string g_test_name("test_calibration");
+  const std::string g_package_filename("/tests/" + g_test_name +".yaml");
   const std::string g_package_url("package://" + g_package_name
                                   + g_package_filename);
+  const std::string g_package_name_url("package://" + g_package_name
+                                       + "/tests/${NAME}.yaml");
   const std::string g_default_url("file://${ROS_HOME}/camera_info/${NAME}.yaml");
   const std::string g_camera_name("08144361026320a0");
 }
@@ -328,6 +331,19 @@ TEST(GetInfo, fromPackage)
   compare_calibration(exp, ci);
 }
 
+// Test ability to access named calibrated CameraInfo from package
+TEST(GetInfo, fromPackageWithName)
+{
+  ros::NodeHandle node;
+  camera_info_manager::CameraInfoManager cinfo(node, g_test_name,
+                                               g_package_name_url);
+  EXPECT_TRUE(cinfo.isCalibrated());
+
+  sensor_msgs::CameraInfo ci(cinfo.getCameraInfo());
+  sensor_msgs::CameraInfo exp(expected_calibration());
+  compare_calibration(exp, ci);
+}
+
 // Test load of unresolved "package:" URL files
 TEST(GetInfo, unresolvedLoads)
 {
@@ -347,26 +363,24 @@ TEST(GetInfo, unresolvedLoads)
   EXPECT_FALSE(cinfo.isCalibrated());
 }
 
-#if 0 // feature not implemented yet
 // Test load of "package:" URL after changing name
 TEST(GetInfo, nameChange)
 {
   ros::NodeHandle node;
-  const std::string package_url("package://camera_info_manager/test/${NAME}.yaml");
   const std::string missing_file("no_such_file");
 
   // first declare using non-existent camera name
-  camera_info_manager::CameraInfoManager cinfo(node, package_url, missing_file);
+  camera_info_manager::CameraInfoManager cinfo(node, missing_file,
+                                               g_package_name_url);
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  // set name to test file that exists
-  EXPECT_TRUE(cinfo.setCameraName("test_calibration"));
+  // set name so it resolves to a test file that does exist
+  EXPECT_TRUE(cinfo.setCameraName(g_test_name));
   EXPECT_TRUE(cinfo.isCalibrated());
   sensor_msgs::CameraInfo ci(cinfo.getCameraInfo());
   sensor_msgs::CameraInfo exp(expected_calibration());
   compare_calibration(exp, ci);
 }
-#endif
 
 // Test load of invalid CameraInfo URLs
 TEST(GetInfo, invalidLoads)
@@ -591,6 +605,9 @@ TEST(UrlSubstitution, cameraName)
   exp_url = "package://" + g_package_name + "/tests/" + empty_name
     + "_calibration.yaml";
   check_url_substitution(node, name_url, exp_url, empty_name);
+
+  // substitute test camera calibration from this package
+  check_url_substitution(node, g_package_name_url, g_package_url, g_test_name);
 }
 
 TEST(UrlSubstitution, rosHome)
