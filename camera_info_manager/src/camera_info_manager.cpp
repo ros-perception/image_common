@@ -44,6 +44,12 @@
 
 #include "camera_info_manager/camera_info_manager.h"
 
+namespace camera_info_manager
+{
+  const std::string default_camera_info_url =
+    "file://${ROS_HOME}/camera_info/${NAME}.yaml";
+};
+
 using namespace camera_calibration_parsers;
 
 /** @file
@@ -124,23 +130,25 @@ bool CameraInfoManager::loadCalibration(const std::string &url,
 {
   bool success = false;                 // return value
 
-  url_type_t url_type = parseURL(url);
+  const std::string resURL(resolveURL(url, cname));
+  url_type_t url_type = parseURL(resURL);
 
   if (url_type != URL_empty)
     {
-      ROS_INFO_STREAM("camera calibration URL: " << url);
+      ROS_INFO_STREAM("camera calibration URL: " << resURL);
     }
 
   switch (url_type)
     {
     case URL_empty:
       {
-        ROS_DEBUG("no camera calibration source");
+        ROS_INFO("using default calibration URL");
+        success = loadCalibration(default_camera_info_url, cname);
         break;
       }
     case URL_file:
       {
-        success = loadCalibrationFile(url.substr(7), cname);
+        success = loadCalibrationFile(resURL.substr(7), cname);
         break;
       }
     case URL_flash:
@@ -150,14 +158,14 @@ bool CameraInfoManager::loadCalibration(const std::string &url,
       }
     case URL_package:
       {
-        std::string filename(getPackageFileName(url));
+        std::string filename(getPackageFileName(resURL));
         if (!filename.empty())
           success = loadCalibrationFile(filename, cname);
         break;
       }
     default:
       {
-        ROS_ERROR_STREAM("Invalid camera calibration URL: " << url);
+        ROS_ERROR_STREAM("Invalid camera calibration URL: " << resURL);
         break;
       }
     }
@@ -345,7 +353,7 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string &url
  *
  * @param new_info contains CameraInfo to save
  * @param url is a copy of the URL storage location (if empty, use
- *            "file:///tmp/calibration_<cname>.yaml")
+ *            "file://${ROS_HOME}/camera_info/${NAME}.yaml")
  * @param cname is a copy of the camera_name_
  * @return true, if successful
  */
@@ -356,23 +364,24 @@ CameraInfoManager::saveCalibration(const sensor_msgs::CameraInfo &new_info,
 {
   bool success = false;
 
-  switch (parseURL(url))
+  const std::string resURL(resolveURL(url, cname));
+
+  switch (parseURL(resURL))
     {
     case URL_empty:
       {
         // store using default file name
-        std::string filename("/tmp/calibration_" + cname + ".yaml");
-        success = saveCalibrationFile(new_info, filename, cname);
+        success = saveCalibration(new_info, default_camera_info_url, cname);
         break;
       }
     case URL_file:
       {
-        success = saveCalibrationFile(new_info, url.substr(7), cname);
+        success = saveCalibrationFile(new_info, resURL.substr(7), cname);
         break;
       }
     case URL_package:
       {
-        std::string filename(getPackageFileName(url));
+        std::string filename(getPackageFileName(resURL));
         if (!filename.empty())
           success = saveCalibrationFile(new_info, filename, cname);
         break;
@@ -380,8 +389,8 @@ CameraInfoManager::saveCalibration(const sensor_msgs::CameraInfo &new_info,
     default:
       {
         // invalid URL, save to default location
-        ROS_ERROR_STREAM("invalid url: " << url << " (ignored)");
-        success = saveCalibration(new_info, std::string(""), cname);
+        ROS_ERROR_STREAM("invalid url: " << resURL << " (ignored)");
+        success = saveCalibration(new_info, default_camera_info_url, cname);
         break;
       }
     }
@@ -481,6 +490,12 @@ bool CameraInfoManager::setCameraName(const std::string &cname)
  */
 bool CameraInfoManager::validateURL(const std::string &url)
 {
-  url_type_t url_type = parseURL(url);
+  std::string cname;                    // copy of camera name
+  {
+    boost::recursive_mutex::scoped_lock lock(mutex_);
+    cname = camera_name_;
+  } // release the lock
+
+  url_type_t url_type = parseURL(resolveURL(url, cname));
   return (url_type < URL_invalid);
 }
