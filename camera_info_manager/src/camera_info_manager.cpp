@@ -37,6 +37,9 @@
 #include <string>
 #include <locale>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <boost/algorithm/string.hpp>
@@ -413,6 +416,54 @@ CameraInfoManager::saveCalibrationFile(const sensor_msgs::CameraInfo &new_info,
                                        const std::string &cname)
 {
   ROS_INFO_STREAM("writing calibration data to " << filename);
+
+  // isolate the name of the containing directory
+  size_t last_slash = filename.rfind('/');
+  if (last_slash >= filename.length())
+    {
+      // No slash in the name.  This should never happen, the URL
+      // parser ensures there is at least one '/' at the beginning.
+      ROS_ERROR_STREAM("filename [" << filename << "] has no '/'");
+      return false;                     // not a valid URL
+    }
+
+  // make sure the directory exists and is writable
+  std::string dirname(filename.substr(0, last_slash+1));
+  struct stat stat_data;
+  int rc = stat(dirname.c_str(), &stat_data);
+  if (rc != 0)
+    {
+      if (errno == ENOENT)
+        {
+          // directory does not exist, try to create it and its parents
+          std::string command("mkdir -p " + dirname);
+          rc = system(command.c_str());
+          if (rc != 0)
+            {
+              // mkdir failed
+              ROS_ERROR_STREAM("unable to create path to directory ["
+                               << dirname << "]");
+              return false;
+            }
+        }
+      else
+        {
+          // not accessible, or something screwy
+          ROS_ERROR_STREAM("directory [" << dirname << "] not accessible");
+          return false;
+        }
+    }
+  else if (!S_ISDIR(stat_data.st_mode))
+    {
+      // dirname exists but is not a directory
+      ROS_ERROR_STREAM("[" << dirname << "] is not a directory");
+      return false;
+    }
+
+  // Directory exists and is accessible. Permissions might still be bad.
+
+  // Currently, writeCalibration() always returns true no matter what
+  // (ros-pkg ticket #5010).
   return writeCalibration(filename, cname, new_info);
 }
 

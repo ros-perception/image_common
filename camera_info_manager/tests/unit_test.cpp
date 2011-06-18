@@ -105,7 +105,8 @@ void delete_file(std::string filename)
   int rc = unlink(filename.c_str());
   if (rc != 0)
     {
-      EXPECT_EQ(errno, ENOENT);
+      if (errno != ENOENT)
+        ROS_INFO_STREAM("unexpected unlink() error: " << errno);
     }
 }
 
@@ -427,21 +428,15 @@ TEST(SetInfo, saveCalibrationDefault)
   sensor_msgs::CameraInfo exp(expected_calibration());
   bool success;
 
-#define MISSING_DIR_BUG_WORKAROUND 1
-#if MISSING_DIR_BUG_WORKAROUND
-  // first, delete everything in the /tmp/camera_info directory
-  make_tmp_camera_info_directory();
-#else
-  // creation of missing directories not working yet, run test anyway
+  // Set ${ROS_HOME} to /tmp, then delete the /tmp/camera_info
+  // directory and everything in it.
+  setenv("ROS_HOME", "/tmp", true);
   delete_tmp_camera_info_directory();
-#endif
 
   {
     // create instance to save calibrated data
     camera_info_manager::CameraInfoManager cinfo(node);
-#if !MISSING_DIR_BUG_WORKAROUND
     EXPECT_FALSE(cinfo.isCalibrated());
-#endif
 
     // issue calibration service request
     success = set_calibration(node, exp);
@@ -471,7 +466,7 @@ TEST(SetInfo, saveCalibrationCameraName)
   sensor_msgs::CameraInfo exp(expected_calibration());
   bool success;
 
-  // first, delete the file
+  // set ${ROS_HOME} to /tmp, delete the calibration file
   std::string ros_home("/tmp");
   setenv("ROS_HOME", ros_home.c_str(), true);
   std::string tmpFile(ros_home + "/camera_info/" + g_camera_name + ".yaml");
