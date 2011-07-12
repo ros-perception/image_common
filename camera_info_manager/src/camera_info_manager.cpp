@@ -51,9 +51,8 @@ namespace camera_info_manager
 {
   const std::string default_camera_info_url =
     "file://${ROS_HOME}/camera_info/${NAME}.yaml";
-};
 
-using namespace camera_calibration_parsers;
+  using namespace camera_calibration_parsers;
 
 /** @file
 
@@ -205,7 +204,7 @@ bool CameraInfoManager::loadCalibrationFile(const std::string &filename,
       success = true;
       {
         // lock only while updating cam_info_
-        boost::recursive_mutex::scoped_lock lock(mutex_);
+        boost::mutex::scoped_lock lock(mutex_);
         cam_info_ = cam_info;
       }
     }
@@ -228,7 +227,7 @@ bool CameraInfoManager::loadCameraInfo(const std::string &url)
 {
   std::string cname;
   {
-    boost::recursive_mutex::scoped_lock lock(mutex_);
+    boost::mutex::scoped_lock lock(mutex_);
     url_ = url;
     cname = camera_name_;
   }
@@ -483,7 +482,7 @@ CameraInfoManager::setCameraInfo(sensor_msgs::SetCameraInfo::Request &req,
   std::string url_copy;
   std::string cname;
   {
-    boost::recursive_mutex::scoped_lock lock(mutex_);
+    boost::mutex::scoped_lock lock(mutex_);
     cam_info_ = req.camera_info;
     url_copy = url_;
     cname = camera_name_;
@@ -529,7 +528,7 @@ bool CameraInfoManager::setCameraName(const std::string &cname)
   // the name is valid, update our private copy
   std::string url;
   {
-    boost::recursive_mutex::scoped_lock lock(mutex_);
+    boost::mutex::scoped_lock lock(mutex_);
     camera_name_ = cname;
     url = url_;
   }
@@ -552,10 +551,12 @@ bool CameraInfoManager::validateURL(const std::string &url)
 {
   std::string cname;                    // copy of camera name
   {
-    boost::recursive_mutex::scoped_lock lock(mutex_);
+    boost::mutex::scoped_lock lock(mutex_);
     cname = camera_name_;
   } // release the lock
 
   url_type_t url_type = parseURL(resolveURL(url, cname));
   return (url_type < URL_invalid);
 }
+
+} // namespace camera_info_manager

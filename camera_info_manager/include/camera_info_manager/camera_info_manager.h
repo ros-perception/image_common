@@ -39,7 +39,7 @@
 #define _CAMERA_INFO_MANAGER_H_
 
 #include <ros/ros.h>
-#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/mutex.hpp>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
 
@@ -50,12 +50,15 @@
     @author Jack O'Quin
  */
 
+namespace camera_info_manager
+{
+
 /** @brief CameraInfo Manager class
 
-    Provides CameraInfo, handles the SetCameraInfo service requests,
-    saves and restores sensor_msgs/CameraInfo data.  The calling node
-    must invoke ros::spin() or ros::spinOnce() in some thread, so
-    CameraInfoManager can handle arriving service requests.
+    Provides CameraInfo, handles the sensor_msgs/SetCameraInfo service
+    requests, saves and restores sensor_msgs/CameraInfo data.  The
+    calling node must invoke ros::spin() or ros::spinOnce() in some
+    thread, so CameraInfoManager can handle arriving service requests.
 
     The location for getting and saving calibration data is expressed
     by Uniform Resource Locator. Some cameras are capable of saving
@@ -65,15 +68,29 @@
     Example URL syntax:
 
     - file:///full/path/to/local/file.yaml
-
+    - file:///full/path/to/videre/file.ini
     - package://ros_package_name/calibrations/camera3.yaml
-
     - flash:///1 (not yet implemented)
 
-    If the URL is empty, no calibration data are loaded, and any data
-    provided via set_camera_info will be stored in:
+    Beginning with Electric Emys, the URL may contain substitution
+    variables, including:
 
-    - file:///tmp/calibration_<camera_name>.yaml.
+    - ${NAME} resolved to the current camera name defined by the
+              device driver.
+
+    - ${ROS_HOME} resolved to the $ROS_HOME environment variable if
+                  defined, "~/.ros" if not.
+
+    Examples with variable substitution:
+
+    - package://my_cameras/calibrations/${NAME}.yaml
+    - file://${ROS_HOME}/camera_info/left_front_camera.yaml
+
+    If the URL is empty, calibration data are loaded from, and stored to:
+
+    - file://${ROS_HOME}/camera_info/${NAME}.yaml.
+
+    (In C-turtle and Diamondback, an empty URL was handled differently.)
 
 @par Services
 
@@ -81,9 +98,6 @@
    information
 
 */
-
-namespace camera_info_manager
-{
 
 class CameraInfoManager
 {
@@ -104,14 +118,14 @@ class CameraInfoManager
    */
   sensor_msgs::CameraInfo getCameraInfo(void)
   {
-    boost::recursive_mutex::scoped_lock lock_(mutex_);
+    boost::mutex::scoped_lock lock_(mutex_);
     return cam_info_;
   }
 
   /** Returns true if the current CameraInfo is calibrated. */
   bool isCalibrated(void)
   {
-    boost::recursive_mutex::scoped_lock lock_(mutex_);
+    boost::mutex::scoped_lock lock_(mutex_);
     return (cam_info_.K[0] != 0.0);
   }
 
@@ -151,12 +165,12 @@ class CameraInfoManager
   bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req,
                      sensor_msgs::SetCameraInfo::Response &rsp);
 
-  /** This recursive mutex is only held for a short time while
+  /** This non-recursive mutex is only held for a short time while
    *  accessing or changing private class variables.  To avoid
    *  deadlocks, it is never held during I/O or while invoking a
    *  callback.
    */
-  boost::recursive_mutex mutex_;
+  boost::mutex mutex_;
 
   // private data
   ros::NodeHandle nh_;                  ///< node handle for service
