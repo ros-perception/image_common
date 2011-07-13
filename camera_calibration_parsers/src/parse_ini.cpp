@@ -1,5 +1,6 @@
 #include "camera_calibration_parsers/parse_ini.h"
 #include <sensor_msgs/distortion_models.h>
+#include <ros/console.h>
 
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/spirit/include/classic_file_iterator.hpp>
