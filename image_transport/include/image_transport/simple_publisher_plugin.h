@@ -195,7 +195,7 @@ private:
   PublishFn bindInternalPublisher(const PubT& pub) const
   {
     // Bind PubT::publish(const Message&) as PublishFn
-    typedef void (PubT::*InternalPublishMemFn)(const ros::Message&) const;
+    typedef void (PubT::*InternalPublishMemFn)(const M&) const;
     InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
     return boost::bind(internal_pub_mem_fn, &pub, _1);
   }
