@@ -19,5 +19,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 rosbuild_add_boost_directories()
 
 rosbuild_add_library(${PROJECT_NAME} src/parse.cpp src/parse_ini.cpp src/parse_yml.cpp)
+target_link_libraries(${PROJECT_NAME} yaml-cpp)
 rosbuild_add_executable(convert src/convert.cpp)
 target_link_libraries(convert ${PROJECT_NAME})
