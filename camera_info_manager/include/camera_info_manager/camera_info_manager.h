@@ -56,30 +56,85 @@ namespace camera_info_manager
 /** @brief CameraInfo Manager class
 
     Provides CameraInfo, handles the sensor_msgs/SetCameraInfo service
-    requests, saves and restores sensor_msgs/CameraInfo data.  The
-    calling node must invoke ros::spin() or ros::spinOnce() in some
-    thread, so CameraInfoManager can handle arriving service requests.
+    requests, saves and restores sensor_msgs/CameraInfo data.
+
+    @par ROS Service
+
+    - @b set_camera_info (sensor_msgs/SetCameraInfo) stores
+         calibration information
+
+    Typically, these service requests are made by a calibration
+    package, such as:
+
+    - http://www.ros.org/wiki/camera_calibration
+
+    The calling node @em must invoke ros::spin() or ros::spinOnce() in
+    some thread, so CameraInfoManager can handle arriving service
+    requests.
+
+    @par Camera Name
+
+    The device driver sets a camera name via the
+    CameraInfoManager::CameraInfoManager constructor or the
+    setCameraName() method.  This name is written when CameraInfo is
+    saved, and checked when data are loaded, with a warning logged if
+    the name read does not match.
+
+    Syntax: a camera name contains any combination of alphabetic,
+            numeric and '_' characters.  Case is significant.
+
+    Camera drivers may use any syntactically valid name they please.
+    Where possible, it is best for the name to be unique to the
+    device, such as a GUID, or the make, model and serial number.  Any
+    parameters that affect calibration, such as resolution, focus,
+    zoom, etc., may also be included in the name, uniquely identifying
+    each CameraInfo file.
+
+    Beginning with Electric Emys, the camera name can be resolved as
+    part of the URL, allowing direct access to device-specific
+    calibration information.
+
+    @par Uniform Resource Locator
 
     The location for getting and saving calibration data is expressed
-    by Uniform Resource Locator. Some cameras are capable of saving
-    these data in flash memory, others use a local file to keep track
-    of calibration information.
+    by Uniform Resource Locator.  The driver defines a URL via the
+    CameraInfoManager::CameraInfoManager constructor or the
+    loadCameraInfo() method.  Many drivers provide a @c
+    ~camera_info_url parameter so users may customize this URL, but
+    that is handled outside this class.
+
+    Typically, cameras store calibration information in a file, which
+    can be in any format supported by @c camera_calibration_parsers.
+    Currently, that includes YAML and Videre INI files, identified by
+    their .yaml or .ini extensions as shown in the examples.  These
+    file formats are described here:
+
+    - http://www.ros.org/wiki/camera_calibration_parsers#File_formats
 
     Example URL syntax:
 
     - file:///full/path/to/local/file.yaml
     - file:///full/path/to/videre/file.ini
+    - package://camera_info_manager/tests/test_calibration.yaml
     - package://ros_package_name/calibrations/camera3.yaml
-    - flash:///1 (not yet implemented)
+
+    The @c file: URL specifies a full path name in the local system.
+    The @c package: URL is handled the same as @c file:, except the
+    path name is resolved relative to the location of the named ROS
+    package, which @em must be reachable via @c $ROS_PACKAGE_PATH.
 
     Beginning with Electric Emys, the URL may contain substitution
-    variables, including:
+    variables delimited by <tt>${...}</tt>, including:
 
-    - ${NAME} resolved to the current camera name defined by the
-              device driver.
+    - @c ${NAME} resolved to the current camera name defined by the
+                 device driver.
+    - @c ${ROS_HOME} resolved to the @c $ROS_HOME environment variable
+                     if defined, <tt>~/.ros</tt> if not.
 
-    - ${ROS_HOME} resolved to the $ROS_HOME environment variable if
-                  defined, "~/.ros" if not.
+    Resolution is done in a single pass through the URL string.
+    Variable values containing substitutable strings are not resolved
+    recursively.  Unrecognized variable names are treated literally
+    with no substitution, but an error is logged.
 
     Examples with variable substitution:
 
@@ -92,11 +147,6 @@ namespace camera_info_manager
 
     (In C-turtle and Diamondback, an empty URL was handled differently.)
 
-@par Services
-
- - @b set_camera_info (sensor_msgs/SetCameraInfo) to set calibration
-   information
-
 */
 
 class CameraInfoManager
@@ -107,14 +157,15 @@ class CameraInfoManager
                     const std::string &cname="camera",
                     const std::string &url="");
 
-  /** Returns the current CameraInfo data.
+  /** Get the current CameraInfo data.
    *
    * The matrices are all zeros if no calibration was available. The
    * image pipeline handles that as uncalibrated data.
    *
-   * @warning The caller must fill in the CameraInfo message Header.
-   *          The time stamp and frame_id should normally be the same
-   *          as the corresponding Image message Header fields.
+   * @warning The caller @em must fill in the message Header of the
+   *          CameraInfo returned.  The time stamp and frame_id should
+   *          normally be the same as the corresponding Image message
+   *          Header fields.
    */
   sensor_msgs::CameraInfo getCameraInfo(void)
   {
@@ -122,7 +173,7 @@ class CameraInfoManager
     return cam_info_;
   }
 
-  /** Returns true if the current CameraInfo is calibrated. */
+  /** Return true if the current CameraInfo is calibrated. */
   bool isCalibrated(void)
   {
     boost::mutex::scoped_lock lock_(mutex_);
@@ -165,10 +216,13 @@ class CameraInfoManager
   bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req,
                      sensor_msgs::SetCameraInfo::Response &rsp);
 
-  /** This non-recursive mutex is only held for a short time while
+  /** @brief mutual exclusion lock for private data
+   *
+   *  This non-recursive mutex is only held for a short time while
    *  accessing or changing private class variables.  To avoid
-   *  deadlocks, it is never held during I/O or while invoking a
-   *  callback.
+   *  deadlocks and contention, it is never held during I/O or while
+   *  invoking a callback.  Most private methods operate on copies of
+   *  class variables, keeping the mutex hold time short.
    */
   boost::mutex mutex_;
 
