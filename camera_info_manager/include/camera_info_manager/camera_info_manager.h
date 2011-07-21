@@ -141,11 +141,19 @@ namespace camera_info_manager
     - package://my_cameras/calibrations/${NAME}.yaml
     - file://${ROS_HOME}/camera_info/left_front_camera.yaml
 
-    If the URL is empty, calibration data are loaded from, and stored to:
+    In C-turtle and Diamondback, if the URL was empty, no calibration
+    data were loaded, and any data provided via `set_camera_info`
+    would be stored in:
+
+    - file:///tmp/calibration_${NAME}.yaml
+
+    Beginning in Electric, the default URL changed to:
 
     - file://${ROS_HOME}/camera_info/${NAME}.yaml.
 
-    (In C-turtle and Diamondback, an empty URL was handled differently.)
+    If that file exists, its contents are used. Any new calibration
+    will be stored there, missing parent directories being created if
+    necessary and possible.
 
 */
 
