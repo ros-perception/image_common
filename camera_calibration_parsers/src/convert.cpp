@@ -20,6 +20,7 @@ int main(int argc, char** argv)
   }
   if (!writeCalibration(argv[2], name, cam_info)) {
     ROS_ERROR("Failed to save camera model to file %s", argv[2]);
+    return -1;
   }
   
   ROS_INFO("Saved %s", argv[2]);
