@@ -682,14 +682,6 @@ TEST(UrlSubstitution, invalidVariables)
   check_url_substitution(node, name_url, name_url, g_camera_name);
 }
 
-// Test that the bare class name still compiles, with a warning.
-// Remove this test in F-turtle, when it will no longer work.
-TEST(DeprecatedClass, compileWarning)
-{
-  ros::NodeHandle node;
-  CameraInfoManager cinfo(node);
-}
-
 // Run all the tests that were declared with TEST()
 int main(int argc, char **argv)
 {
