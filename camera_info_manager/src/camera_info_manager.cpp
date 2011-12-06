@@ -47,13 +47,6 @@
 
 #include "camera_info_manager/camera_info_manager.h"
 
-namespace camera_info_manager
-{
-  const std::string default_camera_info_url =
-    "file://${ROS_HOME}/camera_info/${NAME}.yaml";
-
-  using namespace camera_calibration_parsers;
-
 /** @file
 
     @brief CameraInfo Manager implementation
@@ -64,6 +57,14 @@ namespace camera_info_manager
     @author Jack O'Quin
  */
 
+namespace camera_info_manager
+{
+
+using namespace camera_calibration_parsers;
+
+/** URL to use when no other is defined. */
+const std::string
+  default_camera_info_url = "file://${ROS_HOME}/camera_info/${NAME}.yaml";
 
 /** Constructor
  *
@@ -88,7 +89,7 @@ CameraInfoManager::CameraInfoManager(ros::NodeHandle nh,
                                        &CameraInfoManager::setCameraInfo, this);
 }
 
-/** get file name corresponding to a "package://" URL
+/** Get file name corresponding to a @c package: URL.
  *
  * @param url a copy of the Uniform Resource Locator
  * @return file name if package found, "" otherwise
@@ -117,7 +118,7 @@ std::string CameraInfoManager::getPackageFileName(const std::string &url)
     }
 }
 
-/** load CameraInfo calibration data (if any)
+/** Load CameraInfo calibration data (if any).
  *
  * @pre mutex_ unlocked
  *
@@ -175,7 +176,7 @@ bool CameraInfoManager::loadCalibration(const std::string &url,
   return success;
 }
 
-/** load CameraInfo calibration data from a file
+/** Load CameraInfo calibration data from a file.
  *
  * @pre mutex_ unlocked
  *
@@ -237,15 +238,10 @@ bool CameraInfoManager::loadCameraInfo(const std::string &url)
 }
 
 
-/** resolve Uniform Resource Locator string.
- *
- *  Make a single pass through the URL string.  Variable values
- *  containing substitutable strings are only resolved once, not
- *  recursively.  Unrecognized variable names are copied literally
- *  with no substitution, and an error is logged.
+/** Resolve Uniform Resource Locator string.
  *
  * @param url a copy of the Uniform Resource Locator, which may
- *            include ${...} substitution variables.
+ *            include <tt>${...}</tt> substitution variables.
  * @param cname is a copy of the camera_name_
  *
  * @return a copy of the URL with any variable information resolved.
@@ -317,7 +313,7 @@ std::string CameraInfoManager::resolveURL(const std::string &url,
   return resolved;
 }
 
-/** parse calibration Uniform Resource Locator
+/** Parse calibration Uniform Resource Locator.
  *
  * @param url string to parse
  * @return URL type
@@ -349,13 +345,13 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string &url
   return URL_invalid;
 }
 
-/** save CameraInfo calibration data
+/** Save CameraInfo calibration data.
  *
  * @pre mutex_ unlocked
  *
  * @param new_info contains CameraInfo to save
  * @param url is a copy of the URL storage location (if empty, use
- *            "file://${ROS_HOME}/camera_info/${NAME}.yaml")
+ *            @c file://${ROS_HOME}/camera_info/${NAME}.yaml)
  * @param cname is a copy of the camera_name_
  * @return true, if successful
  */
@@ -400,7 +396,7 @@ CameraInfoManager::saveCalibration(const sensor_msgs::CameraInfo &new_info,
   return success;
 }
   
-/** save CameraInfo calibration data to a file
+/** Save CameraInfo calibration data to a file.
  *
  * @pre mutex_ unlocked
  *
@@ -466,7 +462,7 @@ CameraInfoManager::saveCalibrationFile(const sensor_msgs::CameraInfo &new_info,
   return writeCalibration(filename, cname, new_info);
 }
 
-/** Callback for SetCameraInfo request
+/** Callback for SetCameraInfo request.
  *
  * Always updates cam_info_ class variable, even if save fails.
  *

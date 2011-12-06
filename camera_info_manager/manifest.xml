@@ -9,7 +9,7 @@
   </description>
   <author>Jack O'Quin</author>
 `  <license>BSD</license>
-  <review status="Doc reviewed" notes="2010-05-26"/>
+  <review status="Doc reviewed" notes="2011-07-12"/>
   <url>http://ros.org/wiki/camera_info_manager</url>
 
   <depend package="camera_calibration_parsers"/>
