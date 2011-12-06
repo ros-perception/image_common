@@ -77,6 +77,11 @@ bool writeCalibrationIni(const std::string& file_name, const std::string& camera
                          const sensor_msgs::CameraInfo& cam_info)
 {
   std::ofstream out(file_name.c_str());
+  if (!out.is_open())
+  {
+    ROS_ERROR("Unable to open camera calibration file [%s] for writing", file_name.c_str());
+    return false;
+  }
   return writeCalibrationIni(out, camera_name, cam_info);
 }
 
