@@ -179,12 +179,24 @@ Publisher::operator void*() const
   return (impl_ && impl_->isValid()) ? (void*)1 : (void*)0;
 }
 
+void Publisher::weakSubscriberCb(const ImplWPtr& impl_wptr,
+                                 const SingleSubscriberPublisher& plugin_pub,
+                                 const SubscriberStatusCallback& user_cb)
+{
+  if (ImplPtr impl = impl_wptr.lock())
+    impl->subscriberCB(plugin_pub, user_cb);
+}
+
 SubscriberStatusCallback Publisher::rebindCB(const SubscriberStatusCallback& user_cb)
 {
   // Note: the subscriber callback must be bound to the internal Impl object, not
-  // 'this'. Due to copying behavior the Impl object may outlive this.
+  // 'this'. Due to copying behavior the Impl object may outlive the original Publisher
+  // instance. But it should not outlive the last Publisher, so we use a weak_ptr.
   if (user_cb)
-    return boost::bind(&Publisher::Impl::subscriberCB, impl_, _1, user_cb);
+  {
+    ImplWPtr impl_wptr(impl_);
+    return boost::bind(&Publisher::weakSubscriberCb, impl_wptr, _1, user_cb);
+  }
   else
     return SubscriberStatusCallback();
 }
