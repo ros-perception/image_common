@@ -4,7 +4,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2010 Jack O'Quin
+*  Copyright (c) 2010-2012 Jack O'Quin
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -155,6 +155,20 @@ namespace camera_info_manager
     will be stored there, missing parent directories being created if
     necessary and possible.
 
+    @par Loading Calibration Data
+
+    Prior to Fuerte, calibration information was loaded in the
+    constructor, and again each time the URL or camera name was
+    updated. This frequently caused logging of confusing and
+    misleading error messages.
+
+    Beginning in Fuerte, camera_info_manager loads nothing until
+    either the @c loadCameraInfo() or @c getCameraInfo() method is
+    called. That suppresses any bogus error messages, but allows
+    (valid) load errors to occur during the first @c
+    getCameraInfo(). To avoid that, do an explicit @c loadCameraInfo()
+    first.
+
 */
 
 class CameraInfoManager
@@ -165,29 +179,8 @@ class CameraInfoManager
                     const std::string &cname="camera",
                     const std::string &url="");
 
-  /** Get the current CameraInfo data.
-   *
-   * The matrices are all zeros if no calibration was available. The
-   * image pipeline handles that as uncalibrated data.
-   *
-   * @warning The caller @em must fill in the message Header of the
-   *          CameraInfo returned.  The time stamp and frame_id should
-   *          normally be the same as the corresponding Image message
-   *          Header fields.
-   */
-  sensor_msgs::CameraInfo getCameraInfo(void)
-  {
-    boost::mutex::scoped_lock lock_(mutex_);
-    return cam_info_;
-  }
-
-  /** Return true if the current CameraInfo is calibrated. */
-  bool isCalibrated(void)
-  {
-    boost::mutex::scoped_lock lock_(mutex_);
-    return (cam_info_.K[0] != 0.0);
-  }
-
+  sensor_msgs::CameraInfo getCameraInfo(void);
+  bool isCalibrated(void);
   bool loadCameraInfo(const std::string &url);
   std::string resolveURL(const std::string &url,
                          const std::string &cname);
@@ -240,6 +233,7 @@ class CameraInfoManager
   std::string camera_name_;             ///< camera name
   std::string url_;                     ///< URL for calibration data
   sensor_msgs::CameraInfo cam_info_;    ///< current CameraInfo
+  bool loaded_cam_info_;                ///< cam_info_ load attempted
 
 }; // class CameraInfoManager
 
