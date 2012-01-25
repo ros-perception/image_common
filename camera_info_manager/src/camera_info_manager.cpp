@@ -3,7 +3,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2010 Jack O'Quin
+*  Copyright (c) 2010-2012 Jack O'Quin
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -79,14 +79,55 @@ CameraInfoManager::CameraInfoManager(ros::NodeHandle nh,
                                      const std::string &cname,
                                      const std::string &url):
   nh_(nh),
-  camera_name_(cname)
+  camera_name_(cname),
+  url_(url),
+  loaded_cam_info_(false)
 {
-  // Set the URL and load camera calibration data (if any).
-  loadCameraInfo(url);
-
   // register callback for camera calibration service request
   info_service_ = nh_.advertiseService("set_camera_info",
                                        &CameraInfoManager::setCameraInfo, this);
+}
+
+/** Get the current CameraInfo data.
+ *
+ * If CameraInfo has not yet been loaded, an attempt must be made
+ * here.  To avoid that, ensure that loadCameraInfo() ran previously.
+ * If the load is attempted but fails, an empty CameraInfo will be
+ * supplied.
+ *
+ * The matrices are all zeros if no calibration is available. The
+ * image pipeline handles that as uncalibrated data.
+ *
+ * @warning The caller @em must fill in the message Header of the
+ *          CameraInfo returned.  The time stamp and frame_id should
+ *          normally be the same as the corresponding Image message
+ *          Header fields.
+ */
+sensor_msgs::CameraInfo CameraInfoManager::getCameraInfo(void)
+{
+  while (true)
+    {
+      std::string cname;
+      std::string url;
+      {
+        boost::mutex::scoped_lock lock_(mutex_);
+        if (loaded_cam_info_)
+          {
+            return cam_info_;           // all done
+          }
+
+        // load being attempted now
+        loaded_cam_info_ = true;
+
+        // copy the name and URL strings
+        url = url_;
+        cname = camera_name_;
+
+      } // release the lock
+
+      // attempt load without the lock, it is not recursive
+      loadCalibration(url, cname);
+    }
 }
 
 /** Get file name corresponding to a @c package: URL.
@@ -115,6 +156,42 @@ std::string CameraInfoManager::getPackageFileName(const std::string &url)
     {
       // Construct file name from package location and remainder of URL.
       return pkgPath + url.substr(rest);
+    }
+}
+
+/** Is the current CameraInfo calibrated?
+ *
+ * If CameraInfo has not yet been loaded, an attempt must be made
+ * here.  To avoid that, ensure that loadCameraInfo() ran previously.
+ * If the load failed, CameraInfo will be empty and this predicate
+ * will return false.
+ *
+ * @return true if the current CameraInfo is calibrated.
+ */
+bool CameraInfoManager::isCalibrated(void)
+{
+  while (true)
+    {
+      std::string cname;
+      std::string url;
+      {
+        boost::mutex::scoped_lock lock_(mutex_);
+        if (loaded_cam_info_)
+          {
+            return (cam_info_.K[0] != 0.0);
+          }
+
+        // load being attempted now
+        loaded_cam_info_ = true;
+
+        // copy the name and URL strings
+        url = url_;
+        cname = camera_name_;
+
+      } // release the lock
+
+      // attempt load without the lock, it is not recursive
+      loadCalibration(url, cname);
     }
 }
 
@@ -219,10 +296,14 @@ bool CameraInfoManager::loadCalibrationFile(const std::string &filename,
 
 /** Set a new URL and load its calibration data (if any).
  *
+ * If multiple threads call this method simultaneously with different
+ * URLs, there is no guarantee which will prevail.
+ *
  * @param url new Uniform Resource Locator for CameraInfo.
  * @return true if new URL contains calibration data.
  *
- * cam_info_ updated, if successful.
+ * @post @c loaded_cam_info_ true (meaning a load was attempted, even
+ *       if it failed); @c cam_info_ updated, if successful.
  */
 bool CameraInfoManager::loadCameraInfo(const std::string &url)
 {
@@ -231,6 +312,7 @@ bool CameraInfoManager::loadCameraInfo(const std::string &url)
     boost::mutex::scoped_lock lock(mutex_);
     url_ = url;
     cname = camera_name_;
+    loaded_cam_info_ = true;
   }
 
   // load using copies of the parameters, no need to hold the lock
@@ -482,6 +564,7 @@ CameraInfoManager::setCameraInfo(sensor_msgs::SetCameraInfo::Request &req,
     cam_info_ = req.camera_info;
     url_copy = url_;
     cname = camera_name_;
+    loaded_cam_info_ = true;
   }
 
   if (!nh_.ok())
@@ -502,11 +585,12 @@ CameraInfoManager::setCameraInfo(sensor_msgs::SetCameraInfo::Request &req,
 /** Set a new camera name.
  *
  * @param cname new camera name to use for saving calibration data
- * @return true if new name has valid syntax
  *
- * cam_name_ updated, if valid.
+ * @return true if new name has valid syntax; valid names contain only
+ *              alphabetic, numeric, or '_' characters.
  *
- * Valid names contain only alphabetic, numeric, or '_' characters.
+ * @post @c cam_name_ updated, if valid; since it may affect the URL,
+ *       @c cam_info_ will be reloaded before being used again.
  */
 bool CameraInfoManager::setCameraName(const std::string &cname)
 {
@@ -521,17 +605,14 @@ bool CameraInfoManager::setCameraName(const std::string &cname)
         return false;
     }
 
-  // the name is valid, update our private copy
-  std::string url;
+  // The name is valid, so update our private copy.  Since the new
+  // name might cause the existing URL to resolve somewhere else,
+  // force @c cam_info_ to be reloaded before being used again.
   {
     boost::mutex::scoped_lock lock(mutex_);
     camera_name_ = cname;
-    url = url_;
+    loaded_cam_info_ = false;
   }
-
-  // Attempt to reload the camera info, the new name might cause the
-  // existing URL to resolve somewhere else.
-  loadCalibration(url, cname);
 
   return true;
 }

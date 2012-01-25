@@ -105,14 +105,18 @@ private:
             const ros::VoidPtr& tracked_object, bool latch,
             const PubLoaderPtr& loader);
 
-  SubscriberStatusCallback rebindCB(const SubscriberStatusCallback& user_cb);
-  
   struct Impl;
   typedef boost::shared_ptr<Impl> ImplPtr;
   typedef boost::weak_ptr<Impl> ImplWPtr;
   
   ImplPtr impl_;
 
+  static void weakSubscriberCb(const ImplWPtr& impl_wptr,
+                               const SingleSubscriberPublisher& plugin_pub,
+                               const SubscriberStatusCallback& user_cb);
+  
+  SubscriberStatusCallback rebindCB(const SubscriberStatusCallback& user_cb);
+  
   friend class ImageTransport;
 };
 
