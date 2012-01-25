@@ -162,12 +162,12 @@ namespace camera_info_manager
     updated. This frequently caused logging of confusing and
     misleading error messages.
 
-    Beginning in Fuerte, camera_info_manager loads nothing until
-    either the @c loadCameraInfo() or @c getCameraInfo() method is
-    called. That suppresses any bogus error messages, but allows
-    (valid) load errors to occur during the first @c
-    getCameraInfo(). To avoid that, do an explicit @c loadCameraInfo()
-    first.
+    Beginning in Fuerte, camera_info_manager loads nothing until the
+    @c loadCameraInfo(), @c isCalibrated() or @c getCameraInfo()
+    method is called. That suppresses bogus error messages, but allows
+    (valid) load errors to occur during the first @c getCameraInfo(),
+    or @c isCalibrated(). To avoid that, do an explicit @c
+    loadCameraInfo() first.
 
 */
 
