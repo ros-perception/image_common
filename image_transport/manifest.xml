@@ -13,6 +13,7 @@
   <depend package="sensor_msgs"/>
   <depend package="pluginlib"/>
   <depend package="message_filters"/>
+  <depend package="roscpp"/>
 
   <export>
     <cpp lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -limage_transport" cflags="-I${prefix}/include"/>
