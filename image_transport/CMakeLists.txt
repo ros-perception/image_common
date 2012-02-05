@@ -18,7 +18,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_boost_directories()
 rosbuild_add_library(${PROJECT_NAME} src/publisher.cpp src/subscriber.cpp src/single_subscriber_publisher.cpp src/image_transport.cpp src/camera_common.cpp src/camera_publisher.cpp src/camera_subscriber.cpp src/manifest.cpp)
-rosbuild_link_boost(${PROJECT_NAME} system)
+rosbuild_link_boost(${PROJECT_NAME} system signals)
 
 rosbuild_add_executable(republish src/republish.cpp)
 target_link_libraries(republish ${PROJECT_NAME})
