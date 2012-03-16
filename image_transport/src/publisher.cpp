@@ -39,6 +39,15 @@
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/erase.hpp>
 
+// Workaround for #5357, #5380: failure to compile in some cases because for some
+// compilers Boost.Foreach's const rvalue detection fails, and it tries to make a
+// copy of abstract class PublisherPlugin.
+// See https://svn.boost.org/trac/boost/ticket/3996 for details.
+namespace boost { namespace foreach {
+  template <>
+  struct is_noncopyable<ptr_vector<image_transport::PublisherPlugin> > : mpl::true_ {};
+}}
+
 namespace image_transport {
 
 struct Publisher::Impl
