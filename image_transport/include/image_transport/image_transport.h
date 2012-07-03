@@ -147,10 +147,15 @@ public:
   }
 
   /**
-   * \brief Returns the names of all transports declared available in the system. Declared
+   * \brief Returns the names of all transports declared in the system. Declared
    * transports are not necessarily built or loadable.
    */
   std::vector<std::string> getDeclaredTransports() const;
+
+  /**
+   * \brief Returns the names of all transports that are loadable in the system.
+   */
+  std::vector<std::string> getLoadableTransports() const;
 
 private:
   struct Impl;

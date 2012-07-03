@@ -4,6 +4,7 @@
 #include <pluginlib/class_loader.h>
 #include <boost/make_shared.hpp>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string/erase.hpp>
 
 namespace image_transport {
 
@@ -83,9 +84,31 @@ std::vector<std::string> ImageTransport::getDeclaredTransports() const
   std::vector<std::string> transports = impl_->sub_loader_->getDeclaredClasses();
   // Remove the "_sub" at the end of each class name.
   BOOST_FOREACH(std::string& transport, transports) {
-    transport = transport.substr(0, transport.size() - 4);
+    transport = boost::erase_last_copy(transport, "_sub");
   }
   return transports;
+}
+
+std::vector<std::string> ImageTransport::getLoadableTransports() const
+{
+  std::vector<std::string> loadableTransports;
+
+  BOOST_FOREACH( const std::string& transportPlugin, impl_->sub_loader_->getDeclaredClasses() )
+  {
+    // If the plugin loads without throwing an exception, add its
+    // transport name to the list of valid plugins, otherwise ignore
+    // it.
+    try
+    {
+      boost::shared_ptr<image_transport::SubscriberPlugin> sub = impl_->sub_loader_->createInstance(transportPlugin);
+      loadableTransports.push_back(boost::erase_last_copy(transportPlugin, "_sub")); // Remove the "_sub" at the end of each class name.
+    }
+    catch (const pluginlib::LibraryLoadException& e) {}
+    catch (const pluginlib::CreateClassException& e) {}
+  }
+
+  return loadableTransports;
+
 }
 
 } //namespace image_transport
