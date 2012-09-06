@@ -14,9 +14,11 @@
   <build_depends>pluginlib</build_depends>
   <build_depends>ros</build_depends>
   <build_depends>ros_comm</build_depends>
+  <build_depends>tinyxml</build_depends>
   <depends>common_msgs</depends>
   <depends>common_rosdeps</depends>
   <depends>pluginlib</depends>
   <depends>ros</depends>
   <depends>ros_comm</depends>
+  <depends>tinyxml</depends>
 </stack>
