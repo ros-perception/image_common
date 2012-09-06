@@ -1,15 +1,22 @@
 <stack>
-  <description brief="Common code for working with images">
-    Common code for working with images in ROS.
-  </description>
-  <author>Maintained by Vincent Rabaud vrabaud@willowgarage.com</author>
-  <license>BSD</license>  
-  <review status="Doc reviewed" notes="2009/6/10"/>
-  <url>http://ros.org/wiki/image_common</url>
-  <depend stack="common_msgs" /> <!-- sensor_msgs -->
-  <depend stack="common_rosdeps" /> <!-- common_rosdeps -->
-  <depend stack="pluginlib" /> <!-- pluginlib -->
-  <depend stack="ros" /> <!-- roslib -->
-  <depend stack="ros_comm" /> <!-- rostest, roscpp, message_filters -->
+  <name>image_common</name>
+  <version>1.9.0</version>
+  <description>Common code for working with images in ROS.</description>
+  <author>Patrick Mihelich</author>
+  <maintainer email="vrabaud@willowgarage.com">Vincent Rabaud</maintainer>
+  <license>BSD</license>
+  <copyright>Willow Garage</copyright>
 
+  <url>http://www.ros.org/wiki/image_common</url>
+  <build_depends>catkin</build_depends>
+  <build_depends>common_msgs</build_depends>
+  <build_depends>common_rosdeps</build_depends>
+  <build_depends>pluginlib</build_depends>
+  <build_depends>ros</build_depends>
+  <build_depends>ros_comm</build_depends>
+  <depends>common_msgs</depends>
+  <depends>common_rosdeps</depends>
+  <depends>pluginlib</depends>
+  <depends>ros</depends>
+  <depends>ros_comm</depends>
 </stack>
