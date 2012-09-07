@@ -10,13 +10,11 @@
   <url>http://www.ros.org/wiki/image_common</url>
   <build_depends>catkin</build_depends>
   <build_depends>common_msgs</build_depends>
-  <build_depends>common_rosdeps</build_depends>
   <build_depends>pluginlib</build_depends>
   <build_depends>ros</build_depends>
   <build_depends>ros_comm</build_depends>
   <build_depends>tinyxml</build_depends>
   <depends>common_msgs</depends>
-  <depends>common_rosdeps</depends>
   <depends>pluginlib</depends>
   <depends>ros</depends>
   <depends>ros_comm</depends>
