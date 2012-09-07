@@ -1,15 +1,29 @@
+project(polled_camera)
+catkin_project(${PROJECT_NAME} INCLUDE_DIRS include)
+
 # generate the server
-find_package(genmsg REQUIRED)
+find_package(catkin REQUIRED genmsg sensor_msgs std_msgs)
 
-find_package(catkin REQUIRED sensor_msgs std_msgs)
-
-return()
 add_service_files(DIRECTORY srv FILES GetPolledImage.srv)
 
 generate_messages(DEPENDENCIES sensor_msgs std_msgs)
 
 
 # create some library and exe
-add_library(polled_camera src/publication_server.cpp)
+find_package(catkin REQUIRED image_transport rosconsole roscpp)
+include_directories(SYSTEM ${image_transport_INCLUDE_DIRS})
+include_directories(include)
+
+add_library(${PROJECT_NAME} src/publication_server.cpp)
+target_link_libraries(${PROJECT_NAME} ${rosconsole_LIBRARIES})
+install(TARGETS ${PROJECT_NAME}
+        DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION}
+)
 
 add_executable(poller src/poller.cpp)
+target_link_libraries(poller ${PROJECT_NAME}
+                             ${roscpp_LIBRARIES}
+)
+install(TARGETS poller
+        DESTINATION ${CATKIN_PROJECT_BIN_DESTINATION}
+)

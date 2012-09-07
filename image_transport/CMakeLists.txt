@@ -2,17 +2,7 @@ project(image_transport)
 catkin_project(${PROJECT_NAME} INCLUDE_DIRS include)
 
 find_package(Boost)
-if(FALSE)
-find_package(ROS COMPONENTS message_filters pluginlib rosconsole roscpp roslib)
-#TODO, use the above for Groovy
-else()
-    find_package(ROS COMPONENTS message_filters rosconsole roscpp roslib)
-    find_library(pluginlib_poco poco_lite /opt/ros/fuerte/stacks/pluginlib/lib/)
-    find_library(pluginlib_boost boost_fs_wrapper /opt/ros/fuerte/stacks/pluginlib/lib/)
-
-    set(pluginlib_LIBRARIES ${pluginlib_poco} ${pluginlib_boost})
-    include_directories(/opt/ros/fuerte/stacks/pluginlib/include)
-endif()
+find_package(catkin COMPONENTS message_filters pluginlib rosconsole roscpp roslib)
 
 include_directories(SYSTEM ${pluginlib_INCLUDE_DIRS} ${roscpp_INCLUDE_DIRS})
 include_directories(include)
@@ -29,7 +19,7 @@ target_link_libraries(${PROJECT_NAME} ${BOOST_LIBRARIES}
 )
 
 install(TARGETS ${PROJECT_NAME}
-        DESTINATION lib
+        DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION}
         COMPONENT main
 )
 
@@ -45,5 +35,5 @@ target_link_libraries(list_transports ${PROJECT_NAME}
 )
 
 install(TARGETS list_transports republish
-        DESTINATION share/${PROJECT_NAME}/bin
+        DESTINATION ${CATKIN_PROJECT_BIN_DESTINATION}
 )
