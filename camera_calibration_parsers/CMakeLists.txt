@@ -1,5 +1,7 @@
 project(camera_calibration_parsers)
-catkin_project(${PROJECT_NAME} INCLUDE_DIRS include)
+catkin_project(${PROJECT_NAME} INCLUDE_DIRS include
+                               LIBRARIES camera_calibration_parsers
+)
 
 include_directories(include)
 

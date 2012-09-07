@@ -1,5 +1,7 @@
 project(camera_info_manager)
-catkin_project(${PROJECT_NAME} INCLUDE_DIRS include)
+catkin_project(${PROJECT_NAME} INCLUDE_DIRS include
+                               LIBRARIES camera_info_manager
+)
 
 find_package(catkin COMPONENTS camera_calibration_parsers image_transport roscpp)
 
@@ -9,6 +11,7 @@ include_directories(SYSTEM ${roscpp_INCLUDE_DIRS}
 )
 include_directories(include)
 
+# add a library
 add_library(${PROJECT_NAME} src/camera_info_manager.cpp)
 
 install(TARGETS ${PROJECT_NAME}

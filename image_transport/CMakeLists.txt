@@ -1,5 +1,7 @@
 project(image_transport)
-catkin_project(${PROJECT_NAME} INCLUDE_DIRS include)
+catkin_project(${PROJECT_NAME} INCLUDE_DIRS include
+                               LIBRARIES image_transport
+)
 
 find_package(Boost)
 find_package(catkin COMPONENTS message_filters pluginlib rosconsole roscpp roslib)
