@@ -1,6 +1,6 @@
 <stack>
   <name>image_common</name>
-  <version>1.9.1</version>
+  <version>1.9.2</version>
   <description>Common code for working with images in ROS.</description>
   <author>Patrick Mihelich</author>
   <maintainer email="vrabaud@willowgarage.com">Vincent Rabaud</maintainer>
