@@ -23,4 +23,6 @@ install(TARGETS ${PROJECT_NAME}
 catkin_add_gtest(unit_test tests/unit_test.cpp)
 target_link_libraries(unit_test ${PROJECT_NAME})
 
+if (FALSE)
 rosbuild_add_rostest(tests/unit_test.test)
+endif()

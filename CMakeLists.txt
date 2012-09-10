@@ -5,7 +5,8 @@ catkin_stack()
 catkin_project(image_common
 )
 
+# process folders in the order of dependencies
 add_subdirectory(camera_calibration_parsers)
-add_subdirectory(camera_info_manager)
 add_subdirectory(image_transport)
+add_subdirectory(camera_info_manager)
 add_subdirectory(polled_camera)
