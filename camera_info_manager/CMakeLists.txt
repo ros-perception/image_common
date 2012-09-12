@@ -18,6 +18,9 @@ install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION}
         COMPONENT main
 )
+install(DIRECTORY include/
+        DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+)
 
 # unit test uses gtest, but needs rostest to create a ROS environment
 catkin_add_gtest(unit_test tests/unit_test.cpp)

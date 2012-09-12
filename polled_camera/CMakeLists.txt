@@ -22,6 +22,9 @@ target_link_libraries(${PROJECT_NAME} ${rosconsole_LIBRARIES})
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION}
 )
+install(DIRECTORY include/
+        DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+)
 
 add_executable(poller src/poller.cpp)
 target_link_libraries(poller ${PROJECT_NAME}

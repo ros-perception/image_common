@@ -24,6 +24,9 @@ install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION}
         COMPONENT main
 )
+install(DIRECTORY include/
+        DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+)
 
 # add two execs
 add_executable(republish src/republish.cpp)
