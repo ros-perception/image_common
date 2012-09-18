@@ -7,9 +7,7 @@
   <review status="Doc reviewed" notes="2009/6/10"/>
   <url>http://ros.org/wiki/image_common</url>
   <depend stack="common_msgs" /> <!-- sensor_msgs -->
-  <depend stack="common_rosdeps" /> <!-- common_rosdeps -->
   <depend stack="pluginlib" /> <!-- pluginlib -->
   <depend stack="ros" /> <!-- roslib -->
   <depend stack="ros_comm" /> <!-- rostest, roscpp, message_filters -->
-
 </stack>
