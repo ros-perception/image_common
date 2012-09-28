@@ -1,4 +1,6 @@
 <package>
+  <name>image_transport</name>
+  <version>1.9.7</version>
   <description brief="image_transport">
 
      image_transport should always be used to subscribe to and publish images. It provides transparent
@@ -7,20 +9,24 @@
 
   </description>
   <author>Patrick Mihelich</author>
+  <maintainer email="vrabaud@willowgarage.com">Vincent Rabaud</maintainer>
   <license>BSD</license>
-  <review status="doc reviewed" notes=""/>
+
   <url>http://ros.org/wiki/image_transport</url>
-  <depend package="sensor_msgs"/>
-  <depend package="pluginlib"/>
-  <depend package="message_filters"/>
-  <depend package="roscpp"/>
 
   <export>
-    <cpp lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -limage_transport" cflags="-I${prefix}/include"/>
     <image_transport plugin="${prefix}/default_plugins.xml" />
   </export>
 
-  <platform os="ubuntu" version="9.04"/>
-  <platform os="ubuntu" version="9.10"/>
-  <platform os="ubuntu" version="10.04"/>
+  <build_depend>message_filters</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>rosconsole</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+
+  <run_depend>message_filters</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>rosconsole</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
 </package>

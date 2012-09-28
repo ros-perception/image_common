@@ -1,0 +1,19 @@
+<package>
+  <name>camera_calibration_parsers</name>
+  <version>1.9.7</version>
+  <description brief="camera_calibration_parsers">
+     camera_calibration_parsers contains routines for reading and writing camera calibration parameters.
+  </description>
+  <author>Patrick Mihelich</author>
+  <maintainer email="vrabaud@willowgarage.com">Vincent Rabaud</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/camera_calibration_parsers</url>
+
+  <build_depend>rosconsole</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>yaml_cpp</build_depend>
+
+  <run_depend>rosconsole</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>yaml_cpp</run_depend>
+</package>

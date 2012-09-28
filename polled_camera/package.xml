@@ -1,0 +1,29 @@
+<package>
+  <name>polled_camera</name>
+  <version>1.9.7</version>
+  <description brief="Library for polled camera drivers">
+
+     polled_camera contains a service and C++ helper classes for implementing a polled
+     camera driver node and requesting images from it. The package is currently for
+     internal use as the API is still under development.
+
+  </description>
+  <author>Patrick Mihelich</author>
+  <maintainer email="vrabaud@willowgarage.com">Vincent Rabaud</maintainer>
+  <license>BSD</license>
+  <url>http://ros.org/wiki/polled_camera</url>
+
+  <build_depend>genmsg</build_depend>
+  <build_depend>image_transport</build_depend>
+  <build_depend>rosconsole</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <run_depend>genmsg</run_depend>
+  <run_depend>image_transport</run_depend>
+  <run_depend>rosconsole</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+</package>

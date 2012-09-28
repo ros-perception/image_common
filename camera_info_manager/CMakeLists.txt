@@ -1,6 +1,9 @@
+cmake_minimum_required(VERSION 2.8)
 project(camera_info_manager)
-catkin_project(${PROJECT_NAME} INCLUDE_DIRS include
-                               LIBRARIES camera_info_manager
+
+find_package(catkin REQUIRED)
+catkin_package(INCLUDE_DIRS include
+               LIBRARIES camera_info_manager
 )
 
 find_package(catkin COMPONENTS camera_calibration_parsers image_transport roscpp roslib)
@@ -19,7 +22,7 @@ target_link_libraries(${PROJECT_NAME} ${camera_calibration_parsers_LIBRARIES}
 )
 
 install(TARGETS ${PROJECT_NAME}
-        DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION}
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         COMPONENT main
 )
 install(DIRECTORY include/

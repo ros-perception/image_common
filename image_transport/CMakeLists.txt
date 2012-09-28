@@ -1,6 +1,9 @@
+cmake_minimum_required(VERSION 2.8)
 project(image_transport)
-catkin_project(${PROJECT_NAME} INCLUDE_DIRS include
-                               LIBRARIES image_transport
+
+find_package(catkin REQUIRED)
+catkin_package(INCLUDE_DIRS include
+               LIBRARIES image_transport
 )
 
 find_package(Boost)
@@ -21,7 +24,7 @@ target_link_libraries(${PROJECT_NAME} ${BOOST_LIBRARIES}
 )
 
 install(TARGETS ${PROJECT_NAME}
-        DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION}
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         COMPONENT main
 )
 install(DIRECTORY include/
@@ -40,5 +43,5 @@ target_link_libraries(list_transports ${PROJECT_NAME}
 )
 
 install(TARGETS list_transports republish
-        DESTINATION ${CATKIN_PROJECT_BIN_DESTINATION}
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

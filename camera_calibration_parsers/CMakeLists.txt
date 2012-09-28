@@ -1,6 +1,9 @@
+cmake_minimum_required(VERSION 2.8)
 project(camera_calibration_parsers)
-catkin_project(${PROJECT_NAME} INCLUDE_DIRS include
-                               LIBRARIES ${PROJECT_NAME}
+
+find_package(catkin REQUIRED)
+catkin_package(INCLUDE_DIRS include
+               LIBRARIES ${PROJECT_NAME}
 )
 
 include_directories(include)
@@ -16,7 +19,7 @@ add_library(${PROJECT_NAME} src/parse.cpp
 target_link_libraries(${PROJECT_NAME} yaml-cpp)
 
 install(TARGETS ${PROJECT_NAME}
-        DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION}
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         COMPONENT main
 )
 install(DIRECTORY include/
@@ -28,5 +31,5 @@ add_executable(convert src/convert.cpp)
 target_link_libraries(convert ${PROJECT_NAME} ${rosconsole_LIBRARIES})
 
 install(TARGETS convert
-        DESTINATION ${CATKIN_PROJECT_BIN_DESTINATION}
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
