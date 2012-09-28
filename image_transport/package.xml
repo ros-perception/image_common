@@ -18,6 +18,7 @@
     <image_transport plugin="${prefix}/default_plugins.xml" />
   </export>
 
+  <build_depend>catkin</build_depend>
   <build_depend>message_filters</build_depend>
   <build_depend>pluginlib</build_depend>
   <build_depend>rosconsole</build_depend>

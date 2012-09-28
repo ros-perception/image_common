@@ -14,6 +14,7 @@
   <license>BSD</license>
   <url>http://ros.org/wiki/camera_info_manager</url>
 
+  <build_depend>catkin</build_depend>
   <build_depend>camera_calibration_parser</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>roscpp</build_depend>

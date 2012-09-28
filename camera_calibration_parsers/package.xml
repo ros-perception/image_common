@@ -9,6 +9,7 @@
   <license>BSD</license>
   <url>http://ros.org/wiki/camera_calibration_parsers</url>
 
+  <build_depend>catkin</build_depend>
   <build_depend>rosconsole</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>yaml_cpp</build_depend>
