@@ -1,6 +1,6 @@
 <package>
   <name>polled_camera</name>
-  <version>1.9.7</version>
+  <version>1.9.8</version>
   <description brief="Library for polled camera drivers">
 
      polled_camera contains a service and C++ helper classes for implementing a polled
@@ -21,7 +21,6 @@
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
 
-  <run_depend>genmsg</run_depend>
   <run_depend>image_transport</run_depend>
   <run_depend>rosconsole</run_depend>
   <run_depend>roscpp</run_depend>
