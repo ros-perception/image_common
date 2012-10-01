@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 2.8)
 project(camera_calibration_parsers)
 
 find_package(catkin REQUIRED)
+
+find_package(catkin REQUIRED sensor_msgs)
 catkin_package(INCLUDE_DIRS include
                LIBRARIES ${PROJECT_NAME}
+               DEPENDS sensor_msgs
 )
 
 include_directories(include)

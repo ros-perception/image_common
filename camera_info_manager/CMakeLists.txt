@@ -2,11 +2,15 @@ cmake_minimum_required(VERSION 2.8)
 project(camera_info_manager)
 
 find_package(catkin REQUIRED)
+
+find_package(Boost)
+find_package(catkin REQUIRED roscpp sensor_msgs)
 catkin_package(INCLUDE_DIRS include
                LIBRARIES camera_info_manager
+               DEPENDS Boost roscpp sensor_msgs
 )
 
-find_package(catkin COMPONENTS camera_calibration_parsers image_transport roscpp roslib)
+find_package(catkin COMPONENTS camera_calibration_parsers image_transport roscpp roslib rostest)
 
 include_directories(SYSTEM ${camera_calibration_parsers_INCLUDE_DIRS}
                            ${image_transport_INCLUDE_DIRS}
@@ -33,6 +37,4 @@ install(DIRECTORY include/${PROJECT_NAME}
 catkin_add_gtest(unit_test tests/unit_test.cpp)
 target_link_libraries(unit_test ${PROJECT_NAME})
 
-if (FALSE)
-rosbuild_add_rostest(tests/unit_test.test)
-endif()
+add_rostest(tests/unit_test.test)

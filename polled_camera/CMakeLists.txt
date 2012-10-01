@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 2.8)
 project(polled_camera)
 
 find_package(catkin REQUIRED)
-catkin_package(INCLUDE_DIRS include)
+
+find_package(catkin REQUIRED roscpp sensor_msgs)
+catkin_package(DEPENDS roscpp sensor_msgs 
+               INCLUDE_DIRS include
+)
 
 # generate the server
 find_package(catkin REQUIRED genmsg sensor_msgs std_msgs)

@@ -14,14 +14,20 @@
   <license>BSD</license>
   <url>http://ros.org/wiki/camera_info_manager</url>
 
+  <build_depend>boost</build_depend>
   <build_depend>catkin</build_depend>
   <build_depend>camera_calibration_parser</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>roslib</build_depend>
+  <build_depend>sensor_msgs</build_depend>
 
+  <run_depend>boost</run_depend>
   <run_depend>camera_calibration_parser</run_depend>
   <run_depend>image_transport</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>roslib</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+
+  <test_depend>rostest</test_depend>
 </package>
