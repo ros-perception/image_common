@@ -16,5 +16,5 @@
   <build_depend>yaml_cpp</build_depend>
 
   <run_depend>sensor_msgs</run_depend>
-  <run_depend>yaml_cpp</run_depend>
+  <run_depend>yaml-cpp</run_depend>
 </package>
