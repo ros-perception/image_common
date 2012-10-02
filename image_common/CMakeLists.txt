@@ -1,7 +1,0 @@
-cmake_minimum_required(VERSION 2.8)
-project(image_pipeline)
-
-find_package(catkin REQUIRED)
-
-find_package(catkin REQUIRED camera_calibration_parsers camera_info_manager image_transport polled_camera)
-catkin_package(DEPENDS camera_calibration_parsers camera_info_manager image_transport polled_camera)
