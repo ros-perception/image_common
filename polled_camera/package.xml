@@ -1,6 +1,6 @@
 <package>
   <name>polled_camera</name>
-  <version>1.9.13</version>
+  <version>1.9.14</version>
   <description brief="Library for polled camera drivers">
 
      polled_camera contains a service and C++ helper classes for implementing a polled

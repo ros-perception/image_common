@@ -1,6 +1,6 @@
 <package>
   <name>camera_info_manager</name>
-  <version>1.9.13</version>
+  <version>1.9.14</version>
   <description brief="Camera calibration information manager">
 
      This package provides a C++ interface for camera calibration
