@@ -6,6 +6,7 @@ find_package(catkin REQUIRED)
 find_package(catkin REQUIRED roscpp sensor_msgs)
 catkin_package(DEPENDS roscpp sensor_msgs 
                INCLUDE_DIRS include
+               LIBRARIES ${PROJECT_NAME}
 )
 
 # generate the server

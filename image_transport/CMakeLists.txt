@@ -6,7 +6,7 @@ find_package(catkin REQUIRED)
 find_package(catkin REQUIRED sensor_msgs roscpp)
 catkin_package(DEPENDS sensor_msgs roscpp
                INCLUDE_DIRS include
-               LIBRARIES image_transport
+               LIBRARIES ${PROJECT_NAME}
 )
 
 find_package(Boost)

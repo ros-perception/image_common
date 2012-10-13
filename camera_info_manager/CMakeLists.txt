@@ -6,7 +6,7 @@ find_package(catkin REQUIRED)
 find_package(Boost)
 find_package(catkin REQUIRED roscpp sensor_msgs)
 catkin_package(INCLUDE_DIRS include
-               LIBRARIES camera_info_manager
+               LIBRARIES ${PROJECT_NAME}
                DEPENDS Boost roscpp sensor_msgs
 )
 
@@ -29,7 +29,7 @@ install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         COMPONENT main
 )
-install(DIRECTORY include/${PROJECT_NAME}
+install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
