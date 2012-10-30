@@ -44,3 +44,8 @@ target_link_libraries(list_transports ${PROJECT_NAME}
 install(TARGETS list_transports republish
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+# add xml file
+install(FILES default_plugins.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
