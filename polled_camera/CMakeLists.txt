@@ -1,20 +1,18 @@
 cmake_minimum_required(VERSION 2.8)
 project(polled_camera)
 
-find_package(catkin REQUIRED)
-
-find_package(catkin REQUIRED roscpp sensor_msgs)
-catkin_package(DEPENDS roscpp sensor_msgs 
-               INCLUDE_DIRS include
-               LIBRARIES ${PROJECT_NAME}
-)
-
 # generate the server
-find_package(catkin REQUIRED genmsg sensor_msgs std_msgs)
+find_package(catkin REQUIRED genmsg roscpp sensor_msgs std_msgs)
 
 add_service_files(DIRECTORY srv FILES GetPolledImage.srv)
 
 generate_messages(DEPENDENCIES sensor_msgs std_msgs)
+
+# define the project
+catkin_package(DEPENDS roscpp sensor_msgs
+               INCLUDE_DIRS include
+               LIBRARIES ${PROJECT_NAME}
+)
 
 
 # create some library and exe
