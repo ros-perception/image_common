@@ -1,6 +1,6 @@
 <package>
   <name>image_common</name>
-  <version>1.9.16</version>
+  <version>1.9.17</version>
   <description>Common code for working with images in ROS.</description>
   <author>Patrick Mihelich</author>
   <author>James Bowman</author>
