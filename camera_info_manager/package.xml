@@ -1,7 +1,7 @@
 <package>
   <name>camera_info_manager</name>
   <version>1.9.17</version>
-  <description brief="Camera calibration information manager">
+  <description>
 
      This package provides a C++ interface for camera calibration
      information.  It provides CameraInfo, and handles SetCameraInfo

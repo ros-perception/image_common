@@ -1,7 +1,7 @@
 <package>
   <name>image_transport</name>
   <version>1.9.17</version>
-  <description brief="image_transport">
+  <description>
 
      image_transport should always be used to subscribe to and publish images. It provides transparent
      support for transporting images in low-bandwidth compressed formats. Examples (provided by separate
