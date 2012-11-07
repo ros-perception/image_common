@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.3)
 project(image_transport)
 
 find_package(catkin REQUIRED)
@@ -15,14 +15,16 @@ find_package(catkin COMPONENTS message_filters pluginlib rosconsole roscpp rosli
 include_directories(SYSTEM ${catkin_INCLUDE_DIRS})
 include_directories(include)
 
-# add a library
-add_library(${PROJECT_NAME} src/publisher.cpp src/subscriber.cpp src/single_subscriber_publisher.cpp src/image_transport.cpp src/camera_common.cpp src/camera_publisher.cpp src/camera_subscriber.cpp src/manifest.cpp)
+# Build libimage_transport
+add_library(${PROJECT_NAME} src/publisher.cpp src/subscriber.cpp src/single_subscriber_publisher.cpp src/image_transport.cpp src/camera_common.cpp src/camera_publisher.cpp src/camera_subscriber.cpp)
 target_link_libraries(${PROJECT_NAME} ${BOOST_LIBRARIES}
                                       ${catkin_LIBRARIES}
-                                      tinyxml
-)
+                                      tinyxml)
 
-install(TARGETS ${PROJECT_NAME}
+# Build libimage_transport_plugins                                      
+add_library(${PROJECT_NAME}_plugins src/manifest.cpp)
+
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         COMPONENT main
 )

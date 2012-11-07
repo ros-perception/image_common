@@ -1,4 +1,4 @@
-<library path="lib/libimage_transport">
+<library path="lib/libimage_transport_plugins">
   <class name="image_transport/raw_pub" type="image_transport::RawPublisher" base_class_type="image_transport::PublisherPlugin">
     <description>
       This is the default publisher. It publishes the Image as-is on the base topic.
