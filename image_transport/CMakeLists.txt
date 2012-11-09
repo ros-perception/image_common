@@ -3,14 +3,13 @@ project(image_transport)
 
 find_package(catkin REQUIRED)
 
-find_package(catkin REQUIRED sensor_msgs roscpp)
-catkin_package(DEPENDS sensor_msgs roscpp
+find_package(catkin REQUIRED message_filters pluginlib rosconsole roscpp roslib sensor_msgs)
+catkin_package(DEPENDS pluginlib roscpp sensor_msgs
                INCLUDE_DIRS include
                LIBRARIES ${PROJECT_NAME}
 )
 
 find_package(Boost)
-find_package(catkin COMPONENTS message_filters pluginlib rosconsole roscpp roslib)
 
 include_directories(SYSTEM ${catkin_INCLUDE_DIRS})
 include_directories(include)
@@ -38,9 +37,7 @@ target_link_libraries(republish ${PROJECT_NAME})
 
 add_executable(list_transports src/list_transports.cpp)
 target_link_libraries(list_transports ${PROJECT_NAME}
-                                      ${message_filters_LIBRARIES}
-                                      ${roscpp_LIBRARIES}
-                                      ${roslib_LIBRARIES}
+                                      ${catkin_LIBRARIES}
 )
 
 install(TARGETS list_transports republish
