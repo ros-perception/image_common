@@ -13,7 +13,8 @@
   <license>BSD</license>
   <url>http://ros.org/wiki/polled_camera</url>
 
-  <build_depend>catkin</build_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+
   <build_depend>genmsg</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>rosconsole</build_depend>
