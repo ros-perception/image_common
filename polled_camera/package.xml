@@ -15,7 +15,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>genmsg</build_depend>
+  <build_depend>message_generation</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>rosconsole</build_depend>
   <build_depend>roscpp</build_depend>
