@@ -35,18 +35,8 @@
 #include "image_transport/publisher.h"
 #include "image_transport/publisher_plugin.h"
 #include <pluginlib/class_loader.h>
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/erase.hpp>
-
-// Workaround for #5357, #5380: failure to compile in some cases because for some
-// compilers Boost.Foreach's const rvalue detection fails, and it tries to make a
-// copy of abstract class PublisherPlugin.
-// See https://svn.boost.org/trac/boost/ticket/3996 for details.
-namespace boost { namespace foreach {
-  template <>
-  struct is_noncopyable<ptr_vector<image_transport::PublisherPlugin> > : mpl::true_ {};
-}}
 
 namespace image_transport {
 
@@ -65,8 +55,8 @@ struct Publisher::Impl
   uint32_t getNumSubscribers() const
   {
     uint32_t count = 0;
-    BOOST_FOREACH(const PublisherPlugin& pub, publishers_)
-      count += pub.getNumSubscribers();
+    BOOST_FOREACH(const boost::shared_ptr<PublisherPlugin>& pub, publishers_)
+      count += pub->getNumSubscribers();
     return count;
   }
 
@@ -84,8 +74,8 @@ struct Publisher::Impl
   {
     if (!unadvertised_) {
       unadvertised_ = true;
-      BOOST_FOREACH(PublisherPlugin& pub, publishers_)
-        pub.shutdown();
+      BOOST_FOREACH(boost::shared_ptr<PublisherPlugin>& pub, publishers_)
+        pub->shutdown();
       publishers_.clear();
     }
   }
@@ -101,7 +91,7 @@ struct Publisher::Impl
   
   std::string base_topic_;
   PubLoaderPtr loader_;
-  boost::ptr_vector<PublisherPlugin> publishers_;
+  std::vector<boost::shared_ptr<PublisherPlugin> > publishers_;
   bool unadvertised_;
   //double constructed_;
 };
@@ -121,7 +111,7 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
   
   BOOST_FOREACH(const std::string& lookup_name, loader->getDeclaredClasses()) {
     try {
-      PublisherPlugin* pub = loader->createClassInstance(lookup_name);
+      boost::shared_ptr<PublisherPlugin> pub = loader->createInstance(lookup_name);
       impl_->publishers_.push_back(pub);
       pub->advertise(nh, impl_->base_topic_, queue_size, rebindCB(connect_cb),
                      rebindCB(disconnect_cb), tracked_object, latch);
@@ -156,9 +146,9 @@ void Publisher::publish(const sensor_msgs::Image& message) const
     return;
   }
   
-  BOOST_FOREACH(const PublisherPlugin& pub, impl_->publishers_) {
-    if (pub.getNumSubscribers() > 0)
-      pub.publish(message);
+  BOOST_FOREACH(const boost::shared_ptr<PublisherPlugin>& pub, impl_->publishers_) {
+    if (pub->getNumSubscribers() > 0)
+      pub->publish(message);
   }
 }
 
@@ -169,9 +159,9 @@ void Publisher::publish(const sensor_msgs::ImageConstPtr& message) const
     return;
   }
   
-  BOOST_FOREACH(const PublisherPlugin& pub, impl_->publishers_) {
-    if (pub.getNumSubscribers() > 0)
-      pub.publish(message);
+  BOOST_FOREACH(const boost::shared_ptr<PublisherPlugin>& pub, impl_->publishers_) {
+    if (pub->getNumSubscribers() > 0)
+      pub->publish(message);
   }
 }
 

@@ -67,7 +67,7 @@ struct Subscriber::Impl
   }
   
   SubLoaderPtr loader_;
-  boost::scoped_ptr<SubscriberPlugin> subscriber_;
+  boost::shared_ptr<SubscriberPlugin> subscriber_;
   bool unsubscribed_;
   //double constructed_;
 };
@@ -81,7 +81,7 @@ Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint3
   // Load the plugin for the chosen transport.
   std::string lookup_name = SubscriberPlugin::getLookupName(transport_hints.getTransport());
   try {
-    impl_->subscriber_.reset( loader->createClassInstance(lookup_name) );
+    impl_->subscriber_ = loader->createInstance(lookup_name);
   }
   catch (pluginlib::PluginlibException& e) {
     throw TransportLoadException(transport_hints.getTransport(), e.what());

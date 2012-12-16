@@ -37,9 +37,8 @@ int main(int argc, char** argv)
     transports[transport_name].pub_name = lookup_name;
     transports[transport_name].package_name = pub_loader.getClassPackage(lookup_name);
     try {
-      PublisherPlugin* pub = pub_loader.createClassInstance(lookup_name);
+      boost::shared_ptr<PublisherPlugin> pub = pub_loader.createInstance(lookup_name);
       transports[transport_name].pub_status = SUCCESS;
-      delete pub;
     }
     catch (const LibraryLoadException& e) {
       transports[transport_name].pub_status = LIB_LOAD_FAILURE;
@@ -54,9 +53,8 @@ int main(int argc, char** argv)
     transports[transport_name].sub_name = lookup_name;
     transports[transport_name].package_name = sub_loader.getClassPackage(lookup_name);
     try {
-      SubscriberPlugin* sub = sub_loader.createClassInstance(lookup_name);
+      boost::shared_ptr<SubscriberPlugin> sub = sub_loader.createInstance(lookup_name);
       transports[transport_name].sub_status = SUCCESS;
-      delete sub;
     }
     catch (const LibraryLoadException& e) {
       transports[transport_name].sub_status = LIB_LOAD_FAILURE;

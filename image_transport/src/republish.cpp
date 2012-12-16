@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     typedef image_transport::PublisherPlugin Plugin;
     pluginlib::ClassLoader<Plugin> loader("image_transport", "image_transport::PublisherPlugin");
     std::string lookup_name = Plugin::getLookupName(out_transport);
-    boost::shared_ptr<Plugin> pub( loader.createClassInstance(lookup_name) );
+    boost::shared_ptr<Plugin> pub( loader.createInstance(lookup_name) );
     pub->advertise(nh, out_topic, 1, image_transport::SubscriberStatusCallback(),
                    image_transport::SubscriberStatusCallback(), ros::VoidPtr(), false);
 
