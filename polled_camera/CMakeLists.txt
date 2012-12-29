@@ -24,7 +24,7 @@ include_directories(include
 
 add_library(${PROJECT_NAME} src/publication_server.cpp)
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
-target_link_libraries(${PROJECT_NAME} ${rosconsole_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
@@ -34,7 +34,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 add_executable(poller src/poller.cpp)
 target_link_libraries(poller ${PROJECT_NAME}
-                             ${roscpp_LIBRARIES}
+                             ${catkin_LIBRARIES}
 )
 install(TARGETS poller
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
