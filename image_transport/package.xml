@@ -12,7 +12,9 @@
   <maintainer email="vrabaud@willowgarage.com">Vincent Rabaud</maintainer>
   <license>BSD</license>
 
-  <url>http://ros.org/wiki/image_transport</url>
+  <url type="website">http://ros.org/wiki/image_transport</url>
+  <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>
+  <url type="repository">https://github.com/ros-perception/image_common</url>
 
   <export>
     <image_transport plugin="${prefix}/default_plugins.xml" />

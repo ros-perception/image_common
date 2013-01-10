@@ -7,7 +7,10 @@
   <author>Patrick Mihelich</author>
   <maintainer email="vrabaud@willowgarage.com">Vincent Rabaud</maintainer>
   <license>BSD</license>
-  <url>http://ros.org/wiki/camera_calibration_parsers</url>
+
+  <url type="website">http://ros.org/wiki/camera_calibration_parsers</url>
+  <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>
+  <url type="repository">https://github.com/ros-perception/image_common</url>
 
   <buildtool_depend>catkin</buildtool_depend>
   
