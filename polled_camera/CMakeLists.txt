@@ -19,7 +19,7 @@ catkin_package(DEPENDS roscpp sensor_msgs
 find_package(catkin REQUIRED image_transport rosconsole roscpp)
 include_directories(SYSTEM ${image_transport_INCLUDE_DIRS})
 include_directories(include
-                    ${CATKIN_BUILD_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+                    ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
 )
 
 add_library(${PROJECT_NAME} src/publication_server.cpp)
