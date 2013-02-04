@@ -33,8 +33,10 @@ install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
-# unit test uses gtest, but needs rostest to create a ROS environment
-catkin_add_gtest(unit_test tests/unit_test.cpp)
+# Unit test uses gtest, but needs rostest to create a ROS environment.
+# Hence, it must be created as a normal executable, not using
+# catkin_add_gtest() which runs an additional test without rostest.
+add_executable(unit_test tests/unit_test.cpp)
 target_link_libraries(unit_test ${PROJECT_NAME})
 
 add_rostest(tests/unit_test.test)
