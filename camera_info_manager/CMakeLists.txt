@@ -37,6 +37,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 # Hence, it must be created as a normal executable, not using
 # catkin_add_gtest() which runs an additional test without rostest.
 add_executable(unit_test tests/unit_test.cpp)
-target_link_libraries(unit_test ${PROJECT_NAME})
+target_link_libraries(unit_test ${PROJECT_NAME} ${GTEST_LIBRARIES})
 
 add_rostest(tests/unit_test.test)
