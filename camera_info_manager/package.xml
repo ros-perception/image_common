@@ -10,7 +10,7 @@
 
   </description>
   <author>Jack O'Quin</author>
-  <maintainer email="vrabaud@willowgarage.com">Vincent Rabaud</maintainer>
+  <maintainer email="vincent.rabaud@gmail.com">Vincent Rabaud</maintainer>
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/camera_info_manager</url>

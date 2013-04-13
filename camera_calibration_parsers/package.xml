@@ -5,7 +5,7 @@
      camera_calibration_parsers contains routines for reading and writing camera calibration parameters.
   </description>
   <author>Patrick Mihelich</author>
-  <maintainer email="vrabaud@willowgarage.com">Vincent Rabaud</maintainer>
+  <maintainer email="vincent.rabaud@gmail.com">Vincent Rabaud</maintainer>
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/camera_calibration_parsers</url>
