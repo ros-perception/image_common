@@ -199,7 +199,7 @@ bool readCalibrationYml(const std::string& file_name, std::string& camera_name,
 {
   std::ifstream fin(file_name.c_str());
   if (!fin.good()) {
-    ROS_ERROR("Unable to open camera calibration file [%s]", file_name.c_str());
+    ROS_INFO("Unable to open camera calibration file [%s]", file_name.c_str());
     return false;
   }
   bool success = readCalibrationYml(fin, camera_name, cam_info);

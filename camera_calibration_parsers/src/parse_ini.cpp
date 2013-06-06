@@ -218,7 +218,7 @@ bool readCalibrationIni(const std::string& file_name, std::string& camera_name,
 
   Iterator first(file_name);
   if (!first) {
-    ROS_ERROR("Unable to open camera calibration file [%s]", file_name.c_str());
+    ROS_INFO("Unable to open camera calibration file [%s]", file_name.c_str());
     return false;
   }
   Iterator last = first.make_end();
