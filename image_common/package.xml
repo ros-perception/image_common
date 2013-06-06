@@ -4,6 +4,7 @@
   <description>Common code for working with images in ROS.</description>
   <author>Patrick Mihelich</author>
   <author>James Bowman</author>
+  <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
   <maintainer email="vincent.rabaud@gmail.com">Vincent Rabaud</maintainer>
   <license>BSD</license>
   
