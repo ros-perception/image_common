@@ -11,6 +11,12 @@ catkin_package(
   CATKIN_DEPENDS sensor_msgs
 )
 
+find_package(PkgConfig)
+pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
+if(NEW_YAMLCPP_FOUND)
+add_definitions(-DHAVE_NEW_YAMLCPP)
+endif(NEW_YAMLCPP_FOUND)
+
 # define the library
 add_library(${PROJECT_NAME}
   src/parse.cpp
