@@ -81,6 +81,14 @@ YAML::Emitter& operator << (YAML::Emitter& out, const SimpleMatrix& m)
   return out;
 }
 
+#ifdef HAVE_NEW_YAMLCPP
+template<typename T>
+void operator >> (const YAML::Node& node, T& i)
+{
+  i = node.as<T>();
+}
+#endif
+
 void operator >> (const YAML::Node& node, SimpleMatrix& m)
 {
   int rows, cols;
@@ -144,6 +152,14 @@ bool writeCalibrationYml(const std::string& file_name, const std::string& camera
 bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs::CameraInfo& cam_info)
 {
   try {
+#ifdef HAVE_NEW_YAMLCPP
+    YAML::Node doc = YAML::Load(in);
+
+    if (doc[CAM_YML_NAME])
+      doc[CAM_YML_NAME] >> camera_name;
+    else
+      camera_name = "unknown";
+#else
     YAML::Parser parser(in);
     if (!parser) {
       ROS_ERROR("Unable to create YAML parser for camera calibration");
@@ -156,7 +172,8 @@ bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs:
       *name_node >> camera_name;
     else
       camera_name = "unknown";
-  
+#endif
+
     doc[WIDTH_YML_NAME] >> cam_info.width;
     doc[HEIGHT_YML_NAME] >> cam_info.height;
 
@@ -169,9 +186,15 @@ bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs:
     doc[P_YML_NAME] >> P_;
 
     // Different distortion models may have different numbers of parameters
+#ifdef HAVE_NEW_YAMLCPP
+    if (doc[DMODEL_YML_NAME]) {
+      doc[DMODEL_YML_NAME] >> cam_info.distortion_model;
+    }
+#else
     if (const YAML::Node* model_node = doc.FindValue(DMODEL_YML_NAME)) {
       *model_node >> cam_info.distortion_model;
     }
+#endif
     else {
       // Assume plumb bob for backwards compatibility
       cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
