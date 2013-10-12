@@ -18,7 +18,7 @@
   <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>
   <url type="repository">https://github.com/ros-perception/image_common</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
 
   <build_depend>boost</build_depend>
   <build_depend>camera_calibration_parsers</build_depend>
