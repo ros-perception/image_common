@@ -85,7 +85,7 @@ CameraInfoManager::CameraInfoManager(ros::NodeHandle nh,
 {
   // register callback for camera calibration service request
   info_service_ = nh_.advertiseService("set_camera_info",
-                                       &CameraInfoManager::setCameraInfo, this);
+                                       &CameraInfoManager::setCameraInfoService, this);
 }
 
 /** Get the current CameraInfo data.
@@ -105,7 +105,7 @@ CameraInfoManager::CameraInfoManager(ros::NodeHandle nh,
  */
 sensor_msgs::CameraInfo CameraInfoManager::getCameraInfo(void)
 {
-  while (true)
+  while (ros::ok())
     {
       std::string cname;
       std::string url;
@@ -553,8 +553,8 @@ CameraInfoManager::saveCalibrationFile(const sensor_msgs::CameraInfo &new_info,
  * @return true if message handled
  */
 bool 
-CameraInfoManager::setCameraInfo(sensor_msgs::SetCameraInfo::Request &req,
-                                 sensor_msgs::SetCameraInfo::Response &rsp)
+CameraInfoManager::setCameraInfoService(sensor_msgs::SetCameraInfo::Request &req,
+                                        sensor_msgs::SetCameraInfo::Response &rsp)
 {
   // copies of class variables needed for saving calibration
   std::string url_copy;
@@ -613,6 +613,24 @@ bool CameraInfoManager::setCameraName(const std::string &cname)
     camera_name_ = cname;
     loaded_cam_info_ = false;
   }
+
+  return true;
+}
+
+/** Set the camera info manually
+ *
+ * @param camera_info new camera calibration data
+ *
+ * @return true if new camera info is set
+ *
+ * @post @c cam_info_ updated, if valid;
+ */
+bool CameraInfoManager::setCameraInfo(const sensor_msgs::CameraInfo &camera_info)
+{
+  boost::mutex::scoped_lock lock(mutex_);
+
+  cam_info_ = camera_info;
+  loaded_cam_info_ = true;
 
   return true;
 }
