@@ -1,3 +1,7 @@
+1.11.2 (2014-02-13  08:32:06 +0100)
+-----------------------------------
+* add a dependency on pkg-config to have it work on Indigo
+
 1.11.1 (2014-01-26  02:32:06 +0100)
-----------------------------------
-- fix YAML CPP 0.5.x compatibility
+-----------------------------------
+* fix YAML CPP 0.5.x compatibility
