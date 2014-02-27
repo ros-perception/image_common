@@ -10,7 +10,7 @@ catkin_package(INCLUDE_DIRS include
                DEPENDS Boost roscpp sensor_msgs
 )
 
-find_package(catkin COMPONENTS camera_calibration_parsers image_transport roscpp roslib rostest)
+find_package(catkin COMPONENTS camera_calibration_parsers image_transport roscpp roslib)
 
 include_directories(SYSTEM ${camera_calibration_parsers_INCLUDE_DIRS}
                            ${image_transport_INCLUDE_DIRS}
@@ -34,6 +34,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 if(CATKIN_ENABLE_TESTING)
+  find_package(rostest)
   # Unit test uses gtest, but needs rostest to create a ROS environment.
   # Hence, it must be created as a normal executable, not using
   # catkin_add_gtest() which runs an additional test without rostest.
