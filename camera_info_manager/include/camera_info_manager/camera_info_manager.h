@@ -185,7 +185,6 @@ class CameraInfoManager
   std::string resolveURL(const std::string &url,
                          const std::string &cname);
   bool setCameraName(const std::string &cname);
-  bool setCameraInfo(const sensor_msgs::CameraInfo &camera_info);
   bool validateURL(const std::string &url);
 
  private:
@@ -215,8 +214,8 @@ class CameraInfoManager
   bool saveCalibrationFile(const sensor_msgs::CameraInfo &new_info,
                            const std::string &filename,
                            const std::string &cname);
-  bool setCameraInfoService(sensor_msgs::SetCameraInfo::Request &req,
-                            sensor_msgs::SetCameraInfo::Response &rsp);
+  bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req,
+                     sensor_msgs::SetCameraInfo::Response &rsp);
 
   /** @brief mutual exclusion lock for private data
    *
