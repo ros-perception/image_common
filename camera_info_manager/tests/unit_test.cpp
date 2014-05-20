@@ -400,6 +400,28 @@ TEST(GetInfo, invalidLoads)
   compare_calibration(exp, ci);
 }
 
+// Test ability to set CameraInfo directly
+TEST(SetInfo, setCameraInfo)
+{
+  ros::NodeHandle node;
+  camera_info_manager::CameraInfoManager cinfo(node);
+
+  // issue calibration service request
+  sensor_msgs::CameraInfo exp(expected_calibration());
+  bool success = cinfo.setCameraInfo(exp);
+  EXPECT_TRUE(success);
+
+  // only check results if the service succeeded, avoiding confusing
+  // and redundant failure messages
+  if (success)
+    {
+      // check that it worked
+      EXPECT_TRUE(cinfo.isCalibrated());
+      sensor_msgs::CameraInfo ci = cinfo.getCameraInfo();
+      compare_calibration(exp, ci);
+    }
+}
+
 // Test ability to set calibrated CameraInfo
 TEST(SetInfo, setCalibration)
 {
