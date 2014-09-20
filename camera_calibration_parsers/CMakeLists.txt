@@ -12,10 +12,12 @@ catkin_package(
 )
 
 find_package(PkgConfig)
-pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
-if(NEW_YAMLCPP_FOUND)
-add_definitions(-DHAVE_NEW_YAMLCPP)
-endif(NEW_YAMLCPP_FOUND)
+pkg_check_modules(YAML_CPP yaml-cpp)
+if(${YAML_CPP_VERSION} VERSION_GREATER 0.5)
+  add_definitions(-DHAVE_NEW_YAMLCPP)
+endif()
+include_directories(${YAML_CPP_INCLUDE_DIRS})
+link_directories(${YAML_CPP_LIBRARY_DIRS})
 
 # define the library
 add_library(${PROJECT_NAME}
@@ -23,7 +25,7 @@ add_library(${PROJECT_NAME}
   src/parse_ini.cpp
   src/parse_yml.cpp
 )
-target_link_libraries(${PROJECT_NAME} yaml-cpp ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} yaml-cpp ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 add_dependencies(${PROJECT_NAME} sensor_msgs_gencpp)
 
 install(
