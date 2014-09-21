@@ -2,8 +2,8 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.4 (2014-09-21)
+-------------------
 * fix bad yaml-cpp usage in certain conditions
   fixes `#24 <https://github.com/ros-perception/image_common/issues/24>`_
 * Contributors: Vincent Rabaud
