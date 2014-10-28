@@ -105,7 +105,7 @@ int main(int argc, char** argv)
     printf("%s", value.first.c_str());
     if ((td.pub_status == CREATE_FAILURE || td.pub_status == LIB_LOAD_FAILURE) ||
         (td.sub_status == CREATE_FAILURE || td.sub_status == LIB_LOAD_FAILURE)) {
-      printf(" (*): Not available. Try 'rosmake %s'.", td.package_name.c_str());
+      printf(" (*): Not available. Try 'catkin_make --pkg %s'.", td.package_name.c_str());
       problem_package = true;
     }
     printf("\n");
