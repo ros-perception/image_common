@@ -35,7 +35,6 @@ add_dependencies(${PROJECT_NAME} sensor_msgs_gencpp)
 target_link_libraries(${PROJECT_NAME}
   ${Boost_LIBRARIES}
   ${catkin_LIBRARIES}
-  tinyxml
 )
 
 # Build libimage_transport_plugins                                      
