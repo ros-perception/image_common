@@ -38,7 +38,7 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 
-void increment(int* value)
+inline void increment(int* value)
 {
   ++(*value);
 }
