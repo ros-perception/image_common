@@ -281,9 +281,10 @@ bool CameraInfoManager::loadCalibrationFile(const std::string &filename,
         }
       success = true;
       {
-        // lock only while updating cam_info_
+        // lock only while updating cam_info_ and url_
         boost::mutex::scoped_lock lock(mutex_);
         cam_info_ = cam_info;
+        url_ = filename;
       }
     }
   else
