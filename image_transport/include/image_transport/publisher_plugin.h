@@ -101,6 +101,27 @@ public:
   }
 
   /**
+   * \brief Publish an image using the transport associated with this PublisherPlugin.
+   * This version of the function can be used to optimize cases where you don't want to
+   * fill a ROS message first to avoid useless copies.
+   * @param message an image message to use information from (but not data)
+   * @param data a pointer to the image data to use to fill the Image message
+   */
+  virtual void publish(const sensor_msgs::Image& message, const uint8_t* data) const
+  {
+    sensor_msgs::Image msg;
+    msg.header = message.header;
+    msg.height = message.height;
+    msg.width = message.width;
+    msg.encoding = message.encoding;
+    msg.is_bigendian = message.is_bigendian;
+    msg.step = message.step;
+    msg.data = std::vector<uint8_t>(data, data + msg.step*msg.height);
+
+    publish(msg);
+  }
+
+  /**
    * \brief Shutdown any advertisements associated with this PublisherPlugin.
    */
   virtual void shutdown() = 0;
