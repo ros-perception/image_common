@@ -12,12 +12,20 @@ catkin_package(
 )
 
 find_package(PkgConfig)
-pkg_check_modules(YAML_CPP yaml-cpp)
-if(${YAML_CPP_VERSION} VERSION_GREATER 0.5)
-  add_definitions(-DHAVE_NEW_YAMLCPP)
+
+if (APPLE)
+  #find yaml cpp for mac os
+  find_library(YAML_CPP_LIBRARIES NAMES yaml-cpp)
+  find_path(YAML_CPP_H_INCLUDE_DIR yaml-cpp/yaml.h )
+  SET(YAML_CPP_INCLUDE_DIR ${YAML_CPP_H_INCLUDE_DIR}/yaml-cpp)
+else()
+  pkg_check_modules(YAML_CPP yaml-cpp)
+  if(${YAML_CPP_VERSION} VERSION_GREATER 0.5)
+    add_definitions(-DHAVE_NEW_YAMLCPP)
+  endif()
+  link_directories(${YAML_CPP_LIBRARY_DIRS})
 endif()
 include_directories(${YAML_CPP_INCLUDE_DIRS})
-link_directories(${YAML_CPP_LIBRARY_DIRS})
 
 # define the library
 add_library(${PROJECT_NAME}
@@ -25,7 +33,14 @@ add_library(${PROJECT_NAME}
   src/parse_ini.cpp
   src/parse_yml.cpp
 )
-target_link_libraries(${PROJECT_NAME} yaml-cpp ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
+
+if (APPLE)
+  #target link fixes for mac os
+  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
+else()
+  target_link_libraries(${PROJECT_NAME} yaml-cpp ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
+endif()
+
 add_dependencies(${PROJECT_NAME} sensor_msgs_gencpp)
 
 install(
