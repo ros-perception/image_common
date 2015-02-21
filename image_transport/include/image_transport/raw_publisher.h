@@ -62,6 +62,9 @@ public:
     getPublisher().publish(message);
   }
 
+  // Override the default implementation to not copy data to a sensor_msgs::Image first
+  virtual void publish(const sensor_msgs::Image& message, const uint8_t* data) const;
+
 protected:
   virtual void publish(const sensor_msgs::Image& message, const PublishFn& publish_fn) const
   {

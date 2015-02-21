@@ -38,7 +38,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 # Build libimage_transport_plugins                                      
-add_library(${PROJECT_NAME}_plugins src/manifest.cpp)
+add_library(${PROJECT_NAME}_plugins src/manifest.cpp src/raw_publisher.cpp)
 target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 
 install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins
