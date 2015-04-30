@@ -118,7 +118,7 @@ CameraSubscriber::CameraSubscriber(ImageTransport& image_it, ros::NodeHandle& in
   impl_->info_sub_.registerCallback(boost::bind(increment, &impl_->info_received_));
   impl_->sync_.registerCallback(boost::bind(increment, &impl_->both_received_));
   impl_->check_synced_timer_ = info_nh.createWallTimer(ros::WallDuration(10.0),
-                                                       boost::bind(&Impl::checkImagesSynchronized, impl_));
+                                                       boost::bind(&Impl::checkImagesSynchronized, impl_.get()));
 }
 
 std::string CameraSubscriber::getTopic() const
