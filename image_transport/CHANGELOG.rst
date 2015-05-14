@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.5 (2015-05-14)
+-------------------
 * image_transport: fix CameraSubscriber shutdown (circular shared_ptr ref)
   CameraSubscriber uses a private boost::shared_ptr to share an impl object
   between copied instances. In CameraSubscriber::CameraSubscriber(), it

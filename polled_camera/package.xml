@@ -1,6 +1,6 @@
 <package>
   <name>polled_camera</name>
-  <version>1.11.4</version>
+  <version>1.11.5</version>
   <description>
 
      polled_camera contains a service and C++ helper classes for implementing a polled
