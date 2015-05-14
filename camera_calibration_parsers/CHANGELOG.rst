@@ -2,6 +2,11 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix catkin_make failure (due to yaml-cpp deps) for mac os
+* Contributors: Yifei Zhang
+
 1.11.4 (2014-09-21)
 -------------------
 * fix bad yaml-cpp usage in certain conditions

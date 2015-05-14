@@ -2,6 +2,25 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* image_transport: fix CameraSubscriber shutdown (circular shared_ptr ref)
+  CameraSubscriber uses a private boost::shared_ptr to share an impl object
+  between copied instances. In CameraSubscriber::CameraSubscriber(), it
+  handed this shared_ptr to boost::bind() and saved the created wall timer
+  in the impl object, thus creating a circular reference. The impl object
+  was therefore never freed.
+  Fix that by passing a plain pointer to boost::bind().
+* avoid a memory copy for the raw publisher
+* add a way to publish an image with only the data pointer
+* Make function inline to avoid duplicated names when linking statically
+* add plugin examples for the tutorial
+* update instructions for catkin
+* remove uselessly linked library
+  fixes `#28 <https://github.com/ros-perception/image_common/issues/28>`_
+* add a tutorial for image_transport
+* Contributors: Gary Servin, Max Schwarz, Vincent Rabaud
+
 1.11.4 (2014-09-21)
 -------------------
 
