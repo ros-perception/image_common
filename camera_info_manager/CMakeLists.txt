@@ -20,11 +20,21 @@ include_directories(include)
 
 # add a library
 add_library(${PROJECT_NAME} src/camera_info_manager.cpp)
-target_link_libraries(${PROJECT_NAME} ${camera_calibration_parsers_LIBRARIES}
-                                      ${roscpp_LIBRARIES}
-                                      ${roslib_LIBRARIES}
-)
 
+if(APPLE)
+  # fix compiler error at linking x86_64 in OS X
+  target_link_libraries(${PROJECT_NAME} ${camera_calibration_parsers_LIBRARIES}
+                                        ${roscpp_LIBRARIES}
+                                        ${roslib_LIBRARIES}
+                                        ${catkin_LIBRARIES}
+  )
+else()
+  target_link_libraries(${PROJECT_NAME} ${camera_calibration_parsers_LIBRARIES}
+                                        ${roscpp_LIBRARIES}
+                                        ${roslib_LIBRARIES}
+  )
+endif()
+  
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         COMPONENT main
