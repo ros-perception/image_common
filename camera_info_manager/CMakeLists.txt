@@ -12,18 +12,12 @@ catkin_package(INCLUDE_DIRS include
 
 find_package(catkin COMPONENTS camera_calibration_parsers image_transport roscpp roslib)
 
-include_directories(SYSTEM ${camera_calibration_parsers_INCLUDE_DIRS}
-                           ${image_transport_INCLUDE_DIRS}
-                           ${roscpp_INCLUDE_DIRS}
-)
+include_directories(SYSTEM ${catkin_INCLUDE_DIRS})
 include_directories(include)
 
 # add a library
 add_library(${PROJECT_NAME} src/camera_info_manager.cpp)
-target_link_libraries(${PROJECT_NAME} ${camera_calibration_parsers_LIBRARIES}
-                                      ${roscpp_LIBRARIES}
-                                      ${roslib_LIBRARIES}
-)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
