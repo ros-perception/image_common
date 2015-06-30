@@ -37,12 +37,7 @@ add_library(${PROJECT_NAME}
   src/parse_yml.cpp
 )
 
-if (APPLE)
-  #target link fixes for mac os
-  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
-else()
-  target_link_libraries(${PROJECT_NAME} yaml-cpp ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
-endif()
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 add_dependencies(${PROJECT_NAME} sensor_msgs_gencpp)
 
@@ -64,3 +59,7 @@ install(
   TARGETS convert
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+if(CATKIN_ENABLE_TESTING)
+  add_subdirectory(test)
+endif()
