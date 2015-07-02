@@ -24,5 +24,6 @@
   <run_depend>sensor_msgs</run_depend>
   <run_depend>yaml-cpp</run_depend>
 
+  <test_depend>rosbash</test_depend>
   <test_depend>rosunit</test_depend>
 </package>
