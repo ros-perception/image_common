@@ -43,6 +43,7 @@
 #include <boost/spirit/include/classic_confix.hpp>
 #include <boost/spirit/include/classic_loops.hpp>
 #include <boost/typeof/typeof.hpp>
+#include <boost/filesystem.hpp>
 #include <iterator>
 #include <fstream>
 
@@ -112,6 +113,11 @@ bool writeCalibrationIni(std::ostream& out, const std::string& camera_name,
 bool writeCalibrationIni(const std::string& file_name, const std::string& camera_name,
                          const sensor_msgs::CameraInfo& cam_info)
 {
+  boost::filesystem::path dir(boost::filesystem::path(file_name).parent_path());
+  if(!boost::filesystem::exists(dir) &&
+     !boost::filesystem::create_directories(dir)){
+    ROS_ERROR("Unable to create directory for camera calibration file [%s]", dir.c_str());
+  }
   std::ofstream out(file_name.c_str());
   if (!out.is_open())
   {
