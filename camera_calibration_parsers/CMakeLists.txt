@@ -3,7 +3,9 @@ project(camera_calibration_parsers)
 
 find_package(catkin REQUIRED sensor_msgs rosconsole)
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+find_package(Boost REQUIRED COMPONENTS filesystem)
+
+include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 catkin_package(
   INCLUDE_DIRS include
@@ -37,7 +39,7 @@ add_library(${PROJECT_NAME}
   src/parse_yml.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES} ${Boost_LIBRARIES})
 
 add_dependencies(${PROJECT_NAME} sensor_msgs_gencpp)
 
