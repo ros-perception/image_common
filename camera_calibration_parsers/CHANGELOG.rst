@@ -2,8 +2,8 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.6 (2015-07-16)
+-------------------
 * [camera_calibration_parsers] Better error message when calib file can't be written
 * add rosbash as a test dependency
 * add a test dependency now that we have tests
