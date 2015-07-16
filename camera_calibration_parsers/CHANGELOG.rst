@@ -2,6 +2,17 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [camera_calibration_parsers] Better error message when calib file can't be written
+* add rosbash as a test dependency
+* add a test dependency now that we have tests
+* parse distortion of arbitraty length in INI
+  This fixes `#33 <https://github.com/ros-perception/image_common/issues/33>`_
+* add a test to parse INI calibration files with 5 or 8 D param
+* Add yaml-cpp case for building on Android
+* Contributors: Gary Servin, Isaac IY Saito, Vincent Rabaud
+
 1.11.5 (2015-05-14)
 -------------------
 * Fix catkin_make failure (due to yaml-cpp deps) for mac os

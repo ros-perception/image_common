@@ -2,6 +2,9 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.11.5 (2015-05-14)
 -------------------
 * image_transport: fix CameraSubscriber shutdown (circular shared_ptr ref)

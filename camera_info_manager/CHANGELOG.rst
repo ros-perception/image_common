@@ -2,6 +2,12 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* simplify target_link_libraries
+  That should fix `#35 <https://github.com/ros-perception/image_common/issues/35>`_
+* Contributors: Vincent Rabaud
+
 1.11.5 (2015-05-14)
 -------------------
 
