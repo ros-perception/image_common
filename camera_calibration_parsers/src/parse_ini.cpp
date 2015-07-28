@@ -114,7 +114,7 @@ bool writeCalibrationIni(const std::string& file_name, const std::string& camera
                          const sensor_msgs::CameraInfo& cam_info)
 {
   boost::filesystem::path dir(boost::filesystem::path(file_name).parent_path());
-  if(!boost::filesystem::exists(dir) &&
+  if (!dir.empty() && !boost::filesystem::exists(dir) &&
      !boost::filesystem::create_directories(dir)){
     ROS_ERROR("Unable to create directory for camera calibration file [%s]", dir.c_str());
   }

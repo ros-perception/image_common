@@ -38,11 +38,11 @@ import unittest
 
 class TestParser(unittest.TestCase):
     def test_ini(self):
-        for file in ['calib5.ini', 'calib8.ini']:
-            print 'rosrun camera_calibration_parsers convert $(rospack find camera_calibration_parsers)/test/%s test.yaml' % file
-            p = subprocess.Popen('rosrun camera_calibration_parsers convert $(rospack find camera_calibration_parsers)/test/%s ./test.yaml' % file, shell=True, stderr=subprocess.PIPE)
-            out, err = p.communicate()
-            self.assertEqual(err, '')
+        for files in [('calib5.ini', 'calib5.yaml'), ('calib8.ini', 'calib8.yaml')]:
+            for dir in [ '', './']:
+                p = subprocess.Popen('rosrun camera_calibration_parsers convert $(rospack find camera_calibration_parsers)/test/%s %s%s' % (files[0], dir, files[1]), shell=True, stderr=subprocess.PIPE)
+                out, err = p.communicate()
+                self.assertEqual(err, '')
 
 if __name__ == '__main__':
     rosunit.unitrun('camera_calibration_parsers', 'parser', TestParser)
