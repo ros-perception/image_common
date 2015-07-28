@@ -2,8 +2,8 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.7 (2015-07-28)
+-------------------
 * fix `#39 <https://github.com/ros-perception/image_common/issues/39>`_
 * make sure test does not fail
 * Contributors: Vincent Rabaud
