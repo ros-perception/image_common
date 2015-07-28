@@ -2,6 +2,12 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix `#39 <https://github.com/ros-perception/image_common/issues/39>`_
+* make sure test does not fail
+* Contributors: Vincent Rabaud
+
 1.11.6 (2015-07-16)
 -------------------
 * [camera_calibration_parsers] Better error message when calib file can't be written

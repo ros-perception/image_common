@@ -2,6 +2,9 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.11.6 (2015-07-16)
 -------------------
 * simplify target_link_libraries
