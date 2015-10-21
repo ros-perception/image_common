@@ -15,12 +15,7 @@ catkin_package(
 
 find_package(PkgConfig)
 
-if (APPLE)
-  #find yaml cpp for mac os
-  find_library(YAML_CPP_LIBRARIES NAMES yaml-cpp)
-  find_path(YAML_CPP_H_INCLUDE_DIR yaml-cpp/yaml.h )
-  SET(YAML_CPP_INCLUDE_DIR ${YAML_CPP_H_INCLUDE_DIR}/yaml-cpp)
-elseif (ANDROID)
+if (ANDROID)
     find_package(yaml-cpp)
     add_definitions(-DHAVE_NEW_YAMLCPP)
 else()
