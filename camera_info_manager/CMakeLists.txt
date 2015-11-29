@@ -12,7 +12,7 @@ catkin_package(INCLUDE_DIRS include
 
 find_package(catkin COMPONENTS camera_calibration_parsers image_transport roscpp roslib)
 
-include_directories(SYSTEM ${catkin_INCLUDE_DIRS})
+include_directories(${catkin_INCLUDE_DIRS})
 include_directories(include)
 
 # add a library
@@ -33,7 +33,7 @@ if(CATKIN_ENABLE_TESTING)
   # Hence, it must be created as a normal executable, not using
   # catkin_add_gtest() which runs an additional test without rostest.
   add_executable(unit_test tests/unit_test.cpp)
-  target_link_libraries(unit_test ${PROJECT_NAME} ${GTEST_LIBRARIES})
+  target_link_libraries(unit_test ${PROJECT_NAME} ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
 
   add_rostest(tests/unit_test.test)
 endif()
