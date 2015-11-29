@@ -2,6 +2,11 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix compilation on Fedora, fixes `#42 <https://github.com/ros-perception/image_common/issues/42>`_
+* Contributors: Vincent Rabaud
+
 1.11.7 (2015-07-28)
 -------------------
 

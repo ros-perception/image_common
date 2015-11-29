@@ -2,6 +2,12 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove no-longer-neccessary flags to allow OS X to use 0.3 and 0.5 of yaml-cpp.
+* remove buggy CMake message
+* Contributors: Helen Oleynikova, Vincent Rabaud
+
 1.11.7 (2015-07-28)
 -------------------
 * fix `#39 <https://github.com/ros-perception/image_common/issues/39>`_
