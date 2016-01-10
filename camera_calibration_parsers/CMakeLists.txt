@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 2.8)
 project(camera_calibration_parsers)
 
-find_package(catkin REQUIRED sensor_msgs rosconsole)
+find_package(catkin REQUIRED sensor_msgs rosconsole roscpp roscpp_serialization)
 
-find_package(Boost REQUIRED COMPONENTS filesystem)
+find_package(Boost REQUIRED COMPONENTS filesystem python)
+find_package(PythonLibs 2.7 REQUIRED)
+include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+catkin_python_setup()
 
 catkin_package(
   INCLUDE_DIRS include
@@ -14,6 +16,7 @@ catkin_package(
 )
 
 find_package(PkgConfig)
+
 
 if (ANDROID)
     find_package(yaml-cpp)
@@ -34,7 +37,17 @@ add_library(${PROJECT_NAME}
   src/parse_yml.cpp
 )
 
+add_library(${PROJECT_NAME}_wrapper
+  src/parse_wrapper.cpp)
+
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+
+# Don't prepend wrapper library name with lib and add to Python libs.
+set_target_properties(${PROJECT_NAME}_wrapper PROPERTIES
+        PREFIX ""
+        LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
+        )
 
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 

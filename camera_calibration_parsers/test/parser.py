@@ -35,6 +35,8 @@
 import rosunit
 import subprocess
 import unittest
+import os
+from camera_calibration_parsers import readCalibration
 
 class TestParser(unittest.TestCase):
     def test_ini(self):
@@ -43,6 +45,17 @@ class TestParser(unittest.TestCase):
                 p = subprocess.Popen('rosrun camera_calibration_parsers convert $(rospack find camera_calibration_parsers)/test/%s %s%s' % (files[0], dir, files[1]), shell=True, stderr=subprocess.PIPE)
                 out, err = p.communicate()
                 self.assertEqual(err, '')
+
+    def test_readCalibration(self):
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        camera_name, camera_info = readCalibration(os.path.join(script_dir, 'calib5.ini'))
+        self.assertEqual(camera_name, 'mono_left')
+        self.assertEqual(camera_info.height, 480)
+        self.assertEqual(camera_info.width, 640)
+        self.assertEqual(camera_info.P[0], 262.927429)
+        
+        camera_name, camera_info = readCalibration(os.path.join(script_dir, 'calib8.ini'))
+        self.assertEqual(camera_info.distortion_model, 'rational_polynomial')
 
 if __name__ == '__main__':
     rosunit.unitrun('camera_calibration_parsers', 'parser', TestParser)
