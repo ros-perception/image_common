@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.9 (2016-01-17)
+-------------------
 * fix linkage in tutorials
 * Use $catkin_EXPORTED_TARGETS
 * Contributors: Jochen Sprickerhof, Vincent Rabaud

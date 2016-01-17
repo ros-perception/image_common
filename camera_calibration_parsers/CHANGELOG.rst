@@ -2,8 +2,8 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.9 (2016-01-17)
+-------------------
 * Add python wrapper for readCalibration.
   Reads .ini or .yaml calibration file and returns camera name and sensor_msgs/cameraInfo.
 * Use $catkin_EXPORTED_TARGETS
