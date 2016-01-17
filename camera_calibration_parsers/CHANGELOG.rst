@@ -2,6 +2,13 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add python wrapper for readCalibration.
+  Reads .ini or .yaml calibration file and returns camera name and sensor_msgs/cameraInfo.
+* Use $catkin_EXPORTED_TARGETS
+* Contributors: Jochen Sprickerhof, Markus Roth
+
 1.11.8 (2015-11-29)
 -------------------
 * Remove no-longer-neccessary flags to allow OS X to use 0.3 and 0.5 of yaml-cpp.

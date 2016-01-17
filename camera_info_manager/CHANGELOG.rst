@@ -2,6 +2,9 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.11.8 (2015-11-29)
 -------------------
 * fix compilation on Fedora, fixes `#42 <https://github.com/ros-perception/image_common/issues/42>`_
