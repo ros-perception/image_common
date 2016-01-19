@@ -2,8 +2,8 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.10 (2016-01-19)
+--------------------
 * Add install target for python wrapper library
 * Only link against needed Boost libraries
   9829b02 introduced a python dependency into find_package(Boost..) which
