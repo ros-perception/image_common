@@ -65,6 +65,9 @@ install(
 add_executable(convert src/convert.cpp)
 target_link_libraries(convert ${PROJECT_NAME} ${rosconsole_LIBRARIES})
 
+add_executable(save_camera_info src/save_camera_info.cpp)
+target_link_libraries(save_camera_info ${PROJECT_NAME})
+
 install(
   TARGETS convert
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
