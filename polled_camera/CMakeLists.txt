@@ -17,7 +17,7 @@ catkin_package(DEPENDS roscpp sensor_msgs
 
 # create some library and exe
 find_package(catkin REQUIRED image_transport rosconsole roscpp)
-include_directories(SYSTEM ${image_transport_INCLUDE_DIRS})
+include_directories(${image_transport_INCLUDE_DIRS})
 include_directories(include
                     ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
 )
