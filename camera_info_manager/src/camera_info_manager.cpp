@@ -128,6 +128,8 @@ sensor_msgs::CameraInfo CameraInfoManager::getCameraInfo(void)
       // attempt load without the lock, it is not recursive
       loadCalibration(url, cname);
     }
+
+  return sensor_msgs::CameraInfo();
 }
 
 /** Get file name corresponding to a @c package: URL.
