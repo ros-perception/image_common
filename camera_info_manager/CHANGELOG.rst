@@ -2,8 +2,8 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.11 (2016-09-24)
+--------------------
 * Return empty CameraInfo when !ros::ok()
 * Contributors: Enrique Fernandez
 
