@@ -2,6 +2,9 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.11.10 (2016-01-19)
 --------------------
 * Add install target for python wrapper library
