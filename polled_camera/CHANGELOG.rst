@@ -2,8 +2,8 @@
 Changelog for package polled_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.11 (2016-09-24)
+--------------------
 * address gcc6 build error in polled_camera
   With gcc6, compiling fails with `stdlib.h: No such file or directory`,
   as including '-isystem /usr/include' breaks with gcc6, cf.,
