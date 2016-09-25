@@ -18,9 +18,9 @@ before_install:
   # Install ROS
   - sudo sh -c "echo \"deb http://packages.ros.org/ros-shadow-fixed/ubuntu $ROS_CI_DESKTOP main\" > /etc/apt/sources.list.d/ros-latest.list"
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-  - sudo apt-get update -qq
+  - sudo apt-get update -qq &>/dev/null
   # Install ROS
-  - sudo apt-get install -qq -y python-catkin-pkg python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-catkin
+  - sudo apt-get install -qq -y python-catkin-pkg python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-catkin >/dev/null
   - source /opt/ros/$ROS_DISTRO/setup.bash
   # Setup for rosdep
   - sudo rosdep init
@@ -47,18 +47,18 @@ before_script:
 
   # package depdencies: install using rosdep.
   - cd ~/catkin_ws
-  - rosdep install -q -y -r --from-paths src --ignore-src --rosdistro $ROS_DISTRO
+  - rosdep install -q -y -r --from-paths src --ignore-src --rosdistro $ROS_DISTRO >/dev/null
 
 # Compile and test.
 script:
   - source /opt/ros/$ROS_DISTRO/setup.bash
   - cd ~/catkin_ws
-  - catkin build -p1 -j1
+  - catkin build --no-status -p1 -j1
   - catkin run_tests -p1 -j1
   - catkin_test_results --all build
   - catkin clean -b --yes
   - catkin config --install
-  - catkin build -p1 -j1
+  - catkin build --no-status -p1 -j1
 after_failure:
   - find ${HOME}/.ros/test_results -type f -exec echo "== {} ==" \; -exec cat {} \;
   - for file in ${HOME}/.ros/log/rostest-*; do echo "=== $file ==="; cat $file; done
