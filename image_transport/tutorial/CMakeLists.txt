@@ -13,7 +13,7 @@ catkin_package()
 
 find_package(OpenCV)
 
-include_directories(include ${OpenCV_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 # add the publisher example
 add_executable(my_publisher src/my_publisher.cpp)
