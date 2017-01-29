@@ -2,6 +2,19 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix CMake of image_transport/tutorial and polled_camera
+  Fix loads of problems with the CMakeLists.
+* image_transport/tutorial: Add dependency on generated msg
+  Without this, build fails on Kinetic because ResizedImage.h has not been
+  generated yet.
+* image_transport/tutorial: Add missing catkin_INCLUDE_DIRS
+  Without this, compilation files on Kinetic because ros.h cannot be found.
+* 1.11.11
+* update changelogs
+* Contributors: Martin Guenther, Vincent Rabaud
+
 1.11.11 (2016-09-24)
 --------------------
 

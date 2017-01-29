@@ -2,6 +2,23 @@
 Changelog for package polled_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix CMake of image_transport/tutorial and polled_camera
+  Fix loads of problems with the CMakeLists.
+* 1.11.11
+* update changelogs
+* address gcc6 build error in polled_camera
+  With gcc6, compiling fails with `stdlib.h: No such file or directory`,
+  as including '-isystem /usr/include' breaks with gcc6, cf.,
+  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70129.
+  This commit addresses this issue for this package in the same way
+  it was addressed in various other ROS packages. A list of related
+  commits and pull requests is at:
+  https://github.com/ros/rosdistro/issues/12783
+  Signed-off-by: Lukas Bulwahn <lukas.bulwahn@oss.bmw-carit.de>
+* Contributors: Lukas Bulwahn, Martin Guenther, Vincent Rabaud
+
 1.11.11 (2016-09-24)
 --------------------
 * address gcc6 build error in polled_camera

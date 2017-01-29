@@ -2,6 +2,14 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Properly detect Boost Python 2 or 3
+  This fixes `#59 <https://github.com/ros-perception/image_common/issues/59>`_
+* 1.11.11
+* update changelogs
+* Contributors: Vincent Rabaud
+
 1.11.11 (2016-09-24)
 --------------------
 
