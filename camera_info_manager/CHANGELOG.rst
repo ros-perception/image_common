@@ -2,8 +2,8 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.12 (2017-01-29)
+--------------------
 * 1.11.11
 * update changelogs
 * Return empty CameraInfo when !ros::ok()

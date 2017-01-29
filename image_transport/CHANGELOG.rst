@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.12 (2017-01-29)
+--------------------
 * Fix CMake of image_transport/tutorial and polled_camera
   Fix loads of problems with the CMakeLists.
 * image_transport/tutorial: Add dependency on generated msg

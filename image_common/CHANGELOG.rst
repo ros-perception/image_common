@@ -2,8 +2,8 @@
 Changelog for package image_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.12 (2017-01-29)
+--------------------
 * 1.11.11
 * update changelogs
 * Contributors: Vincent Rabaud
