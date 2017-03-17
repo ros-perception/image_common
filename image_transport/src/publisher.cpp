@@ -101,7 +101,8 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
                      const SubscriberStatusCallback& connect_cb,
                      const SubscriberStatusCallback& disconnect_cb,
                      const ros::VoidPtr& tracked_object, bool latch,
-                     const PubLoaderPtr& loader)
+                     const PubLoaderPtr& loader,
+                     const std::set<std::string>& blacklist)
   : impl_(new Impl)
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
@@ -110,6 +111,10 @@ Publisher::Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_
   impl_->loader_ = loader;
   
   BOOST_FOREACH(const std::string& lookup_name, loader->getDeclaredClasses()) {
+    const std::string transport_name = boost::erase_last_copy(lookup_name, "_pub");
+    if (blacklist.count(transport_name))
+      continue;
+
     try {
       boost::shared_ptr<PublisherPlugin> pub = loader->createInstance(lookup_name);
       impl_->publishers_.push_back(pub);

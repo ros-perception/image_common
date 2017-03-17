@@ -65,6 +65,11 @@ ImageTransport::~ImageTransport()
 {
 }
 
+void ImageTransport::disablePlugin(const std::string plugin_name)
+{
+  blacklist_.insert(plugin_name);
+}
+
 Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queue_size, bool latch)
 {
   return advertise(base_topic, queue_size, SubscriberStatusCallback(),
@@ -76,7 +81,7 @@ Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queu
                                     const SubscriberStatusCallback& disconnect_cb,
                                     const ros::VoidPtr& tracked_object, bool latch)
 {
-  return Publisher(impl_->nh_, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch, impl_->pub_loader_);
+  return Publisher(impl_->nh_, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch, impl_->pub_loader_, blacklist_);
 }
 
 Subscriber ImageTransport::subscribe(const std::string& base_topic, uint32_t queue_size,

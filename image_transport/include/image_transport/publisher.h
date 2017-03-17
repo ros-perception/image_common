@@ -37,6 +37,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
+#include <set>
 #include "image_transport/single_subscriber_publisher.h"
 #include "image_transport/exception.h"
 #include "image_transport/loader_fwds.h"
@@ -103,7 +104,8 @@ private:
             const SubscriberStatusCallback& connect_cb,
             const SubscriberStatusCallback& disconnect_cb,
             const ros::VoidPtr& tracked_object, bool latch,
-            const PubLoaderPtr& loader);
+            const PubLoaderPtr& loader,
+            const std::set<std::string>& blacklist);
 
   struct Impl;
   typedef boost::shared_ptr<Impl> ImplPtr;
@@ -116,7 +118,7 @@ private:
                                const SubscriberStatusCallback& user_cb);
   
   SubscriberStatusCallback rebindCB(const SubscriberStatusCallback& user_cb);
-  
+
   friend class ImageTransport;
 };
 
