@@ -35,7 +35,6 @@
 #ifndef IMAGE_TRANSPORT_IMAGE_TRANSPORT_H
 #define IMAGE_TRANSPORT_IMAGE_TRANSPORT_H
 
-#include <set>
 #include "image_transport/publisher.h"
 #include "image_transport/subscriber.h"
 #include "image_transport/camera_publisher.h"
@@ -55,11 +54,6 @@ public:
   explicit ImageTransport(const ros::NodeHandle& nh);
 
   ~ImageTransport();
-
-  /*!
-   * \brief Add a plugin name to disable in a publisher
-   */
-  void disablePlugin(const std::string plugin_name);
 
   /*!
    * \brief Advertise an image topic, simple version.
@@ -203,8 +197,6 @@ private:
   typedef boost::weak_ptr<Impl> ImplWPtr;
 
   ImplPtr impl_;
-
-  std::set<std::string> blacklist_;
 };
 
 } //namespace image_transport
