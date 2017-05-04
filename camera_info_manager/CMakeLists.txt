@@ -1,16 +1,15 @@
 cmake_minimum_required(VERSION 2.8)
 project(camera_info_manager)
 
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS camera_calibration_parsers image_transport roscpp roslib)
 
 find_package(Boost)
 find_package(catkin REQUIRED roscpp sensor_msgs)
 catkin_package(INCLUDE_DIRS include
                LIBRARIES ${PROJECT_NAME}
+               CATKIN_DEPENDS camera_calibration_parsers
                DEPENDS Boost roscpp sensor_msgs
 )
-
-find_package(catkin COMPONENTS camera_calibration_parsers image_transport roscpp roslib)
 
 include_directories(${catkin_INCLUDE_DIRS})
 include_directories(include)
