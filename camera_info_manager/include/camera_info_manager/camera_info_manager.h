@@ -187,6 +187,7 @@ class CameraInfoManager
   bool setCameraName(const std::string &cname);
   bool setCameraInfo(const sensor_msgs::CameraInfo &camera_info);
   bool validateURL(const std::string &url);
+  const std::string& getURL() const { return url_;}
 
  private:
 
