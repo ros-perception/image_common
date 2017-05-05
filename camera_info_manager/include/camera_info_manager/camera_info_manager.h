@@ -177,7 +177,8 @@ class CameraInfoManager
 
   CameraInfoManager(ros::NodeHandle nh,
                     const std::string &cname="camera",
-                    const std::string &url="");
+                    const std::string &url="",
+		    const std::string &srvname="set_camera_info");
 
   sensor_msgs::CameraInfo getCameraInfo(void);
   bool isCalibrated(void);
