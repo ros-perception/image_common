@@ -35,5 +35,5 @@ if(CATKIN_ENABLE_TESTING)
   add_executable(unit_test tests/unit_test.cpp)
   target_link_libraries(unit_test ${PROJECT_NAME} ${GTEST_LIBRARIES} ${catkin_LIBRARIES})
 
-  add_rostest(tests/unit_test.test)
+  add_rostest(tests/unit_test.test DEPENDENCIES unit_test)
 endif()
