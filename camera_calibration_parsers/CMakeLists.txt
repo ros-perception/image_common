@@ -45,7 +45,7 @@ add_library(${PROJECT_NAME}_wrapper
   src/parse_wrapper.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY})
-target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 # Don't prepend wrapper library name with lib and add to Python libs.
 set_target_properties(${PROJECT_NAME}_wrapper PROPERTIES
