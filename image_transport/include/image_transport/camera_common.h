@@ -39,7 +39,12 @@
 
 namespace image_transport {
 
-/// \brief Form the camera info topic name, sibling to the base topic
+/**
+ * \brief Form the camera info topic name, sibling to the base topic.
+ *
+ * \note This function assumes that the name is completely resolved. If the \c 
+ * base_topic is remapped the resulting camera info topic will be incorrect. 
+ */
 std::string getCameraInfoTopic(const std::string& base_topic);
 
 } //namespace image_transport
