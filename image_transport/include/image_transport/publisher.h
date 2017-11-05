@@ -116,7 +116,7 @@ private:
                                const SubscriberStatusCallback& user_cb);
   
   SubscriberStatusCallback rebindCB(const SubscriberStatusCallback& user_cb);
-  
+
   friend class ImageTransport;
 };
 
