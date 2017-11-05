@@ -2,8 +2,8 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.13 (2017-11-05)
+--------------------
 * Fix the find_package(catkin) redundancy
 * Add a dependency between the test and the test executable
 * Add camera_calibration_parsers dependency to camera_info_manager

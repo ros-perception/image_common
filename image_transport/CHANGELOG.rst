@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.13 (2017-11-05)
+--------------------
 * Disable image publisher plugins by name (`#60 <https://github.com/ros-perception/image_common/issues/60>`_)
   * Disable publisher plugins by name
   * Now have per publisher blacklist instead of image_transport wide.

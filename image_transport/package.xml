@@ -1,6 +1,6 @@
 <package>
   <name>image_transport</name>
-  <version>1.11.12</version>
+  <version>1.11.13</version>
   <description>
 
      image_transport should always be used to subscribe to and publish images. It provides transparent

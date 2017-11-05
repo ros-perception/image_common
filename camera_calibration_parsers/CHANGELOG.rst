@@ -2,8 +2,8 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.13 (2017-11-05)
+--------------------
 * Use Boost_LIBRARIES instead of Boost_PYTHON_LIBRARY
   This was causing issues when building with python3 since then
   `Boost_PYTHON_LIBRARY` is not set, instead cmake sets
