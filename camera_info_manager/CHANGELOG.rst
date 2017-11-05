@@ -2,6 +2,13 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix the find_package(catkin) redundancy
+* Add a dependency between the test and the test executable
+* Add camera_calibration_parsers dependency to camera_info_manager
+* Contributors: Max Schettler, Vincent Rabaud
+
 1.11.12 (2017-01-29)
 --------------------
 * 1.11.11
@@ -82,7 +89,7 @@ Changelog for package camera_info_manager
 * fix catkin gtest and rostest problem
 * fix unit test dependencies
 * Removed duplicated test dependancy
-  Test dependencies should never duplicate build or run dependencies.
+  Test dependencies should never duplicate build or run dependencies.
 * Contributors: Aaron Blasdel, Jack O'Quin
 
 1.10.0 (2013-01-13)

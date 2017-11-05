@@ -2,6 +2,20 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use Boost_LIBRARIES instead of Boost_PYTHON_LIBRARY
+  This was causing issues when building with python3 since then
+  `Boost_PYTHON_LIBRARY` is not set, instead cmake sets
+  `Boost_PYTHON3_LIBRARY`. So instead of adding each library separately,
+  using `Boost_LIBRARIES` seems to be better. For reference, from the
+  cmake docs:
+  ```
+  Boost_LIBRARIES        - Boost component libraries to be linked
+  Boost\_<C>_LIBRARY      - Libraries to link for component <C>
+  ```
+* Contributors: Kartik Mohta, Vincent Rabaud
+
 1.11.12 (2017-01-29)
 --------------------
 * Properly detect Boost Python 2 or 3

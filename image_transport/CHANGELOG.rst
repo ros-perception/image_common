@@ -2,6 +2,19 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Disable image publisher plugins by name (`#60 <https://github.com/ros-perception/image_common/issues/60>`_)
+  * Disable publisher plugins by name
+  * Now have per publisher blacklist instead of image_transport wide.
+* update to use non deprecated pluginlib macro
+* Extend documentation of `getCameraInfoTopic`
+  Document the fact that the `base_topic` argument must be resolved in order to build the correct camera info topic.
+* Added cv::waitkey(10) for blank popup
+  Without the cv::waitkey(10), it results in a blank popup which crashes/ leads to a black popup. This change corrects that problem.
+  ROS Kinetic, Ubuntu 16.04.3
+* Contributors: Aaditya Saraiya, Lucas Walter, Mikael Arguedas, Thibaud Chupin, Vincent Rabaud
+
 1.11.12 (2017-01-29)
 --------------------
 * Fix CMake of image_transport/tutorial and polled_camera
