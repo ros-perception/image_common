@@ -4,6 +4,8 @@ project(image_transport)
 find_package(catkin REQUIRED
   COMPONENTS
     message_filters
+    nodelet
+    nodelet_topic_tools
     pluginlib
     rosconsole
     roscpp
@@ -64,6 +66,6 @@ install(TARGETS list_transports republish
 )
 
 # add xml file
-install(FILES default_plugins.xml
+install(FILES default_plugins.xml nodelet_plugins.xml
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
