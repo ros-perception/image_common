@@ -1,0 +1,9 @@
+<library path="libimage_transport_nodelet">
+  <class name="image_transport/Republish"
+         type="image_transport::RepublishNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      Nodelet to republish image using specified transport
+    </description>
+  </class>
+</library>
