@@ -14,23 +14,21 @@ TEST(CameraCommon, getCameraInfoTopic_topic) {
   EXPECT_EQ(info_topic, "/camera_info");
 }
 
-/*
- * Crashes in boost impl
+// Crashes in boost implementation
 TEST(CameraCommon, getCameraInfoTopic2_slash) {
+  //TODO: Check if this is the correct behavior
   const auto topic_name = "/";
   const auto info_topic = image_transport::getCameraInfoTopic(topic_name);
   EXPECT_EQ(info_topic, "/camera_info");
 }
-*/
 
-/*
- * Crashes in boost impl
+// Crashes in boost implementation
 TEST(CameraCommon, getCameraInfoTopic2_empty) {
+  //TODO: Check if this is the correct behavior
   const auto topic_name = "";
   const auto info_topic = image_transport::getCameraInfoTopic(topic_name);
   EXPECT_EQ(info_topic, "/camera_info");
 }
-*/
 
 TEST(CameraCommon, erase_last_copy) {
   EXPECT_EQ("image", image_transport::erase_last_copy("image_pub", "_pub"));
