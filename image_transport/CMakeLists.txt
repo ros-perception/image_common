@@ -22,12 +22,12 @@ include_directories(include)
 # Build libimage_transport
 add_library(${PROJECT_NAME}
   src/camera_common.cpp
+  src/publisher.cpp
+  #src/subscriber.cpp
   #src/camera_publisher.cpp
   #src/camera_subscriber.cpp
   #src/image_transport.cpp
-  #src/publisher.cpp
   #src/single_subscriber_publisher.cpp
-  #src/subscriber.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
@@ -57,6 +57,11 @@ if(BUILD_TESTING)
   ament_add_gtest(${PROJECT_NAME}-camera_common test/test_camera_common.cpp)
   if(TARGET ${PROJECT_NAME}-camera_common)
     target_link_libraries(${PROJECT_NAME}-camera_common ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-publisher test/test_publisher.cpp)
+  if(TARGET ${PROJECT_NAME}-publisher)
+    target_link_libraries(${PROJECT_NAME}-publisher ${PROJECT_NAME})
   endif()
 endif()
 

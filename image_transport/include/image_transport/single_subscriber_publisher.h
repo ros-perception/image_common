@@ -35,7 +35,9 @@
 #ifndef IMAGE_TRANSPORT_SINGLE_SUBSCRIBER_PUBLISHER
 #define IMAGE_TRANSPORT_SINGLE_SUBSCRIBER_PUBLISHER
 
-#include <sensor_msgs/Image.h>
+#include <sensor_msgs/msg/image.hpp>
+
+#include <string>
 
 namespace image_transport {
 
@@ -51,7 +53,7 @@ private:
 
 public:
   typedef std::function<uint32_t()> GetNumSubscribersFn;
-  typedef std::function<void(const sensor_msgs::Image&)> PublishFn;
+  typedef std::function<void(const sensor_msgs::msg::Image&)> PublishFn;
 
   SingleSubscriberPublisher(const std::string& caller_id, const std::string& topic,
                             const GetNumSubscribersFn& num_subscribers_fn,
@@ -63,8 +65,8 @@ public:
 
   uint32_t getNumSubscribers() const;
 
-  void publish(const sensor_msgs::Image& message) const;
-  void publish(const sensor_msgs::ImageConstPtr& message) const;
+  void publish(const sensor_msgs::msg::Image& message) const;
+  void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const;
 
 private:
   std::string caller_id_;

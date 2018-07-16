@@ -35,9 +35,12 @@
 #ifndef IMAGE_TRANSPORT_CAMERA_PUBLISHER_H
 #define IMAGE_TRANSPORT_CAMERA_PUBLISHER_H
 
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/CameraInfo.h>
+#include <rclcpp/macros.hpp>
+#include <rclcpp/node.hpp>
+
+#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/msg/camera_info.hpp>
+
 #include "image_transport/single_subscriber_publisher.h"
 
 namespace image_transport {
@@ -85,13 +88,13 @@ public:
   /*!
    * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  void publish(const sensor_msgs::Image& image, const sensor_msgs::CameraInfo& info) const;
+  void publish(const sensor_msgs::msg::Image& image, const sensor_msgs::msg::CameraInfo& info) const;
 
   /*!
    * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  void publish(const sensor_msgs::ImageConstPtr& image,
-               const sensor_msgs::CameraInfoConstPtr& info) const;
+  void publish(const sensor_msgs::msg::Image::ConstSharedPtr& image,
+               const sensor_msgs::msg::CameraInfo::ConstSharedPtr& info) const;
 
   /*!
    * \brief Publish an (image, info) pair with given timestamp on the topics associated with
@@ -100,7 +103,7 @@ public:
    * Convenience version, which sets the timestamps of both image and info to stamp before
    * publishing.
    */
-  void publish(sensor_msgs::Image& image, sensor_msgs::CameraInfo& info, ros::Time stamp) const;
+  void publish(sensor_msgs::msg::Image& image, sensor_msgs::msg::CameraInfo& info, ros::Time stamp) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
@@ -113,7 +116,7 @@ public:
   bool operator==(const CameraPublisher& rhs) const { return impl_ == rhs.impl_; }
 
 private:
-  CameraPublisher(ImageTransport& image_it, ros::NodeHandle& info_nh,
+  CameraPublisher(ImageTransport& image_it, rclcpp::Node::SharedPtr& info_nh,
                   const std::string& base_topic, uint32_t queue_size,
                   const SubscriberStatusCallback& image_connect_cb,
                   const SubscriberStatusCallback& image_disconnect_cb,

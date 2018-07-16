@@ -35,13 +35,15 @@
 #ifndef IMAGE_TRANSPORT_PUBLISHER_H
 #define IMAGE_TRANSPORT_PUBLISHER_H
 
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
+#include <rclcpp/node.hpp>
+#include <rclcpp/macros.hpp>
+
 #include "image_transport/single_subscriber_publisher.h"
 #include "image_transport/exception.h"
 #include "image_transport/loader_fwds.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Manages advertisements of multiple transport options on an Image topic.
@@ -81,25 +83,25 @@ public:
   /*!
    * \brief Publish an image on the topics associated with this Publisher.
    */
-  void publish(const sensor_msgs::Image& message) const;
+  void publish(const sensor_msgs::msg::Image & message) const;
 
   /*!
    * \brief Publish an image on the topics associated with this Publisher.
    */
-  void publish(const sensor_msgs::ImageConstPtr& message) const;
+  void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
    */
   void shutdown();
 
-  operator void*() const;
-  bool operator< (const Publisher& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const Publisher& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const Publisher& rhs) const { return impl_ == rhs.impl_; }
+  operator void *() const;
+  bool operator<(const Publisher & rhs) const;
+  bool operator!=(const Publisher & rhs) const;
+  bool operator==(const Publisher & rhs) const;
 
 private:
-  Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+  Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
             const SubscriberStatusCallback& connect_cb,
             const SubscriberStatusCallback& disconnect_cb,
             const std::shared_ptr<void>& tracked_object, bool latch,
@@ -111,11 +113,12 @@ private:
 
   ImplPtr impl_;
 
-  static void weakSubscriberCb(const ImplWPtr& impl_wptr,
-                               const SingleSubscriberPublisher& plugin_pub,
-                               const SubscriberStatusCallback& user_cb);
+  static void weakSubscriberCb(
+    const ImplWPtr & impl_wptr,
+    const SingleSubscriberPublisher & plugin_pub,
+    const SubscriberStatusCallback & user_cb);
 
-  SubscriberStatusCallback rebindCB(const SubscriberStatusCallback& user_cb);
+  SubscriberStatusCallback rebindCB(const SubscriberStatusCallback & user_cb);
 
   friend class ImageTransport;
 };
