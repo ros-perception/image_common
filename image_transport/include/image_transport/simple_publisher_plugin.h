@@ -95,7 +95,7 @@ protected:
   virtual void advertiseImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                              const SubscriberStatusCallback& user_connect_cb,
                              const SubscriberStatusCallback& user_disconnect_cb,
-                             const ros::VoidPtr& tracked_object, bool latch)
+                             const std::shared_ptr<void>& tracked_object, bool latch)
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     ros::NodeHandle param_nh(transport_topic);

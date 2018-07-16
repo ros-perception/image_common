@@ -66,14 +66,14 @@ public:
   Publisher advertise(const std::string& base_topic, uint32_t queue_size,
                       const SubscriberStatusCallback& connect_cb,
                       const SubscriberStatusCallback& disconnect_cb = SubscriberStatusCallback(),
-                      const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = false);
+                      const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(), bool latch = false);
 
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
   Subscriber subscribe(const std::string& base_topic, uint32_t queue_size,
                        const std::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                       const ros::VoidPtr& tracked_object = ros::VoidPtr(),
+                       const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(),
                        const TransportHints& transport_hints = TransportHints());
 
   /**
@@ -85,7 +85,7 @@ public:
   {
     return subscribe(base_topic, queue_size,
                      std::function<void(const sensor_msgs::ImageConstPtr&)>(fp),
-                     ros::VoidPtr(), transport_hints);
+                     std::shared_ptr<void>(), transport_hints);
   }
 
   /**
@@ -96,7 +96,7 @@ public:
                        void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
                        const TransportHints& transport_hints = TransportHints())
   {
-    return subscribe(base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1), ros::VoidPtr(), transport_hints);
+    return subscribe(base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1), std::shared_ptr<void>(), transport_hints);
   }
 
   /**
@@ -125,7 +125,7 @@ public:
                                   const SubscriberStatusCallback& image_disconnect_cb = SubscriberStatusCallback(),
                                   const ros::SubscriberStatusCallback& info_connect_cb = ros::SubscriberStatusCallback(),
                                   const ros::SubscriberStatusCallback& info_disconnect_cb = ros::SubscriberStatusCallback(),
-                                  const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = false);
+                                  const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(), bool latch = false);
 
   /**
    * \brief Subscribe to a synchronized image & camera info topic pair, version for arbitrary
@@ -136,7 +136,7 @@ public:
    */
   CameraSubscriber subscribeCamera(const std::string& base_topic, uint32_t queue_size,
                                    const CameraSubscriber::Callback& callback,
-                                   const ros::VoidPtr& tracked_object = ros::VoidPtr(),
+                                   const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(),
                                    const TransportHints& transport_hints = TransportHints());
 
   /**
@@ -147,7 +147,7 @@ public:
                                              const sensor_msgs::CameraInfoConstPtr&),
                                    const TransportHints& transport_hints = TransportHints())
   {
-    return subscribeCamera(base_topic, queue_size, CameraSubscriber::Callback(fp), ros::VoidPtr(),
+    return subscribeCamera(base_topic, queue_size, CameraSubscriber::Callback(fp), std::shared_ptr<void>(),
                            transport_hints);
   }
 
@@ -161,7 +161,7 @@ public:
                                                 const sensor_msgs::CameraInfoConstPtr&), T* obj,
                                    const TransportHints& transport_hints = TransportHints())
   {
-    return subscribeCamera(base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1, std::placeholders::_2), ros::VoidPtr(),
+    return subscribeCamera(base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1, std::placeholders::_2), std::shared_ptr<void>(),
                            transport_hints);
   }
 

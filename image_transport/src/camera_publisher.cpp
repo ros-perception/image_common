@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -53,7 +53,7 @@ struct CameraPublisher::Impl
   {
     return !unadvertised_;
   }
-  
+
   void shutdown()
   {
     if (!unadvertised_) {
@@ -75,7 +75,7 @@ CameraPublisher::CameraPublisher(ImageTransport& image_it, ros::NodeHandle& info
                                  const SubscriberStatusCallback& image_disconnect_cb,
                                  const ros::SubscriberStatusCallback& info_connect_cb,
                                  const ros::SubscriberStatusCallback& info_disconnect_cb,
-                                 const ros::VoidPtr& tracked_object, bool latch)
+                                 const std::shared_ptr<void>& tracked_object, bool latch)
   : impl_(new Impl)
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
@@ -114,7 +114,7 @@ void CameraPublisher::publish(const sensor_msgs::Image& image, const sensor_msgs
     ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
-  
+
   impl_->image_pub_.publish(image);
   impl_->info_pub_.publish(info);
 }
@@ -126,7 +126,7 @@ void CameraPublisher::publish(const sensor_msgs::ImageConstPtr& image,
     ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
-  
+
   impl_->image_pub_.publish(image);
   impl_->info_pub_.publish(info);
 }
@@ -138,7 +138,7 @@ void CameraPublisher::publish(sensor_msgs::Image& image, sensor_msgs::CameraInfo
     ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
-  
+
   image.header.stamp = stamp;
   info.header.stamp = stamp;
   publish(image, info);

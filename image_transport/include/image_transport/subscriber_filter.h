@@ -108,7 +108,7 @@ public:
     unsubscribe();
 
     sub_ = it.subscribe(base_topic, queue_size, std::bind(&SubscriberFilter::cb, this, std::placeholders::_1),
-                        ros::VoidPtr(), transport_hints);
+                        std::shared_ptr<void>(), transport_hints);
   }
 
   /**

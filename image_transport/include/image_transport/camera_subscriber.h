@@ -101,7 +101,7 @@ private:
   CameraSubscriber(ImageTransport& image_it, ros::NodeHandle& info_nh,
                    const std::string& base_topic, uint32_t queue_size,
                    const Callback& callback,
-                   const ros::VoidPtr& tracked_object = ros::VoidPtr(),
+                   const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(),
                    const TransportHints& transport_hints = TransportHints());
 
   struct Impl;

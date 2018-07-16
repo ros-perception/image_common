@@ -36,8 +36,9 @@
 #define IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
 
 #include <ros/ros.h>
-#include <sensor_msgs/Image.h>
+
 #include "image_transport/transport_hints.h"
+#include "image_transport/types.h"
 
 namespace image_transport {
 
@@ -65,7 +66,7 @@ public:
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
   void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 const Callback& callback, const ros::VoidPtr& tracked_object = ros::VoidPtr(),
+                 const Callback& callback, const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(),
                  const TransportHints& transport_hints = TransportHints())
   {
     return subscribeImpl(nh, base_topic, queue_size, callback, tracked_object, transport_hints);
@@ -75,12 +76,12 @@ public:
    * \brief Subscribe to an image topic, version for bare function.
    */
   void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(*fp)(const sensor_msgs::ImageConstPtr&),
+                 void(*fp)(const ImageConstPtr&),
                  const TransportHints& transport_hints = TransportHints())
   {
     return subscribe(nh, base_topic, queue_size,
                      std::function<void(const sensor_msgs::ImageConstPtr&)>(fp),
-                     ros::VoidPtr(), transport_hints);
+                     std::shared_ptr<void>(), transport_hints);
   }
 
   /**
@@ -88,10 +89,10 @@ public:
    */
   template<class T>
   void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
+                 void(T::*fp)(const ImageConstPtr&), T* obj,
                  const TransportHints& transport_hints = TransportHints())
   {
-    return subscribe(nh, base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1), ros::VoidPtr(), transport_hints);
+    return subscribe(nh, base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1), std::shared_ptr<void>(), transport_hints);
   }
 
   /**
@@ -135,7 +136,7 @@ protected:
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
   virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const Callback& callback, const ros::VoidPtr& tracked_object,
+                             const Callback& callback, const std::shared_ptr<void>& tracked_object,
                              const TransportHints& transport_hints) = 0;
 };
 

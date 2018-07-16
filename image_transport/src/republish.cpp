@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     // Use Publisher::publish as the subscriber callback
     typedef void (image_transport::Publisher::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
-    sub = it.subscribe(in_topic, 1, std::bind(pub_mem_fn, &pub, std::placeholders::_1), ros::VoidPtr(), in_transport);
+    sub = it.subscribe(in_topic, 1, std::bind(pub_mem_fn, &pub, std::placeholders::_1), std::shared_ptr<void>(), in_transport);
 
     ros::spin();
   }
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
     std::shared_ptr<Plugin> pub = std::move(instance);
 
     pub->advertise(nh, out_topic, 1, image_transport::SubscriberStatusCallback(),
-                   image_transport::SubscriberStatusCallback(), ros::VoidPtr(), false);
+                   image_transport::SubscriberStatusCallback(), std::shared_ptr<void>(), false);
 
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;

@@ -73,7 +73,7 @@ struct Subscriber::Impl
 
 Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                        const std::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
-                       const ros::VoidPtr& tracked_object, const TransportHints& transport_hints,
+                       const std::shared_ptr<void>& tracked_object, const TransportHints& transport_hints,
                        const SubLoaderPtr& loader)
   : impl_(new Impl)
 {

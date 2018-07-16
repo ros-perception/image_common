@@ -102,7 +102,7 @@ private:
   Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
             const SubscriberStatusCallback& connect_cb,
             const SubscriberStatusCallback& disconnect_cb,
-            const ros::VoidPtr& tracked_object, bool latch,
+            const std::shared_ptr<void>& tracked_object, bool latch,
             const PubLoaderPtr& loader);
 
   struct Impl;

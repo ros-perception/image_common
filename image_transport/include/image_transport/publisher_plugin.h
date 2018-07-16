@@ -36,7 +36,8 @@
 #define IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
 
 #include <ros/ros.h>
-#include <sensor_msgs/Image.h>
+
+#include <sensor_msgs/msg/image.hpp>
 #include "image_transport/single_subscriber_publisher.h"
 
 namespace image_transport {
@@ -66,7 +67,7 @@ public:
                  bool latch = true)
   {
     advertiseImpl(nh, base_topic, queue_size, SubscriberStatusCallback(),
-                  SubscriberStatusCallback(), ros::VoidPtr(), latch);
+                  SubscriberStatusCallback(), std::shared_ptr<void>(), latch);
   }
 
   /**
@@ -75,7 +76,7 @@ public:
   void advertise(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                  const SubscriberStatusCallback& connect_cb,
                  const SubscriberStatusCallback& disconnect_cb = SubscriberStatusCallback(),
-                 const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = true)
+                 const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(), bool latch = true)
   {
     advertiseImpl(nh, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
   }
@@ -94,12 +95,12 @@ public:
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
-  virtual void publish(const sensor_msgs::Image& message) const = 0;
+  virtual void publish(const sensor_msgs::msg::Image& message) const = 0;
 
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
-  virtual void publish(const sensor_msgs::ImageConstPtr& message) const
+  virtual void publish(const sensor_msgs::msg::ImageConstPtr& message) const
   {
     publish(*message);
   }
@@ -111,7 +112,7 @@ public:
    * @param message an image message to use information from (but not data)
    * @param data a pointer to the image data to use to fill the Image message
    */
-  virtual void publish(const sensor_msgs::Image& message, const uint8_t* data) const
+  virtual void publish(const sensor_msgs::msg::Image& message, const uint8_t* data) const
   {
     sensor_msgs::Image msg;
     msg.header = message.header;
@@ -146,7 +147,7 @@ protected:
   virtual void advertiseImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
                              const SubscriberStatusCallback& connect_cb,
                              const SubscriberStatusCallback& disconnect_cb,
-                             const ros::VoidPtr& tracked_object, bool latch) = 0;
+                             const std::shared_ptr<void>& tracked_object, bool latch) = 0;
 };
 
 } //namespace image_transport

@@ -119,7 +119,7 @@ private:
                   const SubscriberStatusCallback& image_disconnect_cb,
                   const ros::SubscriberStatusCallback& info_connect_cb,
                   const ros::SubscriberStatusCallback& info_disconnect_cb,
-                  const ros::VoidPtr& tracked_object, bool latch);
+                  const std::shared_ptr<void>& tracked_object, bool latch);
 
   struct Impl;
   typedef std::shared_ptr<Impl> ImplPtr;

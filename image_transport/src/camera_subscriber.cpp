@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -62,7 +62,7 @@ struct CameraSubscriber::Impl
   {
     return !unsubscribed_;
   }
-  
+
   void shutdown()
   {
     if (!unsubscribed_) {
@@ -87,7 +87,7 @@ struct CameraSubscriber::Impl
     }
     image_received_ = info_received_ = both_received_ = 0;
   }
-  
+
   SubscriberFilter image_sub_;
   message_filters::Subscriber<sensor_msgs::CameraInfo> info_sub_;
   message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::CameraInfo> sync_;
@@ -99,7 +99,7 @@ struct CameraSubscriber::Impl
 
 CameraSubscriber::CameraSubscriber(ImageTransport& image_it, ros::NodeHandle& info_nh,
                                    const std::string& base_topic, uint32_t queue_size,
-                                   const Callback& callback, const ros::VoidPtr& tracked_object,
+                                   const Callback& callback, const std::shared_ptr<void>& tracked_object,
                                    const TransportHints& transport_hints)
   : impl_(new Impl(queue_size))
 {
