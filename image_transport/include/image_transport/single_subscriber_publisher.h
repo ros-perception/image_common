@@ -38,6 +38,7 @@
 #include <sensor_msgs/msg/image.hpp>
 
 #include <string>
+#include <functional>
 
 namespace image_transport {
 
@@ -55,9 +56,10 @@ public:
   typedef std::function<uint32_t()> GetNumSubscribersFn;
   typedef std::function<void(const sensor_msgs::msg::Image&)> PublishFn;
 
-  SingleSubscriberPublisher(const std::string& caller_id, const std::string& topic,
-                            const GetNumSubscribersFn& num_subscribers_fn,
-                            const PublishFn& publish_fn);
+  SingleSubscriberPublisher(
+    const std::string & caller_id, const std::string & topic,
+    const GetNumSubscribersFn & num_subscribers_fn,
+    const PublishFn & publish_fn);
 
   std::string getSubscriberName() const;
 
@@ -77,7 +79,7 @@ private:
   friend class Publisher; // to get publish_fn_ directly
 };
 
-typedef std::function<void(const SingleSubscriberPublisher&)> SubscriberStatusCallback;
+typedef std::function<void (const SingleSubscriberPublisher &)> SubscriberStatusCallback;
 
 } //namespace image_transport
 

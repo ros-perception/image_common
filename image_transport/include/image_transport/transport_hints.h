@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -35,7 +35,7 @@
 #ifndef IMAGE_TRANSPORT_TRANSPORT_HINTS_H
 #define IMAGE_TRANSPORT_TRANSPORT_HINTS_H
 
-#include <ros/ros.h>
+#include <string>
 
 namespace image_transport {
 
@@ -59,13 +59,15 @@ public:
    * Defaults to the local namespace.
    * @param parameter_name The name of the transport parameter
    */
+  // TODO(ros2) change to equivalent ROS2::TransportHints
   TransportHints(const std::string& default_transport = "raw",
-                 const ros::TransportHints& ros_hints = ros::TransportHints(),
-                 const ros::NodeHandle& parameter_nh = ros::NodeHandle("~"),
+                 /*const ros::TransportHints& ros_hints = ros::TransportHints(),*/
+                 /*const ros::NodeHandle& parameter_nh = ros::NodeHandle("~"),*/
                  const std::string& parameter_name = "image_transport")
-    : ros_hints_(ros_hints), parameter_nh_(parameter_nh)
+    /*: ros_hints_(ros_hints), parameter_nh_(parameter_nh)*/
   {
-    parameter_nh_.param(parameter_name, transport_, default_transport);
+    /*parameter_nh_.param(parameter_name, transport_, default_transport);*/
+    transport_ = default_transport;
   }
 
   const std::string& getTransport() const
@@ -73,20 +75,24 @@ public:
     return transport_;
   }
 
+  /*
   const ros::TransportHints& getRosHints() const
   {
     return ros_hints_;
   }
+  */
 
+  /*
   const ros::NodeHandle& getParameterNH() const
   {
     return parameter_nh_;
   }
-  
+  */
+
 private:
   std::string transport_;
-  ros::TransportHints ros_hints_;
-  ros::NodeHandle parameter_nh_;
+  //ros::TransportHints ros_hints_;
+  //ros::NodeHandle parameter_nh_;
 };
 
 } //namespace image_transport

@@ -63,6 +63,11 @@ if(BUILD_TESTING)
   if(TARGET ${PROJECT_NAME}-publisher)
     target_link_libraries(${PROJECT_NAME}-publisher ${PROJECT_NAME})
   endif()
+
+  ament_add_gtest(${PROJECT_NAME}-subscriber test/test_subscriber.cpp)
+  if(TARGET ${PROJECT_NAME}-subscriber)
+    target_link_libraries(${PROJECT_NAME}-subscriber ${PROJECT_NAME})
+  endif()
 endif()
 
 

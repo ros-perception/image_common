@@ -35,11 +35,10 @@
 #ifndef IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
 #define IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
 
-#include <ros/ros.h>
-
 #include "image_transport/transport_hints.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Base class for plugins to Subscriber.
@@ -64,7 +63,7 @@ public:
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+  void subscribe(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
                  const Callback& callback, const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(),
                  const TransportHints& transport_hints = TransportHints())
   {
@@ -74,12 +73,12 @@ public:
   /**
    * \brief Subscribe to an image topic, version for bare function.
    */
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(*fp)(const sensor_msgs::ImageConstPtr&),
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(rclcpp::Node::SharedPtr & nh, const std::string & base_topic, uint32_t queue_size,
+                 void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
+                 const TransportHints & transport_hints = TransportHints())
   {
     return subscribe(nh, base_topic, queue_size,
-                     std::function<void(const sensor_msgs::ImageConstPtr&)>(fp),
+                     std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>(fp),
                      std::shared_ptr<void>(), transport_hints);
   }
 
@@ -87,9 +86,9 @@ public:
    * \brief Subscribe to an image topic, version for class member function with bare pointer.
    */
   template<class T>
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(rclcpp::Node::SharedPtr & nh, const std::string & base_topic, uint32_t queue_size,
+                 void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
+                 const TransportHints & transport_hints = TransportHints())
   {
     return subscribe(nh, base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1), std::shared_ptr<void>(), transport_hints);
   }
@@ -98,8 +97,8 @@ public:
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
   template<class T>
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(T::*fp)(const sensor_msgs::ImageConstPtr&),
+  void subscribe(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
+                 void(T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
                  const std::shared_ptr<T>& obj,
                  const TransportHints& transport_hints = TransportHints())
   {
@@ -125,7 +124,7 @@ public:
    * \brief Return the lookup name of the SubscriberPlugin associated with a specific
    * transport identifier.
    */
-  static std::string getLookupName(const std::string& transport_type)
+  static std::string getLookupName(const std::string & transport_type)
   {
     return "image_transport/" + transport_type + "_sub";
   }
@@ -134,7 +133,7 @@ protected:
   /**
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
-  virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
+  virtual void subscribeImpl(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
                              const Callback& callback, const std::shared_ptr<void>& tracked_object,
                              const TransportHints& transport_hints) = 0;
 };
