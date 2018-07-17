@@ -79,7 +79,7 @@ Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queu
 }
 
 Subscriber ImageTransport::subscribe(const std::string& base_topic, uint32_t queue_size,
-                                     const std::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+                                     const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
                                      const std::shared_ptr<void>& tracked_object, const TransportHints& transport_hints)
 {
   return Subscriber(impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints, impl_->sub_loader_);

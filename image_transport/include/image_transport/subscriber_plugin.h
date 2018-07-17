@@ -35,6 +35,8 @@
 #ifndef IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
 #define IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
 
+#include <rclcpp/macros.hpp>
+
 #include "image_transport/transport_hints.h"
 
 namespace image_transport

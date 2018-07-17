@@ -72,7 +72,7 @@ public:
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
   Subscriber subscribe(const std::string& base_topic, uint32_t queue_size,
-                       const std::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+                       const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
                        const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(),
                        const TransportHints& transport_hints = TransportHints());
 
@@ -80,11 +80,11 @@ public:
    * \brief Subscribe to an image topic, version for bare function.
    */
   Subscriber subscribe(const std::string& base_topic, uint32_t queue_size,
-                       void(*fp)(const sensor_msgs::ImageConstPtr&),
+                       void(*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
                        const TransportHints& transport_hints = TransportHints())
   {
     return subscribe(base_topic, queue_size,
-                     std::function<void(const sensor_msgs::ImageConstPtr&)>(fp),
+                     std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>(fp),
                      std::shared_ptr<void>(), transport_hints);
   }
 
@@ -93,7 +93,7 @@ public:
    */
   template<class T>
   Subscriber subscribe(const std::string& base_topic, uint32_t queue_size,
-                       void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
+                       void(T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&), T* obj,
                        const TransportHints& transport_hints = TransportHints())
   {
     return subscribe(base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1), std::shared_ptr<void>(), transport_hints);
@@ -104,7 +104,7 @@ public:
    */
   template<class T>
   Subscriber subscribe(const std::string& base_topic, uint32_t queue_size,
-                       void(T::*fp)(const sensor_msgs::ImageConstPtr&),
+                       void(T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
                        const std::shared_ptr<T>& obj,
                        const TransportHints& transport_hints = TransportHints())
   {
@@ -143,8 +143,8 @@ public:
    * \brief Subscribe to a synchronized image & camera info topic pair, version for bare function.
    */
   CameraSubscriber subscribeCamera(const std::string& base_topic, uint32_t queue_size,
-                                   void(*fp)(const sensor_msgs::ImageConstPtr&,
-                                             const sensor_msgs::CameraInfoConstPtr&),
+                                   void(*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
+                                             const sensor_msgs::msg::CameraInfo::ConstSharedPtr&),
                                    const TransportHints& transport_hints = TransportHints())
   {
     return subscribeCamera(base_topic, queue_size, CameraSubscriber::Callback(fp), std::shared_ptr<void>(),
@@ -157,8 +157,8 @@ public:
    */
   template<class T>
   CameraSubscriber subscribeCamera(const std::string& base_topic, uint32_t queue_size,
-                                   void(T::*fp)(const sensor_msgs::ImageConstPtr&,
-                                                const sensor_msgs::CameraInfoConstPtr&), T* obj,
+                                   void(T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
+                                                const sensor_msgs::msg::CameraInfo::ConstSharedPtr&), T* obj,
                                    const TransportHints& transport_hints = TransportHints())
   {
     return subscribeCamera(base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1, std::placeholders::_2), std::shared_ptr<void>(),
@@ -171,8 +171,8 @@ public:
    */
   template<class T>
   CameraSubscriber subscribeCamera(const std::string& base_topic, uint32_t queue_size,
-                                   void(T::*fp)(const sensor_msgs::ImageConstPtr&,
-                                                const sensor_msgs::CameraInfoConstPtr&),
+                                   void(T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
+                                                const sensor_msgs::msg::CameraInfo::ConstSharedPtr&),
                                    const std::shared_ptr<T>& obj,
                                    const TransportHints& transport_hints = TransportHints())
   {

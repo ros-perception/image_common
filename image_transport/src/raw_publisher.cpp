@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -34,18 +34,18 @@
 
 #include <image_transport/raw_publisher.h>
 #include <ros/static_assert.h>
-#include <sensor_msgs/Image.h>
+#include <sensor_msgs/msg/image.hpp>
 
 /** The code in the following namespace copies a lof of code from cv_bridge
  * It does not depend on cv_bridge to not depend on OpenCV
  * It re-defines a CvImage so that we can publish that object and not a
- * sensor_msgs::Image, which requires a memory copy
+ * sensor_msgs::msg::Image, which requires a memory copy
  */
 
 class ImageTransportImage
 {
 public:
-  sensor_msgs::Image image_; //!< ROS header
+  sensor_msgs::msg::Image image_; //!< ROS header
   const uint8_t* data_;           //!< Image data for use with OpenCV
 
   /**
@@ -56,7 +56,7 @@ public:
   /**
    * \brief Constructor.
    */
-  ImageTransportImage(const sensor_msgs::Image& image, const uint8_t* data)
+  ImageTransportImage(const sensor_msgs::msg::Image& image, const uint8_t* data)
     : image_(image), data_(data)
   {
   }
@@ -69,26 +69,26 @@ namespace message_traits {
 
 template<> struct MD5Sum<ImageTransportImage>
 {
-  static const char* value() { return MD5Sum<sensor_msgs::Image>::value(); }
+  static const char* value() { return MD5Sum<sensor_msgs::msg::Image>::value(); }
   static const char* value(const ImageTransportImage&) { return value(); }
 
-  static const uint64_t static_value1 = MD5Sum<sensor_msgs::Image>::static_value1;
-  static const uint64_t static_value2 = MD5Sum<sensor_msgs::Image>::static_value2;
-  
+  static const uint64_t static_value1 = MD5Sum<sensor_msgs::msg::Image>::static_value1;
+  static const uint64_t static_value2 = MD5Sum<sensor_msgs::msg::Image>::static_value2;
+
   // If the definition of sensor_msgs/Image changes, we'll get a compile error here.
-  ROS_STATIC_ASSERT(MD5Sum<sensor_msgs::Image>::static_value1 == 0x060021388200f6f0ULL);
-  ROS_STATIC_ASSERT(MD5Sum<sensor_msgs::Image>::static_value2 == 0xf447d0fcd9c64743ULL);
+  ROS_STATIC_ASSERT(MD5Sum<sensor_msgs::msg::Image>::static_value1 == 0x060021388200f6f0ULL);
+  ROS_STATIC_ASSERT(MD5Sum<sensor_msgs::msg::Image>::static_value2 == 0xf447d0fcd9c64743ULL);
 };
 
 template<> struct DataType<ImageTransportImage>
 {
-  static const char* value() { return DataType<sensor_msgs::Image>::value(); }
+  static const char* value() { return DataType<sensor_msgs::msg::Image>::value(); }
   static const char* value(const ImageTransportImage&) { return value(); }
 };
 
 template<> struct Definition<ImageTransportImage>
 {
-  static const char* value() { return Definition<sensor_msgs::Image>::value(); }
+  static const char* value() { return Definition<sensor_msgs::msg::Image>::value(); }
   static const char* value(const ImageTransportImage&) { return value(); }
 };
 
@@ -101,7 +101,7 @@ namespace serialization {
 template<> struct Serializer<ImageTransportImage>
 {
   /// @todo Still ignoring endianness...
-  
+
   template<typename Stream>
   inline static void write(Stream& stream, const ImageTransportImage& m)
   {
@@ -132,7 +132,7 @@ template<> struct Serializer<ImageTransportImage>
 
 namespace image_transport {
 
-void RawPublisher::publish(const sensor_msgs::Image& message, const uint8_t* data) const
+void RawPublisher::publish(const sensor_msgs::msg::Image& message, const uint8_t* data) const
 {
    getPublisher().publish(ImageTransportImage(message, data));
 }

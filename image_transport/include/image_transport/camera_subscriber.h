@@ -50,7 +50,7 @@ class ImageTransport;
  * CameraSubscriber is the client-side counterpart to CameraPublisher, and assumes the
  * same topic naming convention. The callback is of type:
 \verbatim
-void callback(const sensor_msgs::ImageConstPtr&, const sensor_msgs::CameraInfoConstPtr&);
+void callback(const sensor_msgs::msg::Image::ConstSharedPtr&, const sensor_msgs::msg::CameraInfo::ConstSharedPtr&);
 \endverbatim
  *
  * A CameraSubscriber should always be created through a call to
@@ -62,8 +62,8 @@ void callback(const sensor_msgs::ImageConstPtr&, const sensor_msgs::CameraInfoCo
 class CameraSubscriber
 {
 public:
-  typedef std::function<void(const sensor_msgs::ImageConstPtr&,
-                             const sensor_msgs::CameraInfoConstPtr&)> Callback;
+  typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&,
+                             const sensor_msgs::msg::CameraInfo::ConstSharedPtr&)> Callback;
 
   CameraSubscriber() {}
 

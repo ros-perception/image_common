@@ -36,6 +36,7 @@
 #define IMAGE_TRANSPORT_SINGLE_SUBSCRIBER_PUBLISHER
 
 #include "rclcpp/macros.hpp"
+#include "sensor_msgs/msg/image.hpp"
 
 #include <sensor_msgs/msg/image.hpp>
 

@@ -102,7 +102,6 @@ struct Publisher::Impl
   //double constructed_;
 };
 
-
 Publisher::Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
                      const SubscriberStatusCallback& connect_cb,
                      const SubscriberStatusCallback& disconnect_cb,
@@ -112,7 +111,9 @@ Publisher::Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
+  //TODO(ros2) fix name resolution
   //impl_->base_topic_ = nh.resolveName(base_topic);
+  impl_->base_topic_ = base_topic;
   impl_->loader_ = loader;
 
   std::vector<std::string> blacklist_vec;
@@ -174,6 +175,7 @@ void Publisher::publish(const sensor_msgs::msg::Image & message) const
 void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
+    //TODO(ros2) Fix log message
     //ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::Publisher");
     return;
   }

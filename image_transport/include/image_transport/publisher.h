@@ -38,6 +38,8 @@
 #include <rclcpp/node.hpp>
 #include <rclcpp/macros.hpp>
 
+#include <sensor_msgs/msg/image.hpp>
+
 #include "image_transport/single_subscriber_publisher.h"
 #include "image_transport/exception.h"
 #include "image_transport/loader_fwds.h"

@@ -89,8 +89,8 @@ struct CameraSubscriber::Impl
   }
 
   SubscriberFilter image_sub_;
-  message_filters::Subscriber<sensor_msgs::CameraInfo> info_sub_;
-  message_filters::TimeSynchronizer<sensor_msgs::Image, sensor_msgs::CameraInfo> sync_;
+  message_filters::Subscriber<sensor_msgs::msg::CameraInfo> info_sub_;
+  message_filters::TimeSynchronizer<sensor_msgs::msg::Image, sensor_msgs::msg::CameraInfo> sync_;
   bool unsubscribed_;
   // For detecting when the topics aren't synchronized
   ros::WallTimer check_synced_timer_;

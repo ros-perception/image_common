@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -45,7 +45,7 @@ namespace image_transport {
  * RawPublisher is a simple wrapper for ros::Publisher, publishing unaltered Image
  * messages on the base topic.
  */
-class RawPublisher : public SimplePublisherPlugin<sensor_msgs::Image>
+class RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
 {
 public:
   virtual ~RawPublisher() {}
@@ -57,16 +57,16 @@ public:
 
   // Override the default implementation because publishing the message pointer allows
   // the no-copy intraprocess optimization.
-  virtual void publish(const sensor_msgs::ImageConstPtr& message) const
+  virtual void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const
   {
     getPublisher().publish(message);
   }
 
-  // Override the default implementation to not copy data to a sensor_msgs::Image first
-  virtual void publish(const sensor_msgs::Image& message, const uint8_t* data) const;
+  // Override the default implementation to not copy data to a sensor_msgs::msg::Image first
+  virtual void publish(const sensor_msgs::msg::Image& message, const uint8_t* data) const;
 
 protected:
-  virtual void publish(const sensor_msgs::Image& message, const PublishFn& publish_fn) const
+  virtual void publish(const sensor_msgs::msg::Image& message, const PublishFn& publish_fn) const
   {
     publish_fn(message);
   }

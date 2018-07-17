@@ -34,6 +34,9 @@
 
 #include "image_transport/subscriber.h"
 #include "image_transport/subscriber_plugin.h"
+
+#include <sensor_msgs/msg/image.hpp>
+
 #include <pluginlib/class_loader.hpp>
 
 namespace image_transport {
