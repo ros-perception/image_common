@@ -50,7 +50,7 @@ public:
   SubscriberPlugin(const SubscriberPlugin&) = delete;
   SubscriberPlugin& operator=( const SubscriberPlugin& ) = delete;
 
-  typedef std::function<void(const sensor_msgs::ImageConstPtr&)> Callback;
+  typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)> Callback;
 
   virtual ~SubscriberPlugin() {}
 
