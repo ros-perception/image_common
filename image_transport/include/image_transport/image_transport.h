@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -69,10 +69,10 @@ public:
                       const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = false);
 
   /**
-   * \brief Subscribe to an image topic, version for arbitrary boost::function object.
+   * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
   Subscriber subscribe(const std::string& base_topic, uint32_t queue_size,
-                       const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+                       const std::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                        const ros::VoidPtr& tracked_object = ros::VoidPtr(),
                        const TransportHints& transport_hints = TransportHints());
 
@@ -84,7 +84,7 @@ public:
                        const TransportHints& transport_hints = TransportHints())
   {
     return subscribe(base_topic, queue_size,
-                     boost::function<void(const sensor_msgs::ImageConstPtr&)>(fp),
+                     std::function<void(const sensor_msgs::ImageConstPtr&)>(fp),
                      ros::VoidPtr(), transport_hints);
   }
 
@@ -96,7 +96,7 @@ public:
                        void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
                        const TransportHints& transport_hints = TransportHints())
   {
-    return subscribe(base_topic, queue_size, boost::bind(fp, obj, _1), ros::VoidPtr(), transport_hints);
+    return subscribe(base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1), ros::VoidPtr(), transport_hints);
   }
 
   /**
@@ -105,10 +105,10 @@ public:
   template<class T>
   Subscriber subscribe(const std::string& base_topic, uint32_t queue_size,
                        void(T::*fp)(const sensor_msgs::ImageConstPtr&),
-                       const boost::shared_ptr<T>& obj,
+                       const std::shared_ptr<T>& obj,
                        const TransportHints& transport_hints = TransportHints())
   {
-    return subscribe(base_topic, queue_size, boost::bind(fp, obj.get(), _1), obj, transport_hints);
+    return subscribe(base_topic, queue_size, std::bind(fp, obj.get(), std::placeholders::_1), obj, transport_hints);
   }
 
   /*!
@@ -129,7 +129,7 @@ public:
 
   /**
    * \brief Subscribe to a synchronized image & camera info topic pair, version for arbitrary
-   * boost::function object.
+   * std::function object.
    *
    * This version assumes the standard topic naming scheme, where the info topic is
    * named "camera_info" in the same namespace as the base image topic.
@@ -161,7 +161,7 @@ public:
                                                 const sensor_msgs::CameraInfoConstPtr&), T* obj,
                                    const TransportHints& transport_hints = TransportHints())
   {
-    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj, _1, _2), ros::VoidPtr(),
+    return subscribeCamera(base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1, std::placeholders::_2), ros::VoidPtr(),
                            transport_hints);
   }
 
@@ -173,10 +173,10 @@ public:
   CameraSubscriber subscribeCamera(const std::string& base_topic, uint32_t queue_size,
                                    void(T::*fp)(const sensor_msgs::ImageConstPtr&,
                                                 const sensor_msgs::CameraInfoConstPtr&),
-                                   const boost::shared_ptr<T>& obj,
+                                   const std::shared_ptr<T>& obj,
                                    const TransportHints& transport_hints = TransportHints())
   {
-    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj.get(), _1, _2), obj,
+    return subscribeCamera(base_topic, queue_size, std::bind(fp, obj.get(), std::placeholders::_1, std::placeholders::_2), obj,
                            transport_hints);
   }
 
@@ -193,8 +193,8 @@ public:
 
 private:
   struct Impl;
-  typedef boost::shared_ptr<Impl> ImplPtr;
-  typedef boost::weak_ptr<Impl> ImplWPtr;
+  typedef std::shared_ptr<Impl> ImplPtr;
+  typedef std::weak_ptr<Impl> ImplWPtr;
 
   ImplPtr impl_;
 };

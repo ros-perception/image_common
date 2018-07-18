@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -36,7 +36,8 @@
 #define IMAGE_TRANSPORT_SIMPLE_PUBLISHER_PLUGIN_H
 
 #include "image_transport/publisher_plugin.h"
-#include <boost/scoped_ptr.hpp>
+
+#include <memory>
 
 namespace image_transport {
 
@@ -81,7 +82,7 @@ public:
       ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
       return;
     }
-    
+
     publish(message, bindInternalPublisher(simple_impl_->pub_));
   }
 
@@ -106,7 +107,7 @@ protected:
   }
 
   //! Generic function for publishing the internal message type.
-  typedef boost::function<void(const M&)> PublishFn;
+  typedef std::function<void(const M&)> PublishFn;
 
   /**
    * \brief Publish an image using the specified publish function. Must be implemented by
@@ -169,15 +170,15 @@ private:
       : param_nh_(nh)
     {
     }
-    
+
     const ros::NodeHandle param_nh_;
     ros::Publisher pub_;
   };
-  
-  boost::scoped_ptr<SimplePublisherPluginImpl> simple_impl_;
+
+  std::unique_ptr<SimplePublisherPluginImpl> simple_impl_;
 
   typedef void (SimplePublisherPlugin::*SubscriberStatusMemFn)(const ros::SingleSubscriberPublisher& pub);
-  
+
   /**
    * Binds the user callback to subscriberCB(), which acts as an intermediary to expose
    * a publish(Image) interface to the user while publishing to an internal topic.
@@ -185,13 +186,13 @@ private:
   ros::SubscriberStatusCallback bindCB(const SubscriberStatusCallback& user_cb,
                                        SubscriberStatusMemFn internal_cb_fn)
   {
-    ros::SubscriberStatusCallback internal_cb = boost::bind(internal_cb_fn, this, _1);
+    ros::SubscriberStatusCallback internal_cb = std::bind(internal_cb_fn, this, std::placeholders::_1);
     if (user_cb)
-      return boost::bind(&SimplePublisherPlugin::subscriberCB, this, _1, user_cb, internal_cb);
+      return std::bind(&SimplePublisherPlugin::subscriberCB, this, std::placeholders::_1, user_cb, internal_cb);
     else
       return internal_cb;
   }
-  
+
   /**
    * Forms the ros::SingleSubscriberPublisher for the internal communication topic into
    * an image_transport::SingleSubscriberPublisher for Image messages and passes it
@@ -203,21 +204,21 @@ private:
   {
     // First call the internal callback (for sending setup headers, etc.)
     internal_cb(ros_ssp);
-    
+
     // Construct a function object for publishing sensor_msgs::Image through the
     // subclass-implemented publish() using the ros::SingleSubscriberPublisher to send
     // messages of the transport-specific type.
     typedef void (SimplePublisherPlugin::*PublishMemFn)(const sensor_msgs::Image&, const PublishFn&) const;
     PublishMemFn pub_mem_fn = &SimplePublisherPlugin::publish;
-    ImagePublishFn image_publish_fn = boost::bind(pub_mem_fn, this, _1, bindInternalPublisher(ros_ssp));
-    
+    ImagePublishFn image_publish_fn = std::bind(pub_mem_fn, this, std::placeholders::_1, bindInternalPublisher(ros_ssp));
+
     SingleSubscriberPublisher ssp(ros_ssp.getSubscriberName(), getTopic(),
-                                  boost::bind(&SimplePublisherPlugin::getNumSubscribers, this),
+                                  std::bind(&SimplePublisherPlugin::getNumSubscribers, this),
                                   image_publish_fn);
     user_cb(ssp);
   }
 
-  typedef boost::function<void(const sensor_msgs::Image&)> ImagePublishFn;
+  typedef std::function<void(const sensor_msgs::Image&)> ImagePublishFn;
 
   /**
    * Returns a function object for publishing the transport-specific message type
@@ -231,7 +232,7 @@ private:
     // Bind PubT::publish(const Message&) as PublishFn
     typedef void (PubT::*InternalPublishMemFn)(const M&) const;
     InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
-    return boost::bind(internal_pub_mem_fn, &pub, _1);
+    return std::bind(internal_pub_mem_fn, &pub, std::placeholders::_1);
   }
 };
 

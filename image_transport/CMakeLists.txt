@@ -11,8 +11,6 @@ find_package(catkin REQUIRED
     sensor_msgs
 )
 
-find_package(Boost REQUIRED)
-
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
@@ -33,11 +31,10 @@ add_library(${PROJECT_NAME}
 )
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}
-  ${Boost_LIBRARIES}
   ${catkin_LIBRARIES}
 )
 
-# Build libimage_transport_plugins                                      
+# Build libimage_transport_plugins
 add_library(${PROJECT_NAME}_plugins src/manifest.cpp src/raw_publisher.cpp)
 target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 

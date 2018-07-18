@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -50,15 +50,15 @@ int main(int argc, char** argv)
 
   image_transport::ImageTransport it(nh);
   image_transport::Subscriber sub;
-  
+
   if (argc < 3) {
     // Use all available transports for output
     image_transport::Publisher pub = it.advertise(out_topic, 1);
-    
+
     // Use Publisher::publish as the subscriber callback
     typedef void (image_transport::Publisher::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
-    sub = it.subscribe(in_topic, 1, boost::bind(pub_mem_fn, &pub, _1), ros::VoidPtr(), in_transport);
+    sub = it.subscribe(in_topic, 1, std::bind(pub_mem_fn, &pub, std::placeholders::_1), ros::VoidPtr(), in_transport);
 
     ros::spin();
   }
@@ -70,14 +70,17 @@ int main(int argc, char** argv)
     typedef image_transport::PublisherPlugin Plugin;
     pluginlib::ClassLoader<Plugin> loader("image_transport", "image_transport::PublisherPlugin");
     std::string lookup_name = Plugin::getLookupName(out_transport);
-    boost::shared_ptr<Plugin> pub( loader.createInstance(lookup_name) );
+
+    auto instance = loader.createUniqueInstance(lookup_name);
+    std::shared_ptr<Plugin> pub = std::move(instance);
+
     pub->advertise(nh, out_topic, 1, image_transport::SubscriberStatusCallback(),
                    image_transport::SubscriberStatusCallback(), ros::VoidPtr(), false);
 
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;
     PublishMemFn pub_mem_fn = &Plugin::publish;
-    sub = it.subscribe(in_topic, 1, boost::bind(pub_mem_fn, pub.get(), _1), pub, in_transport);
+    sub = it.subscribe(in_topic, 1, std::bind(pub_mem_fn, pub.get(), std::placeholders::_1), pub, in_transport);
 
     ros::spin();
   }

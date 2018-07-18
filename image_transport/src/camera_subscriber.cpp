@@ -111,14 +111,14 @@ CameraSubscriber::CameraSubscriber(ImageTransport& image_it, ros::NodeHandle& in
   impl_->info_sub_ .subscribe(info_nh, info_topic, queue_size, transport_hints.getRosHints());
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
   // need for Boost.Bind here is kind of broken
-  impl_->sync_.registerCallback(boost::bind(callback, _1, _2));
+  impl_->sync_.registerCallback(std::bind(callback, std::placeholders::_1, std::placeholders::_2));
 
   // Complain every 10s if it appears that the image and info topics are not synchronized
-  impl_->image_sub_.registerCallback(boost::bind(increment, &impl_->image_received_));
-  impl_->info_sub_.registerCallback(boost::bind(increment, &impl_->info_received_));
-  impl_->sync_.registerCallback(boost::bind(increment, &impl_->both_received_));
+  impl_->image_sub_.registerCallback(std::bind(increment, &impl_->image_received_));
+  impl_->info_sub_.registerCallback(std::bind(increment, &impl_->info_received_));
+  impl_->sync_.registerCallback(std::bind(increment, &impl_->both_received_));
   impl_->check_synced_timer_ = info_nh.createWallTimer(ros::WallDuration(10.0),
-                                                       boost::bind(&Impl::checkImagesSynchronized, impl_.get()));
+                                                       std::bind(&Impl::checkImagesSynchronized, impl_.get()));
 }
 
 std::string CameraSubscriber::getTopic() const

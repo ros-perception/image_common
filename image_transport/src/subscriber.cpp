@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -36,7 +36,6 @@
 #include "image_transport/subscriber_plugin.h"
 #include <ros/names.h>
 #include <pluginlib/class_loader.h>
-#include <boost/scoped_ptr.hpp>
 
 namespace image_transport {
 
@@ -65,15 +64,15 @@ struct Subscriber::Impl
         subscriber_->shutdown();
     }
   }
-  
+
   SubLoaderPtr loader_;
-  boost::shared_ptr<SubscriberPlugin> subscriber_;
+  std::shared_ptr<SubscriberPlugin> subscriber_;
   bool unsubscribed_;
   //double constructed_;
 };
 
 Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                       const boost::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
+                       const std::function<void(const sensor_msgs::ImageConstPtr&)>& callback,
                        const ros::VoidPtr& tracked_object, const TransportHints& transport_hints,
                        const SubLoaderPtr& loader)
   : impl_(new Impl)
@@ -81,7 +80,8 @@ Subscriber::Subscriber(ros::NodeHandle& nh, const std::string& base_topic, uint3
   // Load the plugin for the chosen transport.
   std::string lookup_name = SubscriberPlugin::getLookupName(transport_hints.getTransport());
   try {
-    impl_->subscriber_ = loader->createInstance(lookup_name);
+    auto instance = loader->createUniqueInstance(lookup_name);
+    impl_->subscriber_ = std::move(instance);
   }
   catch (pluginlib::PluginlibException& e) {
     throw TransportLoadException(transport_hints.getTransport(), e.what());

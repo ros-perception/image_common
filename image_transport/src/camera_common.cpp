@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -38,9 +38,10 @@
 #include <boost/algorithm/string/join.hpp>
 #include <vector>
 
-namespace image_transport {
+namespace image_transport
+{
 
-std::string getCameraInfoTopic(const std::string& base_topic)
+std::string getCameraInfoTopic(const std::string & base_topic)
 {
   // Split into separate names
   std::vector<std::string> names;
@@ -53,6 +54,17 @@ std::string getCameraInfoTopic(const std::string& base_topic)
   names.back() = "camera_info";
   // Join back together into topic name
   return boost::algorithm::join(names, "/");
+}
+
+std::string erase_last_copy(const std::string & input, const std::string & search)
+{
+  size_t found = input.rfind(search);
+  auto input_copy = input;
+  if (found != std::string::npos) {
+    input_copy.replace(found, search.length(), "");
+  }
+  return input_copy;
+
 }
 
 } //namespace image_transport

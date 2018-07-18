@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -35,8 +35,6 @@
 #include "image_transport/publisher_plugin.h"
 #include "image_transport/subscriber_plugin.h"
 #include <pluginlib/class_loader.h>
-#include <boost/foreach.hpp>
-#include <boost/algorithm/string/erase.hpp>
 #include <map>
 
 using namespace image_transport;
@@ -66,12 +64,12 @@ int main(int argc, char** argv)
   typedef std::map<std::string, TransportDesc> StatusMap;
   StatusMap transports;
 
-  BOOST_FOREACH(const std::string& lookup_name, pub_loader.getDeclaredClasses()) {
-    std::string transport_name = boost::erase_last_copy(lookup_name, "_pub");
+  for(const std::string& lookup_name: pub_loader.getDeclaredClasses()) {
+    std::string transport_name = erase_last_copy(lookup_name, "_pub");
     transports[transport_name].pub_name = lookup_name;
     transports[transport_name].package_name = pub_loader.getClassPackage(lookup_name);
     try {
-      boost::shared_ptr<PublisherPlugin> pub = pub_loader.createInstance(lookup_name);
+      std::shared_ptr<PublisherPlugin> pub = pub_loader.createInstance(lookup_name);
       transports[transport_name].pub_status = SUCCESS;
     }
     catch (const LibraryLoadException& e) {
@@ -82,12 +80,12 @@ int main(int argc, char** argv)
     }
   }
 
-  BOOST_FOREACH(const std::string& lookup_name, sub_loader.getDeclaredClasses()) {
-    std::string transport_name = boost::erase_last_copy(lookup_name, "_sub");
+  for(const std::string& lookup_name: sub_loader.getDeclaredClasses()) {
+    std::string transport_name = erase_last_copy(lookup_name, "_sub");
     transports[transport_name].sub_name = lookup_name;
     transports[transport_name].package_name = sub_loader.getClassPackage(lookup_name);
     try {
-      boost::shared_ptr<SubscriberPlugin> sub = sub_loader.createInstance(lookup_name);
+      std::shared_ptr<SubscriberPlugin> sub = sub_loader.createInstance(lookup_name);
       transports[transport_name].sub_status = SUCCESS;
     }
     catch (const LibraryLoadException& e) {
@@ -100,7 +98,7 @@ int main(int argc, char** argv)
 
   bool problem_package = false;
   printf("Declared transports:\n");
-  BOOST_FOREACH(const StatusMap::value_type& value, transports) {
+  for(const StatusMap::value_type& value: transports) {
     const TransportDesc& td = value.second;
     printf("%s", value.first.c_str());
     if ((td.pub_status == CREATE_FAILURE || td.pub_status == LIB_LOAD_FAILURE) ||
@@ -116,7 +114,7 @@ int main(int argc, char** argv)
 #endif
 
   printf("\nDetails:\n");
-  BOOST_FOREACH(const StatusMap::value_type& value, transports) {
+  dor(const StatusMap::value_type& value: transports) {
     const TransportDesc& td = value.second;
     printf("----------\n");
     printf("\"%s\"\n", value.first.c_str());
@@ -136,6 +134,6 @@ int main(int argc, char** argv)
     else
       printf(" - Subscriber: %s\n", sub_loader.getClassDescription(td.sub_name).c_str());
   }
-  
+
   return 0;
 }
