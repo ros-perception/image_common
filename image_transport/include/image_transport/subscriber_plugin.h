@@ -38,7 +38,6 @@
 #include <ros/ros.h>
 
 #include "image_transport/transport_hints.h"
-#include "image_transport/types.h"
 
 namespace image_transport {
 
@@ -47,11 +46,11 @@ namespace image_transport {
  */
 class SubscriberPlugin
 {
-private:
+public:
+  SubscriberPlugin() = default;
   SubscriberPlugin(const SubscriberPlugin&) = delete;
   SubscriberPlugin& operator=( const SubscriberPlugin& ) = delete;
 
-public:
   typedef std::function<void(const sensor_msgs::ImageConstPtr&)> Callback;
 
   virtual ~SubscriberPlugin() {}
@@ -76,7 +75,7 @@ public:
    * \brief Subscribe to an image topic, version for bare function.
    */
   void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(*fp)(const ImageConstPtr&),
+                 void(*fp)(const sensor_msgs::ImageConstPtr&),
                  const TransportHints& transport_hints = TransportHints())
   {
     return subscribe(nh, base_topic, queue_size,
@@ -89,7 +88,7 @@ public:
    */
   template<class T>
   void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(T::*fp)(const ImageConstPtr&), T* obj,
+                 void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
                  const TransportHints& transport_hints = TransportHints())
   {
     return subscribe(nh, base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1), std::shared_ptr<void>(), transport_hints);

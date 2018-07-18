@@ -37,7 +37,7 @@
 
 #include <ros/ros.h>
 
-#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/Image.h>
 #include "image_transport/single_subscriber_publisher.h"
 
 namespace image_transport {
@@ -47,11 +47,11 @@ namespace image_transport {
  */
 class PublisherPlugin
 {
-private:
+public:
+  PublisherPlugin() = default;
   PublisherPlugin(const PublisherPlugin&) = delete;
   PublisherPlugin& operator=( const PublisherPlugin& ) = delete;
 
-public:
   virtual ~PublisherPlugin() {}
 
   /**
@@ -95,12 +95,12 @@ public:
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
-  virtual void publish(const sensor_msgs::msg::Image& message) const = 0;
+  virtual void publish(const sensor_msgs::Image& message) const = 0;
 
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
-  virtual void publish(const sensor_msgs::msg::ImageConstPtr& message) const
+  virtual void publish(const sensor_msgs::ImageConstPtr& message) const
   {
     publish(*message);
   }
@@ -112,7 +112,7 @@ public:
    * @param message an image message to use information from (but not data)
    * @param data a pointer to the image data to use to fill the Image message
    */
-  virtual void publish(const sensor_msgs::msg::Image& message, const uint8_t* data) const
+  virtual void publish(const sensor_msgs::Image& message, const uint8_t* data) const
   {
     sensor_msgs::Image msg;
     msg.header = message.header;

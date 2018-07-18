@@ -100,10 +100,14 @@ protected:
     std::string transport_topic = getTopicToAdvertise(base_topic);
     ros::NodeHandle param_nh(transport_topic);
     simple_impl_.reset(new SimplePublisherPluginImpl(param_nh));
+
+    auto tracked_object_bridge = boost::shared_ptr<void>(tracked_object.get(), [tracked_object](void*) mutable {
+      std::const_pointer_cast<void>(tracked_object).reset();});
+
     simple_impl_->pub_ = nh.advertise<M>(transport_topic, queue_size,
                                          bindCB(user_connect_cb, &SimplePublisherPlugin::connectCallback),
                                          bindCB(user_disconnect_cb, &SimplePublisherPlugin::disconnectCallback),
-                                         tracked_object, latch);
+                                         tracked_object_bridge, latch);
   }
 
   //! Generic function for publishing the internal message type.

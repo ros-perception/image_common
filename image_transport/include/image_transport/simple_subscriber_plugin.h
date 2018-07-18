@@ -110,9 +110,12 @@ protected:
     ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
     simple_impl_.reset(new SimpleSubscriberPluginImpl(param_nh));
 
+    auto tracked_object_bridge = boost::shared_ptr<void>(tracked_object.get(), [tracked_object](void*) mutable {
+      std::const_pointer_cast<void>(tracked_object).reset();});
+
     simple_impl_->sub_ = nh.subscribe<M>(getTopicToSubscribe(base_topic), queue_size,
                                          std::bind(&SimpleSubscriberPlugin::internalCallback, this, std::placeholders::_1, callback),
-                                         tracked_object, transport_hints.getRosHints());
+                                         tracked_object_bridge, transport_hints.getRosHints());
   }
 
   /**

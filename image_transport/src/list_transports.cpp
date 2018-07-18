@@ -32,6 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include "image_transport/camera_common.h"
 #include "image_transport/publisher_plugin.h"
 #include "image_transport/subscriber_plugin.h"
 #include <pluginlib/class_loader.h>
@@ -69,7 +70,7 @@ int main(int argc, char** argv)
     transports[transport_name].pub_name = lookup_name;
     transports[transport_name].package_name = pub_loader.getClassPackage(lookup_name);
     try {
-      std::shared_ptr<PublisherPlugin> pub = pub_loader.createInstance(lookup_name);
+      auto pub = pub_loader.createUniqueInstance(lookup_name);
       transports[transport_name].pub_status = SUCCESS;
     }
     catch (const LibraryLoadException& e) {
@@ -85,7 +86,7 @@ int main(int argc, char** argv)
     transports[transport_name].sub_name = lookup_name;
     transports[transport_name].package_name = sub_loader.getClassPackage(lookup_name);
     try {
-      std::shared_ptr<SubscriberPlugin> sub = sub_loader.createInstance(lookup_name);
+      auto sub = sub_loader.createUniqueInstance(lookup_name);
       transports[transport_name].sub_status = SUCCESS;
     }
     catch (const LibraryLoadException& e) {
@@ -114,7 +115,7 @@ int main(int argc, char** argv)
 #endif
 
   printf("\nDetails:\n");
-  dor(const StatusMap::value_type& value: transports) {
+  for(const auto& value: transports) {
     const TransportDesc& td = value.second;
     printf("----------\n");
     printf("\"%s\"\n", value.first.c_str());

@@ -85,8 +85,11 @@ CameraPublisher::CameraPublisher(ImageTransport& image_it, ros::NodeHandle& info
 
   impl_->image_pub_ = image_it.advertise(image_topic, queue_size, image_connect_cb,
                                          image_disconnect_cb, tracked_object, latch);
+
+  auto tracked_object_bridge = boost::shared_ptr<void>(tracked_object.get(), [tracked_object](void*) mutable {
+      std::const_pointer_cast<void>(tracked_object).reset();});
   impl_->info_pub_ = info_nh.advertise<sensor_msgs::CameraInfo>(info_topic, queue_size, info_connect_cb,
-                                                                info_disconnect_cb, tracked_object, latch);
+                                                                info_disconnect_cb, tracked_object_bridge, latch);
 }
 
 uint32_t CameraPublisher::getNumSubscribers() const
