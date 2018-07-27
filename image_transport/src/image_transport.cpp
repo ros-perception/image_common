@@ -37,26 +37,26 @@
 #include "image_transport/publisher_plugin.h"
 #include "image_transport/subscriber_plugin.h"
 
-#include <pluginlib/class_loader.h>
+#include <pluginlib/class_loader.hpp>
 
 namespace image_transport {
 
 struct ImageTransport::Impl
 {
-  ros::NodeHandle nh_;
+  rclcpp::Node::SharedPtr node_;
   PubLoaderPtr pub_loader_;
   SubLoaderPtr sub_loader_;
 
-  Impl(const ros::NodeHandle& nh)
-    : nh_(nh),
+  Impl(const rclcpp::Node::SharedPtr& node)
+    : node_(node),
       pub_loader_( std::make_shared<PubLoader>("image_transport", "image_transport::PublisherPlugin") ),
       sub_loader_( std::make_shared<SubLoader>("image_transport", "image_transport::SubscriberPlugin") )
   {
   }
 };
 
-ImageTransport::ImageTransport(const ros::NodeHandle& nh)
-  : impl_(new Impl(nh))
+ImageTransport::ImageTransport(const rclcpp::Node::SharedPtr& node)
+  : impl_(new Impl(node))
 {
 }
 
@@ -66,50 +66,24 @@ ImageTransport::~ImageTransport()
 
 Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queue_size, bool latch)
 {
-  return advertise(base_topic, queue_size, SubscriberStatusCallback(),
-                   SubscriberStatusCallback(), std::shared_ptr<void>(), latch);
-}
-
-Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queue_size,
-                                    const SubscriberStatusCallback& connect_cb,
-                                    const SubscriberStatusCallback& disconnect_cb,
-                                    const std::shared_ptr<void>& tracked_object, bool latch)
-{
-  return Publisher(impl_->nh_, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch, impl_->pub_loader_);
+  return Publisher(impl_->node_, base_topic, queue_size, latch, impl_->pub_loader_);
 }
 
 Subscriber ImageTransport::subscribe(const std::string& base_topic, uint32_t queue_size,
-                                     const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
-                                     const std::shared_ptr<void>& tracked_object, const TransportHints& transport_hints)
+                                     const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback)
 {
-  return Subscriber(impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints, impl_->sub_loader_);
+  return Subscriber(impl_->node_, base_topic, queue_size, callback, impl_->sub_loader_);
 }
 
 CameraPublisher ImageTransport::advertiseCamera(const std::string& base_topic, uint32_t queue_size, bool latch)
 {
-  return advertiseCamera(base_topic, queue_size,
-                         SubscriberStatusCallback(), SubscriberStatusCallback(),
-                         ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(),
-                         std::shared_ptr<void>(), latch);
-}
-
-CameraPublisher ImageTransport::advertiseCamera(const std::string& base_topic, uint32_t queue_size,
-                                                const SubscriberStatusCallback& image_connect_cb,
-                                                const SubscriberStatusCallback& image_disconnect_cb,
-                                                const ros::SubscriberStatusCallback& info_connect_cb,
-                                                const ros::SubscriberStatusCallback& info_disconnect_cb,
-                                                const std::shared_ptr<void>& tracked_object, bool latch)
-{
-  return CameraPublisher(*this, impl_->nh_, base_topic, queue_size, image_connect_cb, image_disconnect_cb,
-                         info_connect_cb, info_disconnect_cb, tracked_object, latch);
+  return advertiseCamera(base_topic, queue_size, latch);
 }
 
 CameraSubscriber ImageTransport::subscribeCamera(const std::string& base_topic, uint32_t queue_size,
-                                                 const CameraSubscriber::Callback& callback,
-                                                 const std::shared_ptr<void>& tracked_object,
-                                                 const TransportHints& transport_hints)
+                                                 const CameraSubscriber::Callback& callback)
 {
-  return CameraSubscriber(*this, impl_->nh_, base_topic, queue_size, callback, tracked_object, transport_hints);
+  return CameraSubscriber(*this, impl_->node_, base_topic, queue_size, callback);
 }
 
 std::vector<std::string> ImageTransport::getDeclaredTransports() const

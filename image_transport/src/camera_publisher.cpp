@@ -59,40 +59,34 @@ struct CameraPublisher::Impl
     if (!unadvertised_) {
       unadvertised_ = true;
       image_pub_.shutdown();
-      info_pub_.shutdown();
+      //info_pub_.shutdown();
     }
   }
 
   Publisher image_pub_;
-  ros::Publisher info_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr info_pub_;
   bool unadvertised_;
   //double constructed_;
 };
 
-CameraPublisher::CameraPublisher(ImageTransport& image_it, rclcpp::Node::SharedPtr& info_nh,
-                                 const std::string& base_topic, uint32_t queue_size,
-                                 const SubscriberStatusCallback& image_connect_cb,
-                                 const SubscriberStatusCallback& image_disconnect_cb,
-                                 const ros::SubscriberStatusCallback& info_connect_cb,
-                                 const ros::SubscriberStatusCallback& info_disconnect_cb,
-                                 const std::shared_ptr<void>& tracked_object, bool latch)
+CameraPublisher::CameraPublisher(ImageTransport& image_it, rclcpp::Node::SharedPtr& node,
+                                 const std::string& base_topic, rmw_qos_profile_t custom_qos)
   : impl_(new Impl)
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
   // image topic is remapped (#4539).
-  std::string image_topic = info_nh.resolveName(base_topic);
+  //std::string image_topic = info_nh.resolveName(base_topic);
+  std::string image_topic = base_topic;
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  impl_->image_pub_ = image_it.advertise(image_topic, queue_size, image_connect_cb,
-                                         image_disconnect_cb, tracked_object, latch);
-  impl_->info_pub_ = info_nh.advertise<sensor_msgs::msg::CameraInfo>(info_topic, queue_size, info_connect_cb,
-                                                                info_disconnect_cb, tracked_object, latch);
+  impl_->image_pub_ = image_it.advertise(image_topic, custom_qos);
+  impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, custom_qos);
 }
 
 uint32_t CameraPublisher::getNumSubscribers() const
 {
-  if (impl_ && impl_->isValid())
-    return std::max(impl_->image_pub_.getNumSubscribers(), impl_->info_pub_.getNumSubscribers());
+  //if (impl_ && impl_->isValid())
+    //return std::max(impl_->image_pub_.getNumSubscribers(), impl_->info_pub_.getNumSubscribers());
   return 0;
 }
 
@@ -129,19 +123,6 @@ void CameraPublisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr& ima
 
   impl_->image_pub_.publish(image);
   impl_->info_pub_.publish(info);
-}
-
-void CameraPublisher::publish(sensor_msgs::msg::Image& image, sensor_msgs::msg::CameraInfo& info,
-                              ros::Time stamp) const
-{
-  if (!impl_ || !impl_->isValid()) {
-    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
-    return;
-  }
-
-  image.header.stamp = stamp;
-  info.header.stamp = stamp;
-  publish(image, info);
 }
 
 void CameraPublisher::shutdown()

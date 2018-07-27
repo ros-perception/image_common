@@ -85,16 +85,6 @@ struct Publisher::Impl
     }
   }
 
-  void subscriberCB(
-    const SingleSubscriberPublisher & plugin_pub,
-    const SubscriberStatusCallback & user_cb)
-  {
-    SingleSubscriberPublisher ssp(plugin_pub.getSubscriberName(), getTopic(),
-                                  std::bind(&Publisher::Impl::getNumSubscribers, this),
-                                  plugin_pub.publish_fn_);
-    user_cb(ssp);
-  }
-
   std::string base_topic_;
   PubLoaderPtr loader_;
   std::vector<std::shared_ptr<PublisherPlugin>> publishers_;
@@ -102,11 +92,8 @@ struct Publisher::Impl
   //double constructed_;
 };
 
-Publisher::Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
-                     const SubscriberStatusCallback& connect_cb,
-                     const SubscriberStatusCallback& disconnect_cb,
-                     const std::shared_ptr<void>& tracked_object, bool latch,
-                     const PubLoaderPtr& loader)
+Publisher::Publisher(rclcpp::Node::SharedPtr& node, const std::string& base_topic,
+                     const PubLoaderPtr& loader, rmw_qos_profile_t custom_qos)
   : impl_(new Impl)
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
@@ -132,8 +119,7 @@ Publisher::Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
       impl_->publishers_.push_back(std::move(pub));
-      pub->advertise(nh, impl_->base_topic_, queue_size, rebindCB(connect_cb),
-        rebindCB(disconnect_cb), tracked_object, latch);
+      pub->advertise(node, impl_->base_topic_, custom_qos);
     } catch (const std::runtime_error & e) {
       //ROS_DEBUG("Failed to load plugin %s, error string: %s",
         //lookup_name.c_str(), e.what());
@@ -204,28 +190,5 @@ bool Publisher::operator<(const Publisher & rhs) const {return impl_ < rhs.impl_
 bool Publisher::operator!=(const Publisher & rhs) const {return impl_ != rhs.impl_;}
 bool Publisher::operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
 
-
-void Publisher::weakSubscriberCb(
-  const ImplWPtr & impl_wptr,
-  const SingleSubscriberPublisher & plugin_pub,
-  const SubscriberStatusCallback & user_cb)
-{
-  if (ImplPtr impl = impl_wptr.lock()) {
-    impl->subscriberCB(plugin_pub, user_cb);
-  }
-}
-
-SubscriberStatusCallback Publisher::rebindCB(const SubscriberStatusCallback & user_cb)
-{
-  // Note: the subscriber callback must be bound to the internal Impl object, not
-  // 'this'. Due to copying behavior the Impl object may outlive the original Publisher
-  // instance. But it should not outlive the last Publisher, so we use a weak_ptr.
-  if (user_cb) {
-    ImplWPtr impl_wptr(impl_);
-    return std::bind(&Publisher::weakSubscriberCb, impl_wptr, std::placeholders::_1, user_cb);
-  } else {
-    return SubscriberStatusCallback();
-  }
-}
 
 } //namespace image_transport

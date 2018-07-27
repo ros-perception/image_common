@@ -16,6 +16,9 @@ find_package(ament_cmake REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(tinyxml_vendor REQUIRED)
+find_package(TinyXML REQUIRED)
 
 include_directories(include)
 
@@ -25,13 +28,14 @@ add_library(${PROJECT_NAME}
   src/publisher.cpp
   src/subscriber.cpp
   src/single_subscriber_publisher.cpp
-  #src/camera_publisher.cpp
-  #src/camera_subscriber.cpp
-  #src/image_transport.cpp
+  src/camera_publisher.cpp
+  src/camera_subscriber.cpp
+  src/image_transport.cpp
 )
 
 ament_target_dependencies(${PROJECT_NAME}
   "message_filters"
+  "pluginlib"
   "rclcpp"
   "sensor_msgs"
 )
@@ -67,6 +71,11 @@ if(BUILD_TESTING)
   ament_add_gtest(${PROJECT_NAME}-subscriber test/test_subscriber.cpp)
   if(TARGET ${PROJECT_NAME}-subscriber)
     target_link_libraries(${PROJECT_NAME}-subscriber ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-message_passing test/test_message_passing.cpp)
+  if(TARGET ${PROJECT_NAME}-message_passing)
+    target_link_libraries(${PROJECT_NAME}-message_passing ${PROJECT_NAME})
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-single_subscriber_publisher test/test_single_subscriber_publisher.cpp)

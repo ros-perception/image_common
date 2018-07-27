@@ -73,20 +73,21 @@ struct Subscriber::Impl
   //double constructed_;
 };
 
-Subscriber::Subscriber(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
+Subscriber::Subscriber(rclcpp::Node::SharedPtr& node, const std::string& base_topic,
                        const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
-                       const std::shared_ptr<void>& tracked_object, const TransportHints& transport_hints,
-                       const SubLoaderPtr& loader)
+                       const SubLoaderPtr& loader,
+                       rmw_qos_profile_t custom_qos)
   : impl_(new Impl)
 {
   // Load the plugin for the chosen transport.
-  std::string lookup_name = SubscriberPlugin::getLookupName(transport_hints.getTransport());
+  // TODO(ros2) Get this from a parameter?
+  std::string lookup_name = SubscriberPlugin::getLookupName("raw");
   try {
     auto instance = loader->createUniqueInstance(lookup_name);
     impl_->subscriber_ = std::move(instance);
   }
   catch (pluginlib::PluginlibException& e) {
-    throw TransportLoadException(transport_hints.getTransport(), e.what());
+    throw TransportLoadException(lookup_name, e.what());
   }
   // Hang on to the class loader so our shared library doesn't disappear from under us.
   impl_->loader_ = loader;
@@ -116,7 +117,7 @@ Subscriber::Subscriber(rclcpp::Node::SharedPtr& nh, const std::string& base_topi
   }
 
   // Tell plugin to subscribe.
-  impl_->subscriber_->subscribe(nh, base_topic, queue_size, callback, tracked_object, transport_hints);
+  impl_->subscriber_->subscribe(node, base_topic, callback, custom_qos);
 }
 
 std::string Subscriber::getTopic() const

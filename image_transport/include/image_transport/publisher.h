@@ -103,24 +103,15 @@ public:
   bool operator==(const Publisher & rhs) const;
 
 private:
-  Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
-            const SubscriberStatusCallback& connect_cb,
-            const SubscriberStatusCallback& disconnect_cb,
-            const std::shared_ptr<void>& tracked_object, bool latch,
-            const PubLoaderPtr& loader);
+  Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
+      const PubLoaderPtr& loader,
+      rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
   struct Impl;
   typedef std::shared_ptr<Impl> ImplPtr;
   typedef std::weak_ptr<Impl> ImplWPtr;
 
   ImplPtr impl_;
-
-  static void weakSubscriberCb(
-    const ImplWPtr & impl_wptr,
-    const SingleSubscriberPublisher & plugin_pub,
-    const SubscriberStatusCallback & user_cb);
-
-  SubscriberStatusCallback rebindCB(const SubscriberStatusCallback & user_cb);
 
   friend class ImageTransport;
 };
