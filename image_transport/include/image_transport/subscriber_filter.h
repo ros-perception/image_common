@@ -35,9 +35,7 @@
 #ifndef IMAGE_TRANSPORT_SUBSCRIBER_FILTER_H
 #define IMAGE_TRANSPORT_SUBSCRIBER_FILTER_H
 
-#include <ros/ros.h>
 #include <message_filters/simple_filter.h>
-
 #include "image_transport/image_transport.h"
 
 namespace image_transport {
@@ -74,10 +72,9 @@ public:
    * \param queue_size The subscription queue size
    * \param transport_hints The transport hints to pass along
    */
-  SubscriberFilter(ImageTransport& it, const std::string& base_topic, uint32_t queue_size,
-                   const TransportHints& transport_hints = TransportHints())
+  SubscriberFilter(ImageTransport& it, const std::string& base_topic)
   {
-    subscribe(it, base_topic, queue_size, transport_hints);
+    subscribe(it, base_topic);
   }
 
   /**
@@ -99,20 +96,11 @@ public:
    *
    * \param nh The ros::NodeHandle to use to subscribe.
    * \param base_topic The topic to subscribe to.
-   * \param queue_size The subscription queue size
-   * \param transport_hints The transport hints to pass along
    */
-  void subscribe(ImageTransport& it, const std::string& base_topic, uint32_t queue_size,
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(ImageTransport& it, const std::string& base_topic, rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
     unsubscribe();
-
-<<<<<<< HEAD
-    sub_ = it.subscribe(base_topic, queue_size, std::bind(&SubscriberFilter::cb, this, std::placeholders::_1),
-=======
-    sub_ = it.subscribe(base_topic, queue_size, boost::bind(&SubscriberFilter::cb, this, _1),
->>>>>>> 1a9dceb... Type updates.
-                        std::shared_ptr<void>(), transport_hints);
+    sub_ = it.subscribe(base_topic, std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), custom_qos);
   }
 
   /**

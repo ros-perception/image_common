@@ -40,7 +40,8 @@
 
 #include "image_transport/subscriber_plugin.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Base class to simplify implementing most plugins to Subscriber.
@@ -60,7 +61,7 @@ namespace image_transport {
  * getTopicToSubscribe() controls the name of the internal communication topic. It
  * defaults to \<base topic\>/\<transport name\>.
  */
-template <class M>
+template<class M>
 class SimpleSubscriberPlugin : public SubscriberPlugin
 {
 public:
@@ -68,19 +69,19 @@ public:
 
   virtual std::string getTopic() const
   {
-    if (simple_impl_) return simple_impl_->sub_.getTopic();
+    //if (simple_impl_) return simple_impl_->sub_.getTopic();
     return std::string();
   }
 
   virtual uint32_t getNumPublishers() const
   {
-    if (simple_impl_) return simple_impl_->sub_.getNumPublishers();
+    //if (simple_impl_) return simple_impl_->sub_.getNumPublishers();
     return 0;
   }
 
   virtual void shutdown()
   {
-    if (simple_impl_) simple_impl_->sub_.shutdown();
+    //if (simple_impl_) simple_impl_->sub_.shutdown();
   }
 
 protected:
@@ -90,55 +91,50 @@ protected:
    * @param message A message from the PublisherPlugin.
    * @param user_cb The user Image callback to invoke, if appropriate.
    */
-  virtual void internalCallback(const typename M::ConstPtr& message, const Callback& user_cb) = 0;
+  virtual void internalCallback(
+    const typename std::shared_ptr<const M> message,
+    const Callback & user_cb) = 0;
 
   /**
    * \brief Return the communication topic name for a given base topic.
    *
    * Defaults to \<base topic\>/\<transport name\>.
    */
-  virtual std::string getTopicToSubscribe(const std::string& base_topic) const
+  virtual std::string getTopicToSubscribe(const std::string & base_topic) const
   {
     return base_topic + "/" + getTransportName();
   }
 
-  virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const Callback& callback, const std::shared_ptr<void>& tracked_object,
-                             const TransportHints& transport_hints)
+  virtual void subscribeImpl(
+    rclcpp::Node::SharedPtr & node,
+    const std::string & base_topic,
+    const Callback & callback,
+    rmw_qos_profile_t custom_qos)
   {
     // Push each group of transport-specific parameters into a separate sub-namespace
-    ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
-    simple_impl_.reset(new SimpleSubscriberPluginImpl(param_nh));
+    //ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
+    simple_impl_ = std::make_shared<SimpleSubscriberPluginImpl>(node);
 
-    auto tracked_object_bridge = boost::shared_ptr<void>(tracked_object.get(), [tracked_object](void*) mutable {
-      std::const_pointer_cast<void>(tracked_object).reset();});
+    std::function<void (const std::shared_ptr<const M>)> fcn = std::bind(&SimpleSubscriberPlugin<M>::internalCallback,
+          this, std::placeholders::_1, callback);
 
-    simple_impl_->sub_ = nh.subscribe<M>(getTopicToSubscribe(base_topic), queue_size,
-                                         std::bind(&SimpleSubscriberPlugin::internalCallback, this, std::placeholders::_1, callback),
-                                         tracked_object_bridge, transport_hints.getRosHints());
-  }
-
-  /**
-   * \brief Returns the ros::NodeHandle to be used for parameter lookup.
-   */
-  const ros::NodeHandle& nh() const
-  {
-    return simple_impl_->param_nh_;
+    auto sub = node->create_subscription<M>(getTopicToSubscribe(base_topic),
+        fcn,
+        custom_qos);
   }
 
 private:
   struct SimpleSubscriberPluginImpl
   {
-    SimpleSubscriberPluginImpl(const ros::NodeHandle& nh)
-      : param_nh_(nh)
+    SimpleSubscriberPluginImpl(const rclcpp::Node::SharedPtr & node)
+    : node_(node)
     {
     }
 
-    const ros::NodeHandle param_nh_;
-    ros::Subscriber sub_;
+    rclcpp::Node::SharedPtr node_;
   };
 
-  std::unique_ptr<SimpleSubscriberPluginImpl> simple_impl_;
+  std::shared_ptr<SimpleSubscriberPluginImpl> simple_impl_;
 };
 
 } //namespace image_transport
