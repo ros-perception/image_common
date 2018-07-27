@@ -103,7 +103,8 @@ public:
    * Convenience version, which sets the timestamps of both image and info to stamp before
    * publishing.
    */
-  void publish(sensor_msgs::msg::Image& image, sensor_msgs::msg::CameraInfo& info, ros::Time stamp) const;
+  //TODO(ros2) Use ros2 time.
+  //void publish(sensor_msgs::msg::Image& image, sensor_msgs::msg::CameraInfo& info, ros::Time stamp) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
@@ -117,12 +118,8 @@ public:
 
 private:
   CameraPublisher(ImageTransport& image_it, rclcpp::Node::SharedPtr& info_nh,
-                  const std::string& base_topic, uint32_t queue_size,
-                  const SubscriberStatusCallback& image_connect_cb,
-                  const SubscriberStatusCallback& image_disconnect_cb,
-                  const ros::SubscriberStatusCallback& info_connect_cb,
-                  const ros::SubscriberStatusCallback& info_disconnect_cb,
-                  const std::shared_ptr<void>& tracked_object, bool latch);
+                  const std::string& base_topic,
+                  rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
   struct Impl;
   typedef std::shared_ptr<Impl> ImplPtr;

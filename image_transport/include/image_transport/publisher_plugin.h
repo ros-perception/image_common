@@ -63,22 +63,10 @@ public:
    * \brief Advertise a topic, simple version.
    */
   void advertise(
-    rclcpp::Node::SharedPtr & nh, const std::string & base_topic, uint32_t queue_size,
-    bool latch = true)
+    rclcpp::Node::SharedPtr & nh, const std::string & base_topic,
+    rmw_qos_profile_t custom_qos)
   {
-    advertiseImpl(nh, base_topic, queue_size, SubscriberStatusCallback(),
-                  SubscriberStatusCallback(), std::shared_ptr<void>(), latch);
-  }
-
-  /**
-   * \brief Advertise a topic with subscriber status callbacks.
-   */
-  void advertise(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
-                 const SubscriberStatusCallback& connect_cb,
-                 const SubscriberStatusCallback& disconnect_cb = SubscriberStatusCallback(),
-                 const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(), bool latch = true)
-  {
-    advertiseImpl(nh, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
+    advertiseImpl(nh, base_topic, custom_qos);
   }
 
   /**
@@ -144,10 +132,7 @@ protected:
   /**
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
-  virtual void advertiseImpl(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
-                             const SubscriberStatusCallback& connect_cb,
-                             const SubscriberStatusCallback& disconnect_cb,
-                             const std::shared_ptr<void>& tracked_object, bool latch) = 0;
+  virtual void advertiseImpl(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, rmw_qos_profile_t custom_qos);
 };
 
 } //namespace image_transport

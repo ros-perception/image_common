@@ -35,10 +35,8 @@
 #ifndef IMAGE_TRANSPORT_CAMERA_SUBSCRIBER_H
 #define IMAGE_TRANSPORT_CAMERA_SUBSCRIBER_H
 
-#include <ros/ros.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <sensor_msgs/Image.h>
-#include "image_transport/transport_hints.h"
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <sensor_msgs/msg/image.hpp>
 
 namespace image_transport {
 
@@ -98,11 +96,14 @@ public:
   bool operator==(const CameraSubscriber& rhs) const { return impl_ == rhs.impl_; }
 
 private:
-  CameraSubscriber(ImageTransport& image_it, ros::NodeHandle& info_nh,
+  CameraSubscriber(ImageTransport& image_it, rclcpp::Node::SharedPtr& info_nh,
                    const std::string& base_topic, uint32_t queue_size,
-                   const Callback& callback,
+                   const Callback& callback);
+                   /*
+                    * TODO(ros2) implement transport hints and subscriber tracking.
                    const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(),
                    const TransportHints& transport_hints = TransportHints());
+                   */
 
   struct Impl;
   typedef std::shared_ptr<Impl> ImplPtr;

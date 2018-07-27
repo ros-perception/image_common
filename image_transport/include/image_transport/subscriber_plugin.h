@@ -37,8 +37,6 @@
 
 #include <rclcpp/macros.hpp>
 
-#include "image_transport/transport_hints.h"
-
 namespace image_transport
 {
 
@@ -65,46 +63,35 @@ public:
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
-  void subscribe(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
-                 const Callback& callback, const std::shared_ptr<void>& tracked_object = std::shared_ptr<void>(),
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
+                 const Callback& callback,
+                 rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribeImpl(nh, base_topic, queue_size, callback, tracked_object, transport_hints);
+    return subscribeImpl(nh, base_topic, callback, custom_qos);
   }
 
   /**
    * \brief Subscribe to an image topic, version for bare function.
    */
-  void subscribe(rclcpp::Node::SharedPtr & nh, const std::string & base_topic, uint32_t queue_size,
+  void subscribe(rclcpp::Node::SharedPtr & nh, const std::string & base_topic,
                  void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
-                 const TransportHints & transport_hints = TransportHints())
+                 rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe(nh, base_topic, queue_size,
+    return subscribe(nh, base_topic,
                      std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>(fp),
-                     std::shared_ptr<void>(), transport_hints);
+                     custom_qos);
   }
 
   /**
    * \brief Subscribe to an image topic, version for class member function with bare pointer.
    */
   template<class T>
-  void subscribe(rclcpp::Node::SharedPtr & nh, const std::string & base_topic, uint32_t queue_size,
+  void subscribe(rclcpp::Node::SharedPtr & nh, const std::string & base_topic,
                  void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
-                 const TransportHints & transport_hints = TransportHints())
+                 rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe(nh, base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1), std::shared_ptr<void>(), transport_hints);
-  }
-
-  /**
-   * \brief Subscribe to an image topic, version for class member function with shared_ptr.
-   */
-  template<class T>
-  void subscribe(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
-                 const std::shared_ptr<T>& obj,
-                 const TransportHints& transport_hints = TransportHints())
-  {
-    return subscribe(nh, base_topic, queue_size, std::bind(fp, obj.get(), std::placeholders::_1), obj, transport_hints);
+    return subscribe(nh, base_topic,
+        std::bind(fp, obj, std::placeholders::_1), custom_qos);
   }
 
   /**
@@ -135,9 +122,9 @@ protected:
   /**
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
-  virtual void subscribeImpl(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, uint32_t queue_size,
-                             const Callback& callback, const std::shared_ptr<void>& tracked_object,
-                             const TransportHints& transport_hints) = 0;
+  virtual void subscribeImpl(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
+                             const Callback& callback,
+                             rmw_qos_profile_t custom_qos = rmw_qos_profile_default) = 0;
 };
 
 } //namespace image_transport
