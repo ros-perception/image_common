@@ -122,7 +122,7 @@ protected:
   /**
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
-  virtual void subscribeImpl(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
+  virtual void subscribeImpl(rclcpp::Node::SharedPtr& node, const std::string& base_topic,
                              const Callback& callback,
                              rmw_qos_profile_t custom_qos = rmw_qos_profile_default) = 0;
 };

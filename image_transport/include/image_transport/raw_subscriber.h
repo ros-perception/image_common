@@ -35,6 +35,7 @@
 #ifndef IMAGE_TRANSPORT_RAW_SUBSCRIBER_H
 #define IMAGE_TRANSPORT_RAW_SUBSCRIBER_H
 
+#include <sensor_msgs/msg/image.hpp>
 #include "image_transport/simple_subscriber_plugin.h"
 
 namespace image_transport {
@@ -56,7 +57,7 @@ public:
   }
 
 protected:
-  virtual void internalCallback(const sensor_msgs::msg::Image::ConstSharedPtr& message, const Callback& user_cb)
+  virtual void internalCallback(const std::shared_ptr<const sensor_msgs::msg::Image> message, const Callback& user_cb)
   {
     user_cb(message);
   }

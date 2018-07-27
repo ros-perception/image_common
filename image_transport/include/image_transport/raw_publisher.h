@@ -35,6 +35,7 @@
 #ifndef IMAGE_TRANSPORT_RAW_PUBLISHER_H
 #define IMAGE_TRANSPORT_RAW_PUBLISHER_H
 
+#include <sensor_msgs/msg/image.hpp>
 #include "image_transport/simple_publisher_plugin.h"
 
 namespace image_transport {
@@ -54,16 +55,6 @@ public:
   {
     return "raw";
   }
-
-  // Override the default implementation because publishing the message pointer allows
-  // the no-copy intraprocess optimization.
-  virtual void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const
-  {
-    getPublisher().publish(message);
-  }
-
-  // Override the default implementation to not copy data to a sensor_msgs::msg::Image first
-  virtual void publish(const sensor_msgs::msg::Image& message, const uint8_t* data) const;
 
 protected:
   virtual void publish(const sensor_msgs::msg::Image& message, const PublishFn& publish_fn) const

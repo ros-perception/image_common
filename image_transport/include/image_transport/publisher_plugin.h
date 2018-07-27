@@ -35,6 +35,8 @@
 #ifndef IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
 #define IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
 
+#include <rclcpp/node.hpp>
+
 #include <sensor_msgs/msg/image.hpp>
 #include "image_transport/single_subscriber_publisher.h"
 
@@ -132,7 +134,7 @@ protected:
   /**
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
-  virtual void advertiseImpl(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, rmw_qos_profile_t custom_qos);
+  virtual void advertiseImpl(rclcpp::Node::SharedPtr& nh, const std::string& base_topic, rmw_qos_profile_t custom_qos) = 0;
 };
 
 } //namespace image_transport

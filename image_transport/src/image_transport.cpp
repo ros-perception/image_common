@@ -39,7 +39,8 @@
 
 #include <pluginlib/class_loader.hpp>
 
-namespace image_transport {
+namespace image_transport
+{
 
 struct ImageTransport::Impl
 {
@@ -47,16 +48,18 @@ struct ImageTransport::Impl
   PubLoaderPtr pub_loader_;
   SubLoaderPtr sub_loader_;
 
-  Impl(const rclcpp::Node::SharedPtr& node)
-    : node_(node),
-      pub_loader_( std::make_shared<PubLoader>("image_transport", "image_transport::PublisherPlugin") ),
-      sub_loader_( std::make_shared<SubLoader>("image_transport", "image_transport::SubscriberPlugin") )
+  Impl(const rclcpp::Node::SharedPtr & node)
+  : node_(node),
+    pub_loader_(std::make_shared<PubLoader>("image_transport",
+      "image_transport::PublisherPlugin") ),
+    sub_loader_(std::make_shared<SubLoader>("image_transport",
+      "image_transport::SubscriberPlugin") )
   {
   }
 };
 
-ImageTransport::ImageTransport(const rclcpp::Node::SharedPtr& node)
-  : impl_(new Impl(node))
+ImageTransport::ImageTransport(const rclcpp::Node::SharedPtr & node)
+: impl_(new Impl(node))
 {
 }
 
@@ -64,33 +67,38 @@ ImageTransport::~ImageTransport()
 {
 }
 
-Publisher ImageTransport::advertise(const std::string& base_topic, uint32_t queue_size, bool latch)
+Publisher ImageTransport::advertise(const std::string & base_topic, rmw_qos_profile_t custom_qos)
 {
-  return Publisher(impl_->node_, base_topic, queue_size, latch, impl_->pub_loader_);
+  return Publisher(impl_->node_, base_topic, impl_->pub_loader_, custom_qos);
 }
 
-Subscriber ImageTransport::subscribe(const std::string& base_topic, uint32_t queue_size,
-                                     const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback)
+Subscriber ImageTransport::subscribe(
+  const std::string & base_topic,
+  const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)> & callback,
+  rmw_qos_profile_t custom_qos)
 {
-  return Subscriber(impl_->node_, base_topic, queue_size, callback, impl_->sub_loader_);
+  return Subscriber(impl_->node_, base_topic, callback, impl_->sub_loader_, custom_qos);
 }
 
-CameraPublisher ImageTransport::advertiseCamera(const std::string& base_topic, uint32_t queue_size, bool latch)
+CameraPublisher ImageTransport::advertiseCamera(
+  const std::string & base_topic, rmw_qos_profile_t custom_qos)
 {
-  return advertiseCamera(base_topic, queue_size, latch);
+  return advertiseCamera(base_topic, custom_qos);
 }
 
-CameraSubscriber ImageTransport::subscribeCamera(const std::string& base_topic, uint32_t queue_size,
-                                                 const CameraSubscriber::Callback& callback)
+CameraSubscriber ImageTransport::subscribeCamera(
+  const std::string & base_topic,
+  const CameraSubscriber::Callback & callback,
+  rmw_qos_profile_t custom_qos)
 {
-  return CameraSubscriber(*this, impl_->node_, base_topic, queue_size, callback);
+  return CameraSubscriber(*this, impl_->node_, base_topic, callback, custom_qos);
 }
 
 std::vector<std::string> ImageTransport::getDeclaredTransports() const
 {
   std::vector<std::string> transports = impl_->sub_loader_->getDeclaredClasses();
   // Remove the "_sub" at the end of each class name.
-  for(std::string& transport: transports) {
+  for (std::string & transport: transports) {
     transport = erase_last_copy(transport, "_sub");
   }
   return transports;
@@ -100,18 +108,17 @@ std::vector<std::string> ImageTransport::getLoadableTransports() const
 {
   std::vector<std::string> loadableTransports;
 
-  for( const std::string& transportPlugin: impl_->sub_loader_->getDeclaredClasses() )
-  {
+  for (const std::string & transportPlugin: impl_->sub_loader_->getDeclaredClasses() ) {
     // If the plugin loads without throwing an exception, add its
     // transport name to the list of valid plugins, otherwise ignore
     // it.
-    try
-    {
-      std::shared_ptr<image_transport::SubscriberPlugin> sub = impl_->sub_loader_->createUniqueInstance(transportPlugin);
+    try {
+      std::shared_ptr<image_transport::SubscriberPlugin> sub =
+        impl_->sub_loader_->createUniqueInstance(transportPlugin);
       loadableTransports.push_back(erase_last_copy(transportPlugin, "_sub")); // Remove the "_sub" at the end of each class name.
+    } catch (const pluginlib::LibraryLoadException & e) {
+    } catch (const pluginlib::CreateClassException & e) {
     }
-    catch (const pluginlib::LibraryLoadException& e) {}
-    catch (const pluginlib::CreateClassException& e) {}
   }
 
   return loadableTransports;

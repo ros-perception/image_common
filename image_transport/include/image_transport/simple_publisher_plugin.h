@@ -66,48 +66,38 @@ public:
 
   virtual uint32_t getNumSubscribers() const
   {
-    if (simple_impl_) return simple_impl_->pub_.getNumSubscribers();
+    //if (simple_impl_) return simple_impl_->pub_.getNumSubscribers();
     return 0;
   }
 
   virtual std::string getTopic() const
   {
-    if (simple_impl_) return simple_impl_->pub_.getTopic();
+    //if (simple_impl_) return simple_impl_->pub_.getTopic();
     return std::string();
   }
 
   virtual void publish(const sensor_msgs::msg::Image& message) const
   {
     if (!simple_impl_ || !simple_impl_->pub_) {
-      ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
+      //ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
       return;
     }
 
-    publish(message, bindInternalPublisher(simple_impl_->pub_));
+    publish(message, bindInternalPublisher(simple_impl_->pub_.get()));
   }
 
   virtual void shutdown()
   {
-    if (simple_impl_) simple_impl_->pub_.shutdown();
+    //if (simple_impl_) simple_impl_->pub_.shutdown();
   }
 
 protected:
-  virtual void advertiseImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const SubscriberStatusCallback& user_connect_cb,
-                             const SubscriberStatusCallback& user_disconnect_cb,
-                             const std::shared_ptr<void>& tracked_object, bool latch)
+  virtual void advertiseImpl(rclcpp::Node::SharedPtr& node, const std::string& base_topic, rmw_qos_profile_t custom_qos)
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
-    ros::NodeHandle param_nh(transport_topic);
-    simple_impl_.reset(new SimplePublisherPluginImpl(param_nh));
+    simple_impl_.reset(new SimplePublisherPluginImpl(node));
 
-    auto tracked_object_bridge = boost::shared_ptr<void>(tracked_object.get(), [tracked_object](void*) mutable {
-      std::const_pointer_cast<void>(tracked_object).reset();});
-
-    simple_impl_->pub_ = nh.advertise<M>(transport_topic, queue_size,
-                                         bindCB(user_connect_cb, &SimplePublisherPlugin::connectCallback),
-                                         bindCB(user_disconnect_cb, &SimplePublisherPlugin::disconnectCallback),
-                                         tracked_object_bridge, latch);
+    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, custom_qos);
   }
 
   //! Generic function for publishing the internal message type.
@@ -133,94 +123,20 @@ protected:
     return base_topic + "/" + getTransportName();
   }
 
-  /**
-   * \brief Function called when a subscriber connects to the internal publisher.
-   *
-   * Defaults to noop.
-   */
-  virtual void connectCallback(const ros::SingleSubscriberPublisher& pub) {}
-
-  /**
-   * \brief Function called when a subscriber disconnects from the internal publisher.
-   *
-   * Defaults to noop.
-   */
-  virtual void disconnectCallback(const ros::SingleSubscriberPublisher& pub) {}
-
-  /**
-   * \brief Returns the ros::NodeHandle to be used for parameter lookup.
-   */
-  const ros::NodeHandle& nh() const
-  {
-    return simple_impl_->param_nh_;
-  }
-
-  /**
-   * \brief Returns the internal ros::Publisher.
-   *
-   * This really only exists so RawPublisher can implement no-copy intraprocess message
-   * passing easily.
-   */
-  const ros::Publisher& getPublisher() const
-  {
-    ROS_ASSERT(simple_impl_);
-    return simple_impl_->pub_;
-  }
-
 private:
   struct SimplePublisherPluginImpl
   {
-    SimplePublisherPluginImpl(const ros::NodeHandle& nh)
-      : param_nh_(nh)
+    SimplePublisherPluginImpl(const rclcpp::Node::SharedPtr& node)
+      : node_(node)
     {
+
     }
 
-    const ros::NodeHandle param_nh_;
-    ros::Publisher pub_;
+    const rclcpp::Node::SharedPtr node_;
+    typename rclcpp::Publisher<M>::SharedPtr pub_;
   };
 
   std::unique_ptr<SimplePublisherPluginImpl> simple_impl_;
-
-  typedef void (SimplePublisherPlugin::*SubscriberStatusMemFn)(const ros::SingleSubscriberPublisher& pub);
-
-  /**
-   * Binds the user callback to subscriberCB(), which acts as an intermediary to expose
-   * a publish(Image) interface to the user while publishing to an internal topic.
-   */
-  ros::SubscriberStatusCallback bindCB(const SubscriberStatusCallback& user_cb,
-                                       SubscriberStatusMemFn internal_cb_fn)
-  {
-    ros::SubscriberStatusCallback internal_cb = std::bind(internal_cb_fn, this, std::placeholders::_1);
-    if (user_cb)
-      return std::bind(&SimplePublisherPlugin::subscriberCB, this, std::placeholders::_1, user_cb, internal_cb);
-    else
-      return internal_cb;
-  }
-
-  /**
-   * Forms the ros::SingleSubscriberPublisher for the internal communication topic into
-   * an image_transport::SingleSubscriberPublisher for Image messages and passes it
-   * to the user subscriber status callback.
-   */
-  void subscriberCB(const ros::SingleSubscriberPublisher& ros_ssp,
-                    const SubscriberStatusCallback& user_cb,
-                    const ros::SubscriberStatusCallback& internal_cb)
-  {
-    // First call the internal callback (for sending setup headers, etc.)
-    internal_cb(ros_ssp);
-
-    // Construct a function object for publishing sensor_msgs::msg::Image through the
-    // subclass-implemented publish() using the ros::SingleSubscriberPublisher to send
-    // messages of the transport-specific type.
-    typedef void (SimplePublisherPlugin::*PublishMemFn)(const sensor_msgs::msg::Image&, const PublishFn&) const;
-    PublishMemFn pub_mem_fn = &SimplePublisherPlugin::publish;
-    ImagePublishFn image_publish_fn = std::bind(pub_mem_fn, this, std::placeholders::_1, bindInternalPublisher(ros_ssp));
-
-    SingleSubscriberPublisher ssp(ros_ssp.getSubscriberName(), getTopic(),
-                                  std::bind(&SimplePublisherPlugin::getNumSubscribers, this),
-                                  image_publish_fn);
-    user_cb(ssp);
-  }
 
   typedef std::function<void(const sensor_msgs::msg::Image&)> ImagePublishFn;
 
@@ -231,12 +147,12 @@ private:
    * @param pub An object with method void publish(const M&)
    */
   template <class PubT>
-  PublishFn bindInternalPublisher(const PubT& pub) const
+  PublishFn bindInternalPublisher(PubT* pub) const
   {
     // Bind PubT::publish(const Message&) as PublishFn
-    typedef void (PubT::*InternalPublishMemFn)(const M&) const;
+    typedef void (PubT::*InternalPublishMemFn)(const M&);
     InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
-    return std::bind(internal_pub_mem_fn, &pub, std::placeholders::_1);
+    return std::bind(internal_pub_mem_fn, pub, std::placeholders::_1);
   }
 };
 

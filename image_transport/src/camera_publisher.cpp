@@ -98,31 +98,31 @@ std::string CameraPublisher::getTopic() const
 
 std::string CameraPublisher::getInfoTopic() const
 {
-  if (impl_) return impl_->info_pub_.getTopic();
+  //if (impl_) return impl_->info_pub_.getTopic();
   return std::string();
 }
 
 void CameraPublisher::publish(const sensor_msgs::msg::Image& image, const sensor_msgs::msg::CameraInfo& info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
+    //ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 
   impl_->image_pub_.publish(image);
-  impl_->info_pub_.publish(info);
+  impl_->info_pub_->publish(info);
 }
 
 void CameraPublisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr& image,
                               const sensor_msgs::msg::CameraInfo::ConstSharedPtr& info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
+    //ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 
   impl_->image_pub_.publish(image);
-  impl_->info_pub_.publish(info);
+  impl_->info_pub_->publish(info);
 }
 
 void CameraPublisher::shutdown()

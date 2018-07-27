@@ -81,8 +81,8 @@ TEST_F(MessagePassingTesting, one_message_passing)
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node_);
 
-  image_transport::Publisher pub = it().advertise("camera/image", 1);
-  image_transport::Subscriber sub = it().subscribe("camera/image", 1, imageCallback);
+  image_transport::Publisher pub = it().advertise("camera/image");
+  image_transport::Subscriber sub = it().subscribe("camera/image", imageCallback);
 
   // generate random image and publish it
   pub.publish(generate_random_image());
@@ -99,8 +99,8 @@ TEST_F(MessagePassingTesting, stress_message_passing)
 
   int images_to_stress = 1000;
 
-  image_transport::Publisher pub = it().advertise("camera/image", 1);
-  image_transport::Subscriber sub = it().subscribe("camera/image", 1, imageCallback);
+  image_transport::Publisher pub = it().advertise("camera/image");
+  image_transport::Subscriber sub = it().subscribe("camera/image", imageCallback);
 
   // generate random image and publish it
   int image_pubs = 0;
@@ -116,9 +116,9 @@ TEST_F(MessagePassingTesting, stress_message_passing)
 
 int main(int argc, char ** argv)
 {
+  rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
-
   int ret = RUN_ALL_TESTS();
-
+  rclcpp::shutdown();
   return ret;
 }
