@@ -52,7 +52,7 @@ namespace image_transport
 class ImageTransport
 {
 public:
-  explicit ImageTransport(const rclcpp::Node::SharedPtr & node);
+  explicit ImageTransport(rclcpp::Node::SharedPtr node);
 
   ~ImageTransport();
 

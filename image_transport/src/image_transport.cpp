@@ -48,7 +48,7 @@ struct ImageTransport::Impl
   PubLoaderPtr pub_loader_;
   SubLoaderPtr sub_loader_;
 
-  Impl(const rclcpp::Node::SharedPtr & node)
+  Impl(rclcpp::Node::SharedPtr node)
   : node_(node),
     pub_loader_(std::make_shared<PubLoader>("image_transport",
       "image_transport::PublisherPlugin") ),
@@ -58,7 +58,7 @@ struct ImageTransport::Impl
   }
 };
 
-ImageTransport::ImageTransport(const rclcpp::Node::SharedPtr & node)
+ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
 : impl_(new Impl(node))
 {
 }
@@ -99,6 +99,7 @@ std::vector<std::string> ImageTransport::getDeclaredTransports() const
   std::vector<std::string> transports = impl_->sub_loader_->getDeclaredClasses();
   // Remove the "_sub" at the end of each class name.
   for (std::string & transport: transports) {
+    std::cout << "getDeclaredTransports: " << transport << std::endl;
     transport = erase_last_copy(transport, "_sub");
   }
   return transports;
@@ -113,6 +114,7 @@ std::vector<std::string> ImageTransport::getLoadableTransports() const
     // transport name to the list of valid plugins, otherwise ignore
     // it.
     try {
+      std::cout << transportPlugin << std::endl;
       std::shared_ptr<image_transport::SubscriberPlugin> sub =
         impl_->sub_loader_->createUniqueInstance(transportPlugin);
       loadableTransports.push_back(erase_last_copy(transportPlugin, "_sub")); // Remove the "_sub" at the end of each class name.

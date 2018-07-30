@@ -73,7 +73,7 @@ struct Subscriber::Impl
   //double constructed_;
 };
 
-Subscriber::Subscriber(rclcpp::Node::SharedPtr& node, const std::string& base_topic,
+Subscriber::Subscriber(rclcpp::Node::SharedPtr node, const std::string& base_topic,
                        const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
                        const SubLoaderPtr& loader,
                        rmw_qos_profile_t custom_qos)
@@ -117,6 +117,7 @@ Subscriber::Subscriber(rclcpp::Node::SharedPtr& node, const std::string& base_to
   }
 
   // Tell plugin to subscribe.
+  std::cout << "Subscribing to: " << base_topic << std::endl;
   impl_->subscriber_->subscribe(node, base_topic, callback, custom_qos);
 }
 

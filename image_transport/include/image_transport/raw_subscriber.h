@@ -59,12 +59,8 @@ public:
 protected:
   virtual void internalCallback(const std::shared_ptr<const sensor_msgs::msg::Image> message, const Callback& user_cb)
   {
+    std::cout << "internalCallback" << std::endl;
     user_cb(message);
-  }
-
-  virtual std::string getTopicToSubscribe(const std::string& base_topic) const
-  {
-    return base_topic;
   }
 };
 

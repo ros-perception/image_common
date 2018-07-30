@@ -39,6 +39,7 @@
 #include <memory>
 
 #include "image_transport/subscriber_plugin.h"
+#include "rclcpp/subscription.hpp"
 
 namespace image_transport
 {
@@ -106,19 +107,21 @@ protected:
   }
 
   virtual void subscribeImpl(
-    rclcpp::Node::SharedPtr & node,
+    rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos)
   {
     // Push each group of transport-specific parameters into a separate sub-namespace
     //ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
-    simple_impl_ = std::make_shared<SimpleSubscriberPluginImpl>(node);
+    simple_impl_ = std::make_unique<SimpleSubscriberPluginImpl>(node);
 
     std::function<void (const std::shared_ptr<const M>)> fcn = std::bind(&SimpleSubscriberPlugin<M>::internalCallback,
           this, std::placeholders::_1, callback);
 
-    auto sub = node->create_subscription<M>(getTopicToSubscribe(base_topic),
+    std::cout << "getTopicToSubsribe " << getTopicToSubscribe(base_topic) << std::endl;
+
+    simple_impl_->sub_ = node->create_subscription<M>(getTopicToSubscribe(base_topic),
         fcn,
         custom_qos);
   }
@@ -126,15 +129,16 @@ protected:
 private:
   struct SimpleSubscriberPluginImpl
   {
-    SimpleSubscriberPluginImpl(const rclcpp::Node::SharedPtr & node)
+    SimpleSubscriberPluginImpl(rclcpp::Node::SharedPtr node)
     : node_(node)
     {
     }
 
     rclcpp::Node::SharedPtr node_;
+    typename rclcpp::Subscription<M>::SharedPtr sub_;
   };
 
-  std::shared_ptr<SimpleSubscriberPluginImpl> simple_impl_;
+  std::unique_ptr<SimpleSubscriberPluginImpl> simple_impl_;
 };
 
 } //namespace image_transport

@@ -92,7 +92,7 @@ public:
   bool operator==(const Subscriber& rhs) const { return impl_ == rhs.impl_; }
 
 private:
-  Subscriber(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
+  Subscriber(rclcpp::Node::SharedPtr node, const std::string& base_topic,
              const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
              const SubLoaderPtr& loader,
              rmw_qos_profile_t custom_qos);

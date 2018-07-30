@@ -73,21 +73,23 @@ protected:
 
 void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 {
+  (void) msg;
+  std::cout << "imageCallback" << std::endl;
   total_images_received++;
 }
 
 TEST_F(MessagePassingTesting, one_message_passing)
 {
-  rclcpp::executors::SingleThreadedExecutor executor;
-  executor.add_node(node_);
-
   image_transport::Publisher pub = it().advertise("camera/image");
   image_transport::Subscriber sub = it().subscribe("camera/image", imageCallback);
+
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node_);
 
   // generate random image and publish it
   pub.publish(generate_random_image());
 
-  executor.spin_once(0s);
+  executor.spin_some();
 
   ASSERT_EQ(1, total_images_received);
 }
@@ -102,11 +104,13 @@ TEST_F(MessagePassingTesting, stress_message_passing)
   image_transport::Publisher pub = it().advertise("camera/image");
   image_transport::Subscriber sub = it().subscribe("camera/image", imageCallback);
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   // generate random image and publish it
   int image_pubs = 0;
   while (image_pubs < images_to_stress) {
     pub.publish(generate_random_image());
-    executor.spin_once(0s);
+    executor.spin_some();
     image_pubs++;
   }
 

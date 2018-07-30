@@ -8,7 +8,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra -Wpedantic -fsanitize=address)
 endif()
 
 find_package(ament_cmake REQUIRED)
@@ -19,7 +19,6 @@ find_package(sensor_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(tinyxml_vendor REQUIRED)
 find_package(TinyXML REQUIRED)
-
 
 include_directories(include)
 
@@ -41,14 +40,23 @@ ament_target_dependencies(${PROJECT_NAME}
   "sensor_msgs"
 )
 
+link_libraries("-fsanitize=address")
+
 add_library(${PROJECT_NAME}_plugins
+  SHARED
   src/manifest.cpp
   src/raw_publisher.cpp)
 target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 pluginlib_export_plugin_description_file(image_transport default_plugins.xml)
 
+add_executable(list_transports
+  src/list_transports.cpp
+)
+
+target_link_libraries(list_transports ${PROJECT_NAME})
+
 install(
-  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins
+  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins list_transports
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -90,3 +98,5 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-single_subscriber_publisher ${PROJECT_NAME})
   endif()
 endif()
+
+ament_package()

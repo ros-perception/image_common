@@ -105,7 +105,7 @@ public:
 private:
   Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
       const PubLoaderPtr& loader,
-      rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+      rmw_qos_profile_t custom_qos);
 
   struct Impl;
   typedef std::shared_ptr<Impl> ImplPtr;

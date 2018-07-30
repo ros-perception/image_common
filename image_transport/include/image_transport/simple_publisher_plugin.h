@@ -67,7 +67,7 @@ public:
   virtual uint32_t getNumSubscribers() const
   {
     //if (simple_impl_) return simple_impl_->pub_.getNumSubscribers();
-    return 0;
+    return 1;
   }
 
   virtual std::string getTopic() const
@@ -96,6 +96,8 @@ protected:
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     simple_impl_.reset(new SimplePublisherPluginImpl(node));
+
+    std::cout << "getTopicToAdvertise " << transport_topic << std::endl;
 
     simple_impl_->pub_ = node->create_publisher<M>(transport_topic, custom_qos);
   }

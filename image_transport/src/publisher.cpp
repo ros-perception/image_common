@@ -118,8 +118,9 @@ Publisher::Publisher(rclcpp::Node::SharedPtr& node, const std::string& base_topi
 
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
+      auto pub_ptr = pub.get();
       impl_->publishers_.push_back(std::move(pub));
-      pub->advertise(node, impl_->base_topic_, custom_qos);
+      pub_ptr->advertise(node, impl_->base_topic_, custom_qos);
     } catch (const std::runtime_error & e) {
       //ROS_DEBUG("Failed to load plugin %s, error string: %s",
         //lookup_name.c_str(), e.what());
