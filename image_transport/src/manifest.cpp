@@ -37,5 +37,4 @@
 #include "image_transport/raw_subscriber.h"
 
 PLUGINLIB_EXPORT_CLASS( image_transport::RawPublisher, image_transport::PublisherPlugin)
-
-//PLUGINLIB_EXPORT_CLASS( image_transport::RawSubscriber, image_transport::SubscriberPlugin)
+PLUGINLIB_EXPORT_CLASS( image_transport::RawSubscriber, image_transport::SubscriberPlugin)

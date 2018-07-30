@@ -72,9 +72,9 @@ public:
    * \param queue_size The subscription queue size
    * \param transport_hints The transport hints to pass along
    */
-  SubscriberFilter(ImageTransport& it, const std::string& base_topic)
+  SubscriberFilter(rclcpp::Node::SharedPtr node, const std::string& base_topic)
   {
-    subscribe(it, base_topic);
+    subscribe(node, base_topic);
   }
 
   /**
@@ -97,10 +97,12 @@ public:
    * \param nh The ros::NodeHandle to use to subscribe.
    * \param base_topic The topic to subscribe to.
    */
-  void subscribe(ImageTransport& it, const std::string& base_topic, rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  void subscribe(
+      rclcpp::Node::SharedPtr node,
+      const std::string& base_topic, rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
     unsubscribe();
-    sub_ = it.subscribe(base_topic, std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), custom_qos);
+    sub_ = image_transport::create_subscription(node, base_topic, std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), custom_qos);
   }
 
   /**

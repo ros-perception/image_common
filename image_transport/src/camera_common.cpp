@@ -49,7 +49,7 @@ std::string getCameraInfoTopic(const std::string & base_topic)
 
   if (rcutils_split(base_topic.c_str(), '/', allocator, &tokens) != RCUTILS_RET_OK) {
     RCUTILS_SET_ERROR_MSG(rcutils_get_error_string_safe(), allocator)
-    fprintf(stderr, rcutils_get_error_string_safe());
+    fprintf(stderr, "%s\n", rcutils_get_error_string_safe());
   } else {
     if (tokens.size > 0) {
       for(size_t ii = 0; ii < tokens.size - 1; ++ii) {

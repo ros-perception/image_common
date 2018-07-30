@@ -35,8 +35,10 @@
 #ifndef IMAGE_TRANSPORT_PUBLISHER_H
 #define IMAGE_TRANSPORT_PUBLISHER_H
 
-#include <rclcpp/node.hpp>
+#include <memory>
+
 #include <rclcpp/macros.hpp>
+#include <rclcpp/node.hpp>
 
 #include <sensor_msgs/msg/image.hpp>
 
@@ -67,7 +69,13 @@ namespace image_transport
 class Publisher
 {
 public:
-  Publisher() {}
+  Publisher() = default;
+
+  Publisher(
+    rclcpp::Node::SharedPtr nh,
+    const std::string & base_topic,
+    PubLoaderPtr loader,
+    rmw_qos_profile_t custom_qos);
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to
@@ -90,7 +98,7 @@ public:
   /*!
    * \brief Publish an image on the topics associated with this Publisher.
    */
-  void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const;
+  void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
@@ -98,22 +106,13 @@ public:
   void shutdown();
 
   operator void *() const;
-  bool operator<(const Publisher & rhs) const;
-  bool operator!=(const Publisher & rhs) const;
-  bool operator==(const Publisher & rhs) const;
+  bool operator<(const Publisher & rhs) const {return impl_ < rhs.impl_;}
+  bool operator!=(const Publisher & rhs) const {return impl_ != rhs.impl_;}
+  bool operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
-  Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
-      const PubLoaderPtr& loader,
-      rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
-
   struct Impl;
-  typedef std::shared_ptr<Impl> ImplPtr;
-  typedef std::weak_ptr<Impl> ImplWPtr;
-
-  ImplPtr impl_;
-
-  friend class ImageTransport;
+  std::shared_ptr<Impl> impl_;
 };
 
 } //namespace image_transport

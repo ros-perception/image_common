@@ -67,7 +67,12 @@ public:
   typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&,
                              const sensor_msgs::msg::CameraInfo::ConstSharedPtr&)> Callback;
 
-  CameraSubscriber() {}
+  CameraSubscriber() = default;
+
+  CameraSubscriber(rclcpp::Node::SharedPtr node,
+                   const std::string& base_topic,
+                   const Callback& callback,
+                   rmw_qos_profile_t = rmw_qos_profile_default);
 
   /**
    * \brief Get the base topic (on which the raw image is published).
@@ -100,18 +105,9 @@ public:
   bool operator==(const CameraSubscriber& rhs) const { return impl_ == rhs.impl_; }
 
 private:
-  CameraSubscriber(ImageTransport& image_it, rclcpp::Node::SharedPtr& info_nh,
-                   const std::string& base_topic,
-                   const Callback& callback,
-                   rmw_qos_profile_t = rmw_qos_profile_default);
 
   struct Impl;
-  typedef std::shared_ptr<Impl> ImplPtr;
-  typedef std::weak_ptr<Impl> ImplWPtr;
-
-  ImplPtr impl_;
-
-  friend class ImageTransport;
+  std::shared_ptr<Impl> impl_;
 };
 
 } //namespace image_transport

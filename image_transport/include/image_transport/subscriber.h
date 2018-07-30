@@ -41,7 +41,8 @@
 #include "image_transport/exception.h"
 #include "image_transport/loader_fwds.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Manages a subscription callback on a specific topic that can be interpreted
@@ -61,7 +62,16 @@ namespace image_transport {
 class Subscriber
 {
 public:
-  Subscriber() {}
+  typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)> Callback;
+
+  Subscriber() = default;
+
+  Subscriber(
+    rclcpp::Node::SharedPtr node,
+    const std::string & base_topic,
+    const Callback& callback,
+    SubLoaderPtr loader,
+    rmw_qos_profile_t custom_qos);
 
   /**
    * \brief Returns the base image topic.
@@ -86,24 +96,15 @@ public:
    */
   void shutdown();
 
-  operator void*() const;
-  bool operator< (const Subscriber& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const Subscriber& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const Subscriber& rhs) const { return impl_ == rhs.impl_; }
+  operator void *() const;
+  bool operator<(const Subscriber & rhs) const {return impl_ < rhs.impl_;}
+  bool operator!=(const Subscriber & rhs) const {return impl_ != rhs.impl_;}
+  bool operator==(const Subscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
-  Subscriber(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
-             const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
-             const SubLoaderPtr& loader,
-             rmw_qos_profile_t custom_qos);
 
   struct Impl;
-  typedef std::shared_ptr<Impl> ImplPtr;
-  typedef std::weak_ptr<Impl> ImplWPtr;
-
-  ImplPtr impl_;
-
-  friend class ImageTransport;
+  std::shared_ptr<Impl> impl_;
 };
 
 } //namespace image_transport

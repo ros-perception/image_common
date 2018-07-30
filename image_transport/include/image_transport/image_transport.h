@@ -35,130 +35,134 @@
 #ifndef IMAGE_TRANSPORT_IMAGE_TRANSPORT_H
 #define IMAGE_TRANSPORT_IMAGE_TRANSPORT_H
 
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <rclcpp/node.hpp>
+
 #include "image_transport/publisher.h"
 #include "image_transport/subscriber.h"
 #include "image_transport/camera_publisher.h"
 #include "image_transport/camera_subscriber.h"
 
-namespace image_transport
-{
+namespace image_transport {
 
-/**
- * \brief Advertise and subscribe to image topics.
- *
- * ImageTransport is analogous to ros::NodeHandle in that it contains advertise() and
- * subscribe() functions for creating advertisements and subscriptions of image topics.
- */
-class ImageTransport
-{
-public:
-  explicit ImageTransport(const rclcpp::Node::SharedPtr & node);
-
-  ~ImageTransport();
-
-  /*!
-   * \brief Advertise an image topic, simple version.
-   */
-  Publisher advertise(
+Publisher create_publisher(
+    rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
-  /**
-   * \brief Subscribe to an image topic, version for arbitrary std::function object.
-   */
-  Subscriber subscribe(
+Subscriber create_subscription(
+    rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
-    const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)> & callback,
+    const Subscriber::Callback& callback,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
-  /**
-   * \brief Subscribe to an image topic, version for bare function.
-   */
-  Subscriber subscribe(
-    const std::string & base_topic,
-    void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
-  {
-    return subscribe(base_topic,
-             std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)>(fp), custom_qos);
-  }
-
-  /**
-   * \brief Subscribe to an image topic, version for class member function with bare pointer.
-   */
-  template<class T>
-  Subscriber subscribe(
-    const std::string & base_topic,
-    void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
-  {
-    return subscribe(base_topic,
-             std::bind(fp, obj, std::placeholders::_1), custom_qos);
-  }
-
-  /*!
-   * \brief Advertise a synchronized camera raw image + info topic pair, simple version.
-   */
-  CameraPublisher advertiseCamera(
+CameraPublisher create_camera_publisher(
+    rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
-  /**
-   * \brief Subscribe to a synchronized image & camera info topic pair, version for arbitrary
-   * std::function object.
-   *
-   * This version assumes the standard topic naming scheme, where the info topic is
-   * named "camera_info" in the same namespace as the base image topic.
-   */
-  CameraSubscriber subscribeCamera(
+CameraSubscriber create_camera_subscription(
+    rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     const CameraSubscriber::Callback & callback,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
-  /**
-   * \brief Subscribe to a synchronized image & camera info topic pair, version for bare function.
-   */
-  CameraSubscriber subscribeCamera(
+std::vector<std::string> getDeclaredTransports();
+std::vector<std::string> getLoadableTransports();
+
+class ImageTransport
+{
+public:
+  ImageTransport(rclcpp::Node::SharedPtr node);
+  ~ImageTransport();
+
+  Publisher advertise(
     const std::string & base_topic,
-    void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &,
-    const sensor_msgs::msg::CameraInfo::ConstSharedPtr &),
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+  Subscriber subscribe(
+    const std::string & base_topic,
+    const Subscriber::Callback& callback,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+  Subscriber subscribe(
+    const std::string & base_topic,
+    void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribeCamera(base_topic, CameraSubscriber::Callback(fp), custom_qos);
+    return subscribe(base_topic, Subscriber::Callback(fp), custom_qos);
   }
 
-  /**
-   * \brief Subscribe to a synchronized image & camera info topic pair, version for class member
-   * function with bare pointer.
-   */
   template<class T>
-  CameraSubscriber subscribeCamera(
+  Subscriber subscribe(
     const std::string & base_topic,
-    void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &,
-    const sensor_msgs::msg::CameraInfo::ConstSharedPtr &), T * obj,
+    void (T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
+    T* obj,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribeCamera(base_topic,
-             std::bind(fp, obj, std::placeholders::_1, std::placeholders::_2), custom_qos);
+    return subscribe(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
   }
 
-  /**
-   * \brief Returns the names of all transports declared in the system. Declared
-   * transports are not necessarily built or loadable.
-   */
-  std::vector<std::string> getDeclaredTransports() const;
+  template<class T>
+  Subscriber subscribe(
+    const std::string & base_topic,
+    void (T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
+    const std::shared_ptr<T>& obj,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  {
+    return subscribe(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
+  }
 
-  /**
-   * \brief Returns the names of all transports that are loadable in the system.
-   */
+  CameraPublisher advertise_camera(
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+  CameraSubscriber subscribe_camera(
+    const std::string & base_topic,
+    const CameraSubscriber::Callback& callback,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+  CameraSubscriber subscribe_camera(
+    const std::string & base_topic,
+    void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
+               const sensor_msgs::msg::CameraInfo::ConstSharedPtr&),
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  {
+    return subscribe_camera(base_topic, CameraSubscriber::Callback(fp), custom_qos);
+  }
+
+  template<class T>
+  CameraSubscriber subscribe_camera(
+    const std::string & base_topic,
+    void (T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
+                  const sensor_msgs::msg::CameraInfo::ConstSharedPtr&),
+    T* obj,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  {
+    return subscribe_camera(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
+  }
+
+  template<class T>
+  CameraSubscriber subscribe_camera(
+    const std::string & base_topic,
+    void (T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
+                  const sensor_msgs::msg::CameraInfo::ConstSharedPtr&),
+    const std::shared_ptr<T> obj,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  {
+    return subscribe_camera(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
+  }
+
+  std::vector<std::string> getDeclaredTransports() const;
   std::vector<std::string> getLoadableTransports() const;
 
 private:
   struct Impl;
-  typedef std::shared_ptr<Impl> ImplPtr;
-  typedef std::weak_ptr<Impl> ImplWPtr;
-
-  ImplPtr impl_;
+  std::unique_ptr<Impl> impl_;
 };
 
 } //namespace image_transport

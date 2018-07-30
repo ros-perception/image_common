@@ -35,16 +35,22 @@
 #include "image_transport/subscriber.h"
 #include "image_transport/subscriber_plugin.h"
 
+#include <rclcpp/expand_topic_or_service_name.hpp>
+#include <rclcpp/logging.hpp>
+
 #include <sensor_msgs/msg/image.hpp>
 
 #include <pluginlib/class_loader.hpp>
 
-namespace image_transport {
+namespace image_transport
+{
 
 struct Subscriber::Impl
 {
-  Impl()
-    : unsubscribed_(false)
+  Impl(SubLoaderPtr loader)
+  : loader_(loader),
+    logger_(rclcpp::get_logger("image_transport.subscriber")),
+    unsubscribed_(false)
   {
   }
 
@@ -62,35 +68,36 @@ struct Subscriber::Impl
   {
     if (!unsubscribed_) {
       unsubscribed_ = true;
-      if (subscriber_)
+      if (subscriber_) {
         subscriber_->shutdown();
+      }
     }
   }
 
+  std::string lookup_name_;
   SubLoaderPtr loader_;
   std::shared_ptr<SubscriberPlugin> subscriber_;
+  rclcpp::Logger logger_;
   bool unsubscribed_;
   //double constructed_;
 };
 
-Subscriber::Subscriber(rclcpp::Node::SharedPtr& node, const std::string& base_topic,
-                       const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
-                       const SubLoaderPtr& loader,
-                       rmw_qos_profile_t custom_qos)
-  : impl_(new Impl)
+Subscriber::Subscriber(
+  rclcpp::Node::SharedPtr node,
+  const std::string & base_topic,
+  const Callback & callback,
+  SubLoaderPtr loader,
+  rmw_qos_profile_t custom_qos)
+: impl_(std::make_shared<Impl>(loader))
 {
   // Load the plugin for the chosen transport.
   // TODO(ros2) Get this from a parameter?
-  std::string lookup_name = SubscriberPlugin::getLookupName("raw");
+  impl_->lookup_name_ = SubscriberPlugin::getLookupName("raw");
   try {
-    auto instance = loader->createUniqueInstance(lookup_name);
-    impl_->subscriber_ = std::move(instance);
+    impl_->subscriber_ = loader->createSharedInstance(impl_->lookup_name_);
+  } catch (pluginlib::PluginlibException & e) {
+    throw TransportLoadException(impl_->lookup_name_, e.what());
   }
-  catch (pluginlib::PluginlibException& e) {
-    throw TransportLoadException(lookup_name, e.what());
-  }
-  // Hang on to the class loader so our shared library doesn't disappear from under us.
-  impl_->loader_ = loader;
 
   // Try to catch if user passed in a transport-specific topic as base_topic.
   // TODO(ros2) use rclcpp to clean
@@ -99,53 +106,53 @@ Subscriber::Subscriber(rclcpp::Node::SharedPtr& node, const std::string& base_to
 
   size_t found = clean_topic.rfind('/');
   if (found != std::string::npos) {
-    std::string transport = clean_topic.substr(found+1);
+    std::string transport = clean_topic.substr(found + 1);
     std::string plugin_name = SubscriberPlugin::getLookupName(transport);
     std::vector<std::string> plugins = loader->getDeclaredClasses();
     if (std::find(plugins.begin(), plugins.end(), plugin_name) != plugins.end()) {
       std::string real_base_topic = clean_topic.substr(0, found);
 
-      /* TODO(ros2) change to new logging.
-      ROS_WARN("[image_transport] It looks like you are trying to subscribe directly to a "
-               "transport-specific image topic '%s', in which case you will likely get a connection "
-               "error. Try subscribing to the base topic '%s' instead with parameter ~image_transport "
-               "set to '%s' (on the command line, _image_transport:=%s). "
-               "See http://ros.org/wiki/image_transport for details.",
-               clean_topic.c_str(), real_base_topic.c_str(), transport.c_str(), transport.c_str());
-               */
+      RCLCPP_WARN(impl_->logger_,
+        "[image_transport] It looks like you are trying to subscribe directly to a "
+        "transport-specific image topic '%s', in which case you will likely get a connection "
+        "error. Try subscribing to the base topic '%s' instead with parameter ~image_transport "
+        "set to '%s' (on the command line, _image_transport:=%s). "
+        "See http://ros.org/wiki/image_transport for details.",
+        clean_topic.c_str(), real_base_topic.c_str(), transport.c_str(), transport.c_str());
     }
   }
 
   // Tell plugin to subscribe.
+  RCLCPP_DEBUG(impl_->logger_, "Subscribing to: %s\n", base_topic.c_str());
   impl_->subscriber_->subscribe(node, base_topic, callback, custom_qos);
 }
 
 std::string Subscriber::getTopic() const
 {
-  if (impl_) return impl_->subscriber_->getTopic();
+  if (impl_) {return impl_->subscriber_->getTopic();}
   return std::string();
 }
 
 uint32_t Subscriber::getNumPublishers() const
 {
-  if (impl_) return impl_->subscriber_->getNumPublishers();
+  if (impl_) {return impl_->subscriber_->getNumPublishers();}
   return 0;
 }
 
 std::string Subscriber::getTransport() const
 {
-  if (impl_) return impl_->subscriber_->getTransportName();
+  if (impl_) {return impl_->subscriber_->getTransportName();}
   return std::string();
 }
 
 void Subscriber::shutdown()
 {
-  if (impl_) impl_->shutdown();
+  if (impl_) {impl_->shutdown();}
 }
 
-Subscriber::operator void*() const
+Subscriber::operator void *() const
 {
-  return (impl_ && impl_->isValid()) ? (void*)1 : (void*)0;
+  return (impl_ && impl_->isValid()) ? (void *)1 : (void *)0;
 }
 
 } //namespace image_transport

@@ -36,7 +36,10 @@
 #include "image_transport/publisher.h"
 #include "image_transport/publisher_plugin.h"
 
+#include <rclcpp/expand_topic_or_service_name.hpp>
+#include <rclcpp/logging.hpp>
 #include <rclcpp/node.hpp>
+
 #include <pluginlib/class_loader.hpp>
 #include <boost/algorithm/string/erase.hpp>
 
@@ -58,7 +61,7 @@ struct Publisher::Impl
   uint32_t getNumSubscribers() const
   {
     uint32_t count = 0;
-    for (const auto& pub: publishers_) {
+    for (const auto & pub: publishers_) {
       count += pub->getNumSubscribers();
     }
     return count;
@@ -78,7 +81,7 @@ struct Publisher::Impl
   {
     if (!unadvertised_) {
       unadvertised_ = true;
-      for(auto& pub: publishers_) {
+      for (auto & pub: publishers_) {
         pub->shutdown();
       }
       publishers_.clear();
@@ -89,18 +92,17 @@ struct Publisher::Impl
   PubLoaderPtr loader_;
   std::vector<std::shared_ptr<PublisherPlugin>> publishers_;
   bool unadvertised_;
-  //double constructed_;
 };
 
-Publisher::Publisher(rclcpp::Node::SharedPtr& node, const std::string& base_topic,
-                     const PubLoaderPtr& loader, rmw_qos_profile_t custom_qos)
-  : impl_(new Impl)
+Publisher::Publisher(
+  rclcpp::Node::SharedPtr node, const std::string & base_topic,
+  PubLoaderPtr loader, rmw_qos_profile_t custom_qos)
+: impl_(std::make_shared<Impl>())
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
-  //TODO(ros2) fix name resolution
-  //impl_->base_topic_ = nh.resolveName(base_topic);
-  impl_->base_topic_ = base_topic;
+  std::string image_topic = rclcpp::expand_topic_or_service_name(base_topic,
+      node->get_name(), node->get_namespace());
   impl_->loader_ = loader;
 
   std::vector<std::string> blacklist_vec;
@@ -111,6 +113,7 @@ Publisher::Publisher(rclcpp::Node::SharedPtr& node, const std::string& base_topi
   }
 
   for (const auto & lookup_name: loader->getDeclaredClasses()) {
+    //TODO(ros2) remove boost::erase_last_copy
     const std::string transport_name = erase_last_copy(lookup_name, "_pub");
     if (blacklist.count(transport_name)) {
       continue;
@@ -118,11 +121,11 @@ Publisher::Publisher(rclcpp::Node::SharedPtr& node, const std::string& base_topi
 
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
+      pub->advertise(node, image_topic, custom_qos);
       impl_->publishers_.push_back(std::move(pub));
-      pub->advertise(node, impl_->base_topic_, custom_qos);
     } catch (const std::runtime_error & e) {
-      //ROS_DEBUG("Failed to load plugin %s, error string: %s",
-        //lookup_name.c_str(), e.what());
+      fprintf(stderr, "Failed to load plugin %s, error string: %s\n",
+        lookup_name.c_str(), e.what());
     }
   }
 
@@ -147,11 +150,11 @@ std::string Publisher::getTopic() const
 void Publisher::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    //ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::Publisher");
+    fprintf(stderr, "Call to publish() on an invalid image_transport::Publisher\n");
     return;
   }
 
-  for (const auto& pub: impl_->publishers_) {
+  for (const auto & pub: impl_->publishers_) {
     if (pub->getNumSubscribers() > 0) {
       pub->publish(message);
     }
@@ -161,12 +164,11 @@ void Publisher::publish(const sensor_msgs::msg::Image & message) const
 void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    //TODO(ros2) Fix log message
-    //ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::Publisher");
+    fprintf(stderr, "Call to publish() on an invalid image_transport::Publisher\n");
     return;
   }
 
-  for(const auto& pub: impl_->publishers_) {
+  for (const auto & pub: impl_->publishers_) {
     if (pub->getNumSubscribers() > 0) {
       pub->publish(message);
     }
@@ -185,10 +187,5 @@ Publisher::operator void *() const
 {
   return (impl_ && impl_->isValid()) ? (void *)1 : (void *)0;
 }
-
-bool Publisher::operator<(const Publisher & rhs) const {return impl_ < rhs.impl_;}
-bool Publisher::operator!=(const Publisher & rhs) const {return impl_ != rhs.impl_;}
-bool Publisher::operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
-
 
 } //namespace image_transport

@@ -38,20 +38,26 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 
-inline void increment(int* value)
+inline void increment(int * value)
 {
   ++(*value);
 }
 
-namespace image_transport {
+namespace image_transport
+{
 
 struct CameraSubscriber::Impl
 {
-  Impl(rmw_qos_profile_t custom_qos)
-    : //sync_(custom_qos),
-      unsubscribed_(false),
-      image_received_(0), info_received_(0), both_received_(0)
-  {}
+  using Image = sensor_msgs::msg::Image;
+  using CameraInfo = sensor_msgs::msg::CameraInfo;
+  using TimeSync = message_filters::TimeSynchronizer<Image, CameraInfo>;
+
+  Impl()
+  : sync_(10),
+    unsubscribed_(false),
+    image_received_(0), info_received_(0), both_received_(0)
+  {
+  }
 
   ~Impl()
   {
@@ -91,51 +97,52 @@ struct CameraSubscriber::Impl
   }
 
   SubscriberFilter image_sub_;
+  message_filters::Subscriber<CameraInfo> info_sub_;
+  TimeSync sync_;
 
-  //message_filters::Subscriber<sensor_msgs::msg::CameraInfo> info_sub_;
-  //message_filters::TimeSynchronizer<sensor_msgs::msg::Image, sensor_msgs::msg::CameraInfo> sync_;
   bool unsubscribed_;
   // For detecting when the topics aren't synchronized
-  //ros::WallTimer check_synced_timer_;
+  std::shared_ptr<rclcpp::TimerBase> check_synced_timer_;
   int image_received_, info_received_, both_received_;
 };
 
-CameraSubscriber::CameraSubscriber(ImageTransport& image_it, rclcpp::Node::SharedPtr& node,
-                                   const std::string& base_topic,
-                                   const Callback& callback,
-                                   rmw_qos_profile_t custom_qos)
-  : impl_(new Impl(custom_qos))
+CameraSubscriber::CameraSubscriber(
+  rclcpp::Node::SharedPtr node,
+  const std::string & base_topic,
+  const Callback & callback,
+  rmw_qos_profile_t custom_qos)
+: impl_(std::make_shared<Impl>())
 {
   // Must explicitly remap the image topic since we then do some string manipulation on it
   // to figure out the sibling camera_info topic.
-  //std::string image_topic = node.resolveName(base_topic);
-  std::string image_topic = base_topic;
+  std::string image_topic = rclcpp::expand_topic_or_service_name(base_topic,
+      node->get_name(), node->get_namespace());
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  //impl_->image_sub_.subscribe(image_it, image_topic, custom_qos);
-  //impl_->info_sub_ .subscribe(info_nh, info_topic, custom_qos);
+  impl_->image_sub_.subscribe(node, image_topic, custom_qos);
+  impl_->info_sub_.subscribe(node, info_topic, custom_qos);
 
-  //impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
-  // need for Boost.Bind here is kind of broken
-  //impl_->sync_.registerCallback(std::bind(callback, std::placeholders::_1, std::placeholders::_2));
+  impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
+  impl_->sync_.registerCallback(std::bind(callback, std::placeholders::_1, std::placeholders::_2));
 
   // Complain every 10s if it appears that the image and info topics are not synchronized
-  //impl_->image_sub_.registerCallback(std::bind(increment, &impl_->image_received_));
-  //impl_->info_sub_.registerCallback(std::bind(increment, &impl_->info_received_));
-  //impl_->sync_.registerCallback(std::bind(increment, &impl_->both_received_));
-  //impl_->check_synced_timer_ = info_nh.createWallTimer(ros::WallDuration(10.0),
-  //                                                    std::bind(&Impl::checkImagesSynchronized, impl_.get()));
+  impl_->image_sub_.registerCallback(std::bind(increment, &impl_->image_received_));
+  impl_->info_sub_.registerCallback(std::bind(increment, &impl_->info_received_));
+  impl_->sync_.registerCallback(std::bind(increment, &impl_->both_received_));
+
+  impl_->check_synced_timer_ = node->create_wall_timer(std::chrono::seconds(1),
+                                                      std::bind(&Impl::checkImagesSynchronized, impl_.get()));
 }
 
 std::string CameraSubscriber::getTopic() const
 {
-  //if (impl_) return impl_->image_sub_.getTopic();
+  if (impl_) return impl_->image_sub_.getTopic();
   return std::string();
 }
 
 std::string CameraSubscriber::getInfoTopic() const
 {
-  //if (impl_) return impl_->info_sub_.getTopic();
+  if (impl_) return impl_->info_sub_.getSubscriber()->get_topic_name();
   return std::string();
 }
 
@@ -149,18 +156,18 @@ uint32_t CameraSubscriber::getNumPublishers() const
 
 std::string CameraSubscriber::getTransport() const
 {
-  //if (impl_) return impl_->image_sub_.getTransport();
+  if (impl_) return impl_->image_sub_.getTransport();
   return std::string();
 }
 
 void CameraSubscriber::shutdown()
 {
-  if (impl_) impl_->shutdown();
+  if (impl_) {impl_->shutdown();}
 }
 
-CameraSubscriber::operator void*() const
+CameraSubscriber::operator void *() const
 {
-  return (impl_ && impl_->isValid()) ? (void*)1 : (void*)0;
+  return (impl_ && impl_->isValid()) ? (void *)1 : (void *)0;
 }
 
 } //namespace image_transport
