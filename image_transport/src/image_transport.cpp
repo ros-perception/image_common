@@ -56,6 +56,10 @@ struct ImageTransport::Impl
       "image_transport::SubscriberPlugin") )
   {
   }
+
+  ~Impl() {
+    std::cout << "~ImageTransport::Impl" << std::endl;
+  }
 };
 
 ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
@@ -65,6 +69,7 @@ ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
 
 ImageTransport::~ImageTransport()
 {
+  std::cout << "~ImageTransport" << std::endl;
 }
 
 Publisher ImageTransport::advertise(const std::string & base_topic, rmw_qos_profile_t custom_qos)
@@ -114,7 +119,6 @@ std::vector<std::string> ImageTransport::getLoadableTransports() const
     // transport name to the list of valid plugins, otherwise ignore
     // it.
     try {
-      std::cout << transportPlugin << std::endl;
       std::shared_ptr<image_transport::SubscriberPlugin> sub =
         impl_->sub_loader_->createUniqueInstance(transportPlugin);
       loadableTransports.push_back(erase_last_copy(transportPlugin, "_sub")); // Remove the "_sub" at the end of each class name.

@@ -52,7 +52,9 @@ public:
 
   typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)> Callback;
 
-  virtual ~SubscriberPlugin() {}
+  virtual ~SubscriberPlugin() {
+    std::cout << "~SubscriberPlugin" << std::endl;
+  }
 
   /**
    * \brief Get a string identifier for the transport provided by

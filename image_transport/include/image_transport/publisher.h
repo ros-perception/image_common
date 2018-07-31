@@ -35,8 +35,8 @@
 #ifndef IMAGE_TRANSPORT_PUBLISHER_H
 #define IMAGE_TRANSPORT_PUBLISHER_H
 
-#include <rclcpp/node.hpp>
 #include <rclcpp/macros.hpp>
+#include <rclcpp/node.hpp>
 
 #include <sensor_msgs/msg/image.hpp>
 
@@ -103,8 +103,8 @@ public:
   bool operator==(const Publisher & rhs) const;
 
 private:
-  Publisher(rclcpp::Node::SharedPtr& nh, const std::string& base_topic,
-      const PubLoaderPtr& loader,
+  Publisher(rclcpp::Node::SharedPtr nh, const std::string& base_topic,
+      PubLoaderPtr loader,
       rmw_qos_profile_t custom_qos);
 
   struct Impl;

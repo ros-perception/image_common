@@ -94,7 +94,7 @@ public:
 private:
   Subscriber(rclcpp::Node::SharedPtr node, const std::string& base_topic,
              const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
-             const SubLoaderPtr& loader,
+             SubLoaderPtr loader,
              rmw_qos_profile_t custom_qos);
 
   struct Impl;

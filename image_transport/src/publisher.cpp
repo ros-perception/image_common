@@ -36,7 +36,10 @@
 #include "image_transport/publisher.h"
 #include "image_transport/publisher_plugin.h"
 
+#include <rclcpp/expand_topic_or_service_name.hpp>
+#include <rclcpp/logging.hpp>
 #include <rclcpp/node.hpp>
+
 #include <pluginlib/class_loader.hpp>
 #include <boost/algorithm/string/erase.hpp>
 
@@ -46,7 +49,8 @@ namespace image_transport
 struct Publisher::Impl
 {
   Impl()
-  : unadvertised_(false)
+  : logger_(rclcpp::get_logger("image_transport.publisher")),
+    unadvertised_(false)
   {
   }
 
@@ -88,19 +92,18 @@ struct Publisher::Impl
   std::string base_topic_;
   PubLoaderPtr loader_;
   std::vector<std::shared_ptr<PublisherPlugin>> publishers_;
+  rclcpp::Logger logger_;
   bool unadvertised_;
   //double constructed_;
 };
 
-Publisher::Publisher(rclcpp::Node::SharedPtr& node, const std::string& base_topic,
-                     const PubLoaderPtr& loader, rmw_qos_profile_t custom_qos)
+Publisher::Publisher(rclcpp::Node::SharedPtr node, const std::string& base_topic,
+                     PubLoaderPtr loader, rmw_qos_profile_t custom_qos)
   : impl_(new Impl)
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
-  //TODO(ros2) fix name resolution
-  //impl_->base_topic_ = nh.resolveName(base_topic);
-  impl_->base_topic_ = base_topic;
+  impl_->base_topic_  = rclcpp::expand_topic_or_service_name(base_topic, node->get_name(), node->get_namespace());
   impl_->loader_ = loader;
 
   std::vector<std::string> blacklist_vec;
@@ -122,8 +125,8 @@ Publisher::Publisher(rclcpp::Node::SharedPtr& node, const std::string& base_topi
       impl_->publishers_.push_back(std::move(pub));
       pub_ptr->advertise(node, impl_->base_topic_, custom_qos);
     } catch (const std::runtime_error & e) {
-      //ROS_DEBUG("Failed to load plugin %s, error string: %s",
-        //lookup_name.c_str(), e.what());
+      RCLCPP_DEBUG(impl_->logger_, "Failed to load plugin %s, error string: %s",
+        lookup_name.c_str(), e.what());
     }
   }
 
@@ -148,7 +151,7 @@ std::string Publisher::getTopic() const
 void Publisher::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    //ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::Publisher");
+    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::Publisher");
     return;
   }
 
@@ -162,8 +165,7 @@ void Publisher::publish(const sensor_msgs::msg::Image & message) const
 void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    //TODO(ros2) Fix log message
-    //ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::Publisher");
+    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::Publisher");
     return;
   }
 

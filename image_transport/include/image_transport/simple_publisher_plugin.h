@@ -35,6 +35,9 @@
 #ifndef IMAGE_TRANSPORT_SIMPLE_PUBLISHER_PLUGIN_H
 #define IMAGE_TRANSPORT_SIMPLE_PUBLISHER_PLUGIN_H
 
+#include <rclcpp/logger.hpp>
+#include <rclcpp/logging.hpp>
+
 #include "image_transport/publisher_plugin.h"
 
 #include <memory>
@@ -66,20 +69,20 @@ public:
 
   virtual uint32_t getNumSubscribers() const
   {
-    //if (simple_impl_) return simple_impl_->pub_.getNumSubscribers();
-    return 1;
+    if (simple_impl_) return simple_impl_->node_->count_subscribers(getTopic());
+    return 0;
   }
 
   virtual std::string getTopic() const
   {
-    //if (simple_impl_) return simple_impl_->pub_.getTopic();
+    if (simple_impl_) return simple_impl_->pub_->get_topic_name();
     return std::string();
   }
 
   virtual void publish(const sensor_msgs::msg::Image& message) const
   {
     if (!simple_impl_ || !simple_impl_->pub_) {
-      //ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
+      //RCLCPP_ERROR(simple_impl_->logger_, "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
       return;
     }
 
@@ -92,12 +95,12 @@ public:
   }
 
 protected:
-  virtual void advertiseImpl(rclcpp::Node::SharedPtr& node, const std::string& base_topic, rmw_qos_profile_t custom_qos)
+  virtual void advertiseImpl(rclcpp::Node::SharedPtr node, const std::string& base_topic, rmw_qos_profile_t custom_qos)
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     simple_impl_.reset(new SimplePublisherPluginImpl(node));
 
-    std::cout << "getTopicToAdvertise " << transport_topic << std::endl;
+    //RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic);
 
     simple_impl_->pub_ = node->create_publisher<M>(transport_topic, custom_qos);
   }
@@ -128,13 +131,15 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    SimplePublisherPluginImpl(const rclcpp::Node::SharedPtr& node)
-      : node_(node)
+    SimplePublisherPluginImpl(rclcpp::Node::SharedPtr node)
+      : node_(node),
+        logger_(rclcpp::get_logger("image_transport.publisher.simple_publisher_plugin"))
     {
 
     }
 
-    const rclcpp::Node::SharedPtr node_;
+    rclcpp::Node::SharedPtr node_;
+    rclcpp::Logger logger_;
     typename rclcpp::Publisher<M>::SharedPtr pub_;
   };
 

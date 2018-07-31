@@ -66,17 +66,19 @@ template<class M>
 class SimpleSubscriberPlugin : public SubscriberPlugin
 {
 public:
-  virtual ~SimpleSubscriberPlugin() {}
+  virtual ~SimpleSubscriberPlugin() {
+    std::cout << "~SimpleSubscriberPlugin" << std::endl;
+  }
 
   virtual std::string getTopic() const
   {
-    //if (simple_impl_) return simple_impl_->sub_.getTopic();
+    if (simple_impl_) return simple_impl_->sub_->get_topic_name();
     return std::string();
   }
 
   virtual uint32_t getNumPublishers() const
   {
-    //if (simple_impl_) return simple_impl_->sub_.getNumPublishers();
+    if (simple_impl_) return simple_impl_->node_->count_publishers(getTopic());
     return 0;
   }
 
@@ -93,7 +95,7 @@ protected:
    * @param user_cb The user Image callback to invoke, if appropriate.
    */
   virtual void internalCallback(
-    const typename std::shared_ptr<const M> message,
+    const typename std::shared_ptr<const M>& message,
     const Callback & user_cb) = 0;
 
   /**
@@ -114,15 +116,16 @@ protected:
   {
     // Push each group of transport-specific parameters into a separate sub-namespace
     //ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
-    simple_impl_ = std::make_unique<SimpleSubscriberPluginImpl>(node);
+    simple_impl_ = std::make_shared<SimpleSubscriberPluginImpl>(node);
 
-    std::function<void (const std::shared_ptr<const M>)> fcn = std::bind(&SimpleSubscriberPlugin<M>::internalCallback,
+    std::function<void (const std::shared_ptr<const M>)> fcn =
+      std::bind(&SimpleSubscriberPlugin<M>::internalCallback,
           this, std::placeholders::_1, callback);
 
     std::cout << "getTopicToSubsribe " << getTopicToSubscribe(base_topic) << std::endl;
 
-    simple_impl_->sub_ = node->create_subscription<M>(getTopicToSubscribe(base_topic),
-        fcn,
+    auto sub = node->create_subscription<M>(getTopicToSubscribe(base_topic),
+        [](const typename M::UniquePtr msg){ (void)msg; },
         custom_qos);
   }
 
@@ -134,11 +137,15 @@ private:
     {
     }
 
+    ~SimpleSubscriberPluginImpl() {
+      std::cout << "~SimpleSubscriberPluginImpl" << std::endl;
+    }
+
     rclcpp::Node::SharedPtr node_;
     typename rclcpp::Subscription<M>::SharedPtr sub_;
   };
 
-  std::unique_ptr<SimpleSubscriberPluginImpl> simple_impl_;
+  std::shared_ptr<SimpleSubscriberPluginImpl> simple_impl_;
 };
 
 } //namespace image_transport

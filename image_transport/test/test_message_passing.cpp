@@ -42,6 +42,8 @@
 #include "sensor_msgs/msg/image.hpp"
 #include "image_transport/image_transport.h"
 
+#include "utils.hpp"
+
 using namespace std::chrono_literals;
 
 int total_images_received = 0;
@@ -67,6 +69,13 @@ protected:
     total_images_received = 0;
   }
 
+  void TearDown() {
+    std::cout << "TearDown" << std::endl;
+    if(node_) {
+      std::cout << "Node still valid" << std::endl;
+    }
+  }
+
   rclcpp::Node::SharedPtr node_;
 };
 
@@ -80,20 +89,41 @@ void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 
 TEST_F(MessagePassingTesting, one_message_passing)
 {
+  const size_t max_retries = 3;
+  const size_t max_loops = 200;
+  const std::chrono::milliseconds sleep_per_loop = std::chrono::milliseconds(10);
+
+  rclcpp::executors::SingleThreadedExecutor executor;
+
   image_transport::Publisher pub = it().advertise("camera/image");
   image_transport::Subscriber sub = it().subscribe("camera/image", imageCallback);
 
-  rclcpp::executors::SingleThreadedExecutor executor;
-  executor.add_node(node_);
+  test_rclcpp::wait_for_subscriber(node_, sub.getTopic());
 
-  // generate random image and publish it
-  pub.publish(generate_random_image());
+  ASSERT_EQ(0, total_images_received);
+  ASSERT_EQ(1u, pub.getNumSubscribers());
+  ASSERT_EQ(1u, sub.getNumPublishers());
 
-  executor.spin_some();
+  executor.spin_node_some(node_);
+  ASSERT_EQ(0, total_images_received);
+
+  size_t retry = 0;
+  while(retry < max_retries && total_images_received == 0) {
+    // generate random image and publish it
+    pub.publish(generate_random_image());
+
+    executor.spin_node_some(node_);
+    size_t loop = 0;
+    while ((total_images_received != 1) && (loop++ < max_loops)) {
+      std::this_thread::sleep_for(sleep_per_loop);
+      executor.spin_node_some(node_);
+    }
+  }
 
   ASSERT_EQ(1, total_images_received);
 }
 
+/*
 TEST_F(MessagePassingTesting, stress_message_passing)
 {
   rclcpp::executors::SingleThreadedExecutor executor;
@@ -116,13 +146,14 @@ TEST_F(MessagePassingTesting, stress_message_passing)
 
   ASSERT_EQ(images_to_stress, total_images_received);
 }
-
+*/
 
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
+  std::cout << "rclcpp::shutdown" << std::endl;
   rclcpp::shutdown();
   return ret;
 }

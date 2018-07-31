@@ -35,6 +35,9 @@
 #include "image_transport/subscriber.h"
 #include "image_transport/subscriber_plugin.h"
 
+#include <rclcpp/expand_topic_or_service_name.hpp>
+#include <rclcpp/logging.hpp>
+
 #include <sensor_msgs/msg/image.hpp>
 
 #include <pluginlib/class_loader.hpp>
@@ -44,7 +47,8 @@ namespace image_transport {
 struct Subscriber::Impl
 {
   Impl()
-    : unsubscribed_(false)
+    : logger_(rclcpp::get_logger("image_transport.subscriber")),
+      unsubscribed_(false)
   {
   }
 
@@ -69,13 +73,14 @@ struct Subscriber::Impl
 
   SubLoaderPtr loader_;
   std::shared_ptr<SubscriberPlugin> subscriber_;
+  rclcpp::Logger logger_;
   bool unsubscribed_;
   //double constructed_;
 };
 
 Subscriber::Subscriber(rclcpp::Node::SharedPtr node, const std::string& base_topic,
                        const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,
-                       const SubLoaderPtr& loader,
+                       SubLoaderPtr loader,
                        rmw_qos_profile_t custom_qos)
   : impl_(new Impl)
 {
@@ -105,19 +110,18 @@ Subscriber::Subscriber(rclcpp::Node::SharedPtr node, const std::string& base_top
     if (std::find(plugins.begin(), plugins.end(), plugin_name) != plugins.end()) {
       std::string real_base_topic = clean_topic.substr(0, found);
 
-      /* TODO(ros2) change to new logging.
-      ROS_WARN("[image_transport] It looks like you are trying to subscribe directly to a "
-               "transport-specific image topic '%s', in which case you will likely get a connection "
-               "error. Try subscribing to the base topic '%s' instead with parameter ~image_transport "
-               "set to '%s' (on the command line, _image_transport:=%s). "
-               "See http://ros.org/wiki/image_transport for details.",
-               clean_topic.c_str(), real_base_topic.c_str(), transport.c_str(), transport.c_str());
-               */
+      RCLCPP_WARN(impl_->logger_,
+      "[image_transport] It looks like you are trying to subscribe directly to a "
+      "transport-specific image topic '%s', in which case you will likely get a connection "
+      "error. Try subscribing to the base topic '%s' instead with parameter ~image_transport "
+      "set to '%s' (on the command line, _image_transport:=%s). "
+      "See http://ros.org/wiki/image_transport for details.",
+        clean_topic.c_str(), real_base_topic.c_str(), transport.c_str(), transport.c_str());
     }
   }
 
   // Tell plugin to subscribe.
-  std::cout << "Subscribing to: " << base_topic << std::endl;
+  RCLCPP_DEBUG(impl_->logger_, "Subscribing to: %s\n", base_topic.c_str());
   impl_->subscriber_->subscribe(node, base_topic, callback, custom_qos);
 }
 

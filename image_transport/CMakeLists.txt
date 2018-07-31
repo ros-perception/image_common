@@ -8,7 +8,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic -fsanitize=address)
+  add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 find_package(ament_cmake REQUIRED)
@@ -40,7 +40,7 @@ ament_target_dependencies(${PROJECT_NAME}
   "sensor_msgs"
 )
 
-link_libraries("-fsanitize=address")
+#link_libraries("-fsanitize=address")
 
 add_library(${PROJECT_NAME}_plugins
   SHARED

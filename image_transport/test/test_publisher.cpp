@@ -5,7 +5,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-#include "image_transport/publisher.h"
+#include "image_transport/image_transport.h"
 
 class TestPublisher : public ::testing::Test
 {
@@ -29,5 +29,6 @@ protected:
 };
 
 TEST_F(TestPublisher, construction_and_destruction) {
-
+  image_transport::ImageTransport it(node);
+  image_transport::Publisher pub = it.advertise("camera/image");
 }

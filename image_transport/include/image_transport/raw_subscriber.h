@@ -57,7 +57,7 @@ public:
   }
 
 protected:
-  virtual void internalCallback(const std::shared_ptr<const sensor_msgs::msg::Image> message, const Callback& user_cb)
+  virtual void internalCallback(const std::shared_ptr<const sensor_msgs::msg::Image>& message, const Callback& user_cb)
   {
     std::cout << "internalCallback" << std::endl;
     user_cb(message);
