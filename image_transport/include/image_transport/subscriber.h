@@ -86,6 +86,8 @@ public:
    */
   void shutdown();
 
+  rclcpp::SubscriptionBase::SharedPtr get_sub();
+
   operator void*() const;
   bool operator< (const Subscriber& rhs) const { return impl_ <  rhs.impl_; }
   bool operator!=(const Subscriber& rhs) const { return impl_ != rhs.impl_; }

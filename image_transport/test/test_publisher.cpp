@@ -29,6 +29,6 @@ protected:
 };
 
 TEST_F(TestPublisher, construction_and_destruction) {
-  image_transport::ImageTransport it(node);
-  image_transport::Publisher pub = it.advertise("camera/image");
+  image_transport::ImageTransport it;
+  image_transport::Publisher pub = it.advertise(node, "camera/image");
 }

@@ -69,7 +69,7 @@ public:
 
   virtual uint32_t getNumSubscribers() const
   {
-    if (simple_impl_) return simple_impl_->node_->count_subscribers(getTopic());
+    // if (simple_impl_) return simple_impl_->node_->count_subscribers(getTopic());
     return 0;
   }
 
@@ -98,7 +98,7 @@ protected:
   virtual void advertiseImpl(rclcpp::Node::SharedPtr node, const std::string& base_topic, rmw_qos_profile_t custom_qos)
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
-    simple_impl_.reset(new SimplePublisherPluginImpl(node));
+    simple_impl_.reset(new SimplePublisherPluginImpl());
 
     //RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic);
 
@@ -131,14 +131,15 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    SimplePublisherPluginImpl(rclcpp::Node::SharedPtr node)
-      : node_(node),
+    SimplePublisherPluginImpl()
+    :
+      // : node_(node),
         logger_(rclcpp::get_logger("image_transport.publisher.simple_publisher_plugin"))
     {
 
     }
 
-    rclcpp::Node::SharedPtr node_;
+    // rclcpp::Node::SharedPtr node_;
     rclcpp::Logger logger_;
     typename rclcpp::Publisher<M>::SharedPtr pub_;
   };

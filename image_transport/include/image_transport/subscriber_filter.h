@@ -74,7 +74,7 @@ public:
    */
   SubscriberFilter(ImageTransport& it, const std::string& base_topic)
   {
-    subscribe(it, base_topic);
+    // subscribe(it, base_topic);
   }
 
   /**
@@ -97,11 +97,11 @@ public:
    * \param nh The ros::NodeHandle to use to subscribe.
    * \param base_topic The topic to subscribe to.
    */
-  void subscribe(ImageTransport& it, const std::string& base_topic, rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
-  {
-    unsubscribe();
-    sub_ = it.subscribe(base_topic, std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), custom_qos);
-  }
+  // void subscribe(ImageTransport& it, const std::string& base_topic, rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  // {
+  //   unsubscribe();
+  //   sub_ = it.subscribe(base_topic, std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), custom_qos);
+  // }
 
   /**
    * \brief Force immediate unsubscription of this subscriber from its topic

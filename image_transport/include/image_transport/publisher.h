@@ -103,7 +103,7 @@ public:
   bool operator==(const Publisher & rhs) const;
 
 private:
-  Publisher(rclcpp::Node::SharedPtr nh, const std::string& base_topic,
+  Publisher(rclcpp::Node::SharedPtr node, const std::string& base_topic,
       PubLoaderPtr loader,
       rmw_qos_profile_t custom_qos);
 

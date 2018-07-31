@@ -78,7 +78,7 @@ public:
 
   virtual uint32_t getNumPublishers() const
   {
-    if (simple_impl_) return simple_impl_->node_->count_publishers(getTopic());
+    // if (simple_impl_) return simple_impl_->node_->count_publishers(getTopic());
     return 0;
   }
 
@@ -86,6 +86,8 @@ public:
   {
     //if (simple_impl_) simple_impl_->sub_.shutdown();
   }
+
+  std::shared_ptr<rclcpp::SubscriptionBase> get_sub() {return simple_impl_->sub_;}
 
 protected:
   /**
@@ -116,7 +118,7 @@ protected:
   {
     // Push each group of transport-specific parameters into a separate sub-namespace
     //ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
-    simple_impl_ = std::make_shared<SimpleSubscriberPluginImpl>(node);
+    simple_impl_ = std::make_unique<SimpleSubscriberPluginImpl>();
 
     std::function<void (const std::shared_ptr<const M>)> fcn =
       std::bind(&SimpleSubscriberPlugin<M>::internalCallback,
@@ -132,8 +134,8 @@ protected:
 private:
   struct SimpleSubscriberPluginImpl
   {
-    SimpleSubscriberPluginImpl(rclcpp::Node::SharedPtr node)
-    : node_(node)
+    SimpleSubscriberPluginImpl()
+    // : node_(node)
     {
     }
 
@@ -141,11 +143,11 @@ private:
       std::cout << "~SimpleSubscriberPluginImpl" << std::endl;
     }
 
-    rclcpp::Node::SharedPtr node_;
+    // rclcpp::Node::SharedPtr node_;
     typename rclcpp::Subscription<M>::SharedPtr sub_;
   };
 
-  std::shared_ptr<SimpleSubscriberPluginImpl> simple_impl_;
+  std::unique_ptr<SimpleSubscriberPluginImpl> simple_impl_;
 };
 
 } //namespace image_transport

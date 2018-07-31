@@ -79,7 +79,7 @@ CameraPublisher::CameraPublisher(ImageTransport& image_it, rclcpp::Node::SharedP
   std::string image_topic = base_topic;
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  impl_->image_pub_ = image_it.advertise(image_topic, custom_qos);
+  impl_->image_pub_ = image_it.advertise(node, image_topic, custom_qos);
   impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, custom_qos);
 }
 

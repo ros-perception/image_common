@@ -36,6 +36,7 @@
 #define IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
 
 #include <rclcpp/macros.hpp>
+#include <rclcpp/subscription.hpp>
 
 namespace image_transport
 {
@@ -119,6 +120,8 @@ public:
   {
     return "image_transport/" + transport_type + "_sub";
   }
+
+  virtual std::shared_ptr<rclcpp::SubscriptionBase> get_sub() = 0;
 
 protected:
   /**

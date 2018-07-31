@@ -71,12 +71,16 @@ struct Subscriber::Impl
     }
   }
 
+  std::shared_ptr<rclcpp::SubscriptionBase> get_sub() {return subscriber_->get_sub();}
+
   SubLoaderPtr loader_;
   std::shared_ptr<SubscriberPlugin> subscriber_;
   rclcpp::Logger logger_;
   bool unsubscribed_;
   //double constructed_;
 };
+
+rclcpp::SubscriptionBase::SharedPtr Subscriber::get_sub() {return impl_->get_sub();}
 
 Subscriber::Subscriber(rclcpp::Node::SharedPtr node, const std::string& base_topic,
                        const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>& callback,

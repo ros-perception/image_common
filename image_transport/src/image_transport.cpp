@@ -44,13 +44,13 @@ namespace image_transport
 
 struct ImageTransport::Impl
 {
-  rclcpp::Node::SharedPtr node_;
+  // rclcpp::Node::SharedPtr node_;
   PubLoaderPtr pub_loader_;
   SubLoaderPtr sub_loader_;
 
-  Impl(rclcpp::Node::SharedPtr node)
-  : node_(node),
-    pub_loader_(std::make_shared<PubLoader>("image_transport",
+  Impl()
+  // : node_(node),
+  :  pub_loader_(std::make_shared<PubLoader>("image_transport",
       "image_transport::PublisherPlugin") ),
     sub_loader_(std::make_shared<SubLoader>("image_transport",
       "image_transport::SubscriberPlugin") )
@@ -62,8 +62,8 @@ struct ImageTransport::Impl
   }
 };
 
-ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
-: impl_(new Impl(node))
+ImageTransport::ImageTransport()
+: impl_(new Impl())
 {
 }
 
@@ -72,31 +72,35 @@ ImageTransport::~ImageTransport()
   std::cout << "~ImageTransport" << std::endl;
 }
 
-Publisher ImageTransport::advertise(const std::string & base_topic, rmw_qos_profile_t custom_qos)
+Publisher ImageTransport::advertise(
+  rclcpp::Node::SharedPtr node, const std::string & base_topic, rmw_qos_profile_t custom_qos)
 {
-  return Publisher(impl_->node_, base_topic, impl_->pub_loader_, custom_qos);
+  return Publisher(node, base_topic, impl_->pub_loader_, custom_qos);
 }
 
 Subscriber ImageTransport::subscribe(
+  rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)> & callback,
   rmw_qos_profile_t custom_qos)
 {
-  return Subscriber(impl_->node_, base_topic, callback, impl_->sub_loader_, custom_qos);
+  return Subscriber(node, base_topic, callback, impl_->sub_loader_, custom_qos);
 }
 
 CameraPublisher ImageTransport::advertiseCamera(
+  rclcpp::Node::SharedPtr node,
   const std::string & base_topic, rmw_qos_profile_t custom_qos)
 {
-  return advertiseCamera(base_topic, custom_qos);
+  return advertiseCamera(node, base_topic, custom_qos);
 }
 
 CameraSubscriber ImageTransport::subscribeCamera(
+  rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   const CameraSubscriber::Callback & callback,
   rmw_qos_profile_t custom_qos)
 {
-  return CameraSubscriber(*this, impl_->node_, base_topic, callback, custom_qos);
+  return CameraSubscriber(*this, node, base_topic, callback, custom_qos);
 }
 
 std::vector<std::string> ImageTransport::getDeclaredTransports() const
@@ -114,14 +118,15 @@ std::vector<std::string> ImageTransport::getLoadableTransports() const
 {
   std::vector<std::string> loadableTransports;
 
-  for (const std::string & transportPlugin: impl_->sub_loader_->getDeclaredClasses() ) {
+  for (const std::string & transportPlugin: impl_->sub_loader_->getDeclaredClasses()) {
     // If the plugin loads without throwing an exception, add its
     // transport name to the list of valid plugins, otherwise ignore
     // it.
     try {
       std::shared_ptr<image_transport::SubscriberPlugin> sub =
         impl_->sub_loader_->createUniqueInstance(transportPlugin);
-      loadableTransports.push_back(erase_last_copy(transportPlugin, "_sub")); // Remove the "_sub" at the end of each class name.
+      // Remove the "_sub" at the end of each class name.
+      loadableTransports.push_back(erase_last_copy(transportPlugin, "_sub"));
     } catch (const pluginlib::LibraryLoadException & e) {
     } catch (const pluginlib::CreateClassException & e) {
     }

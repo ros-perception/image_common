@@ -53,7 +53,7 @@ class MessagePassingTesting : public ::testing::Test
 public:
   image_transport::ImageTransport it()
   {
-    return image_transport::ImageTransport(node_);
+    return image_transport::ImageTransport();
   }
 
   sensor_msgs::msg::Image::UniquePtr generate_random_image()
@@ -95,8 +95,8 @@ TEST_F(MessagePassingTesting, one_message_passing)
 
   rclcpp::executors::SingleThreadedExecutor executor;
 
-  image_transport::Publisher pub = it().advertise("camera/image");
-  image_transport::Subscriber sub = it().subscribe("camera/image", imageCallback);
+  image_transport::Publisher pub = it().advertise(node_, "camera/image");
+  image_transport::Subscriber sub = it().subscribe(node_, "camera/image", imageCallback);
 
   test_rclcpp::wait_for_subscriber(node_, sub.getTopic());
 
