@@ -42,10 +42,6 @@
 #include "image_transport/subscriber_plugin.h"
 #include "image_transport/loader_fwds.h"
 
-static constexpr const char* kPluginClass = "image_transport";
-static constexpr const char* kSubBase = "image_transport::SubscriberPlugin";
-static constexpr const char* kPubBase = "image_transport::PublisherPlugin";
-
 namespace image_transport
 {
 
@@ -54,8 +50,8 @@ struct Impl {
   SubLoaderPtr sub_loader_;
 
   Impl():
-    pub_loader_(std::make_shared<PubLoader>(kPluginClass, kPubBase)),
-    sub_loader_(std::make_shared<SubLoader>(kPluginClass, kSubBase))
+    pub_loader_(std::make_shared<PubLoader>("image_tranport", "image_transport::PublisherPlugin")),
+    sub_loader_(std::make_shared<SubLoader>("image_tranport", "image_transport::SubscriberPlugin"))
   {
   }
 };
@@ -155,14 +151,14 @@ Subscriber ImageTransport::subscribe(
   return create_subscription(impl_->node_, base_topic, callback, custom_qos);
 }
 
-CameraPublisher ImageTransport::advertise_camera(
+CameraPublisher ImageTransport::advertiseCamera(
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos)
 {
   return create_camera_publisher(impl_->node_, base_topic, custom_qos);
 }
 
-CameraSubscriber ImageTransport::subscribe_camera(
+CameraSubscriber ImageTransport::subscribeCamera(
     const std::string & base_topic,
     const CameraSubscriber::Callback& callback,
     rmw_qos_profile_t custom_qos)

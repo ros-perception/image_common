@@ -74,21 +74,37 @@ CameraSubscriber create_camera_subscription(
 std::vector<std::string> getDeclaredTransports();
 std::vector<std::string> getLoadableTransports();
 
+/**
+ * \brief Advertise and subscribe to image topics.
+ *
+ * ImageTransport is analogous to ros::NodeHandle in that it contains advertise() and
+ * subscribe() functions for creating advertisements and subscriptions of image topics.
+*/
 class ImageTransport
 {
 public:
-  ImageTransport(rclcpp::Node::SharedPtr node);
+  explicit ImageTransport(rclcpp::Node::SharedPtr node);
+
   ~ImageTransport();
 
+  /*!
+   * \brief Advertise an image topic, simple version.
+   */
   Publisher advertise(
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+  /**
+   * \brief Subscribe to an image topic, version for arbitrary std::function object.
+   */
   Subscriber subscribe(
     const std::string & base_topic,
     const Subscriber::Callback& callback,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+  /**
+   * \brief Subscribe to an image topic, version for bare function.
+   */
   Subscriber subscribe(
     const std::string & base_topic,
     void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
@@ -97,6 +113,9 @@ public:
     return subscribe(base_topic, Subscriber::Callback(fp), custom_qos);
   }
 
+  /**
+   * \brief Subscribe to an image topic, version for class member function with bare pointer.
+   */
   template<class T>
   Subscriber subscribe(
     const std::string & base_topic,
@@ -107,6 +126,9 @@ public:
     return subscribe(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
   }
 
+  /**
+   * \brief Subscribe to an image topic, version for class member function with shared_ptr.
+   */
   template<class T>
   Subscriber subscribe(
     const std::string & base_topic,
@@ -117,24 +139,41 @@ public:
     return subscribe(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
   }
 
-  CameraPublisher advertise_camera(
+  /*!
+   * \brief Advertise a synchronized camera raw image + info topic pair, simple version.
+   */
+  CameraPublisher advertiseCamera(
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
-  CameraSubscriber subscribe_camera(
+  /**
+   * \brief Subscribe to a synchronized image & camera info topic pair, version for arbitrary
+   * std::function object.
+   *
+   * This version assumes the standard topic naming scheme, where the info topic is
+   * named "camera_info" in the same namespace as the base image topic.
+   */
+  CameraSubscriber subscribeCamera(
     const std::string & base_topic,
     const CameraSubscriber::Callback& callback,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+  /**
+   * \brief Subscribe to a synchronized image & camera info topic pair, version for bare function.
+   */
   CameraSubscriber subscribe_camera(
     const std::string & base_topic,
     void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
                const sensor_msgs::msg::CameraInfo::ConstSharedPtr&),
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe_camera(base_topic, CameraSubscriber::Callback(fp), custom_qos);
+    return subscribeCamera(base_topic, CameraSubscriber::Callback(fp), custom_qos);
   }
 
+  /**
+   * \brief Subscribe to a synchronized image & camera info topic pair, version for class member
+   * function with bare pointer.
+   */
   template<class T>
   CameraSubscriber subscribe_camera(
     const std::string & base_topic,
@@ -146,6 +185,10 @@ public:
     return subscribe_camera(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
   }
 
+  /**
+   * \brief Subscribe to a synchronized image & camera info topic pair, version for class member
+   * function with shared_ptr.
+   */
   template<class T>
   CameraSubscriber subscribe_camera(
     const std::string & base_topic,
@@ -157,7 +200,15 @@ public:
     return subscribe_camera(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
   }
 
+  /**
+   * \brief Returns the names of all transports declared in the system. Declared
+   * transports are not necessarily built or loadable.
+   */
   std::vector<std::string> getDeclaredTransports() const;
+
+  /**
+   * \brief Returns the names of all transports that are loadable in the system.
+   */
   std::vector<std::string> getLoadableTransports() const;
 
 private:
