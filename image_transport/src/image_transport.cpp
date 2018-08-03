@@ -50,8 +50,8 @@ struct Impl {
   SubLoaderPtr sub_loader_;
 
   Impl():
-    pub_loader_(std::make_shared<PubLoader>("image_tranport", "image_transport::PublisherPlugin")),
-    sub_loader_(std::make_shared<SubLoader>("image_tranport", "image_transport::SubscriberPlugin"))
+    pub_loader_(std::make_shared<PubLoader>("image_transport", "image_transport::PublisherPlugin")),
+    sub_loader_(std::make_shared<SubLoader>("image_transport", "image_transport::SubscriberPlugin"))
   {
   }
 };
@@ -70,9 +70,10 @@ Subscriber create_subscription(
   rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   const Subscriber::Callback & callback,
+  const std::string& transport,
   rmw_qos_profile_t custom_qos)
 {
-  return Subscriber(node, base_topic, callback, kImpl->sub_loader_, custom_qos);
+  return Subscriber(node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos);
 }
 
 CameraPublisher create_camera_publisher(
@@ -87,9 +88,10 @@ CameraSubscriber create_camera_subscription(
   rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   const CameraSubscriber::Callback & callback,
+  const std::string& transport,
   rmw_qos_profile_t custom_qos)
 {
-  return CameraSubscriber(node, base_topic, callback, custom_qos);
+  return CameraSubscriber(node, base_topic, callback, transport, custom_qos);
 }
 
 std::vector<std::string> getDeclaredTransports()
@@ -146,9 +148,10 @@ Publisher ImageTransport::advertise(
 Subscriber ImageTransport::subscribe(
   const std::string & base_topic,
   const Subscriber::Callback& callback,
+  const std::string& transport,
   rmw_qos_profile_t custom_qos)
 {
-  return create_subscription(impl_->node_, base_topic, callback, custom_qos);
+  return create_subscription(impl_->node_, base_topic, callback, transport, custom_qos);
 }
 
 CameraPublisher ImageTransport::advertiseCamera(
@@ -161,9 +164,10 @@ CameraPublisher ImageTransport::advertiseCamera(
 CameraSubscriber ImageTransport::subscribeCamera(
     const std::string & base_topic,
     const CameraSubscriber::Callback& callback,
+    const std::string& transport,
     rmw_qos_profile_t custom_qos)
 {
-  return  create_camera_subscription(impl_->node_, base_topic, callback, custom_qos);
+  return  create_camera_subscription(impl_->node_, base_topic, callback, transport, custom_qos);
 }
 
 std::vector<std::string> ImageTransport::getDeclaredTransports() const

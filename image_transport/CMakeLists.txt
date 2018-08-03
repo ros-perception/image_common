@@ -43,6 +43,9 @@ ament_target_dependencies(${PROJECT_NAME}
 add_executable(list_transports src/list_transports.cpp)
 target_link_libraries(list_transports ${PROJECT_NAME})
 
+add_executable(republish src/republish.cpp)
+target_link_libraries(republish ${PROJECT_NAME})
+
 add_library(${PROJECT_NAME}_plugins
   SHARED
   src/manifest.cpp
@@ -52,7 +55,7 @@ target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 pluginlib_export_plugin_description_file(image_transport default_plugins.xml)
 
 install(
-  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins list_transports
+  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins list_transports republish
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin

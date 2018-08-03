@@ -110,6 +110,7 @@ CameraSubscriber::CameraSubscriber(
   rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   const Callback & callback,
+  const std::string& transport,
   rmw_qos_profile_t custom_qos)
 : impl_(std::make_shared<Impl>())
 {
@@ -119,7 +120,7 @@ CameraSubscriber::CameraSubscriber(
       node->get_name(), node->get_namespace());
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  impl_->image_sub_.subscribe(node, image_topic, custom_qos);
+  impl_->image_sub_.subscribe(node, image_topic, transport, custom_qos);
   impl_->info_sub_.subscribe(node, info_topic, custom_qos);
 
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);

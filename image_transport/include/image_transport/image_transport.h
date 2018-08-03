@@ -58,6 +58,7 @@ Subscriber create_subscription(
     rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     const Subscriber::Callback& callback,
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
 CameraPublisher create_camera_publisher(
@@ -69,6 +70,7 @@ CameraSubscriber create_camera_subscription(
     rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     const CameraSubscriber::Callback & callback,
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
 std::vector<std::string> getDeclaredTransports();
@@ -100,6 +102,7 @@ public:
   Subscriber subscribe(
     const std::string & base_topic,
     const Subscriber::Callback& callback,
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
   /**
@@ -108,9 +111,10 @@ public:
   Subscriber subscribe(
     const std::string & base_topic,
     void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe(base_topic, Subscriber::Callback(fp), custom_qos);
+    return subscribe(base_topic, Subscriber::Callback(fp), transport, custom_qos);
   }
 
   /**
@@ -121,9 +125,10 @@ public:
     const std::string & base_topic,
     void (T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
     T* obj,
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
+    return subscribe(base_topic, std::bind(fp, obj, std::placeholders::_1), transport, custom_qos);
   }
 
   /**
@@ -134,9 +139,10 @@ public:
     const std::string & base_topic,
     void (T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&),
     const std::shared_ptr<T>& obj,
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
+    return subscribe(base_topic, std::bind(fp, obj, std::placeholders::_1), transport, custom_qos);
   }
 
   /*!
@@ -156,6 +162,7 @@ public:
   CameraSubscriber subscribeCamera(
     const std::string & base_topic,
     const CameraSubscriber::Callback& callback,
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
   /**
@@ -165,9 +172,10 @@ public:
     const std::string & base_topic,
     void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
                const sensor_msgs::msg::CameraInfo::ConstSharedPtr&),
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribeCamera(base_topic, CameraSubscriber::Callback(fp), custom_qos);
+    return subscribeCamera(base_topic, CameraSubscriber::Callback(fp), transport, custom_qos);
   }
 
   /**
@@ -180,9 +188,10 @@ public:
     void (T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
                   const sensor_msgs::msg::CameraInfo::ConstSharedPtr&),
     T* obj,
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe_camera(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
+    return subscribe_camera(base_topic, std::bind(fp, obj, std::placeholders::_1), transport, custom_qos);
   }
 
   /**
@@ -195,9 +204,10 @@ public:
     void (T::*fp)(const sensor_msgs::msg::Image::ConstSharedPtr&,
                   const sensor_msgs::msg::CameraInfo::ConstSharedPtr&),
     const std::shared_ptr<T> obj,
+    const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe_camera(base_topic, std::bind(fp, obj, std::placeholders::_1), custom_qos);
+    return subscribe_camera(base_topic, std::bind(fp, obj, std::placeholders::_1), transport, custom_qos);
   }
 
   /**

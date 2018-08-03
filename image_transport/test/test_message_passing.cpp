@@ -83,7 +83,7 @@ TEST_F(MessagePassingTesting, one_message_passing)
   rclcpp::executors::SingleThreadedExecutor executor;
 
   auto pub = image_transport::create_publisher(node_, "camera/image");
-  auto sub = image_transport::create_subscription(node_, "camera/image", imageCallback);
+  auto sub = image_transport::create_subscription(node_, "camera/image", imageCallback, "raw");
 
   test_rclcpp::wait_for_subscriber(node_, sub.getTopic());
 
@@ -125,7 +125,8 @@ TEST_F(MessagePassingTesting, one_camera_message_passing)
       (void) image;
       (void) info;
       total_images_received++;
-    }
+    },
+    "raw"
   );
 
   test_rclcpp::wait_for_subscriber(node_, sub.getTopic());

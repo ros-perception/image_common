@@ -71,7 +71,8 @@ public:
     const std::string & base_topic,
     const Callback& callback,
     SubLoaderPtr loader,
-    rmw_qos_profile_t custom_qos);
+    const std::string& transport,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
   /**
    * \brief Returns the base image topic.

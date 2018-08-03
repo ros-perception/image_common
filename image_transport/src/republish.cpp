@@ -32,39 +32,42 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include "rclcpp/rclcpp.hpp"
+
 #include "image_transport/image_transport.h"
 #include "image_transport/publisher_plugin.h"
-#include <pluginlib/class_loader.h>
+#include <pluginlib/class_loader.hpp>
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "image_republisher", ros::init_options::AnonymousName);
-  if (argc < 2) {
+  auto vargv = rclcpp::init_and_remove_ros_arguments(argc, argv);
+
+  if (vargv.size() < 2) {
     printf("Usage: %s in_transport in:=<in_base_topic> [out_transport] out:=<out_base_topic>\n", argv[0]);
     return 0;
   }
-  ros::NodeHandle nh;
-  std::string in_topic  = nh.resolveName("in");
-  std::string in_transport = argv[1];
-  std::string out_topic = nh.resolveName("out");
 
-  image_transport::ImageTransport it(nh);
-  image_transport::Subscriber sub;
+  auto node = rclcpp::Node::make_shared("image_republisher");
 
-  if (argc < 3) {
+  std::string in_topic  = rclcpp::expand_topic_or_service_name("in", node->get_name(), node->get_namespace());
+  std::string out_topic = rclcpp::expand_topic_or_service_name("out", node->get_name(), node->get_namespace());
+
+  std::string in_transport = vargv[1];
+
+  if (vargv.size() < 3) {
     // Use all available transports for output
-    image_transport::Publisher pub = it.advertise(out_topic, 1);
+    auto pub = image_transport::create_publisher(node, out_topic);
 
     // Use Publisher::publish as the subscriber callback
     typedef void (image_transport::Publisher::*PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr&) const;
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
-    sub = it.subscribe(in_topic, 1, std::bind(pub_mem_fn, &pub, std::placeholders::_1), std::shared_ptr<void>(), in_transport);
 
-    ros::spin();
+    auto sub = image_transport::create_subscription(node, in_topic, std::bind(pub_mem_fn, &pub, std::placeholders::_1), in_transport);
+    rclcpp::spin(node);
   }
   else {
     // Use one specific transport for output
-    std::string out_transport = argv[2];
+    std::string out_transport = vargv[2];
 
     // Load transport plugin
     typedef image_transport::PublisherPlugin Plugin;
@@ -73,16 +76,13 @@ int main(int argc, char** argv)
 
     auto instance = loader.createUniqueInstance(lookup_name);
     std::shared_ptr<Plugin> pub = std::move(instance);
-
-    pub->advertise(nh, out_topic, 1, image_transport::SubscriberStatusCallback(),
-                   image_transport::SubscriberStatusCallback(), std::shared_ptr<void>(), false);
+    pub->advertise(node, out_topic);
 
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::*PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr&) const;
     PublishMemFn pub_mem_fn = &Plugin::publish;
-    sub = it.subscribe(in_topic, 1, std::bind(pub_mem_fn, pub.get(), std::placeholders::_1), pub, in_transport);
-
-    ros::spin();
+    auto sub = image_transport::create_subscription(node, in_topic, std::bind(pub_mem_fn, pub.get(), std::placeholders::_1), in_transport);
+    rclcpp::spin(node);
   }
 
   return 0;

@@ -87,12 +87,12 @@ Subscriber::Subscriber(
   const std::string & base_topic,
   const Callback & callback,
   SubLoaderPtr loader,
+  const std::string& transport,
   rmw_qos_profile_t custom_qos)
 : impl_(std::make_shared<Impl>(loader))
 {
   // Load the plugin for the chosen transport.
-  // TODO(ros2) Get this from a parameter?
-  impl_->lookup_name_ = SubscriberPlugin::getLookupName("raw");
+  impl_->lookup_name_ = SubscriberPlugin::getLookupName(transport);
   try {
     impl_->subscriber_ = loader->createSharedInstance(impl_->lookup_name_);
   } catch (pluginlib::PluginlibException & e) {
