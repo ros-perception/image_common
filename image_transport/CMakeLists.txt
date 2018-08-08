@@ -14,16 +14,17 @@ endif()
 find_package(ament_cmake REQUIRED)
 
 find_package(message_filters REQUIRED)
+find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(pluginlib REQUIRED)
 find_package(tinyxml_vendor REQUIRED)
 find_package(TinyXML REQUIRED)
 
 include_directories(include)
 
-# Build libimage_transport
+# Build image_transport library
 add_library(${PROJECT_NAME}
+  SHARED
   src/camera_common.cpp
   src/publisher.cpp
   src/subscriber.cpp
@@ -38,29 +39,40 @@ ament_target_dependencies(${PROJECT_NAME}
   "pluginlib"
   "rclcpp"
   "sensor_msgs"
+  "TinyXML"
 )
 
-add_executable(list_transports src/list_transports.cpp)
-target_link_libraries(list_transports ${PROJECT_NAME})
-
-add_executable(republish src/republish.cpp)
-target_link_libraries(republish ${PROJECT_NAME})
-
+# Build image_transport_plugins library (raw)
 add_library(${PROJECT_NAME}_plugins
   SHARED
   src/manifest.cpp
 )
-
 target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
+
+# Build list_trasnports
+add_executable(list_transports src/list_transports.cpp)
+target_link_libraries(list_transports ${PROJECT_NAME})
+
+# Build republish
+add_executable(republish src/republish.cpp)
+target_link_libraries(republish ${PROJECT_NAME})
+
+# Install plugin descriptions
 pluginlib_export_plugin_description_file(image_transport default_plugins.xml)
 
+# Install libraries
 install(
-  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins list_transports republish
-  ARCHIVE DESTINATION lib
+  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
 )
 
+# Install executables
+install(
+  TARGETS list_transports republish
+  RUNTIME DESTINATION share/${PROJECT_NAME}
+)
+
+# Install include directories
 install(
   DIRECTORY "include/"
   DESTINATION include
@@ -68,10 +80,15 @@ install(
 
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(message_filters)
+ament_export_dependencies(rclcpp)
+ament_export_dependencies(sensor_msgs)
+ament_export_dependencies(pluginlib)
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+  #TODO(ros2) enable linting
+  #find_package(ament_lint_auto REQUIRED)
+  #ament_lint_auto_find_test_dependencies()
 
   find_package(ament_cmake_gtest)
 

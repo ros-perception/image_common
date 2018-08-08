@@ -76,12 +76,14 @@ public:
 
   virtual uint32_t getNumPublishers() const
   {
+    //TODO(ros2) Enable count_publisher when rcl/rmw supports it.
     //if (simple_impl_) return simple_impl_->node_->count_publishers(getTopic());
     return 1;
   }
 
   virtual void shutdown()
   {
+    // TODO(ros2) Enable shutdown when rcl/rmw supports it.
     //if (simple_impl_) simple_impl_->sub_.shutdown();
   }
 

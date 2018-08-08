@@ -70,7 +70,7 @@ public:
    * \param nh The ros::NodeHandle to use to subscribe.
    * \param base_topic The topic to subscribe to.
    * \param queue_size The subscription queue size
-   * \param transportThe transport hints to pass along
+   * \param transport The transport hint to pass along
    */
   SubscriberFilter(rclcpp::Node::SharedPtr node, const std::string& base_topic, const std::string& transport)
   {

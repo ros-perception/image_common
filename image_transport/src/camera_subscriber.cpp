@@ -73,6 +73,7 @@ struct CameraSubscriber::Impl
   {
     if (!unsubscribed_) {
       unsubscribed_ = true;
+      // TODO(ros2) Use unsubscribe when rcl/rmw support it.
       //image_sub_.unsubscribe();
       //info_sub_.unsubscribe();
     }
@@ -82,16 +83,15 @@ struct CameraSubscriber::Impl
   {
     int threshold = 3 * both_received_;
     if (image_received_ > threshold || info_received_ > threshold) {
-      /*
-      ROS_WARN_NAMED("sync", // Can suppress ros.image_transport.sync independent of anything else
-                     "[image_transport] Topics '%s' and '%s' do not appear to be synchronized. "
-                     "In the last 10s:\n"
-                     "\tImage messages received:      %d\n"
-                     "\tCameraInfo messages received: %d\n"
-                     "\tSynchronized pairs:           %d",
-                     image_sub_.getTopic().c_str(), info_sub_.getTopic().c_str(),
-                     image_received_, info_received_, both_received_);
-      */
+
+      RCUTILS_LOG_WARN_NAMED("sync", // Can suppress ros.image_transport.sync independent of anything else
+                             "[image_transport] Topics '%s' and '%s' do not appear to be synchronized. "
+                             "In the last 10s:\n"
+                             "\tImage messages received:      %d\n"
+                             "\tCameraInfo messages received: %d\n"
+                             "\tSynchronized pairs:           %d",
+                             image_sub_.getTopic().c_str(), info_sub_.getTopic().c_str(),
+                             image_received_, info_received_, both_received_);
     }
     image_received_ = info_received_ = both_received_ = 0;
   }

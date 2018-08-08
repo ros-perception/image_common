@@ -95,6 +95,19 @@ public:
   }
 
   /**
+   * \brief Subscribe to an image topic, version for class member function with shared_ptr.
+   */
+  template<class T>
+  void subscribe(rclcpp::Node::SharedPtr node, const std::string & base_topic,
+                 void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
+                 std::shared_ptr<T>& obj,
+                 rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  {
+    return subscribe(node, base_topic,
+        std::bind(fp, obj, std::placeholders::_1), custom_qos);
+  }
+
+  /**
    * \brief Get the transport-specific communication topic.
    */
   virtual std::string getTopic() const = 0;

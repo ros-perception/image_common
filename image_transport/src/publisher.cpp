@@ -41,7 +41,6 @@
 #include <rclcpp/node.hpp>
 
 #include <pluginlib/class_loader.hpp>
-#include <boost/algorithm/string/erase.hpp>
 
 namespace image_transport
 {
@@ -113,7 +112,6 @@ Publisher::Publisher(
   }
 
   for (const auto & lookup_name: loader->getDeclaredClasses()) {
-    //TODO(ros2) remove boost::erase_last_copy
     const std::string transport_name = erase_last_copy(lookup_name, "_pub");
     if (blacklist.count(transport_name)) {
       continue;
@@ -124,7 +122,7 @@ Publisher::Publisher(
       pub->advertise(node, image_topic, custom_qos);
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {
-      fprintf(stderr, "Failed to load plugin %s, error string: %s\n",
+      RCUTILS_LOG_ERROR("Failed to load plugin %s, error string: %s\n",
         lookup_name.c_str(), e.what());
     }
   }
@@ -150,7 +148,7 @@ std::string Publisher::getTopic() const
 void Publisher::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    fprintf(stderr, "Call to publish() on an invalid image_transport::Publisher\n");
+    RCUTILS_LOG_ERROR("Call to publish() on an invalid image_transport::Publisher\n");
     return;
   }
 

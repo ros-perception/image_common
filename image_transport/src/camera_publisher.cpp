@@ -73,6 +73,7 @@ struct CameraPublisher::Impl
   bool unadvertised_;
 };
 
+//TODO(ros2) Add support for SubscriberStatusCallbacks when rcl/rmw support it.
 CameraPublisher::CameraPublisher(
   rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
@@ -91,6 +92,7 @@ CameraPublisher::CameraPublisher(
 
 uint32_t CameraPublisher::getNumSubscribers() const
 {
+  //TODO(ros2) add support when rcl/rmw support it.
   //if (impl_ && impl_->isValid())
   //return std::max(impl_->image_pub_.getNumSubscribers(), impl_->info_pub_.getNumSubscribers());
   return 0;
@@ -113,7 +115,8 @@ void CameraPublisher::publish(
   const sensor_msgs::msg::CameraInfo & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    fprintf(stderr, "Call to publish() on an invalid image_transport::CameraPublisher");
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    RCUTILS_LOG_ERROR("Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 
@@ -126,7 +129,8 @@ void CameraPublisher::publish(
   const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    fprintf(stderr, "Call to publish() on an invalid image_transport::CameraPublisher");
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    RCUTILS_LOG_ERROR("Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 

@@ -49,11 +49,17 @@
 
 namespace image_transport {
 
+/*!
+ * \brief Advertise an image topic, free function version.
+ */
 Publisher create_publisher(
     rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+/**
+ * \brief Subscribe to an image topic, free function version.
+ */
 Subscriber create_subscription(
     rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
@@ -61,11 +67,17 @@ Subscriber create_subscription(
     const std::string& transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+/*!
+ * \brief Advertise a camera, free function version.
+ */
 CameraPublisher create_camera_publisher(
     rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+/*!
+ * \brief Subscribe to a camera, free function version.
+ */
 CameraSubscriber create_camera_subscription(
     rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
