@@ -42,9 +42,7 @@ ament_target_dependencies(${PROJECT_NAME}
   "TinyXML"
 )
 
-target_compile_options(${PROJECT_NAME}
-  PUBLIC "-DPLUGINLIB__DISABLE_BOOST_FUNCTIONS"
-)
+target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
 # Build image_transport_plugins library (raw)
 add_library(${PROJECT_NAME}_plugins
