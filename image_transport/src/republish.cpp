@@ -36,6 +36,119 @@
 #include "image_transport/publisher_plugin.h"
 #include <pluginlib/class_loader.h>
 
+class Republisher
+{
+  typedef image_transport::PublisherPlugin Plugin;
+
+  public:
+    Republisher(ros::NodeHandle nh, std::string in_topic, std::string out_topic, std::string in_transport) :
+    nh_(nh),
+    it_(nh_),
+    has_subscriber_(false)
+    {
+      // Use all available transports for output
+      image_transport::SubscriberStatusCallback itsscb = boost::bind(&Republisher::subscribeCallback, this, false, in_topic, in_transport);
+      pub_ = it_.advertise(out_topic, 1, itsscb, itsscb);
+
+      //check if someone was already subscribed
+      subscribeCallback(false, in_topic, in_transport);
+    }
+
+    //constructor for a specific output transport
+    Republisher(ros::NodeHandle nh, std::string in_topic, std::string out_topic, std::string in_transport, std::string out_transport) :
+    nh_(nh),
+    it_(nh_),
+    has_subscriber_(false)
+    {      
+      loader_ = boost::make_shared<pluginlib::ClassLoader<Plugin> >("image_transport", "image_transport::PublisherPlugin");
+      // Load transport plugin
+      std::string lookup_name = Plugin::getLookupName(out_transport);
+      plugin_pub_ = loader_->createInstance(lookup_name);
+
+      image_transport::SubscriberStatusCallback itsscb = boost::bind(&Republisher::subscribeCallback, this, true, in_topic, in_transport);
+      plugin_pub_->advertise(nh_, out_topic, 1, itsscb, itsscb, ros::VoidPtr(), false);
+
+      //check if someone was already subscribed
+      subscribeCallback(true, in_topic, in_transport);
+    }
+
+  private:
+    ros::NodeHandle nh_;
+    image_transport::ImageTransport it_;
+    boost::shared_ptr<image_transport::Subscriber> sub_;
+
+    boost::shared_ptr<pluginlib::ClassLoader<Plugin> > loader_;
+    boost::shared_ptr<Plugin> plugin_pub_;
+    //publisher without plugin
+    image_transport::Publisher pub_;
+
+    bool has_subscriber_;
+
+    void subscribe(std::string in_topic, std::string in_transport)
+    {
+      // Use Publisher::publish as the subscriber callback
+      typedef void (image_transport::Publisher::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;
+      PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
+      sub_ = boost::make_shared<image_transport::Subscriber>(it_.subscribe(in_topic, 1, boost::bind(pub_mem_fn, &pub_, _1), ros::VoidPtr(), in_transport));
+    }
+
+    void subscribePlugin(std::string in_topic, std::string in_transport)
+    {
+      // Use PublisherPlugin::publish as the subscriber callback
+      typedef void (Plugin::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;
+      PublishMemFn pub_mem_fn = &Plugin::publish;
+      sub_ = boost::make_shared<image_transport::Subscriber>(it_.subscribe(in_topic, 1, boost::bind(pub_mem_fn, plugin_pub_.get(), _1), plugin_pub_, in_transport));
+    }
+
+    void subscribeCallback(bool use_plugin, std::string in_topic, std::string in_transport)
+    {
+      if (use_plugin)
+      {
+        if (plugin_pub_->getNumSubscribers() > 0)
+        {
+          if(!has_subscriber_)
+          {
+            subscribePlugin(in_topic, in_transport);
+          }
+          has_subscriber_ = true;
+        }
+        else
+        {
+          if (has_subscriber_)
+          {
+            sub_->shutdown();
+            //destroy the sub to cancel all service advertisements to avoid warning
+            sub_.reset();
+            has_subscriber_ = false;
+          }
+        }
+      }
+      else
+      {
+        if (pub_.getNumSubscribers() > 0)
+        {
+          if (!has_subscriber_)
+          {
+            subscribe(in_topic, in_transport);
+          }
+          has_subscriber_ = true;
+        }
+        else
+        {
+          if (has_subscriber_)
+          {
+            sub_->shutdown();
+            //destroy the sub to cancel all service advertisements to avoid warning
+            sub_.reset();
+            has_subscriber_ = false;
+          }
+        }
+      }
+    }
+};
+
+
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "image_republisher", ros::init_options::AnonymousName);
@@ -45,42 +158,20 @@ int main(int argc, char** argv)
   }
   ros::NodeHandle nh;
   std::string in_topic  = nh.resolveName("in");
-  std::string in_transport = argv[1];
   std::string out_topic = nh.resolveName("out");
+  std::string in_transport = argv[1];
 
-  image_transport::ImageTransport it(nh);
-  image_transport::Subscriber sub;
-  
   if (argc < 3) {
-    // Use all available transports for output
-    image_transport::Publisher pub = it.advertise(out_topic, 1);
-    
-    // Use Publisher::publish as the subscriber callback
-    typedef void (image_transport::Publisher::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;
-    PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
-    sub = it.subscribe(in_topic, 1, boost::bind(pub_mem_fn, &pub, _1), ros::VoidPtr(), in_transport);
-
+    Republisher rep(nh, in_topic, out_topic, in_transport);
     ros::spin();
   }
   else {
     // Use one specific transport for output
     std::string out_transport = argv[2];
-
-    // Load transport plugin
-    typedef image_transport::PublisherPlugin Plugin;
-    pluginlib::ClassLoader<Plugin> loader("image_transport", "image_transport::PublisherPlugin");
-    std::string lookup_name = Plugin::getLookupName(out_transport);
-    boost::shared_ptr<Plugin> pub( loader.createInstance(lookup_name) );
-    pub->advertise(nh, out_topic, 1, image_transport::SubscriberStatusCallback(),
-                   image_transport::SubscriberStatusCallback(), ros::VoidPtr(), false);
-
-    // Use PublisherPlugin::publish as the subscriber callback
-    typedef void (Plugin::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;
-    PublishMemFn pub_mem_fn = &Plugin::publish;
-    sub = it.subscribe(in_topic, 1, boost::bind(pub_mem_fn, pub.get(), _1), pub, in_transport);
-
+    Republisher rep(nh, in_topic, out_topic, in_transport, out_transport);
     ros::spin();
   }
+
 
   return 0;
 }
