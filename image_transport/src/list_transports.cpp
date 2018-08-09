@@ -35,7 +35,7 @@
 #include "image_transport/camera_common.h"
 #include "image_transport/publisher_plugin.h"
 #include "image_transport/subscriber_plugin.h"
-#include <pluginlib/class_loader.h>
+#include <pluginlib/class_loader.hpp>
 #include <map>
 
 using namespace image_transport;
@@ -58,7 +58,7 @@ struct TransportDesc
 };
 /// \endcond
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
   ClassLoader<PublisherPlugin> pub_loader("image_transport", "image_transport::PublisherPlugin");
   ClassLoader<SubscriberPlugin> sub_loader("image_transport", "image_transport::SubscriberPlugin");
@@ -97,7 +97,6 @@ int main(int argc, char** argv)
     }
   }
 
-  bool problem_package = false;
   printf("Declared transports:\n");
   for(const StatusMap::value_type& value: transports) {
     const TransportDesc& td = value.second;
@@ -105,14 +104,9 @@ int main(int argc, char** argv)
     if ((td.pub_status == CREATE_FAILURE || td.pub_status == LIB_LOAD_FAILURE) ||
         (td.sub_status == CREATE_FAILURE || td.sub_status == LIB_LOAD_FAILURE)) {
       printf(" (*): Not available. Try 'catkin_make --pkg %s'.", td.package_name.c_str());
-      problem_package = true;
     }
     printf("\n");
   }
-#if 0
-  if (problem_package)
-    printf("(*) \n");
-#endif
 
   printf("\nDetails:\n");
   for(const auto& value: transports) {
