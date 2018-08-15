@@ -67,9 +67,12 @@ class CameraPublisher
 public:
   CameraPublisher() = default;
 
+
   CameraPublisher(rclcpp::Node::SharedPtr node,
                   const std::string& base_topic,
                   rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+  //TODO(ros2) Restore support for SubscriberStatusCallbacks when available.
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to

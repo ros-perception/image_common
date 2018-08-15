@@ -36,6 +36,8 @@
 #define IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
 
 #include <rclcpp/macros.hpp>
+#include <rclcpp/node.hpp>
+#include <sensor_msgs/msg/image.hpp>
 
 namespace image_transport
 {
