@@ -150,7 +150,7 @@ std::string Publisher::getTopic() const
 void Publisher::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::Publisher");
+    RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::Publisher");
     return;
   }
 
@@ -164,7 +164,7 @@ void Publisher::publish(const sensor_msgs::msg::Image & message) const
 void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::Publisher");
+    RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::Publisher");
     return;
   }
 

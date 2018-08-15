@@ -118,7 +118,7 @@ void CameraPublisher::publish(
   const sensor_msgs::msg::CameraInfo & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
+    RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 
@@ -131,7 +131,7 @@ void CameraPublisher::publish(
   const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
+    RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 
