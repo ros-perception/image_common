@@ -47,8 +47,9 @@ namespace image_transport
 
 struct Publisher::Impl
 {
-  Impl()
-  : unadvertised_(false)
+  Impl(rclcpp::Node::SharedPtr node)
+  : logger_(node->get_logger()),
+    unadvertised_(false)
   {
   }
 
@@ -87,6 +88,7 @@ struct Publisher::Impl
     }
   }
 
+  rclcpp::Logger logger_;
   std::string base_topic_;
   PubLoaderPtr loader_;
   std::vector<std::shared_ptr<PublisherPlugin>> publishers_;
@@ -96,7 +98,7 @@ struct Publisher::Impl
 Publisher::Publisher(
   rclcpp::Node::SharedPtr node, const std::string & base_topic,
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos)
-: impl_(std::make_shared<Impl>())
+: impl_(std::make_shared<Impl>(node))
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
@@ -122,7 +124,7 @@ Publisher::Publisher(
       pub->advertise(node, image_topic, custom_qos);
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {
-      RCUTILS_LOG_ERROR("Failed to load plugin %s, error string: %s\n",
+      RCLCPP_ERROR(impl_->logger_, "Failed to load plugin %s, error string: %s\n",
         lookup_name.c_str(), e.what());
     }
   }
@@ -148,7 +150,7 @@ std::string Publisher::getTopic() const
 void Publisher::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    RCUTILS_LOG_ERROR("Call to publish() on an invalid image_transport::Publisher\n");
+    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::Publisher");
     return;
   }
 
@@ -162,7 +164,7 @@ void Publisher::publish(const sensor_msgs::msg::Image & message) const
 void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    fprintf(stderr, "Call to publish() on an invalid image_transport::Publisher\n");
+    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::Publisher");
     return;
   }
 

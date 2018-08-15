@@ -52,8 +52,9 @@ struct CameraSubscriber::Impl
   using CameraInfo = sensor_msgs::msg::CameraInfo;
   using TimeSync = message_filters::TimeSynchronizer<Image, CameraInfo>;
 
-  Impl()
-  : sync_(10),
+  Impl(rclcpp::Node::SharedPtr node)
+  : logger_(node->get_logger()) ,
+    sync_(10),
     unsubscribed_(false),
     image_received_(0), info_received_(0), both_received_(0)
   {
@@ -84,18 +85,19 @@ struct CameraSubscriber::Impl
     int threshold = 3 * both_received_;
     if (image_received_ > threshold || info_received_ > threshold) {
 
-      RCUTILS_LOG_WARN_NAMED("sync", // Can suppress ros.image_transport.sync independent of anything else
-                             "[image_transport] Topics '%s' and '%s' do not appear to be synchronized. "
-                             "In the last 10s:\n"
-                             "\tImage messages received:      %d\n"
-                             "\tCameraInfo messages received: %d\n"
-                             "\tSynchronized pairs:           %d",
-                             image_sub_.getTopic().c_str(), info_sub_.getTopic().c_str(),
-                             image_received_, info_received_, both_received_);
+      RCLCPP_WARN(logger_,
+        "[image_transport] Topics '%s' and '%s' do not appear to be synchronized. "
+        "In the last 10s:\n"
+        "\tImage messages received:      %d\n"
+        "\tCameraInfo messages received: %d\n"
+        "\tSynchronized pairs:           %d",
+        image_sub_.getTopic().c_str(), info_sub_.getTopic().c_str(),
+        image_received_, info_received_, both_received_);
     }
     image_received_ = info_received_ = both_received_ = 0;
   }
 
+  rclcpp::Logger logger_;
   SubscriberFilter image_sub_;
   message_filters::Subscriber<CameraInfo> info_sub_;
   TimeSync sync_;
@@ -110,9 +112,9 @@ CameraSubscriber::CameraSubscriber(
   rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   const Callback & callback,
-  const std::string& transport,
+  const std::string & transport,
   rmw_qos_profile_t custom_qos)
-: impl_(std::make_shared<Impl>())
+: impl_(std::make_shared<Impl>(node))
 {
   // Must explicitly remap the image topic since we then do some string manipulation on it
   // to figure out the sibling camera_info topic.
@@ -132,18 +134,18 @@ CameraSubscriber::CameraSubscriber(
   impl_->sync_.registerCallback(std::bind(increment, &impl_->both_received_));
 
   impl_->check_synced_timer_ = node->create_wall_timer(std::chrono::seconds(1),
-                                                      std::bind(&Impl::checkImagesSynchronized, impl_.get()));
+      std::bind(&Impl::checkImagesSynchronized, impl_.get()));
 }
 
 std::string CameraSubscriber::getTopic() const
 {
-  if (impl_) return impl_->image_sub_.getTopic();
+  if (impl_) {return impl_->image_sub_.getTopic();}
   return std::string();
 }
 
 std::string CameraSubscriber::getInfoTopic() const
 {
-  if (impl_) return impl_->info_sub_.getSubscriber()->get_topic_name();
+  if (impl_) {return impl_->info_sub_.getSubscriber()->get_topic_name();}
   return std::string();
 }
 
@@ -157,7 +159,7 @@ uint32_t CameraSubscriber::getNumPublishers() const
 
 std::string CameraSubscriber::getTransport() const
 {
-  if (impl_) return impl_->image_sub_.getTransport();
+  if (impl_) {return impl_->image_sub_.getTransport();}
   return std::string();
 }
 

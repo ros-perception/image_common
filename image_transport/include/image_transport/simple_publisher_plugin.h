@@ -35,6 +35,7 @@
 #ifndef IMAGE_TRANSPORT_SIMPLE_PUBLISHER_PLUGIN_H
 #define IMAGE_TRANSPORT_SIMPLE_PUBLISHER_PLUGIN_H
 
+#include <rclcpp/node.hpp>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/logging.hpp>
 
@@ -82,7 +83,8 @@ public:
   virtual void publish(const sensor_msgs::msg::Image& message) const
   {
     if (!simple_impl_ || !simple_impl_->pub_) {
-      //RCLCPP_ERROR(simple_impl_->logger_, "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
+      rclcpp::Logger logger = simple_impl_->node_->get_logger();
+      RCLCPP_ERROR(logger, "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
       return;
     }
 
@@ -100,8 +102,8 @@ protected:
     std::string transport_topic = getTopicToAdvertise(base_topic);
     simple_impl_.reset(new SimplePublisherPluginImpl(node));
 
-    //RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic);
-
+    rclcpp::Logger logger = simple_impl_->node_->get_logger();
+    RCLCPP_DEBUG(logger, "getTopicToAdvertise: %s", transport_topic);
     simple_impl_->pub_ = node->create_publisher<M>(transport_topic, custom_qos);
   }
 
@@ -132,14 +134,12 @@ private:
   struct SimplePublisherPluginImpl
   {
     SimplePublisherPluginImpl(rclcpp::Node::SharedPtr node)
-      : node_(node),
-        logger_(rclcpp::get_logger("image_transport.publisher.simple_publisher_plugin"))
+      : node_(node)
     {
 
     }
 
     rclcpp::Node::SharedPtr node_;
-    rclcpp::Logger logger_;
     typename rclcpp::Publisher<M>::SharedPtr pub_;
   };
 

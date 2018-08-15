@@ -36,6 +36,7 @@
 #include "image_transport/camera_common.h"
 
 #include <rclcpp/expand_topic_or_service_name.hpp>
+#include <rclcpp/logging.hpp>
 #include <rclcpp/node.hpp>
 
 namespace image_transport
@@ -43,8 +44,9 @@ namespace image_transport
 
 struct CameraPublisher::Impl
 {
-  Impl()
-  : unadvertised_(false)
+  Impl(rclcpp::Node::SharedPtr node)
+  : logger_(node->get_logger()) ,
+    unadvertised_(false)
   {
   }
 
@@ -68,6 +70,7 @@ struct CameraPublisher::Impl
     }
   }
 
+  rclcpp::Logger logger_;
   Publisher image_pub_;
   rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr info_pub_;
   bool unadvertised_;
@@ -78,7 +81,7 @@ CameraPublisher::CameraPublisher(
   rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos)
-: impl_(std::make_shared<Impl>())
+: impl_(std::make_shared<Impl>(node))
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
   // image topic is remapped (#4539).
@@ -115,8 +118,7 @@ void CameraPublisher::publish(
   const sensor_msgs::msg::CameraInfo & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
-    RCUTILS_LOG_ERROR("Call to publish() on an invalid image_transport::CameraPublisher");
+    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 
@@ -129,8 +131,7 @@ void CameraPublisher::publish(
   const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
-    RCUTILS_LOG_ERROR("Call to publish() on an invalid image_transport::CameraPublisher");
+    RCLCPP_ERROR(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 

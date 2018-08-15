@@ -47,9 +47,9 @@ namespace image_transport
 
 struct Subscriber::Impl
 {
-  Impl(SubLoaderPtr loader)
-  : loader_(loader),
-    logger_(rclcpp::get_logger("image_transport.subscriber")),
+  Impl(rclcpp::Node::SharedPtr node, SubLoaderPtr loader)
+  : logger_(node->get_logger()),
+    loader_(loader),
     unsubscribed_(false)
   {
   }
@@ -74,10 +74,10 @@ struct Subscriber::Impl
     }
   }
 
+  rclcpp::Logger logger_;
   std::string lookup_name_;
   SubLoaderPtr loader_;
   std::shared_ptr<SubscriberPlugin> subscriber_;
-  rclcpp::Logger logger_;
   bool unsubscribed_;
   //double constructed_;
 };
@@ -89,7 +89,7 @@ Subscriber::Subscriber(
   SubLoaderPtr loader,
   const std::string& transport,
   rmw_qos_profile_t custom_qos)
-: impl_(std::make_shared<Impl>(loader))
+: impl_(std::make_shared<Impl>(node, loader))
 {
   // Load the plugin for the chosen transport.
   impl_->lookup_name_ = SubscriberPlugin::getLookupName(transport);
