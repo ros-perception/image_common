@@ -118,6 +118,7 @@ void CameraPublisher::publish(
   const sensor_msgs::msg::CameraInfo & info) const
 {
   if (!impl_ || !impl_->isValid()) {
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
@@ -131,6 +132,7 @@ void CameraPublisher::publish(
   const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const
 {
   if (!impl_ || !impl_->isValid()) {
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
