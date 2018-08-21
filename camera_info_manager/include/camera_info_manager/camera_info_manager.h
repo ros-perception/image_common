@@ -173,50 +173,55 @@ namespace camera_info_manager
 
 class CameraInfoManager
 {
- public:
-
-  CameraInfoManager(ros::NodeHandle nh,
-                    const std::string &cname="camera",
-                    const std::string &url="");
+public:
+  CameraInfoManager(
+    ros::NodeHandle nh,
+    const std::string & cname = "camera",
+    const std::string & url = "");
 
   sensor_msgs::CameraInfo getCameraInfo(void);
   bool isCalibrated(void);
-  bool loadCameraInfo(const std::string &url);
-  std::string resolveURL(const std::string &url,
-                         const std::string &cname);
-  bool setCameraName(const std::string &cname);
-  bool setCameraInfo(const sensor_msgs::CameraInfo &camera_info);
-  bool validateURL(const std::string &url);
+  bool loadCameraInfo(const std::string & url);
+  std::string resolveURL(
+    const std::string & url,
+    const std::string & cname);
+  bool setCameraName(const std::string & cname);
+  bool setCameraInfo(const sensor_msgs::CameraInfo & camera_info);
+  bool validateURL(const std::string & url);
 
- private:
-
+private:
   // recognized URL types
   typedef enum
-    {
-      // supported URLs
-      URL_empty = 0,             // empty string
-      URL_file,                  // file:
-      URL_package,               // package: 
-      // URLs not supported
-      URL_invalid,               // anything >= is invalid
-      URL_flash,                 // flash: 
-    } url_type_t;
+  {
+    // supported URLs
+    URL_empty = 0,               // empty string
+    URL_file,                    // file:
+    URL_package,                 // package:
+    // URLs not supported
+    URL_invalid,                 // anything >= is invalid
+    URL_flash,                   // flash:
+  } url_type_t;
 
   // private methods
-  std::string getPackageFileName(const std::string &url);
-  bool loadCalibration(const std::string &url,
-                       const std::string &cname);
-  bool loadCalibrationFile(const std::string &filename,
-                           const std::string &cname);
-  url_type_t parseURL(const std::string &url);
-  bool saveCalibration(const sensor_msgs::CameraInfo &new_info,
-                       const std::string &url,
-                       const std::string &cname);
-  bool saveCalibrationFile(const sensor_msgs::CameraInfo &new_info,
-                           const std::string &filename,
-                           const std::string &cname);
-  bool setCameraInfoService(sensor_msgs::SetCameraInfo::Request &req,
-                            sensor_msgs::SetCameraInfo::Response &rsp);
+  std::string getPackageFileName(const std::string & url);
+  bool loadCalibration(
+    const std::string & url,
+    const std::string & cname);
+  bool loadCalibrationFile(
+    const std::string & filename,
+    const std::string & cname);
+  url_type_t parseURL(const std::string & url);
+  bool saveCalibration(
+    const sensor_msgs::CameraInfo & new_info,
+    const std::string & url,
+    const std::string & cname);
+  bool saveCalibrationFile(
+    const sensor_msgs::CameraInfo & new_info,
+    const std::string & filename,
+    const std::string & cname);
+  bool setCameraInfoService(
+    sensor_msgs::SetCameraInfo::Request & req,
+    sensor_msgs::SetCameraInfo::Response & rsp);
 
   /** @brief mutual exclusion lock for private data
    *
@@ -238,6 +243,6 @@ class CameraInfoManager
 
 }; // class CameraInfoManager
 
-}; // namespace camera_info_manager
+}  // namespace camera_info_manager
 
 #endif // _CAMERA_INFO_MANAGER_H_
