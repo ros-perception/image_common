@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -35,13 +35,19 @@
 #ifndef IMAGE_TRANSPORT_PUBLISHER_H
 #define IMAGE_TRANSPORT_PUBLISHER_H
 
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
+#include <memory>
+
+#include <rclcpp/macros.hpp>
+#include <rclcpp/node.hpp>
+
+#include <sensor_msgs/msg/image.hpp>
+
 #include "image_transport/single_subscriber_publisher.h"
 #include "image_transport/exception.h"
 #include "image_transport/loader_fwds.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Manages advertisements of multiple transport options on an Image topic.
@@ -63,7 +69,13 @@ namespace image_transport {
 class Publisher
 {
 public:
-  Publisher() {}
+  Publisher() = default;
+
+  Publisher(
+    rclcpp::Node::SharedPtr nh,
+    const std::string & base_topic,
+    PubLoaderPtr loader,
+    rmw_qos_profile_t custom_qos);
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to
@@ -81,43 +93,26 @@ public:
   /*!
    * \brief Publish an image on the topics associated with this Publisher.
    */
-  void publish(const sensor_msgs::Image& message) const;
+  void publish(const sensor_msgs::msg::Image & message) const;
 
   /*!
    * \brief Publish an image on the topics associated with this Publisher.
    */
-  void publish(const sensor_msgs::ImageConstPtr& message) const;
+  void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
    */
   void shutdown();
 
-  operator void*() const;
-  bool operator< (const Publisher& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const Publisher& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const Publisher& rhs) const { return impl_ == rhs.impl_; }
+  operator void *() const;
+  bool operator<(const Publisher & rhs) const {return impl_ < rhs.impl_;}
+  bool operator!=(const Publisher & rhs) const {return impl_ != rhs.impl_;}
+  bool operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
-  Publisher(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-            const SubscriberStatusCallback& connect_cb,
-            const SubscriberStatusCallback& disconnect_cb,
-            const ros::VoidPtr& tracked_object, bool latch,
-            const PubLoaderPtr& loader);
-
   struct Impl;
-  typedef boost::shared_ptr<Impl> ImplPtr;
-  typedef boost::weak_ptr<Impl> ImplWPtr;
-  
-  ImplPtr impl_;
-
-  static void weakSubscriberCb(const ImplWPtr& impl_wptr,
-                               const SingleSubscriberPublisher& plugin_pub,
-                               const SubscriberStatusCallback& user_cb);
-  
-  SubscriberStatusCallback rebindCB(const SubscriberStatusCallback& user_cb);
-
-  friend class ImageTransport;
+  std::shared_ptr<Impl> impl_;
 };
 
 } //namespace image_transport

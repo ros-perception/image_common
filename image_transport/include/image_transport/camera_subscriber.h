@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -35,10 +35,12 @@
 #ifndef IMAGE_TRANSPORT_CAMERA_SUBSCRIBER_H
 #define IMAGE_TRANSPORT_CAMERA_SUBSCRIBER_H
 
-#include <ros/ros.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <sensor_msgs/Image.h>
-#include "image_transport/transport_hints.h"
+#include <functional>
+
+#include <rclcpp/node.hpp>
+
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <sensor_msgs/msg/image.hpp>
 
 namespace image_transport {
 
@@ -50,7 +52,7 @@ class ImageTransport;
  * CameraSubscriber is the client-side counterpart to CameraPublisher, and assumes the
  * same topic naming convention. The callback is of type:
 \verbatim
-void callback(const sensor_msgs::ImageConstPtr&, const sensor_msgs::CameraInfoConstPtr&);
+void callback(const sensor_msgs::msg::Image::ConstSharedPtr&, const sensor_msgs::msg::CameraInfo::ConstSharedPtr&);
 \endverbatim
  *
  * A CameraSubscriber should always be created through a call to
@@ -62,10 +64,16 @@ void callback(const sensor_msgs::ImageConstPtr&, const sensor_msgs::CameraInfoCo
 class CameraSubscriber
 {
 public:
-  typedef boost::function<void(const sensor_msgs::ImageConstPtr&,
-                               const sensor_msgs::CameraInfoConstPtr&)> Callback;
-  
-  CameraSubscriber() {}
+  typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&,
+                             const sensor_msgs::msg::CameraInfo::ConstSharedPtr&)> Callback;
+
+  CameraSubscriber() = default;
+
+  CameraSubscriber(rclcpp::Node::SharedPtr node,
+                   const std::string& base_topic,
+                   const Callback& callback,
+                   const std::string& transport,
+                   rmw_qos_profile_t = rmw_qos_profile_default);
 
   /**
    * \brief Get the base topic (on which the raw image is published).
@@ -96,21 +104,11 @@ public:
   bool operator< (const CameraSubscriber& rhs) const { return impl_ <  rhs.impl_; }
   bool operator!=(const CameraSubscriber& rhs) const { return impl_ != rhs.impl_; }
   bool operator==(const CameraSubscriber& rhs) const { return impl_ == rhs.impl_; }
-  
-private:
-  CameraSubscriber(ImageTransport& image_it, ros::NodeHandle& info_nh,
-                   const std::string& base_topic, uint32_t queue_size,
-                   const Callback& callback,
-                   const ros::VoidPtr& tracked_object = ros::VoidPtr(),
-                   const TransportHints& transport_hints = TransportHints());
-  
-  struct Impl;
-  typedef boost::shared_ptr<Impl> ImplPtr;
-  typedef boost::weak_ptr<Impl> ImplWPtr;
-  
-  ImplPtr impl_;
 
-  friend class ImageTransport;
+private:
+
+  struct Impl;
+  std::shared_ptr<Impl> impl_;
 };
 
 } //namespace image_transport

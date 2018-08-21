@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -35,22 +35,26 @@
 #ifndef IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
 #define IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
 
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
-#include <boost/noncopyable.hpp>
-#include "image_transport/transport_hints.h"
+#include <rclcpp/macros.hpp>
+#include <rclcpp/node.hpp>
+#include <sensor_msgs/msg/image.hpp>
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Base class for plugins to Subscriber.
  */
-class SubscriberPlugin : boost::noncopyable
+class SubscriberPlugin
 {
 public:
-  typedef boost::function<void(const sensor_msgs::ImageConstPtr&)> Callback;
-  
+  SubscriberPlugin() = default;
+  SubscriberPlugin(const SubscriberPlugin&) = delete;
+  SubscriberPlugin& operator=( const SubscriberPlugin& ) = delete;
+
   virtual ~SubscriberPlugin() {}
+
+  typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)> Callback;
 
   /**
    * \brief Get a string identifier for the transport provided by
@@ -59,48 +63,50 @@ public:
   virtual std::string getTransportName() const = 0;
 
   /**
-   * \brief Subscribe to an image topic, version for arbitrary boost::function object.
+   * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 const Callback& callback, const ros::VoidPtr& tracked_object = ros::VoidPtr(),
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(rclcpp::Node::SharedPtr node, const std::string& base_topic,
+                 const Callback& callback,
+                 rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribeImpl(nh, base_topic, queue_size, callback, tracked_object, transport_hints);
+    return subscribeImpl(node, base_topic, callback, custom_qos);
   }
 
   /**
    * \brief Subscribe to an image topic, version for bare function.
    */
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(*fp)(const sensor_msgs::ImageConstPtr&),
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(rclcpp::Node::SharedPtr node, const std::string & base_topic,
+                 void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
+                 rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe(nh, base_topic, queue_size,
-                     boost::function<void(const sensor_msgs::ImageConstPtr&)>(fp),
-                     ros::VoidPtr(), transport_hints);
+    return subscribe(node, base_topic,
+                     std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)>(fp),
+                     custom_qos);
   }
 
   /**
    * \brief Subscribe to an image topic, version for class member function with bare pointer.
    */
   template<class T>
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(rclcpp::Node::SharedPtr node, const std::string & base_topic,
+                 void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
+                 rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe(nh, base_topic, queue_size, boost::bind(fp, obj, _1), ros::VoidPtr(), transport_hints);
+    return subscribe(node, base_topic,
+        std::bind(fp, obj, std::placeholders::_1), custom_qos);
   }
 
   /**
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
   template<class T>
-  void subscribe(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 void(T::*fp)(const sensor_msgs::ImageConstPtr&),
-                 const boost::shared_ptr<T>& obj,
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(rclcpp::Node::SharedPtr node, const std::string & base_topic,
+                 void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
+                 std::shared_ptr<T>& obj,
+                 rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    return subscribe(nh, base_topic, queue_size, boost::bind(fp, obj.get(), _1), obj, transport_hints);
+    return subscribe(node, base_topic,
+        std::bind(fp, obj, std::placeholders::_1), custom_qos);
   }
 
   /**
@@ -122,7 +128,7 @@ public:
    * \brief Return the lookup name of the SubscriberPlugin associated with a specific
    * transport identifier.
    */
-  static std::string getLookupName(const std::string& transport_type)
+  static std::string getLookupName(const std::string & transport_type)
   {
     return "image_transport/" + transport_type + "_sub";
   }
@@ -131,9 +137,9 @@ protected:
   /**
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
-  virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const Callback& callback, const ros::VoidPtr& tracked_object,
-                             const TransportHints& transport_hints) = 0;
+  virtual void subscribeImpl(rclcpp::Node::SharedPtr node, const std::string& base_topic,
+                             const Callback& callback,
+                             rmw_qos_profile_t custom_qos = rmw_qos_profile_default) = 0;
 };
 
 } //namespace image_transport

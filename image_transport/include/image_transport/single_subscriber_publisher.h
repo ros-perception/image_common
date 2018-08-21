@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -35,9 +35,13 @@
 #ifndef IMAGE_TRANSPORT_SINGLE_SUBSCRIBER_PUBLISHER
 #define IMAGE_TRANSPORT_SINGLE_SUBSCRIBER_PUBLISHER
 
-#include <boost/noncopyable.hpp>
-#include <boost/function.hpp>
-#include <sensor_msgs/Image.h>
+#include "rclcpp/macros.hpp"
+#include "sensor_msgs/msg/image.hpp"
+
+#include <sensor_msgs/msg/image.hpp>
+
+#include <string>
+#include <functional>
 
 namespace image_transport {
 
@@ -45,24 +49,29 @@ namespace image_transport {
  * \brief Allows publication of an image to a single subscriber. Only available inside
  * subscriber connection callbacks.
  */
-class SingleSubscriberPublisher : boost::noncopyable
+class SingleSubscriberPublisher
 {
+private:
+  SingleSubscriberPublisher(const SingleSubscriberPublisher&) = delete;
+  SingleSubscriberPublisher& operator=( const SingleSubscriberPublisher& ) = delete;
+
 public:
-  typedef boost::function<uint32_t()> GetNumSubscribersFn;
-  typedef boost::function<void(const sensor_msgs::Image&)> PublishFn;
-  
-  SingleSubscriberPublisher(const std::string& caller_id, const std::string& topic,
-                            const GetNumSubscribersFn& num_subscribers_fn,
-                            const PublishFn& publish_fn);
-  
+  typedef std::function<uint32_t()> GetNumSubscribersFn;
+  typedef std::function<void(const sensor_msgs::msg::Image&)> PublishFn;
+
+  SingleSubscriberPublisher(
+    const std::string & caller_id, const std::string & topic,
+    const GetNumSubscribersFn & num_subscribers_fn,
+    const PublishFn & publish_fn);
+
   std::string getSubscriberName() const;
 
   std::string getTopic() const;
 
   uint32_t getNumSubscribers() const;
 
-  void publish(const sensor_msgs::Image& message) const;
-  void publish(const sensor_msgs::ImageConstPtr& message) const;
+  void publish(const sensor_msgs::msg::Image& message) const;
+  void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const;
 
 private:
   std::string caller_id_;
@@ -73,7 +82,7 @@ private:
   friend class Publisher; // to get publish_fn_ directly
 };
 
-typedef boost::function<void(const SingleSubscriberPublisher&)> SubscriberStatusCallback;
+typedef std::function<void (const SingleSubscriberPublisher &)> SubscriberStatusCallback;
 
 } //namespace image_transport
 

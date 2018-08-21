@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -35,12 +35,18 @@
 #include "image_transport/image_transport.h"
 #include "image_transport/camera_common.h"
 
-namespace image_transport {
+#include <rclcpp/expand_topic_or_service_name.hpp>
+#include <rclcpp/logging.hpp>
+#include <rclcpp/node.hpp>
+
+namespace image_transport
+{
 
 struct CameraPublisher::Impl
 {
-  Impl()
-    : unadvertised_(false)
+  Impl(rclcpp::Node::SharedPtr node)
+  : logger_(node->get_logger()) ,
+    unadvertised_(false)
   {
   }
 
@@ -53,95 +59,86 @@ struct CameraPublisher::Impl
   {
     return !unadvertised_;
   }
-  
+
   void shutdown()
   {
     if (!unadvertised_) {
       unadvertised_ = true;
       image_pub_.shutdown();
-      info_pub_.shutdown();
+      //TODO(ros2) publishers don't have "shutdown"
+      //info_pub_.shutdown();
     }
   }
 
+  rclcpp::Logger logger_;
   Publisher image_pub_;
-  ros::Publisher info_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr info_pub_;
   bool unadvertised_;
-  //double constructed_;
 };
 
-CameraPublisher::CameraPublisher(ImageTransport& image_it, ros::NodeHandle& info_nh,
-                                 const std::string& base_topic, uint32_t queue_size,
-                                 const SubscriberStatusCallback& image_connect_cb,
-                                 const SubscriberStatusCallback& image_disconnect_cb,
-                                 const ros::SubscriberStatusCallback& info_connect_cb,
-                                 const ros::SubscriberStatusCallback& info_disconnect_cb,
-                                 const ros::VoidPtr& tracked_object, bool latch)
-  : impl_(new Impl)
+//TODO(ros2) Add support for SubscriberStatusCallbacks when rcl/rmw support it.
+CameraPublisher::CameraPublisher(
+  rclcpp::Node::SharedPtr node,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos)
+: impl_(std::make_shared<Impl>(node))
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
   // image topic is remapped (#4539).
-  std::string image_topic = info_nh.resolveName(base_topic);
+  std::string image_topic = rclcpp::expand_topic_or_service_name(base_topic,
+      node->get_name(), node->get_namespace());
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  impl_->image_pub_ = image_it.advertise(image_topic, queue_size, image_connect_cb,
-                                         image_disconnect_cb, tracked_object, latch);
-  impl_->info_pub_ = info_nh.advertise<sensor_msgs::CameraInfo>(info_topic, queue_size, info_connect_cb,
-                                                                info_disconnect_cb, tracked_object, latch);
+  impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos);
+  impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, custom_qos);
 }
 
 uint32_t CameraPublisher::getNumSubscribers() const
 {
-  if (impl_ && impl_->isValid())
-    return std::max(impl_->image_pub_.getNumSubscribers(), impl_->info_pub_.getNumSubscribers());
+  //TODO(ros2) add support when rcl/rmw support it.
+  //if (impl_ && impl_->isValid())
+  //return std::max(impl_->image_pub_.getNumSubscribers(), impl_->info_pub_.getNumSubscribers());
   return 0;
 }
 
 std::string CameraPublisher::getTopic() const
 {
-  if (impl_) return impl_->image_pub_.getTopic();
+  if (impl_) {return impl_->image_pub_.getTopic();}
   return std::string();
 }
 
 std::string CameraPublisher::getInfoTopic() const
 {
-  if (impl_) return impl_->info_pub_.getTopic();
+  if (impl_) return impl_->info_pub_->get_topic_name();
   return std::string();
 }
 
-void CameraPublisher::publish(const sensor_msgs::Image& image, const sensor_msgs::CameraInfo& info) const
+void CameraPublisher::publish(
+  const sensor_msgs::msg::Image & image,
+  const sensor_msgs::msg::CameraInfo & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
-  
+
   impl_->image_pub_.publish(image);
-  impl_->info_pub_.publish(info);
+  impl_->info_pub_->publish(info);
 }
 
-void CameraPublisher::publish(const sensor_msgs::ImageConstPtr& image,
-                              const sensor_msgs::CameraInfoConstPtr& info) const
+void CameraPublisher::publish(
+  const sensor_msgs::msg::Image::ConstSharedPtr & image,
+  const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
-  
-  impl_->image_pub_.publish(image);
-  impl_->info_pub_.publish(info);
-}
 
-void CameraPublisher::publish(sensor_msgs::Image& image, sensor_msgs::CameraInfo& info,
-                              ros::Time stamp) const
-{
-  if (!impl_ || !impl_->isValid()) {
-    ROS_ASSERT_MSG(false, "Call to publish() on an invalid image_transport::CameraPublisher");
-    return;
-  }
-  
-  image.header.stamp = stamp;
-  info.header.stamp = stamp;
-  publish(image, info);
+  impl_->image_pub_.publish(image);
+  impl_->info_pub_->publish(info);
 }
 
 void CameraPublisher::shutdown()
@@ -152,9 +149,9 @@ void CameraPublisher::shutdown()
   }
 }
 
-CameraPublisher::operator void*() const
+CameraPublisher::operator void *() const
 {
-  return (impl_ && impl_->isValid()) ? (void*)1 : (void*)0;
+  return (impl_ && impl_->isValid()) ? (void *)1 : (void *)0;
 }
 
 } //namespace image_transport

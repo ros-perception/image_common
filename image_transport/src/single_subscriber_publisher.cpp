@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -32,17 +32,21 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include <sensor_msgs/msg/image.hpp>
+
 #include "image_transport/single_subscriber_publisher.h"
 #include "image_transport/publisher.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
-SingleSubscriberPublisher::SingleSubscriberPublisher(const std::string& caller_id, const std::string& topic,
-                                                     const GetNumSubscribersFn& num_subscribers_fn,
-                                                     const PublishFn& publish_fn)
-  : caller_id_(caller_id), topic_(topic),
-    num_subscribers_fn_(num_subscribers_fn),
-    publish_fn_(publish_fn)
+SingleSubscriberPublisher::SingleSubscriberPublisher(
+  const std::string & caller_id, const std::string & topic,
+  const GetNumSubscribersFn & num_subscribers_fn,
+  const PublishFn & publish_fn)
+: caller_id_(caller_id), topic_(topic),
+  num_subscribers_fn_(num_subscribers_fn),
+  publish_fn_(publish_fn)
 {
 }
 
@@ -61,12 +65,12 @@ uint32_t SingleSubscriberPublisher::getNumSubscribers() const
   return num_subscribers_fn_();
 }
 
-void SingleSubscriberPublisher::publish(const sensor_msgs::Image& message) const
+void SingleSubscriberPublisher::publish(const sensor_msgs::msg::Image & message) const
 {
   publish_fn_(message);
 }
 
-void SingleSubscriberPublisher::publish(const sensor_msgs::ImageConstPtr& message) const
+void SingleSubscriberPublisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   publish_fn_(*message);
 }

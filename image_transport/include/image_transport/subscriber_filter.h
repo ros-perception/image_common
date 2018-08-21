@@ -35,9 +35,7 @@
 #ifndef IMAGE_TRANSPORT_SUBSCRIBER_FILTER_H
 #define IMAGE_TRANSPORT_SUBSCRIBER_FILTER_H
 
-#include <ros/ros.h>
 #include <message_filters/simple_filter.h>
-
 #include "image_transport/image_transport.h"
 
 namespace image_transport {
@@ -58,10 +56,10 @@ namespace image_transport {
  * The output connection for the SubscriberFilter object is the same signature as for roscpp
  * subscription callbacks, ie.
 \verbatim
-void callback(const boost::shared_ptr<const sensor_msgs::Image>&);
+void callback(const std::shared_ptr<const sensor_msgs::msg::Image>&);
 \endverbatim
  */
-class SubscriberFilter : public message_filters::SimpleFilter<sensor_msgs::Image>
+class SubscriberFilter : public message_filters::SimpleFilter<sensor_msgs::msg::Image>
 {
 public:
   /**
@@ -72,12 +70,11 @@ public:
    * \param nh The ros::NodeHandle to use to subscribe.
    * \param base_topic The topic to subscribe to.
    * \param queue_size The subscription queue size
-   * \param transport_hints The transport hints to pass along
+   * \param transport The transport hint to pass along
    */
-  SubscriberFilter(ImageTransport& it, const std::string& base_topic, uint32_t queue_size,
-                   const TransportHints& transport_hints = TransportHints())
+  SubscriberFilter(rclcpp::Node::SharedPtr node, const std::string& base_topic, const std::string& transport)
   {
-    subscribe(it, base_topic, queue_size, transport_hints);
+    subscribe(node, base_topic, transport);
   }
 
   /**
@@ -99,16 +96,15 @@ public:
    *
    * \param nh The ros::NodeHandle to use to subscribe.
    * \param base_topic The topic to subscribe to.
-   * \param queue_size The subscription queue size
-   * \param transport_hints The transport hints to pass along
    */
-  void subscribe(ImageTransport& it, const std::string& base_topic, uint32_t queue_size,
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(
+      rclcpp::Node::SharedPtr node,
+      const std::string& base_topic,
+      const std::string& transport,
+      rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
     unsubscribe();
-
-    sub_ = it.subscribe(base_topic, queue_size, boost::bind(&SubscriberFilter::cb, this, _1),
-                        ros::VoidPtr(), transport_hints);
+    sub_ = image_transport::create_subscription(node, base_topic, std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), transport, custom_qos);
   }
 
   /**
@@ -150,7 +146,7 @@ public:
 
 private:
 
-  void cb(const sensor_msgs::ImageConstPtr& m)
+  void cb(const sensor_msgs::msg::Image::ConstSharedPtr& m)
   {
     signalMessage(m);
   }

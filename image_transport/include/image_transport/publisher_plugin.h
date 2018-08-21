@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -35,18 +35,24 @@
 #ifndef IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
 #define IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
 
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
+#include <rclcpp/node.hpp>
+
+#include <sensor_msgs/msg/image.hpp>
 #include "image_transport/single_subscriber_publisher.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Base class for plugins to Publisher.
  */
-class PublisherPlugin : boost::noncopyable
+class PublisherPlugin
 {
 public:
+  PublisherPlugin() = default;
+  PublisherPlugin(const PublisherPlugin&) = delete;
+  PublisherPlugin& operator=( const PublisherPlugin& ) = delete;
+
   virtual ~PublisherPlugin() {}
 
   /**
@@ -58,22 +64,12 @@ public:
   /**
    * \brief Advertise a topic, simple version.
    */
-  void advertise(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 bool latch = true)
+  void advertise(
+    rclcpp::Node::SharedPtr & nh,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
-    advertiseImpl(nh, base_topic, queue_size, SubscriberStatusCallback(),
-                  SubscriberStatusCallback(), ros::VoidPtr(), latch);
-  }
-  
-  /**
-   * \brief Advertise a topic with subscriber status callbacks.
-   */
-  void advertise(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                 const SubscriberStatusCallback& connect_cb,
-                 const SubscriberStatusCallback& disconnect_cb = SubscriberStatusCallback(),
-                 const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = true)
-  {
-    advertiseImpl(nh, base_topic, queue_size, connect_cb, disconnect_cb, tracked_object, latch);
+    advertiseImpl(nh, base_topic, custom_qos);
   }
 
   /**
@@ -90,12 +86,12 @@ public:
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
-  virtual void publish(const sensor_msgs::Image& message) const = 0;
+  virtual void publish(const sensor_msgs::msg::Image& message) const = 0;
 
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
-  virtual void publish(const sensor_msgs::ImageConstPtr& message) const
+  virtual void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const
   {
     publish(*message);
   }
@@ -107,16 +103,16 @@ public:
    * @param message an image message to use information from (but not data)
    * @param data a pointer to the image data to use to fill the Image message
    */
-  virtual void publish(const sensor_msgs::Image& message, const uint8_t* data) const
+  virtual void publish(const sensor_msgs::msg::Image& message, const uint8_t* data) const
   {
-    sensor_msgs::Image msg;
+    sensor_msgs::msg::Image msg;
     msg.header = message.header;
     msg.height = message.height;
     msg.width = message.width;
     msg.encoding = message.encoding;
     msg.is_bigendian = message.is_bigendian;
     msg.step = message.step;
-    msg.data = std::vector<uint8_t>(data, data + msg.step*msg.height);
+    msg.data = std::vector<uint8_t>(data, data + msg.step * msg.height);
 
     publish(msg);
   }
@@ -130,7 +126,7 @@ public:
    * \brief Return the lookup name of the PublisherPlugin associated with a specific
    * transport identifier.
    */
-  static std::string getLookupName(const std::string& transport_name)
+  static std::string getLookupName(const std::string & transport_name)
   {
     return "image_transport/" + transport_name + "_pub";
   }
@@ -139,10 +135,7 @@ protected:
   /**
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
-  virtual void advertiseImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const SubscriberStatusCallback& connect_cb,
-                             const SubscriberStatusCallback& disconnect_cb,
-                             const ros::VoidPtr& tracked_object, bool latch) = 0;
+  virtual void advertiseImpl(rclcpp::Node::SharedPtr nh, const std::string& base_topic, rmw_qos_profile_t custom_qos) = 0;
 };
 
 } //namespace image_transport

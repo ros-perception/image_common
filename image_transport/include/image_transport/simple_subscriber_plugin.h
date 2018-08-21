@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -35,10 +35,14 @@
 #ifndef IMAGE_TRANSPORT_SIMPLE_SUBSCRIBER_PLUGIN_H
 #define IMAGE_TRANSPORT_SIMPLE_SUBSCRIBER_PLUGIN_H
 
-#include "image_transport/subscriber_plugin.h"
-#include <boost/scoped_ptr.hpp>
+#include <functional>
+#include <memory>
 
-namespace image_transport {
+#include "image_transport/subscriber_plugin.h"
+#include "rclcpp/subscription.hpp"
+
+namespace image_transport
+{
 
 /**
  * \brief Base class to simplify implementing most plugins to Subscriber.
@@ -58,27 +62,29 @@ namespace image_transport {
  * getTopicToSubscribe() controls the name of the internal communication topic. It
  * defaults to \<base topic\>/\<transport name\>.
  */
-template <class M>
+template<class M>
 class SimpleSubscriberPlugin : public SubscriberPlugin
 {
 public:
-  virtual ~SimpleSubscriberPlugin() {}
+  virtual ~SimpleSubscriberPlugin() {};
 
   virtual std::string getTopic() const
   {
-    if (simple_impl_) return simple_impl_->sub_.getTopic();
+    if (impl_) return impl_->sub_->get_topic_name();
     return std::string();
   }
 
   virtual uint32_t getNumPublishers() const
   {
-    if (simple_impl_) return simple_impl_->sub_.getNumPublishers();
-    return 0;
+    //TODO(ros2) Enable count_publisher when rcl/rmw supports it.
+    //if (simple_impl_) return simple_impl_->node_->count_publishers(getTopic());
+    return 1;
   }
 
   virtual void shutdown()
   {
-    if (simple_impl_) simple_impl_->sub_.shutdown();
+    // TODO(ros2) Enable shutdown when rcl/rmw supports it.
+    //if (simple_impl_) simple_impl_->sub_.shutdown();
   }
 
 protected:
@@ -88,52 +94,47 @@ protected:
    * @param message A message from the PublisherPlugin.
    * @param user_cb The user Image callback to invoke, if appropriate.
    */
-  virtual void internalCallback(const typename M::ConstPtr& message, const Callback& user_cb) = 0;
+  virtual void internalCallback(
+    const typename std::shared_ptr<const M>& message,
+    const Callback & user_cb) = 0;
 
   /**
    * \brief Return the communication topic name for a given base topic.
    *
    * Defaults to \<base topic\>/\<transport name\>.
    */
-  virtual std::string getTopicToSubscribe(const std::string& base_topic) const
+  virtual std::string getTopicToSubscribe(const std::string & base_topic) const
   {
     return base_topic + "/" + getTransportName();
   }
-  
-  virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const Callback& callback, const ros::VoidPtr& tracked_object,
-                             const TransportHints& transport_hints)
+
+  virtual void subscribeImpl(
+    rclcpp::Node::SharedPtr node,
+    const std::string & base_topic,
+    const Callback & callback,
+    rmw_qos_profile_t custom_qos)
   {
+    impl_ = std::make_unique<Impl>();
     // Push each group of transport-specific parameters into a separate sub-namespace
-    ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
-    simple_impl_.reset(new SimpleSubscriberPluginImpl(param_nh));
-
-    simple_impl_->sub_ = nh.subscribe<M>(getTopicToSubscribe(base_topic), queue_size,
-                                         boost::bind(&SimpleSubscriberPlugin::internalCallback, this, _1, callback),
-                                         tracked_object, transport_hints.getRosHints());
-  }
-
-  /**
-   * \brief Returns the ros::NodeHandle to be used for parameter lookup.
-   */
-  const ros::NodeHandle& nh() const
-  {
-    return simple_impl_->param_nh_;
+    //ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
+    //
+    impl_->sub_ = node->create_subscription<M>(getTopicToSubscribe(base_topic),
+        [this, callback](const typename std::shared_ptr<const M> msg){
+          internalCallback(msg, callback);
+        },
+        custom_qos);
   }
 
 private:
-  struct SimpleSubscriberPluginImpl
+  struct Impl
   {
-    SimpleSubscriberPluginImpl(const ros::NodeHandle& nh)
-      : param_nh_(nh)
-    {
-    }
-    
-    const ros::NodeHandle param_nh_;
-    ros::Subscriber sub_;
+    rclcpp::SubscriptionBase::SharedPtr sub_;
   };
-  
-  boost::scoped_ptr<SimpleSubscriberPluginImpl> simple_impl_;
+
+  std::unique_ptr<Impl> impl_;
+
+
+
 };
 
 } //namespace image_transport
