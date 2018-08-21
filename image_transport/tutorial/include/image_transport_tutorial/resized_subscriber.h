@@ -12,6 +12,7 @@ public:
   }
 
 protected:
-  virtual void internalCallback(const typename image_transport_tutorial::ResizedImage::ConstPtr& message,
-                                const Callback& user_cb);
+  virtual void internalCallback(
+    const typename image_transport_tutorial::ResizedImage::ConstPtr & message,
+    const Callback & user_cb);
 };

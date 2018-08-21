@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -38,7 +38,8 @@
 #include "image_transport/subscriber_plugin.h"
 #include <boost/scoped_ptr.hpp>
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Base class to simplify implementing most plugins to Subscriber.
@@ -58,7 +59,7 @@ namespace image_transport {
  * getTopicToSubscribe() controls the name of the internal communication topic. It
  * defaults to \<base topic\>/\<transport name\>.
  */
-template <class M>
+template<class M>
 class SimpleSubscriberPlugin : public SubscriberPlugin
 {
 public:
@@ -66,19 +67,19 @@ public:
 
   virtual std::string getTopic() const
   {
-    if (simple_impl_) return simple_impl_->sub_.getTopic();
+    if (simple_impl_) {return simple_impl_->sub_.getTopic();}
     return std::string();
   }
 
   virtual uint32_t getNumPublishers() const
   {
-    if (simple_impl_) return simple_impl_->sub_.getNumPublishers();
+    if (simple_impl_) {return simple_impl_->sub_.getNumPublishers();}
     return 0;
   }
 
   virtual void shutdown()
   {
-    if (simple_impl_) simple_impl_->sub_.shutdown();
+    if (simple_impl_) {simple_impl_->sub_.shutdown();}
   }
 
 protected:
@@ -88,35 +89,36 @@ protected:
    * @param message A message from the PublisherPlugin.
    * @param user_cb The user Image callback to invoke, if appropriate.
    */
-  virtual void internalCallback(const typename M::ConstPtr& message, const Callback& user_cb) = 0;
+  virtual void internalCallback(const typename M::ConstPtr & message, const Callback & user_cb) = 0;
 
   /**
    * \brief Return the communication topic name for a given base topic.
    *
    * Defaults to \<base topic\>/\<transport name\>.
    */
-  virtual std::string getTopicToSubscribe(const std::string& base_topic) const
+  virtual std::string getTopicToSubscribe(const std::string & base_topic) const
   {
     return base_topic + "/" + getTransportName();
   }
-  
-  virtual void subscribeImpl(ros::NodeHandle& nh, const std::string& base_topic, uint32_t queue_size,
-                             const Callback& callback, const ros::VoidPtr& tracked_object,
-                             const TransportHints& transport_hints)
+
+  virtual void subscribeImpl(
+    ros::NodeHandle & nh, const std::string & base_topic, uint32_t queue_size,
+    const Callback & callback, const ros::VoidPtr & tracked_object,
+    const TransportHints & transport_hints)
   {
     // Push each group of transport-specific parameters into a separate sub-namespace
     ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
     simple_impl_.reset(new SimpleSubscriberPluginImpl(param_nh));
 
     simple_impl_->sub_ = nh.subscribe<M>(getTopicToSubscribe(base_topic), queue_size,
-                                         boost::bind(&SimpleSubscriberPlugin::internalCallback, this, _1, callback),
-                                         tracked_object, transport_hints.getRosHints());
+        boost::bind(&SimpleSubscriberPlugin::internalCallback, this, _1, callback),
+        tracked_object, transport_hints.getRosHints());
   }
 
   /**
    * \brief Returns the ros::NodeHandle to be used for parameter lookup.
    */
-  const ros::NodeHandle& nh() const
+  const ros::NodeHandle & nh() const
   {
     return simple_impl_->param_nh_;
   }
@@ -124,15 +126,15 @@ protected:
 private:
   struct SimpleSubscriberPluginImpl
   {
-    SimpleSubscriberPluginImpl(const ros::NodeHandle& nh)
-      : param_nh_(nh)
+    SimpleSubscriberPluginImpl(const ros::NodeHandle & nh)
+    : param_nh_(nh)
     {
     }
-    
+
     const ros::NodeHandle param_nh_;
     ros::Subscriber sub_;
   };
-  
+
   boost::scoped_ptr<SimpleSubscriberPluginImpl> simple_impl_;
 };
 

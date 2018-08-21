@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -40,7 +40,8 @@
 #include <sensor_msgs/CameraInfo.h>
 #include "image_transport/single_subscriber_publisher.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 class ImageTransport;
 
@@ -85,13 +86,14 @@ public:
   /*!
    * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  void publish(const sensor_msgs::Image& image, const sensor_msgs::CameraInfo& info) const;
+  void publish(const sensor_msgs::Image & image, const sensor_msgs::CameraInfo & info) const;
 
   /*!
    * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  void publish(const sensor_msgs::ImageConstPtr& image,
-               const sensor_msgs::CameraInfoConstPtr& info) const;
+  void publish(
+    const sensor_msgs::ImageConstPtr & image,
+    const sensor_msgs::CameraInfoConstPtr & info) const;
 
   /*!
    * \brief Publish an (image, info) pair with given timestamp on the topics associated with
@@ -100,31 +102,32 @@ public:
    * Convenience version, which sets the timestamps of both image and info to stamp before
    * publishing.
    */
-  void publish(sensor_msgs::Image& image, sensor_msgs::CameraInfo& info, ros::Time stamp) const;
+  void publish(sensor_msgs::Image & image, sensor_msgs::CameraInfo & info, ros::Time stamp) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
    */
   void shutdown();
 
-  operator void*() const;
-  bool operator< (const CameraPublisher& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const CameraPublisher& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const CameraPublisher& rhs) const { return impl_ == rhs.impl_; }
+  operator void *() const;
+  bool operator<(const CameraPublisher & rhs) const {return impl_ < rhs.impl_;}
+  bool operator!=(const CameraPublisher & rhs) const {return impl_ != rhs.impl_;}
+  bool operator==(const CameraPublisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
-  CameraPublisher(ImageTransport& image_it, ros::NodeHandle& info_nh,
-                  const std::string& base_topic, uint32_t queue_size,
-                  const SubscriberStatusCallback& image_connect_cb,
-                  const SubscriberStatusCallback& image_disconnect_cb,
-                  const ros::SubscriberStatusCallback& info_connect_cb,
-                  const ros::SubscriberStatusCallback& info_disconnect_cb,
-                  const ros::VoidPtr& tracked_object, bool latch);
-  
+  CameraPublisher(
+    ImageTransport & image_it, ros::NodeHandle & info_nh,
+    const std::string & base_topic, uint32_t queue_size,
+    const SubscriberStatusCallback & image_connect_cb,
+    const SubscriberStatusCallback & image_disconnect_cb,
+    const ros::SubscriberStatusCallback & info_connect_cb,
+    const ros::SubscriberStatusCallback & info_disconnect_cb,
+    const ros::VoidPtr & tracked_object, bool latch);
+
   struct Impl;
   typedef boost::shared_ptr<Impl> ImplPtr;
   typedef boost::weak_ptr<Impl> ImplWPtr;
-  
+
   ImplPtr impl_;
 
   friend class ImageTransport;

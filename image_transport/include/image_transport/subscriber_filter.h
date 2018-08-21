@@ -40,7 +40,8 @@
 
 #include "image_transport/image_transport.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Image subscription filter.
@@ -74,8 +75,9 @@ public:
    * \param queue_size The subscription queue size
    * \param transport_hints The transport hints to pass along
    */
-  SubscriberFilter(ImageTransport& it, const std::string& base_topic, uint32_t queue_size,
-                   const TransportHints& transport_hints = TransportHints())
+  SubscriberFilter(
+    ImageTransport & it, const std::string & base_topic, uint32_t queue_size,
+    const TransportHints & transport_hints = TransportHints())
   {
     subscribe(it, base_topic, queue_size, transport_hints);
   }
@@ -102,13 +104,14 @@ public:
    * \param queue_size The subscription queue size
    * \param transport_hints The transport hints to pass along
    */
-  void subscribe(ImageTransport& it, const std::string& base_topic, uint32_t queue_size,
-                 const TransportHints& transport_hints = TransportHints())
+  void subscribe(
+    ImageTransport & it, const std::string & base_topic, uint32_t queue_size,
+    const TransportHints & transport_hints = TransportHints())
   {
     unsubscribe();
 
     sub_ = it.subscribe(base_topic, queue_size, boost::bind(&SubscriberFilter::cb, this, _1),
-                        ros::VoidPtr(), transport_hints);
+        ros::VoidPtr(), transport_hints);
   }
 
   /**
@@ -143,14 +146,13 @@ public:
   /**
    * \brief Returns the internal image_transport::Subscriber object.
    */
-  const Subscriber& getSubscriber() const
+  const Subscriber & getSubscriber() const
   {
     return sub_;
   }
 
 private:
-
-  void cb(const sensor_msgs::ImageConstPtr& m)
+  void cb(const sensor_msgs::ImageConstPtr & m)
   {
     signalMessage(m);
   }
