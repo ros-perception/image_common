@@ -93,7 +93,9 @@ struct Publisher::Impl
 
   std::string base_topic_;
   PubLoaderPtr loader_;
-  std::vector<boost::shared_ptr<PublisherPlugin>> publishers_;
+  // Prevent uncrustify from creating '>>', which is valid in C++11
+  typedef boost::shared_ptr<PublisherPlugin> PublisherPluginPtr;
+  std::vector<PublisherPluginPtr> publishers_;
   bool unadvertised_;
   //double constructed_;
 };
