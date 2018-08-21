@@ -35,7 +35,11 @@
 #ifndef IMAGE_TRANSPORT_TRANSPORT_HINTS_H
 #define IMAGE_TRANSPORT_TRANSPORT_HINTS_H
 
+#include <memory>
 #include <string>
+
+
+#include <rclcpp/parameter_client.hpp>
 
 namespace image_transport {
 
@@ -59,15 +63,11 @@ public:
    * Defaults to the local namespace.
    * @param parameter_name The name of the transport parameter
    */
-  // TODO(ros2) change to equivalent ROS2::TransportHints
-  TransportHints(const std::string& default_transport = "raw",
-                 /*const ros::TransportHints& ros_hints = ros::TransportHints(),*/
-                 /*const ros::NodeHandle& parameter_nh = ros::NodeHandle("~"),*/
+  TransportHints(const std::shared_ptr<rclcpp::SyncParametersClient>& parameter_client,
+                 const std::string& default_transport = "raw",
                  const std::string& parameter_name = "image_transport")
-    /*: ros_hints_(ros_hints), parameter_nh_(parameter_nh)*/
   {
-    /*parameter_nh_.param(parameter_name, transport_, default_transport);*/
-    transport_ = default_transport;
+    transport_  = parameter_client->get_parameter<std::string>(parameter_name, default_transport);
   }
 
   const std::string& getTransport() const
@@ -75,24 +75,8 @@ public:
     return transport_;
   }
 
-  /*
-  const ros::TransportHints& getRosHints() const
-  {
-    return ros_hints_;
-  }
-  */
-
-  /*
-  const ros::NodeHandle& getParameterNH() const
-  {
-    return parameter_nh_;
-  }
-  */
-
 private:
   std::string transport_;
-  //ros::TransportHints ros_hints_;
-  //ros::NodeHandle parameter_nh_;
 };
 
 } //namespace image_transport

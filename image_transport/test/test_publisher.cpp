@@ -24,7 +24,7 @@ TEST_F(TestPublisher, Publisher) {
 
 TEST_F(TestPublisher, ImageTransportPublisher) {
   image_transport::ImageTransport it(node_);
-  auto pub = it.advertise("camera/image");
+  auto pub = it.advertise("camera/image", 1);
 }
 
 TEST_F(TestPublisher, CameraPublisher) {
@@ -33,7 +33,7 @@ TEST_F(TestPublisher, CameraPublisher) {
 
 TEST_F(TestPublisher, ImageTransportCameraPublisher) {
   image_transport::ImageTransport it(node_);
-  //auto pub = it.advertise_camera("camera/image");
+  auto pub = it.advertiseCamera("camera/image", 1);
 }
 
 
