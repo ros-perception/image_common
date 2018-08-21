@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -37,7 +37,7 @@
 #include <boost/lexical_cast.hpp>
 #include "polled_camera/GetPolledImage.h"
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   ros::init(argc, argv, "poller", ros::init_options::AnonymousName);
   if (argc < 2) {
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     return 0;
   }
   double hz = boost::lexical_cast<double>(argv[1]);
-  
+
   ros::NodeHandle nh;
   std::string service_name = nh.resolveName("camera") + "/request_image";
   ros::ServiceClient client = nh.serviceClient<polled_camera::GetPolledImage>(service_name);
@@ -59,8 +59,7 @@ int main(int argc, char** argv)
     if (client.call(req, rsp)) {
       std::cout << "Timestamp: " << rsp.stamp << std::endl;
       loop_rate.sleep();
-    }
-    else {
+    } else {
       ROS_ERROR("Service call failed");
       client.waitForExistence();
     }
