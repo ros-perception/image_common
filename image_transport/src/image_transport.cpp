@@ -128,14 +128,12 @@ std::vector<std::string> getLoadableTransports()
 struct ImageTransport::Impl
 {
   rclcpp::Node::SharedPtr node_;
-  rclcpp::SyncParametersClient::SharedPtr param_client_;
 };
 
 ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
 : impl_(std::make_unique<ImageTransport::Impl>())
 {
   impl_->node_ = node;
-  impl_->param_client_ = std::make_shared<rclcpp::SyncParametersClient>(impl_->node_);
 }
 
 ImageTransport::~ImageTransport() = default;
@@ -200,7 +198,7 @@ std::string ImageTransport::getTransportOrDefault(const TransportHints * transpo
 {
   std::string ret;
   if (nullptr == transport_hints) {
-    TransportHints th(impl_->param_client_);
+    TransportHints th(impl_->node_);
     ret = th.getTransport();
   } else {
     ret = transport_hints->getTransport();

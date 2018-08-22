@@ -38,8 +38,7 @@
 #include <memory>
 #include <string>
 
-
-#include <rclcpp/parameter_client.hpp>
+#include <rclcpp/node.hpp>
 
 namespace image_transport {
 
@@ -57,17 +56,15 @@ public:
    * in the node's local namespace. For consistency across ROS applications, the
    * name of this parameter should not be changed without good reason.
    *
+   * @param node Node to use when looking up the transport parameter.
    * @param default_transport Preferred transport to use
-   * @param ros_hints Hints to pass through to ROS subscriptions
-   * @param parameter_nh Node handle to use when looking up the transport parameter.
-   * Defaults to the local namespace.
    * @param parameter_name The name of the transport parameter
    */
-  TransportHints(const std::shared_ptr<rclcpp::SyncParametersClient>& parameter_client,
+  TransportHints(const rclcpp::Node::SharedPtr& node,
                  const std::string& default_transport = "raw",
                  const std::string& parameter_name = "image_transport")
   {
-    transport_  = parameter_client->get_parameter<std::string>(parameter_name, default_transport);
+    node->get_parameter_or<std::string>(parameter_name, transport_, default_transport);
   }
 
   const std::string& getTransport() const
