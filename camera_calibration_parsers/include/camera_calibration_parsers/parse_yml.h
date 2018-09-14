@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -40,7 +40,8 @@
 #include <ostream>
 #include <sensor_msgs/CameraInfo.h>
 
-namespace camera_calibration_parsers {
+namespace camera_calibration_parsers
+{
 
 /**
  * \brief Write calibration parameters to a file in YAML format.
@@ -49,8 +50,9 @@ namespace camera_calibration_parsers {
  * \param camera_name Name of the camera
  * \param cam_info Camera parameters
  */
-bool writeCalibrationYml(std::ostream& out, const std::string& camera_name,
-                         const sensor_msgs::CameraInfo& cam_info);
+bool writeCalibrationYml(
+  std::ostream & out, const std::string & camera_name,
+  const sensor_msgs::CameraInfo & cam_info);
 
 /**
  * \brief Read calibration parameters from a YAML file.
@@ -59,7 +61,9 @@ bool writeCalibrationYml(std::ostream& out, const std::string& camera_name,
  * \param[out] camera_name Name of the camera
  * \param[out] cam_info Camera parameters
  */
-bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs::CameraInfo& cam_info);
+bool readCalibrationYml(
+  std::istream & in, std::string & camera_name,
+  sensor_msgs::CameraInfo & cam_info);
 
 /**
  * \brief Write calibration parameters to a file in YAML format.
@@ -68,8 +72,9 @@ bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs:
  * \param camera_name Name of the camera
  * \param cam_info Camera parameters
  */
-bool writeCalibrationYml(const std::string& file_name, const std::string& camera_name,
-                         const sensor_msgs::CameraInfo& cam_info);
+bool writeCalibrationYml(
+  const std::string & file_name, const std::string & camera_name,
+  const sensor_msgs::CameraInfo & cam_info);
 
 /**
  * \brief Read calibration parameters from a YAML file.
@@ -78,8 +83,9 @@ bool writeCalibrationYml(const std::string& file_name, const std::string& camera
  * \param[out] camera_name Name of the camera
  * \param[out] cam_info Camera parameters
  */
-bool readCalibrationYml(const std::string& file_name, std::string& camera_name,
-                        sensor_msgs::CameraInfo& cam_info);
+bool readCalibrationYml(
+  const std::string & file_name, std::string & camera_name,
+  sensor_msgs::CameraInfo & cam_info);
 
 } //namespace camera_calibration_parsers
 
