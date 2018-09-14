@@ -51,9 +51,36 @@ target_link_libraries(${PROJECT_NAME} ${Boost_FILESYSTEM_LIBRARY} ${YAML_CPP_LIB
 # define the exe to convert
 add_executable(convert src/convert.cpp)
 target_link_libraries(convert ${PROJECT_NAME})
-ament_target_dependencies(convert "yaml")
+
+install(
+  TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(
+  TARGETS convert
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(rclcpp)
+ament_export_dependencies(sensor_msgs)
 
 if(ENABLE_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+
   # TODO: Fix tests
   #  add_subdirectory(test)
 endif()
+
+ament_package()
+
