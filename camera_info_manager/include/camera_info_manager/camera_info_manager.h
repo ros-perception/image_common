@@ -38,10 +38,12 @@
 #ifndef _CAMERA_INFO_MANAGER_H_
 #define _CAMERA_INFO_MANAGER_H_
 
-#include <ros/ros.h>
-#include <boost/thread/mutex.hpp>
-#include <sensor_msgs/CameraInfo.h>
-#include <sensor_msgs/SetCameraInfo.h>
+#include <mutex>
+
+#include <rclcpp/node.hpp>
+
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <sensor_msgs/srv/set_camera_info.hpp>
 
 /** @file
 
@@ -52,6 +54,9 @@
 
 namespace camera_info_manager
 {
+
+using CameraInfo = sensor_msgs::msg::CameraInfo;
+using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
 
 /** @brief CameraInfo Manager class
 
@@ -175,18 +180,18 @@ class CameraInfoManager
 {
 public:
   CameraInfoManager(
-    ros::NodeHandle nh,
+    const rclcpp::Node::SharedPtr & nh,
     const std::string & cname = "camera",
     const std::string & url = "");
 
-  sensor_msgs::CameraInfo getCameraInfo(void);
+  CameraInfo getCameraInfo(void);
   bool isCalibrated(void);
   bool loadCameraInfo(const std::string & url);
   std::string resolveURL(
     const std::string & url,
     const std::string & cname);
   bool setCameraName(const std::string & cname);
-  bool setCameraInfo(const sensor_msgs::CameraInfo & camera_info);
+  bool setCameraInfo(const CameraInfo & camera_info);
   bool validateURL(const std::string & url);
 
 private:
@@ -212,16 +217,16 @@ private:
     const std::string & cname);
   url_type_t parseURL(const std::string & url);
   bool saveCalibration(
-    const sensor_msgs::CameraInfo & new_info,
+    const CameraInfo & new_info,
     const std::string & url,
     const std::string & cname);
   bool saveCalibrationFile(
-    const sensor_msgs::CameraInfo & new_info,
+    const CameraInfo & new_info,
     const std::string & filename,
     const std::string & cname);
-  bool setCameraInfoService(
-    sensor_msgs::SetCameraInfo::Request & req,
-    sensor_msgs::SetCameraInfo::Response & rsp);
+  void setCameraInfoService(
+    const std::shared_ptr<SetCameraInfo::Request> req,
+    std::shared_ptr<SetCameraInfo::Response> rsp);
 
   /** @brief mutual exclusion lock for private data
    *
@@ -231,14 +236,13 @@ private:
    *  invoking a callback.  Most private methods operate on copies of
    *  class variables, keeping the mutex hold time short.
    */
-  boost::mutex mutex_;
+  std::mutex mutex_;
 
   // private data
-  ros::NodeHandle nh_;                  ///< node handle for service
-  ros::ServiceServer info_service_;     ///< set_camera_info service
+  rclcpp::Service<SetCameraInfo>::SharedPtr info_service_;     ///< set_camera_info service
   std::string camera_name_;             ///< camera name
   std::string url_;                     ///< URL for calibration data
-  sensor_msgs::CameraInfo cam_info_;    ///< current CameraInfo
+  CameraInfo cam_info_;    ///< current CameraInfo
   bool loaded_cam_info_;                ///< cam_info_ load attempted
 
 }; // class CameraInfoManager

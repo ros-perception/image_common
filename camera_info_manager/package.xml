@@ -1,4 +1,4 @@
-<package>
+<package format="2">
   <name>camera_info_manager</name>
   <version>1.11.13</version>
   <description>
@@ -10,31 +10,27 @@
 
   </description>
   <author>Jack O'Quin</author>
-  <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
-  <maintainer email="vincent.rabaud@gmail.com">Vincent Rabaud</maintainer>
+  <maintainer email="michael@openrobotics.org">Michael Carroll</maintainer>
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/camera_info_manager</url>
   <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>
   <url type="repository">https://github.com/ros-perception/image_common</url>
 
-  <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
-  <build_depend>boost</build_depend>
-  <build_depend>camera_calibration_parsers</build_depend>
-  <build_depend>image_transport</build_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>roslib</build_depend>
-  <build_depend>rostest</build_depend>
-  <build_depend>sensor_msgs</build_depend>
+  <depend>boost</depend>
+  <depend>camera_calibration_parsers</depend>
+  <depend>image_transport</depend>
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
 
-  <run_depend>boost</run_depend>
-  <run_depend>camera_calibration_parsers</run_depend>
-  <run_depend>image_transport</run_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>roslib</run_depend>
-  <run_depend>sensor_msgs</run_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
-  <test_depend>gtest</test_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 
 </package>
