@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -38,11 +38,11 @@
 
 using namespace camera_calibration_parsers;
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   if (argc < 3) {
     printf("Usage: %s input.yml output.ini\n"
-           "       %s input.ini output.yml\n", argv[0], argv[0]);
+      "       %s input.ini output.yml\n", argv[0], argv[0]);
     return 0;
   }
 
@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     ROS_ERROR("Failed to save camera model to file %s", argv[2]);
     return -1;
   }
-  
+
   ROS_INFO("Saved %s", argv[2]);
   return 0;
 }
