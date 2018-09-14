@@ -36,11 +36,13 @@
 #define CAMERA_CALIBRATION_PARSERS_PARSE_H
 
 #include <string>
-#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/msg/camera_info.hpp>
 
 /// @todo: use stream-based API, so no read/parse distinction
 namespace camera_calibration_parsers
 {
+
+using CameraInfo = sensor_msgs::msg::CameraInfo;
 
 /**
  * \brief Write calibration parameters to a file.
@@ -53,7 +55,7 @@ namespace camera_calibration_parsers
  */
 bool writeCalibration(
   const std::string & file_name, const std::string & camera_name,
-  const sensor_msgs::CameraInfo & cam_info);
+  const CameraInfo & cam_info);
 
 /**
  * \brief Read calibration parameters from a file.
@@ -66,7 +68,7 @@ bool writeCalibration(
  */
 bool readCalibration(
   const std::string & file_name, std::string & camera_name,
-  sensor_msgs::CameraInfo & cam_info);
+  CameraInfo & cam_info);
 
 /**
  * \brief Parse calibration parameters from a string in memory.
@@ -78,7 +80,7 @@ bool readCalibration(
  */
 bool parseCalibration(
   const std::string & buffer, const std::string & format,
-  std::string & camera_name, sensor_msgs::CameraInfo & cam_info);
+  std::string & camera_name, CameraInfo & cam_info);
 
 } //namespace camera_calibration_parsers
 
