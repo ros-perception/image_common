@@ -43,7 +43,7 @@ namespace camera_calibration_parsers
 
 bool writeCalibration(
   const std::string & file_name, const std::string & camera_name,
-  const sensor_msgs::CameraInfo & cam_info)
+  const CameraInfo & cam_info)
 {
   if (boost::iends_with(file_name, ".ini")) {
     return writeCalibrationIni(file_name, camera_name, cam_info);
@@ -57,7 +57,7 @@ bool writeCalibration(
 
 bool readCalibration(
   const std::string & file_name, std::string & camera_name,
-  sensor_msgs::CameraInfo & cam_info)
+  CameraInfo & cam_info)
 {
   if (boost::iends_with(file_name, ".ini")) {
     return readCalibrationIni(file_name, camera_name, cam_info);
@@ -71,7 +71,7 @@ bool readCalibration(
 
 bool parseCalibration(
   const std::string & buffer, const std::string & format,
-  std::string & camera_name, sensor_msgs::CameraInfo & cam_info)
+  std::string & camera_name, CameraInfo & cam_info)
 {
   if (format != "ini") {
     return false;

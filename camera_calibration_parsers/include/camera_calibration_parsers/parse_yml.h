@@ -38,10 +38,12 @@
 #include <string>
 #include <istream>
 #include <ostream>
-#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/msg/camera_info.hpp>
 
 namespace camera_calibration_parsers
 {
+
+using CameraInfo = sensor_msgs::msg::CameraInfo;
 
 /**
  * \brief Write calibration parameters to a file in YAML format.
@@ -52,7 +54,7 @@ namespace camera_calibration_parsers
  */
 bool writeCalibrationYml(
   std::ostream & out, const std::string & camera_name,
-  const sensor_msgs::CameraInfo & cam_info);
+  const CameraInfo & cam_info);
 
 /**
  * \brief Read calibration parameters from a YAML file.
@@ -63,7 +65,7 @@ bool writeCalibrationYml(
  */
 bool readCalibrationYml(
   std::istream & in, std::string & camera_name,
-  sensor_msgs::CameraInfo & cam_info);
+  CameraInfo & cam_info);
 
 /**
  * \brief Write calibration parameters to a file in YAML format.
@@ -74,7 +76,7 @@ bool readCalibrationYml(
  */
 bool writeCalibrationYml(
   const std::string & file_name, const std::string & camera_name,
-  const sensor_msgs::CameraInfo & cam_info);
+  const CameraInfo & cam_info);
 
 /**
  * \brief Read calibration parameters from a YAML file.
@@ -85,7 +87,7 @@ bool writeCalibrationYml(
  */
 bool readCalibrationYml(
   const std::string & file_name, std::string & camera_name,
-  sensor_msgs::CameraInfo & cam_info);
+  CameraInfo & cam_info);
 
 } //namespace camera_calibration_parsers
 

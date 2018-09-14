@@ -1,7 +1,21 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
+
 project(camera_calibration_parsers)
 
-find_package(catkin REQUIRED sensor_msgs rosconsole roscpp roscpp_serialization)
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake_ros REQUIRED)
+
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 find_package(PythonLibs REQUIRED)
 if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
@@ -9,30 +23,8 @@ if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
 else()
   find_package(Boost REQUIRED COMPONENTS filesystem python3)
 endif()
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 
-catkin_python_setup()
-
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS sensor_msgs
-)
-
-find_package(PkgConfig)
-
-
-if (ANDROID)
-    find_package(yaml-cpp)
-    add_definitions(-DHAVE_NEW_YAMLCPP)
-else()
-  pkg_check_modules(YAML_CPP yaml-cpp)
-  if(${YAML_CPP_VERSION} VERSION_GREATER 0.5)
-    add_definitions(-DHAVE_NEW_YAMLCPP)
-  endif()
-  link_directories(${YAML_CPP_LIBRARY_DIRS})
-endif()
-include_directories(${YAML_CPP_INCLUDE_DIRS})
+include_directories(include)
 
 # define the library
 add_library(${PROJECT_NAME}
@@ -40,44 +32,28 @@ add_library(${PROJECT_NAME}
   src/parse_ini.cpp
   src/parse_yml.cpp
 )
-
-add_library(${PROJECT_NAME}_wrapper
-  src/parse_wrapper.cpp)
-
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY})
-target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-
-# Don't prepend wrapper library name with lib and add to Python libs.
-set_target_properties(${PROJECT_NAME}_wrapper PROPERTIES
-        PREFIX ""
-        LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
-        )
-
-add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
-
-install(
-  TARGETS ${PROJECT_NAME}
-  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  COMPONENT main
+ament_target_dependencies(${PROJECT_NAME}
+  "rclcpp"
+  "sensor_msgs"
 )
-install(
-  DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
+target_link_libraries(${PROJECT_NAME} ${Boost_FILESYSTEM_LIBRARY} ${YAML_CPP_LIBRARIES})
+
+# TODO: Reenable Python Wrapper with new serialization technique.
+#add_library(${PROJECT_NAME}_wrapper
+#  src/parse_wrapper.cpp)
+#ament_target_dependencies(${PROJECT_NAME}_wrapper
+#  "rclcpp"
+#  "sensor_msgs"
+#)
+#target_include_directories(${PROJECT_NAME}_wrapper PUBLIC ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+#target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 # define the exe to convert
 add_executable(convert src/convert.cpp)
-target_link_libraries(convert ${PROJECT_NAME} ${rosconsole_LIBRARIES})
+target_link_libraries(convert ${PROJECT_NAME})
+ament_target_dependencies(convert "yaml")
 
-install(
-  TARGETS convert
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(TARGETS ${PROJECT_NAME}_wrapper
-  DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
-)
-
-if(CATKIN_ENABLE_TESTING)
-  add_subdirectory(test)
+if(ENABLE_TESTING)
+  # TODO: Fix tests
+  #  add_subdirectory(test)
 endif()
