@@ -20,7 +20,7 @@
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
   <depend>boost</depend>
-  <depend>camera_calibration_parsers</depend>
+  <!--depend>camera_calibration_parsers</depend-->
   <depend>image_transport</depend>
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>

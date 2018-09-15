@@ -41,7 +41,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <boost/algorithm/string.hpp>
-#include <camera_calibration_parsers/parse.h>
+//#include <camera_calibration_parsers/parse.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
@@ -60,7 +60,7 @@
 namespace camera_info_manager
 {
 
-using namespace camera_calibration_parsers;
+// using namespace camera_calibration_parsers;
 
 /** URL to use when no other is defined. */
 const std::string
@@ -260,8 +260,8 @@ bool CameraInfoManager::loadCalibration(
  * Sets cam_info_, if successful
  */
 bool CameraInfoManager::loadCalibrationFile(
-  const std::string & filename,
-  const std::string & cname)
+  const std::string & /*filename*/,
+  const std::string & /*cname*/)
 {
   bool success = false;
 
@@ -269,20 +269,20 @@ bool CameraInfoManager::loadCalibrationFile(
   std::string cam_name;
   CameraInfo cam_info;
 
-  if (readCalibration(filename, cam_name, cam_info)) {
-    if (cname != cam_name) {
-      //ROS_WARN_STREAM("[" << cname << "] does not match name " <<
-      //  cam_name << " in file " << filename);
-    }
-    success = true;
-    {
-      // lock only while updating cam_info_
-      std::lock_guard<std::mutex> lock(mutex_);
-      cam_info_ = cam_info;
-    }
-  } else {
-    //ROS_WARN_STREAM("Camera calibration file " << filename << " not found.");
-  }
+//  if (readCalibration(filename, cam_name, cam_info)) {
+//    if (cname != cam_name) {
+//      //ROS_WARN_STREAM("[" << cname << "] does not match name " <<
+//      //  cam_name << " in file " << filename);
+//    }
+//    success = true;
+//    {
+//      // lock only while updating cam_info_
+//      std::lock_guard<std::mutex> lock(mutex_);
+//      cam_info_ = cam_info;
+//    }
+//  } else {
+//    //ROS_WARN_STREAM("Camera calibration file " << filename << " not found.");
+//  }
 
   return success;
 }
@@ -469,9 +469,9 @@ CameraInfoManager::saveCalibration(
  */
 bool
 CameraInfoManager::saveCalibrationFile(
-  const CameraInfo & new_info,
+  const CameraInfo & /*new_info*/,
   const std::string & filename,
-  const std::string & cname)
+  const std::string & /*cname*/)
 {
   //ROS_INFO_STREAM("writing calibration data to " << filename);
 
@@ -514,7 +514,7 @@ CameraInfoManager::saveCalibrationFile(
 
   // Currently, writeCalibration() always returns true no matter what
   // (ros-pkg ticket #5010).
-  return writeCalibration(filename, cname, new_info);
+  return false; // writeCalibration(filename, cname, new_info);
 }
 
 /** Callback for SetCameraInfo request.
