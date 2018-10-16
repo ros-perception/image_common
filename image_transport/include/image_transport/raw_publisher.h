@@ -61,6 +61,11 @@ protected:
   {
     publish_fn(message);
   }
+
+  virtual std::string getTopicToAdvertise(const std::string& base_topic) const
+  {
+    return base_topic;
+  }
 };
 
 } //namespace image_transport

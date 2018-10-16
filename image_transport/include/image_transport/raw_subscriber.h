@@ -61,6 +61,11 @@ protected:
   {
     user_cb(message);
   }
+
+  virtual std::string getTopicToSubscribe(const std::string& base_topic) const
+  {
+    return base_topic;
+  }
 };
 
 } //namespace image_transport
