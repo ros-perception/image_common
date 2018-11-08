@@ -49,8 +49,8 @@ std::string getCameraInfoTopic(const std::string & base_topic)
   rcutils_string_array_t tokens;
 
   if (rcutils_split(base_topic.c_str(), '/', allocator, &tokens) != RCUTILS_RET_OK) {
-    RCUTILS_SET_ERROR_MSG(rcutils_get_error_string_safe(), allocator)
-    RCUTILS_LOG_ERROR("%s\n", rcutils_get_error_string_safe());
+    RCUTILS_SET_ERROR_MSG(rcutils_get_error_string().str);
+    RCUTILS_LOG_ERROR("%s\n", rcutils_get_error_string().str);
   } else {
     if (tokens.size > 0) {
       for(size_t ii = 0; ii < tokens.size - 1; ++ii) {
