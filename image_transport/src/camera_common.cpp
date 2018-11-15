@@ -33,37 +33,42 @@
 *********************************************************************/
 
 #include "image_transport/camera_common.h"
-#include "rcutils/error_handling.h"
-#include "rcutils/logging_macros.h"
-#include "rcutils/macros.h"
-#include "rcutils/split.h"
+
 #include <vector>
 
 namespace image_transport
 {
 
+std::vector<std::string> split(std::string input,
+                               const std::string & delim)
+{
+  size_t pos = 0;
+  std::vector<std::string> out;
+
+  while ((pos = input.find(delim)) != std::string::npos) {
+    auto token = input.substr(0, pos);
+    if (token.size() > 0) {
+      out.push_back(token);
+    }
+    input.erase(0, pos + delim.length());
+  }
+  out.push_back(input);
+
+  return out;
+}
+
 std::string getCameraInfoTopic(const std::string & base_topic)
 {
   std::string info_topic;
-  rcutils_allocator_t allocator = rcutils_get_default_allocator();
-  rcutils_string_array_t tokens;
+  auto tokens = split(base_topic, "/");
 
-  if (rcutils_split(base_topic.c_str(), '/', allocator, &tokens) != RCUTILS_RET_OK) {
-    RCUTILS_SET_ERROR_MSG(rcutils_get_error_string_safe(), allocator)
-    RCUTILS_LOG_ERROR("%s\n", rcutils_get_error_string_safe());
-  } else {
-    if (tokens.size > 0) {
-      for(size_t ii = 0; ii < tokens.size - 1; ++ii) {
-        info_topic.append("/");
-        info_topic.append(tokens.data[ii]);
-      }
+  if (tokens.size() > 0) {
+    for(size_t ii = 0; ii < tokens.size() - 1; ++ii) {
+      info_topic.append("/");
+      info_topic.append(tokens[ii]);
     }
-    info_topic += "/camera_info";
   }
-
-  if(rcutils_string_array_fini(&tokens) != RCUTILS_RET_OK) {
-    RCUTILS_LOG_ERROR("Failed to destroy the token string array\n");
-  }
+  info_topic += "/camera_info";
 
   return info_topic;
 }
