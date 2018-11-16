@@ -19,7 +19,7 @@ protected:
 };
 
 TEST_F(TestPublisher, Publisher) {
-  auto pub = image_transport::create_publisher(node_, "camera/image");
+  auto pub = image_transport::create_publisher(node_.get(), "camera/image");
 }
 
 TEST_F(TestPublisher, ImageTransportPublisher) {
@@ -28,7 +28,7 @@ TEST_F(TestPublisher, ImageTransportPublisher) {
 }
 
 TEST_F(TestPublisher, CameraPublisher) {
-  auto camera_pub = image_transport::create_camera_publisher(node_, "camera/image");
+  auto camera_pub = image_transport::create_camera_publisher(node_.get(), "camera/image");
 }
 
 TEST_F(TestPublisher, ImageTransportCameraPublisher) {

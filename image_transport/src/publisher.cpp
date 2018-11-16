@@ -47,7 +47,7 @@ namespace image_transport
 
 struct Publisher::Impl
 {
-  Impl(rclcpp::Node::SharedPtr node)
+  Impl(rclcpp::Node * node)
   : logger_(node->get_logger()),
     unadvertised_(false)
   {
@@ -96,7 +96,7 @@ struct Publisher::Impl
 };
 
 Publisher::Publisher(
-  rclcpp::Node::SharedPtr node, const std::string & base_topic,
+  rclcpp::Node * node, const std::string & base_topic,
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos)
 : impl_(std::make_shared<Impl>(node))
 {

@@ -69,7 +69,7 @@ public:
 
   CameraSubscriber() = default;
 
-  CameraSubscriber(rclcpp::Node::SharedPtr node,
+  CameraSubscriber(rclcpp::Node * node,
                    const std::string& base_topic,
                    const Callback& callback,
                    const std::string& transport,

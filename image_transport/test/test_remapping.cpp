@@ -46,14 +46,14 @@ TEST_F(TestPublisher, Publisher) {
 
   // Subscribe
   bool received{false};
-  auto sub = image_transport::create_subscription(node_remap_, "old_topic",
+  auto sub = image_transport::create_subscription(node_remap_.get(), "old_topic",
     [&received](const sensor_msgs::msg::Image::ConstSharedPtr & msg) {
       (void)msg;
       received = true;
     }, "raw");
 
   // Publish
-  auto pub = image_transport::create_publisher(node_, "new_topic");
+  auto pub = image_transport::create_publisher(node_.get(), "new_topic");
 
   ASSERT_EQ("/namespace/new_topic", sub.getTopic());
   test_rclcpp::wait_for_subscriber(node_remap_, sub.getTopic());

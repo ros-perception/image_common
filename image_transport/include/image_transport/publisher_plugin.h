@@ -50,8 +50,8 @@ class PublisherPlugin
 {
 public:
   PublisherPlugin() = default;
-  PublisherPlugin(const PublisherPlugin&) = delete;
-  PublisherPlugin& operator=( const PublisherPlugin& ) = delete;
+  PublisherPlugin(const PublisherPlugin &) = delete;
+  PublisherPlugin & operator=(const PublisherPlugin &) = delete;
 
   virtual ~PublisherPlugin() {}
 
@@ -65,7 +65,7 @@ public:
    * \brief Advertise a topic, simple version.
    */
   void advertise(
-    rclcpp::Node::SharedPtr & nh,
+    rclcpp::Node * nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
@@ -86,12 +86,12 @@ public:
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
-  virtual void publish(const sensor_msgs::msg::Image& message) const = 0;
+  virtual void publish(const sensor_msgs::msg::Image & message) const = 0;
 
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
-  virtual void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const
+  virtual void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
   {
     publish(*message);
   }
@@ -103,7 +103,7 @@ public:
    * @param message an image message to use information from (but not data)
    * @param data a pointer to the image data to use to fill the Image message
    */
-  virtual void publish(const sensor_msgs::msg::Image& message, const uint8_t* data) const
+  virtual void publish(const sensor_msgs::msg::Image & message, const uint8_t * data) const
   {
     sensor_msgs::msg::Image msg;
     msg.header = message.header;
@@ -135,7 +135,9 @@ protected:
   /**
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
-  virtual void advertiseImpl(rclcpp::Node::SharedPtr nh, const std::string& base_topic, rmw_qos_profile_t custom_qos) = 0;
+  virtual void advertiseImpl(
+    rclcpp::Node * nh, const std::string & base_topic,
+    rmw_qos_profile_t custom_qos) = 0;
 };
 
 } //namespace image_transport

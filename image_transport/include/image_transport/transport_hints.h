@@ -40,7 +40,8 @@
 
 #include <rclcpp/node.hpp>
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Stores transport settings for an image topic subscription.
@@ -60,14 +61,15 @@ public:
    * @param default_transport Preferred transport to use
    * @param parameter_name The name of the transport parameter
    */
-  TransportHints(const rclcpp::Node::SharedPtr& node,
-                 const std::string& default_transport = "raw",
-                 const std::string& parameter_name = "image_transport")
+  TransportHints(
+    const rclcpp::Node * node,
+    const std::string & default_transport = "raw",
+    const std::string & parameter_name = "image_transport")
   {
     node->get_parameter_or<std::string>(parameter_name, transport_, default_transport);
   }
 
-  const std::string& getTransport() const
+  const std::string & getTransport() const
   {
     return transport_;
   }

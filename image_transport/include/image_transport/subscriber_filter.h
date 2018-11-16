@@ -38,7 +38,8 @@
 #include <message_filters/simple_filter.h>
 #include "image_transport/image_transport.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Image subscription filter.
@@ -72,7 +73,9 @@ public:
    * \param queue_size The subscription queue size
    * \param transport The transport hint to pass along
    */
-  SubscriberFilter(rclcpp::Node::SharedPtr node, const std::string& base_topic, const std::string& transport)
+  SubscriberFilter(
+    rclcpp::Node * node, const std::string & base_topic,
+    const std::string & transport)
   {
     subscribe(node, base_topic, transport);
   }
@@ -98,13 +101,15 @@ public:
    * \param base_topic The topic to subscribe to.
    */
   void subscribe(
-      rclcpp::Node::SharedPtr node,
-      const std::string& base_topic,
-      const std::string& transport,
-      rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
     unsubscribe();
-    sub_ = image_transport::create_subscription(node, base_topic, std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), transport, custom_qos);
+    sub_ =
+      image_transport::create_subscription(node, base_topic,
+        std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), transport, custom_qos);
   }
 
   /**
@@ -139,14 +144,13 @@ public:
   /**
    * \brief Returns the internal image_transport::Subscriber object.
    */
-  const Subscriber& getSubscriber() const
+  const Subscriber & getSubscriber() const
   {
     return sub_;
   }
 
 private:
-
-  void cb(const sensor_msgs::msg::Image::ConstSharedPtr& m)
+  void cb(const sensor_msgs::msg::Image::ConstSharedPtr & m)
   {
     signalMessage(m);
   }

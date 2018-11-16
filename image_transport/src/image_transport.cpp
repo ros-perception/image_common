@@ -60,7 +60,7 @@ struct Impl
 static Impl * kImpl = new Impl();
 
 Publisher create_publisher(
-  rclcpp::Node::SharedPtr node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos)
 {
@@ -68,7 +68,7 @@ Publisher create_publisher(
 }
 
 Subscriber create_subscription(
-  rclcpp::Node::SharedPtr node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   const Subscriber::Callback & callback,
   const std::string & transport,
@@ -78,7 +78,7 @@ Subscriber create_subscription(
 }
 
 CameraPublisher create_camera_publisher(
-  rclcpp::Node::SharedPtr node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos)
 {
@@ -86,7 +86,7 @@ CameraPublisher create_camera_publisher(
 }
 
 CameraSubscriber create_camera_subscription(
-  rclcpp::Node::SharedPtr node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   const CameraSubscriber::Callback & callback,
   const std::string & transport,
@@ -144,7 +144,7 @@ Publisher ImageTransport::advertise(const std::string & base_topic, uint32_t que
   (void) latch;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_publisher(impl_->node_, base_topic, custom_qos);
+  return create_publisher(impl_->node_.get(), base_topic, custom_qos);
 }
 
 Subscriber ImageTransport::subscribe(
@@ -156,7 +156,7 @@ Subscriber ImageTransport::subscribe(
   (void) tracked_object;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_subscription(impl_->node_, base_topic, callback,
+  return create_subscription(impl_->node_.get(), base_topic, callback,
            getTransportOrDefault(transport_hints), custom_qos);
 }
 
@@ -168,7 +168,7 @@ CameraPublisher ImageTransport::advertiseCamera(
   (void) latch;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_camera_publisher(impl_->node_, base_topic, custom_qos);
+  return create_camera_publisher(impl_->node_.get(), base_topic, custom_qos);
 }
 
 CameraSubscriber ImageTransport::subscribeCamera(
@@ -180,7 +180,7 @@ CameraSubscriber ImageTransport::subscribeCamera(
   (void) tracked_object;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_camera_subscription(impl_->node_, base_topic, callback,
+  return create_camera_subscription(impl_->node_.get(), base_topic, callback,
            getTransportOrDefault(transport_hints), custom_qos);
 }
 
@@ -198,7 +198,7 @@ std::string ImageTransport::getTransportOrDefault(const TransportHints * transpo
 {
   std::string ret;
   if (nullptr == transport_hints) {
-    TransportHints th(impl_->node_);
+    TransportHints th(impl_->node_.get());
     ret = th.getTransport();
   } else {
     ret = transport_hints->getTransport();

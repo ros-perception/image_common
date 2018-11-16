@@ -22,7 +22,7 @@ TEST_F(TestPublisher, construction_and_destruction) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
-  auto sub = image_transport::create_subscription(node_, "camera/image", fcn, "raw");
+  auto sub = image_transport::create_subscription(node_.get(), "camera/image", fcn, "raw");
 
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.spin_node_some(node_);
