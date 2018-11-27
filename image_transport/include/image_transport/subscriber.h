@@ -62,16 +62,16 @@ namespace image_transport
 class Subscriber
 {
 public:
-  typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&)> Callback;
+  typedef std::function<void (const sensor_msgs::msg::Image::ConstSharedPtr &)> Callback;
 
   Subscriber() = default;
 
   Subscriber(
-    rclcpp::Node::SharedPtr node,
+    rclcpp::Node * node,
     const std::string & base_topic,
-    const Callback& callback,
+    const Callback & callback,
     SubLoaderPtr loader,
-    const std::string& transport,
+    const std::string & transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
   /**
@@ -103,7 +103,6 @@ public:
   bool operator==(const Subscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
-
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };

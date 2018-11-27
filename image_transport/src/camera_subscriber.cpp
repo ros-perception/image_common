@@ -52,7 +52,7 @@ struct CameraSubscriber::Impl
   using CameraInfo = sensor_msgs::msg::CameraInfo;
   using TimeSync = message_filters::TimeSynchronizer<Image, CameraInfo>;
 
-  Impl(rclcpp::Node::SharedPtr node)
+  Impl(rclcpp::Node* node)
   : logger_(node->get_logger()) ,
     sync_(10),
     unsubscribed_(false),
@@ -109,7 +109,7 @@ struct CameraSubscriber::Impl
 };
 
 CameraSubscriber::CameraSubscriber(
-  rclcpp::Node::SharedPtr node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   const Callback & callback,
   const std::string & transport,

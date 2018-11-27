@@ -43,7 +43,8 @@
 
 #include <memory>
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Base class to simplify implementing most plugins to Publisher.
@@ -62,7 +63,7 @@ namespace image_transport {
  * getTopicToAdvertise() controls the name of the internal communication topic.
  * It defaults to \<base topic\>/\<transport name\>.
  */
-template <class M>
+template<class M>
 class SimplePublisherPlugin : public PublisherPlugin
 {
 public:
@@ -70,21 +71,22 @@ public:
 
   virtual uint32_t getNumSubscribers() const
   {
-    if (simple_impl_) return simple_impl_->node_->count_subscribers(getTopic());
+    // TODO(mjcarroll) replace with publisher-specific call.
+    if (simple_impl_) {return simple_impl_->node_->count_subscribers(getTopic());}
     return 0;
   }
 
   virtual std::string getTopic() const
   {
-    if (simple_impl_) return simple_impl_->pub_->get_topic_name();
+    if (simple_impl_) {return simple_impl_->pub_->get_topic_name();}
     return std::string();
   }
 
-  virtual void publish(const sensor_msgs::msg::Image& message) const
+  virtual void publish(const sensor_msgs::msg::Image & message) const
   {
     if (!simple_impl_ || !simple_impl_->pub_) {
-      rclcpp::Logger logger = simple_impl_->node_->get_logger();
-      RCLCPP_ERROR(logger, "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
+      RCLCPP_ERROR(simple_impl_->logger_,
+        "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
       return;
     }
 
@@ -97,18 +99,19 @@ public:
   }
 
 protected:
-  virtual void advertiseImpl(rclcpp::Node::SharedPtr node, const std::string& base_topic, rmw_qos_profile_t custom_qos)
+  virtual void advertiseImpl(
+    rclcpp::Node * node, const std::string & base_topic,
+    rmw_qos_profile_t custom_qos)
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
-    simple_impl_.reset(new SimplePublisherPluginImpl(node));
+    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
 
-    rclcpp::Logger logger = simple_impl_->node_->get_logger();
-    RCLCPP_DEBUG(logger, "getTopicToAdvertise: %s", transport_topic);
+    RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic);
     simple_impl_->pub_ = node->create_publisher<M>(transport_topic, custom_qos);
   }
 
   //! Generic function for publishing the internal message type.
-  typedef std::function<void(const M&)> PublishFn;
+  typedef std::function<void (const M &)> PublishFn;
 
   /**
    * \brief Publish an image using the specified publish function. Must be implemented by
@@ -118,14 +121,16 @@ protected:
    * SimpleSubscriberPlugin to use this function for both normal broadcast publishing and
    * single subscriber publishing (in subscription callbacks).
    */
-  virtual void publish(const sensor_msgs::msg::Image& message, const PublishFn& publish_fn) const = 0;
+  virtual void publish(
+    const sensor_msgs::msg::Image & message,
+    const PublishFn & publish_fn) const = 0;
 
   /**
    * \brief Return the communication topic name for a given base topic.
    *
    * Defaults to \<base topic\>/\<transport name\>.
    */
-  virtual std::string getTopicToAdvertise(const std::string& base_topic) const
+  virtual std::string getTopicToAdvertise(const std::string & base_topic) const
   {
     return base_topic + "/" + getTransportName();
   }
@@ -133,19 +138,20 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    SimplePublisherPluginImpl(rclcpp::Node::SharedPtr node)
-      : node_(node)
+    SimplePublisherPluginImpl(rclcpp::Node* node)
+    : node_(node),
+      logger_(node->get_logger())
     {
-
     }
 
-    rclcpp::Node::SharedPtr node_;
+    rclcpp::Node* node_;
+    rclcpp::Logger logger_;
     typename rclcpp::Publisher<M>::SharedPtr pub_;
   };
 
   std::unique_ptr<SimplePublisherPluginImpl> simple_impl_;
 
-  typedef std::function<void(const sensor_msgs::msg::Image&)> ImagePublishFn;
+  typedef std::function<void (const sensor_msgs::msg::Image &)> ImagePublishFn;
 
   /**
    * Returns a function object for publishing the transport-specific message type
@@ -153,11 +159,11 @@ private:
    *
    * @param pub An object with method void publish(const M&)
    */
-  template <class PubT>
-  PublishFn bindInternalPublisher(PubT* pub) const
+  template<class PubT>
+  PublishFn bindInternalPublisher(PubT * pub) const
   {
     // Bind PubT::publish(const Message&) as PublishFn
-    typedef void (PubT::*InternalPublishMemFn)(const M&);
+    typedef void (PubT::* InternalPublishMemFn)(const M &);
     InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
     return std::bind(internal_pub_mem_fn, pub, std::placeholders::_1);
   }

@@ -109,7 +109,7 @@ protected:
   }
 
   virtual void subscribeImpl(
-    rclcpp::Node::SharedPtr node,
+    rclcpp::Node * node,
     const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos)

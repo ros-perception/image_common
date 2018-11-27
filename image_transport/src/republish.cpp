@@ -38,34 +38,39 @@
 #include "image_transport/publisher_plugin.h"
 #include <pluginlib/class_loader.hpp>
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   auto vargv = rclcpp::init_and_remove_ros_arguments(argc, argv);
 
   if (vargv.size() < 2) {
-    printf("Usage: %s in_transport in:=<in_base_topic> [out_transport] out:=<out_base_topic>\n", argv[0]);
+    printf("Usage: %s in_transport in:=<in_base_topic> [out_transport] out:=<out_base_topic>\n",
+      argv[0]);
     return 0;
   }
 
   auto node = rclcpp::Node::make_shared("image_republisher");
 
-  std::string in_topic  = rclcpp::expand_topic_or_service_name("in", node->get_name(), node->get_namespace());
-  std::string out_topic = rclcpp::expand_topic_or_service_name("out", node->get_name(), node->get_namespace());
+  std::string in_topic = rclcpp::expand_topic_or_service_name("in",
+      node->get_name(), node->get_namespace());
+  std::string out_topic = rclcpp::expand_topic_or_service_name("out",
+      node->get_name(), node->get_namespace());
 
   std::string in_transport = vargv[1];
 
   if (vargv.size() < 3) {
     // Use all available transports for output
-    auto pub = image_transport::create_publisher(node, out_topic);
+    auto pub = image_transport::create_publisher(node.get(), out_topic);
 
     // Use Publisher::publish as the subscriber callback
-    typedef void (image_transport::Publisher::*PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr&) const;
+    typedef void (image_transport::Publisher::* PublishMemFn)(const sensor_msgs::msg::Image::
+      ConstSharedPtr &) const;
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
 
-    auto sub = image_transport::create_subscription(node, in_topic, std::bind(pub_mem_fn, &pub, std::placeholders::_1), in_transport);
+    auto sub =
+      image_transport::create_subscription(node.get(), in_topic,
+        std::bind(pub_mem_fn, &pub, std::placeholders::_1), in_transport);
     rclcpp::spin(node);
-  }
-  else {
+  } else {
     // Use one specific transport for output
     std::string out_transport = vargv[2];
 
@@ -76,12 +81,14 @@ int main(int argc, char** argv)
 
     auto instance = loader.createUniqueInstance(lookup_name);
     std::shared_ptr<Plugin> pub = std::move(instance);
-    pub->advertise(node, out_topic);
+    pub->advertise(node.get(), out_topic);
 
     // Use PublisherPlugin::publish as the subscriber callback
-    typedef void (Plugin::*PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr&) const;
+    typedef void (Plugin::* PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr &) const;
     PublishMemFn pub_mem_fn = &Plugin::publish;
-    auto sub = image_transport::create_subscription(node, in_topic, std::bind(pub_mem_fn, pub.get(), std::placeholders::_1), in_transport);
+    auto sub =
+      image_transport::create_subscription(node.get(), in_topic,
+        std::bind(pub_mem_fn, pub.get(), std::placeholders::_1), in_transport);
     rclcpp::spin(node);
   }
 

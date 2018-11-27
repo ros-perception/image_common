@@ -43,7 +43,8 @@
 
 #include "image_transport/single_subscriber_publisher.h"
 
-namespace image_transport {
+namespace image_transport
+{
 
 class ImageTransport;
 
@@ -68,9 +69,10 @@ public:
   CameraPublisher() = default;
 
 
-  CameraPublisher(rclcpp::Node::SharedPtr node,
-                  const std::string& base_topic,
-                  rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+  CameraPublisher(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
   //TODO(ros2) Restore support for SubscriberStatusCallbacks when available.
 
@@ -95,13 +97,16 @@ public:
   /*!
    * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  void publish(const sensor_msgs::msg::Image& image, const sensor_msgs::msg::CameraInfo& info) const;
+  void publish(
+    const sensor_msgs::msg::Image & image,
+    const sensor_msgs::msg::CameraInfo & info) const;
 
   /*!
    * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  void publish(const sensor_msgs::msg::Image::ConstSharedPtr& image,
-               const sensor_msgs::msg::CameraInfo::ConstSharedPtr& info) const;
+  void publish(
+    const sensor_msgs::msg::Image::ConstSharedPtr & image,
+    const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const;
 
   /*!
    * \brief Publish an (image, info) pair with given timestamp on the topics associated with
@@ -110,17 +115,19 @@ public:
    * Convenience version, which sets the timestamps of both image and info to stamp before
    * publishing.
    */
-  void publish(sensor_msgs::msg::Image& image, sensor_msgs::msg::CameraInfo& info, rclcpp::Time stamp) const;
+  void publish(
+    sensor_msgs::msg::Image & image, sensor_msgs::msg::CameraInfo & info,
+    rclcpp::Time stamp) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
    */
   void shutdown();
 
-  operator void*() const;
-  bool operator< (const CameraPublisher& rhs) const { return impl_ <  rhs.impl_; }
-  bool operator!=(const CameraPublisher& rhs) const { return impl_ != rhs.impl_; }
-  bool operator==(const CameraPublisher& rhs) const { return impl_ == rhs.impl_; }
+  operator void *() const;
+  bool operator<(const CameraPublisher & rhs) const {return impl_ < rhs.impl_;}
+  bool operator!=(const CameraPublisher & rhs) const {return impl_ != rhs.impl_;}
+  bool operator==(const CameraPublisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
   struct Impl;

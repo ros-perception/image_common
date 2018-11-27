@@ -44,8 +44,8 @@ namespace image_transport
 
 struct CameraPublisher::Impl
 {
-  Impl(rclcpp::Node::SharedPtr node)
-  : logger_(node->get_logger()) ,
+  Impl(rclcpp::Node * node)
+  : logger_(node->get_logger()),
     unadvertised_(false)
   {
   }
@@ -78,7 +78,7 @@ struct CameraPublisher::Impl
 
 //TODO(ros2) Add support for SubscriberStatusCallbacks when rcl/rmw support it.
 CameraPublisher::CameraPublisher(
-  rclcpp::Node::SharedPtr node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos)
 : impl_(std::make_shared<Impl>(node))
@@ -109,7 +109,7 @@ std::string CameraPublisher::getTopic() const
 
 std::string CameraPublisher::getInfoTopic() const
 {
-  if (impl_) return impl_->info_pub_->get_topic_name();
+  if (impl_) {return impl_->info_pub_->get_topic_name();}
   return std::string();
 }
 
@@ -119,7 +119,8 @@ void CameraPublisher::publish(
 {
   if (!impl_ || !impl_->isValid()) {
     // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
-    RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
+    RCLCPP_FATAL(impl_->logger_,
+      "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 
@@ -133,7 +134,8 @@ void CameraPublisher::publish(
 {
   if (!impl_ || !impl_->isValid()) {
     // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
-    RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::CameraPublisher");
+    RCLCPP_FATAL(impl_->logger_,
+      "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
 
