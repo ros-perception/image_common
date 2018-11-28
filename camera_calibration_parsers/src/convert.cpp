@@ -33,12 +33,18 @@
 *********************************************************************/
 
 #include "camera_calibration_parsers/parse.h"
+
 #include <cstdio>
+#include <string>
+
+#include <rclcpp/logging.hpp>
+#include <sensor_msgs/msg/camera_info.hpp>
 
 using namespace camera_calibration_parsers;
 
 int main(int argc, char ** argv)
 {
+  auto logger = rclcpp::get_logger("convert");
   if (argc < 3) {
     printf("Usage: %s input.yml output.ini\n"
       "       %s input.ini output.yml\n", argv[0], argv[0]);
@@ -48,14 +54,14 @@ int main(int argc, char ** argv)
   std::string name;
   sensor_msgs::msg::CameraInfo cam_info;
   if (!readCalibration(argv[1], name, cam_info)) {
-    //ROS_ERROR("Failed to load camera model from file %s", argv[1]);
+    RCLCPP_ERROR(logger, "Failed to load camera model from file %s", argv[1]);
     return -1;
   }
   if (!writeCalibration(argv[2], name, cam_info)) {
-    //ROS_ERROR("Failed to save camera model to file %s", argv[2]);
+    RCLCPP_ERROR(logger, "Failed to save camera model to file %s", argv[2]);
     return -1;
   }
 
-  //ROS_INFO("Saved %s", argv[2]);
+  RCLCPP_INFO(logger, "Saved %s", argv[2]);
   return 0;
 }

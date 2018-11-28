@@ -34,7 +34,9 @@
 
 #include "camera_calibration_parsers/parse_yml.h"
 #include <sensor_msgs/distortion_models.hpp>
-#include <boost/filesystem.hpp>
+
+#include "filesystem_helper.hpp"
+
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 #include <ctime>
@@ -146,9 +148,9 @@ bool writeCalibrationYml(
   const std::string & file_name, const std::string & camera_name,
   const CameraInfo & cam_info)
 {
-  boost::filesystem::path dir(boost::filesystem::path(file_name).parent_path());
-  if (!dir.empty() && !boost::filesystem::exists(dir) &&
-    !boost::filesystem::create_directories(dir))
+  impl::fs::path dir(impl::fs::path(file_name).parent_path());
+  if (!dir.empty() && !impl::fs::exists(dir) &&
+    !impl::fs::create_directories(dir))
   {
     //ROS_ERROR("Unable to create directory for camera calibration file [%s]", dir.c_str());
   }

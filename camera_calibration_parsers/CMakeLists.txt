@@ -15,13 +15,13 @@ find_package(ament_cmake_ros REQUIRED)
 
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(yaml-cpp REQUIRED)
+find_package(yaml_cpp_vendor REQUIRED)
 
 find_package(PythonLibs REQUIRED)
 if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
-  find_package(Boost REQUIRED COMPONENTS filesystem python)
+  find_package(Boost REQUIRED COMPONENTS python)
 else()
-  find_package(Boost REQUIRED COMPONENTS filesystem python3)
+  find_package(Boost REQUIRED COMPONENTS python3)
 endif()
 
 include_directories(include)
@@ -32,11 +32,17 @@ add_library(${PROJECT_NAME}
   src/parse_ini.cpp
   src/parse_yml.cpp
 )
-ament_target_dependencies(${PROJECT_NAME}
-  "rclcpp"
-  "sensor_msgs"
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_link_libraries(${PROJECT_NAME} stdc++fs)
+endif()
+
+ament_target_dependencies(
+  ${PROJECT_NAME}
+  rclcpp
+  sensor_msgs
+  yaml_cpp_vendor
 )
-target_link_libraries(${PROJECT_NAME} ${Boost_FILESYSTEM_LIBRARY} ${YAML_CPP_LIBRARIES})
 
 # TODO: Reenable Python Wrapper with new serialization technique.
 #add_library(${PROJECT_NAME}_wrapper
@@ -74,12 +80,15 @@ ament_export_libraries(${PROJECT_NAME})
 ament_export_dependencies(rclcpp)
 ament_export_dependencies(sensor_msgs)
 
-if(ENABLE_TESTING)
+if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  # TODO: Fix tests
-  #  add_subdirectory(test)
+  find_package(ament_cmake_gtest)
+  ament_add_gtest(${PROJECT_NAME}-parse_ini test/test_parse_ini.cpp)
+  if(TARGET ${PROJECT_NAME}-parse_ini)
+    target_link_libraries(${PROJECT_NAME}-parse_ini ${PROJECT_NAME})
+  endif()
 endif()
 
 ament_package()
