@@ -17,13 +17,6 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(yaml_cpp_vendor REQUIRED)
 
-find_package(PythonLibs REQUIRED)
-if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
-  find_package(Boost REQUIRED COMPONENTS python)
-else()
-  find_package(Boost REQUIRED COMPONENTS python3)
-endif()
-
 include_directories(include)
 
 # define the library
@@ -45,6 +38,12 @@ ament_target_dependencies(
 )
 
 # TODO: Reenable Python Wrapper with new serialization technique.
+#find_package(PythonLibs REQUIRED)
+#if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
+#  find_package(Boost REQUIRED COMPONENTS python)
+#else()
+#  find_package(Boost REQUIRED COMPONENTS python3)
+#endif()
 #add_library(${PROJECT_NAME}_wrapper
 #  src/parse_wrapper.cpp)
 #ament_target_dependencies(${PROJECT_NAME}_wrapper
@@ -79,6 +78,7 @@ ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_dependencies(rclcpp)
 ament_export_dependencies(sensor_msgs)
+ament_export_dependencies(yaml_cpp_vendor)
 
 if(BUILD_TESTING)
   # find_package(ament_lint_auto REQUIRED)
