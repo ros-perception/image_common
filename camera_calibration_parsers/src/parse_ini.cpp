@@ -37,6 +37,7 @@
 #include "camera_calibration_parsers/parse_ini.h"
 
 #include <cassert>
+#include <cctype>
 #include <cmath>
 
 #include <algorithm>
