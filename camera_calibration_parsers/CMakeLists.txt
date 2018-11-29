@@ -81,13 +81,19 @@ ament_export_dependencies(rclcpp)
 ament_export_dependencies(sensor_msgs)
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+  # find_package(ament_lint_auto REQUIRED)
+  # ament_lint_auto_find_test_dependencies()
 
   find_package(ament_cmake_gtest)
+
   ament_add_gtest(${PROJECT_NAME}-parse_ini test/test_parse_ini.cpp)
   if(TARGET ${PROJECT_NAME}-parse_ini)
     target_link_libraries(${PROJECT_NAME}-parse_ini ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-parse_yml test/test_parse_yml.cpp)
+  if(TARGET ${PROJECT_NAME}-parse_yml)
+    target_link_libraries(${PROJECT_NAME}-parse_yml ${PROJECT_NAME})
   endif()
 endif()
 

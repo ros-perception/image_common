@@ -89,6 +89,17 @@ bool readCalibrationYml(
   const std::string & file_name, std::string & camera_name,
   CameraInfo & cam_info);
 
+/**
+ * \brief Parse calibration parameters from a string in memory of yaml format.
+ *
+ * \param buffer Calibration string
+ * \param[out] camera_name Name of the camera
+ * \param[out] cam_info Camera parameters
+ */
+bool parseCalibrationYml(
+  const std::string & buffer, std::string & camera_name,
+  CameraInfo & cam_info);
+
 } //namespace camera_calibration_parsers
 
 #endif

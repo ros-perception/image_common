@@ -98,8 +98,6 @@ bool parseCalibrationIni(
   const std::string & buffer, std::string & camera_name,
   CameraInfo & cam_info);
 
-//bool readCalibrationIni
-
 } //namespace camera_calibration_parsers
 
 #endif

@@ -1,8 +1,14 @@
 #include <gtest/gtest.h>
 
+#include <sensor_msgs/distortion_models.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
 
 #include <camera_calibration_parsers/parse_ini.h>
+#include <camera_calibration_parsers/impl/filesystem_helper.hpp>
+
+#include "make_calibs.hpp"
+
+namespace fs = camera_calibration_parsers::impl::fs;
 
 std::string valid_calib5 =
   R"(
@@ -50,51 +56,8 @@ TEST(ParseIni, parse_valid_ini_calib5) {
   sensor_msgs::msg::CameraInfo cam_info;
   auto ret = camera_calibration_parsers::parseCalibrationIni(valid_calib5, camera_name, cam_info);
   ASSERT_EQ(ret, true);
-
-  ASSERT_EQ(cam_info.width, 640U);
-  ASSERT_EQ(cam_info.height, 480U);
   ASSERT_EQ(camera_name, "mono_left");
-
-  ASSERT_DOUBLE_EQ(cam_info.k[0], 1.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[1], 2.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[2], 3.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[3], 4.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[4], 5.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[5], 6.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[6], 7.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[7], 8.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[8], 9.0);
-
-  ASSERT_EQ(cam_info.distortion_model, "plumb_bob");
-  ASSERT_EQ(cam_info.d.size(), 5U);
-  ASSERT_DOUBLE_EQ(cam_info.d[0], 1);
-  ASSERT_DOUBLE_EQ(cam_info.d[1], 2);
-  ASSERT_DOUBLE_EQ(cam_info.d[2], 3);
-  ASSERT_DOUBLE_EQ(cam_info.d[3], 4);
-  ASSERT_DOUBLE_EQ(cam_info.d[4], 5);
-
-  ASSERT_DOUBLE_EQ(cam_info.r[0], 1.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[1], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[2], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[3], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[4], 1.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[5], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[6], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[7], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[8], 1.0);
-
-  ASSERT_DOUBLE_EQ(cam_info.p[0], 1.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[1], 2.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[2], 3.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[3], 4.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[4], 5.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[5], 6.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[6], 7.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[7], 8.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[8], 9.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[9], 10.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[10], 11.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[11], 12.0);
+  check_calib(cam_info);
 }
 
 std::string valid_calib8 =
@@ -143,55 +106,8 @@ TEST(ParseIni, parse_valid_ini_calib8) {
   sensor_msgs::msg::CameraInfo cam_info;
   auto ret = camera_calibration_parsers::parseCalibrationIni(valid_calib8, camera_name, cam_info);
   ASSERT_EQ(ret, true);
-
-  ASSERT_EQ(cam_info.width, 640U);
-  ASSERT_EQ(cam_info.height, 480U);
   ASSERT_EQ(camera_name, "mono_left");
-
-  ASSERT_DOUBLE_EQ(cam_info.k[0], 1.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[1], 2.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[2], 3.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[3], 4.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[4], 5.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[5], 6.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[6], 7.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[7], 8.0);
-  ASSERT_DOUBLE_EQ(cam_info.k[8], 9.0);
-
-  ASSERT_EQ(cam_info.distortion_model, "rational_polynomial");
-  ASSERT_EQ(cam_info.d.size(), 8U);
-  ASSERT_DOUBLE_EQ(cam_info.d[0], 1);
-  ASSERT_DOUBLE_EQ(cam_info.d[1], 2);
-  ASSERT_DOUBLE_EQ(cam_info.d[2], 3);
-  ASSERT_DOUBLE_EQ(cam_info.d[3], 4);
-  ASSERT_DOUBLE_EQ(cam_info.d[4], 5);
-  ASSERT_DOUBLE_EQ(cam_info.d[5], 6);
-  ASSERT_DOUBLE_EQ(cam_info.d[6], 7);
-  ASSERT_DOUBLE_EQ(cam_info.d[7], 8);
-
-  ASSERT_DOUBLE_EQ(cam_info.d[5], 6);
-  ASSERT_DOUBLE_EQ(cam_info.r[0], 1.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[1], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[2], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[3], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[4], 1.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[5], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[6], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[7], 0.0);
-  ASSERT_DOUBLE_EQ(cam_info.r[8], 1.0);
-
-  ASSERT_DOUBLE_EQ(cam_info.p[0], 1.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[1], 2.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[2], 3.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[3], 4.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[4], 5.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[5], 6.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[6], 7.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[7], 8.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[8], 9.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[9], 10.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[10], 11.0);
-  ASSERT_DOUBLE_EQ(cam_info.p[11], 12.0);
+  check_calib(cam_info);
 }
 
 std::string invalid_calib5 =
@@ -271,5 +187,35 @@ TEST(ParseIni, parse_invalid_ini_calib5_2) {
   sensor_msgs::msg::CameraInfo cam_info;
   auto ret = camera_calibration_parsers::parseCalibrationIni(invalid_calib5, camera_name, cam_info);
   ASSERT_EQ(ret, false);
+}
+
+TEST(ParseIni, roundtrip_calib5) {
+  auto tmpdir = fs::temp_directory_path();
+  auto calib_file = tmpdir / "calib5.yml";
+
+  std::string camera_name = "roundtrip_calib5";
+  auto cam_info = make_calib(sensor_msgs::distortion_models::PLUMB_BOB);
+  auto ret_write =
+    camera_calibration_parsers::writeCalibrationIni(calib_file, camera_name, cam_info);
+  ASSERT_EQ(ret_write, true);
+
+  std::string camera_name2;
+  sensor_msgs::msg::CameraInfo cam_info2;
+  auto ret_read =
+    camera_calibration_parsers::readCalibrationIni(calib_file, camera_name2, cam_info2);
+  ASSERT_EQ(ret_read, true);
+  ASSERT_EQ(camera_name2, camera_name);
+  check_calib(cam_info2);
+}
+
+TEST(ParseIni, cant_write_calib8) {
+  auto tmpdir = fs::temp_directory_path();
+  auto calib_file = tmpdir / "calib8.yml";
+
+  std::string camera_name = "roundtrip_calib8";
+  auto cam_info = make_calib(sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL);
+  auto ret_write =
+    camera_calibration_parsers::writeCalibrationIni(calib_file, camera_name, cam_info);
+  ASSERT_EQ(ret_write, false);
 }
 

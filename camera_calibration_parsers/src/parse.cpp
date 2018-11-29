@@ -35,8 +35,10 @@
 #include "camera_calibration_parsers/parse.h"
 #include "camera_calibration_parsers/parse_ini.h"
 #include "camera_calibration_parsers/parse_yml.h"
+#include "camera_calibration_parsers/impl/filesystem_helper.hpp"
 
-#include <boost/algorithm/string/predicate.hpp>
+#include <rclcpp/rclcpp.hpp>
+
 
 namespace camera_calibration_parsers
 {
@@ -45,13 +47,18 @@ bool writeCalibration(
   const std::string & file_name, const std::string & camera_name,
   const CameraInfo & cam_info)
 {
-  if (boost::iends_with(file_name, ".ini")) {
-    return writeCalibrationIni(file_name, camera_name, cam_info);
-  }
-  if (boost::iends_with(file_name, ".yml") || boost::iends_with(file_name, ".yaml")) {
-    return writeCalibrationYml(file_name, camera_name, cam_info);
-  }
+  impl::fs::path p(file_name);
 
+  if (p.extension() == ".ini") {
+    return writeCalibrationIni(file_name, camera_name, cam_info);
+  } else if (p.extension() == ".yml" || p.extension() == ".yaml") {
+    return writeCalibrationYml(file_name, camera_name, cam_info);
+  } else {
+    RCLCPP_ERROR(
+        rclcpp::get_logger("camera_calibration_parsers"),
+        "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
+      p.extension().c_str());
+  }
   return false;
 }
 
@@ -59,11 +66,17 @@ bool readCalibration(
   const std::string & file_name, std::string & camera_name,
   CameraInfo & cam_info)
 {
-  if (boost::iends_with(file_name, ".ini")) {
+  impl::fs::path p(file_name);
+
+  if (p.extension() == ".ini") {
     return readCalibrationIni(file_name, camera_name, cam_info);
-  }
-  if (boost::iends_with(file_name, ".yml") || boost::iends_with(file_name, ".yaml")) {
+  } else if (p.extension() == ".yml" || p.extension() == ".yaml") {
     return readCalibrationYml(file_name, camera_name, cam_info);
+  } else {
+    RCLCPP_ERROR(
+        rclcpp::get_logger("camera_calibration_parsers"),
+        "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
+      p.extension().c_str());
   }
 
   return false;

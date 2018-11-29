@@ -33,18 +33,22 @@
 *********************************************************************/
 
 #include "camera_calibration_parsers/parse_yml.h"
-#include <sensor_msgs/distortion_models.hpp>
 
-#include "filesystem_helper.hpp"
-
-#include <yaml-cpp/yaml.h>
-#include <fstream>
-#include <ctime>
 #include <cassert>
 #include <cstring>
+#include <ctime>
+
+#include <fstream>
+
+#include "camera_calibration_parsers/impl/filesystem_helper.hpp"
+#include <rclcpp/logging.hpp>
+#include <sensor_msgs/distortion_models.hpp>
+#include <yaml-cpp/yaml.h>
 
 namespace camera_calibration_parsers
 {
+
+static rclcpp::Logger kYmlLogger = rclcpp::get_logger("camera_calibration_parsers");
 
 /// \cond
 
@@ -152,11 +156,11 @@ bool writeCalibrationYml(
   if (!dir.empty() && !impl::fs::exists(dir) &&
     !impl::fs::create_directories(dir))
   {
-    //ROS_ERROR("Unable to create directory for camera calibration file [%s]", dir.c_str());
+    RCLCPP_ERROR(kYmlLogger, "Unable to create directory for camera calibration file [%s]", dir.c_str());
   }
   std::ofstream out(file_name.c_str());
   if (!out.is_open()) {
-    //ROS_ERROR("Unable to open camera calibration file [%s] for writing", file_name.c_str());
+    RCLCPP_ERROR(kYmlLogger, "Unable to open camera calibration file [%s] for writing", file_name.c_str());
     return false;
   }
   return writeCalibrationYml(out, camera_name, cam_info);
@@ -189,11 +193,10 @@ bool readCalibrationYml(
     // Different distortion models may have different numbers of parameters
     if (doc[DMODEL_YML_NAME]) {
       doc[DMODEL_YML_NAME] >> cam_info.distortion_model;
-    }
-    else {
+    } else {
       // Assume plumb bob for backwards compatibility
       cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
-      //ROS_WARN("Camera calibration file did not specify distortion model, assuming plumb bob");
+      RCLCPP_WARN(kYmlLogger, "Camera calibration file did not specify distortion model, assuming plumb bob");
     }
     const YAML::Node & D_node = doc[D_YML_NAME];
     int D_rows, D_cols;
@@ -207,7 +210,7 @@ bool readCalibrationYml(
 
     return true;
   } catch (YAML::Exception & e) {
-    //ROS_ERROR("Exception parsing YAML camera calibration:\n%s", e.what());
+    RCLCPP_WARN(kYmlLogger, "Exception parsing YAML camera calibration:\n%s", e.what());
     return false;
   }
 }
@@ -218,14 +221,22 @@ bool readCalibrationYml(
 {
   std::ifstream fin(file_name.c_str());
   if (!fin.good()) {
-    //ROS_INFO("Unable to open camera calibration file [%s]", file_name.c_str());
+    RCLCPP_ERROR(kYmlLogger, "Unable to open camera calibration file [%s]", file_name.c_str());
     return false;
   }
   bool success = readCalibrationYml(fin, camera_name, cam_info);
   if (!success) {
-    //ROS_ERROR("Failed to parse camera calibration from file [%s]", file_name.c_str());
+    RCLCPP_ERROR(kYmlLogger, "Failed to parse camera calibration from file [%s]", file_name.c_str());
   }
   return success;
+}
+
+bool parseCalibrationYml(
+  const std::string & buffer, std::string & camera_name,
+  CameraInfo & cam_info)
+{
+  std::stringstream ss(buffer);
+  return readCalibrationYml(ss, camera_name, cam_info);
 }
 
 } //namespace camera_calibration_parsers
