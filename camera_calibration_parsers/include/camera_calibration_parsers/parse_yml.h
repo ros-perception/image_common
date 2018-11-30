@@ -32,13 +32,15 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef CAMERA_CALIBRATION_PARSERS_PARSE_YML_H
-#define CAMERA_CALIBRATION_PARSERS_PARSE_YML_H
+#ifndef CAMERA_CALIBRATION_PARSERS__PARSE_YML_H_
+#define CAMERA_CALIBRATION_PARSERS__PARSE_YML_H_
 
 #include <string>
 #include <istream>
 #include <ostream>
-#include <sensor_msgs/msg/camera_info.hpp>
+
+#include "sensor_msgs/msg/camera_info.hpp"
+#include "camera_calibration_parsers/visibility_control.hpp"
 
 namespace camera_calibration_parsers
 {
@@ -52,6 +54,7 @@ using CameraInfo = sensor_msgs::msg::CameraInfo;
  * \param camera_name Name of the camera
  * \param cam_info Camera parameters
  */
+CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool writeCalibrationYml(
   std::ostream & out, const std::string & camera_name,
   const CameraInfo & cam_info);
@@ -63,6 +66,7 @@ bool writeCalibrationYml(
  * \param[out] camera_name Name of the camera
  * \param[out] cam_info Camera parameters
  */
+CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool readCalibrationYml(
   std::istream & in, std::string & camera_name,
   CameraInfo & cam_info);
@@ -74,6 +78,7 @@ bool readCalibrationYml(
  * \param camera_name Name of the camera
  * \param cam_info Camera parameters
  */
+CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool writeCalibrationYml(
   const std::string & file_name, const std::string & camera_name,
   const CameraInfo & cam_info);
@@ -85,6 +90,7 @@ bool writeCalibrationYml(
  * \param[out] camera_name Name of the camera
  * \param[out] cam_info Camera parameters
  */
+CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool readCalibrationYml(
   const std::string & file_name, std::string & camera_name,
   CameraInfo & cam_info);
@@ -96,10 +102,11 @@ bool readCalibrationYml(
  * \param[out] camera_name Name of the camera
  * \param[out] cam_info Camera parameters
  */
+CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool parseCalibrationYml(
   const std::string & buffer, std::string & camera_name,
   CameraInfo & cam_info);
 
-} //namespace camera_calibration_parsers
+}  // namespace camera_calibration_parsers
 
-#endif
+#endif  // CAMERA_CALIBRATION_PARSERS__PARSE_YML_H_

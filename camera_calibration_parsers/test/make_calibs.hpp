@@ -1,8 +1,24 @@
-#ifndef CAMERA_CALIBRATION_PARSERS__TEST__MAKE_CALIBS_HPP__
-#define CAMERA_CALIBRATION_PARSERS__TEST__MAKE_CALIBS_HPP__
+// Copyright 2018 Open Source Robotics Foundation, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#ifndef MAKE_CALIBS_HPP__
+#define MAKE_CALIBS_HPP__
 
-#include <sensor_msgs/distortion_models.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
+#include <string>
+
+#include "sensor_msgs/distortion_models.hpp"
+#include "sensor_msgs/msg/camera_info.hpp"
 
 void check_calib(sensor_msgs::msg::CameraInfo cam_info)
 {
@@ -84,4 +100,4 @@ sensor_msgs::msg::CameraInfo make_calib(const std::string & distortion_model)
   return cam_info;
 }
 
-#endif  // CAMERA_CALIBRATION_PARSERS__TEST__MAKE_CALIBS_HPP__
+#endif  // MAKE_CALIBS_HPP__

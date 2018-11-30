@@ -32,11 +32,13 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef CAMERA_CALIBRATION_PARSERS_PARSE_H
-#define CAMERA_CALIBRATION_PARSERS_PARSE_H
+#ifndef CAMERA_CALIBRATION_PARSERS__PARSE_H_
+#define CAMERA_CALIBRATION_PARSERS__PARSE_H_
 
 #include <string>
-#include <sensor_msgs/msg/camera_info.hpp>
+
+#include "sensor_msgs/msg/camera_info.hpp"
+#include "camera_calibration_parsers/visibility_control.hpp"
 
 /// @todo: use stream-based API, so no read/parse distinction
 namespace camera_calibration_parsers
@@ -53,6 +55,7 @@ using CameraInfo = sensor_msgs::msg::CameraInfo;
  * \param camera_name Name of the camera
  * \param cam_info Camera parameters
  */
+CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool writeCalibration(
   const std::string & file_name, const std::string & camera_name,
   const CameraInfo & cam_info);
@@ -66,6 +69,7 @@ bool writeCalibration(
  * \param[out] camera_name Name of the camera
  * \param[out] cam_info Camera parameters
  */
+CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool readCalibration(
   const std::string & file_name, std::string & camera_name,
   CameraInfo & cam_info);
@@ -78,10 +82,11 @@ bool readCalibration(
  * \param[out] camera_name Name of the camera
  * \param[out] cam_info Camera parameters
  */
+CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool parseCalibration(
   const std::string & buffer, const std::string & format,
   std::string & camera_name, CameraInfo & cam_info);
 
-} //namespace camera_calibration_parsers
+}  // namespace camera_calibration_parsers
 
-#endif
+#endif  // CAMERA_CALIBRATION_PARSERS__PARSE_H_

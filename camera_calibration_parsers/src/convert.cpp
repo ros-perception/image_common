@@ -32,15 +32,16 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "camera_calibration_parsers/parse.h"
 
 #include <cstdio>
 #include <string>
 
-#include <rclcpp/logging.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
+#include "rclcpp/logging.hpp"
+#include "sensor_msgs/msg/camera_info.hpp"
+#include "camera_calibration_parsers/parse.h"
 
-using namespace camera_calibration_parsers;
+using camera_calibration_parsers::readCalibration;
+using camera_calibration_parsers::writeCalibration;
 
 int main(int argc, char ** argv)
 {

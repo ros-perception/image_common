@@ -29,11 +29,13 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "camera_calibration_parsers/parse.h"
 #include "camera_calibration_parsers/parse_wrapper.h"
 
-#include <boost/python.hpp>
-#include <ros/serialization.h>
+#include <string>
+
+#include "camera_calibration_parsers/parse.h"
+#include "boost/python.hpp"
+#include "ros/serialization.h"
 
 namespace camera_calibration_parsers
 {
@@ -72,4 +74,4 @@ BOOST_PYTHON_MODULE(camera_calibration_parsers_wrapper)
     boost::python::args("file_name"), "");
 }
 
-} //namespace camera_calibration_parsers
+}  // namespace camera_calibration_parsers

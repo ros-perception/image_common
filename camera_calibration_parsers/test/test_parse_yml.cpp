@@ -1,16 +1,32 @@
+// Copyright 2018 Open Source Robotics Foundation, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 #include <gtest/gtest.h>
 
-#include <sensor_msgs/distortion_models.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
+#include <string>
 
-#include <camera_calibration_parsers/parse_yml.h>
-#include <camera_calibration_parsers/impl/filesystem_helper.hpp>
+#include "sensor_msgs/distortion_models.hpp"
+#include "sensor_msgs/msg/camera_info.hpp"
+
+#include "camera_calibration_parsers/parse_yml.h"
+#include "camera_calibration_parsers/impl/filesystem_helper.hpp"
 
 #include "make_calibs.hpp"
 
 namespace fs = camera_calibration_parsers::impl::fs;
 
-std::string valid_calib5 =
+static const char * kValidCalib5 =
   R"(
 image_width: 640
 image_height: 480
@@ -37,13 +53,13 @@ projection_matrix:
 TEST(ParseYml, parse_valid_yml_calib5) {
   std::string camera_name;
   sensor_msgs::msg::CameraInfo cam_info;
-  auto ret = camera_calibration_parsers::parseCalibrationYml(valid_calib5, camera_name, cam_info);
+  auto ret = camera_calibration_parsers::parseCalibrationYml(kValidCalib5, camera_name, cam_info);
   ASSERT_EQ(ret, true);
   ASSERT_EQ(camera_name, "mono_left");
   check_calib(cam_info);
 }
 
-std::string valid_calib8 =
+static const char * kValidCalib8 =
   R"(
 image_width: 640
 image_height: 480
@@ -70,13 +86,13 @@ projection_matrix:
 TEST(ParseYml, parse_valid_yml_calib8) {
   std::string camera_name;
   sensor_msgs::msg::CameraInfo cam_info;
-  auto ret = camera_calibration_parsers::parseCalibrationYml(valid_calib8, camera_name, cam_info);
+  auto ret = camera_calibration_parsers::parseCalibrationYml(kValidCalib8, camera_name, cam_info);
   ASSERT_EQ(ret, true);
   ASSERT_EQ(camera_name, "mono_left");
   check_calib(cam_info);
 }
 
-std::string invalid_calib5 =
+static const char * kInvalidCalib5 =
   R"(
 image_width: 640
 image_height: 480
@@ -103,7 +119,7 @@ projection_matrix:
 TEST(ParseYml, parse_invalid_yml_calib5) {
   std::string camera_name;
   sensor_msgs::msg::CameraInfo cam_info;
-  auto ret = camera_calibration_parsers::parseCalibrationYml(invalid_calib5, camera_name, cam_info);
+  auto ret = camera_calibration_parsers::parseCalibrationYml(kInvalidCalib5, camera_name, cam_info);
   ASSERT_EQ(ret, false);
 }
 
@@ -113,12 +129,14 @@ TEST(ParseYml, roundtrip_calib5) {
 
   std::string camera_name = "roundtrip_calib5";
   auto cam_info = make_calib(sensor_msgs::distortion_models::PLUMB_BOB);
-  auto ret_write = camera_calibration_parsers::writeCalibrationYml(calib_file, camera_name, cam_info);
+  auto ret_write = camera_calibration_parsers::writeCalibrationYml(
+    calib_file.string(), camera_name, cam_info);
   ASSERT_EQ(ret_write, true);
 
   std::string camera_name2;
   sensor_msgs::msg::CameraInfo cam_info2;
-  auto ret_read = camera_calibration_parsers::readCalibrationYml(calib_file, camera_name2, cam_info2);
+  auto ret_read = camera_calibration_parsers::readCalibrationYml(
+    calib_file.string(), camera_name2, cam_info2);
   ASSERT_EQ(ret_read, true);
   ASSERT_EQ(camera_name2, camera_name);
   check_calib(cam_info2);
@@ -130,12 +148,14 @@ TEST(ParseYml, roundtrip_calib8) {
 
   std::string camera_name = "roundtrip_calib8";
   auto cam_info = make_calib(sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL);
-  auto ret_write = camera_calibration_parsers::writeCalibrationYml(calib_file, camera_name, cam_info);
+  auto ret_write = camera_calibration_parsers::writeCalibrationYml(
+    calib_file.string(), camera_name, cam_info);
   ASSERT_EQ(ret_write, true);
 
   std::string camera_name2;
   sensor_msgs::msg::CameraInfo cam_info2;
-  auto ret_read = camera_calibration_parsers::readCalibrationYml(calib_file, camera_name2, cam_info2);
+  auto ret_read = camera_calibration_parsers::readCalibrationYml(
+    calib_file.string(), camera_name2, cam_info2);
 
   std::cerr << cam_info.distortion_model << " " << cam_info2.distortion_model << std::endl;
 
@@ -143,4 +163,3 @@ TEST(ParseYml, roundtrip_calib8) {
   ASSERT_EQ(camera_name2, camera_name);
   check_calib(cam_info2);
 }
-

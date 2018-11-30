@@ -33,12 +33,14 @@
 *********************************************************************/
 
 #include "camera_calibration_parsers/parse.h"
+
+#include <string>
+
 #include "camera_calibration_parsers/parse_ini.h"
 #include "camera_calibration_parsers/parse_yml.h"
 #include "camera_calibration_parsers/impl/filesystem_helper.hpp"
 
-#include <rclcpp/rclcpp.hpp>
-
+#include "rclcpp/rclcpp.hpp"
 
 namespace camera_calibration_parsers
 {
@@ -55,8 +57,8 @@ bool writeCalibration(
     return writeCalibrationYml(file_name, camera_name, cam_info);
   } else {
     RCLCPP_ERROR(
-        rclcpp::get_logger("camera_calibration_parsers"),
-        "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
+      rclcpp::get_logger("camera_calibration_parsers"),
+      "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
       p.extension().c_str());
   }
   return false;
@@ -74,8 +76,8 @@ bool readCalibration(
     return readCalibrationYml(file_name, camera_name, cam_info);
   } else {
     RCLCPP_ERROR(
-        rclcpp::get_logger("camera_calibration_parsers"),
-        "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
+      rclcpp::get_logger("camera_calibration_parsers"),
+      "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
       p.extension().c_str());
   }
 
@@ -93,4 +95,4 @@ bool parseCalibration(
   return parseCalibrationIni(buffer, camera_name, cam_info);
 }
 
-} //namespace camera_calibration_parsers
+}  // namespace camera_calibration_parsers

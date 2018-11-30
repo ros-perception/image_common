@@ -43,14 +43,14 @@
 #include <algorithm>
 #include <array>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "camera_calibration_parsers/impl/filesystem_helper.hpp"
-
-#include <rclcpp/logging.hpp>
-#include <sensor_msgs/distortion_models.hpp>
+#include "rclcpp/logging.hpp"
+#include "sensor_msgs/distortion_models.hpp"
 
 namespace camera_calibration_parsers
 {
@@ -269,12 +269,15 @@ bool writeCalibrationIni(
   if (cam_info.distortion_model != sensor_msgs::distortion_models::PLUMB_BOB ||
     cam_info.d.size() != 5)
   {
-    RCLCPP_ERROR(kIniLogger, "Videre INI format can only save calibrations using the plumb bob distortion model. "
+    RCLCPP_ERROR(
+      kIniLogger,
+      "Videre INI format can only save calibrations using the plumb bob distortion model. "
       "Use the YAML format instead.\n"
       "\tdistortion_model = '%s', expected '%s'\n"
       "\tD.size() = %d, expected 5",
       cam_info.distortion_model.c_str(),
-      sensor_msgs::distortion_models::PLUMB_BOB, (int)cam_info.d.size());
+      sensor_msgs::distortion_models::PLUMB_BOB,
+      static_cast<int>(cam_info.d.size()));
     return false;
   }
 
@@ -334,7 +337,7 @@ bool readCalibrationIni(
     return false;
   }
 
-  for (auto section: sections) {
+  for (auto section : sections) {
     if (section[0] == "[image]") {
       if (!parse_image_section(section, cam_info)) {
         return false;
@@ -368,4 +371,4 @@ bool parseCalibrationIni(
   return readCalibrationIni(ss, camera_name, cam_info);
 }
 
-} //namespace camera_calibration_parsers
+}  // namespace camera_calibration_parsers

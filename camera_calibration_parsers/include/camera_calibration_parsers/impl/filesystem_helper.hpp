@@ -28,9 +28,6 @@
  */
 /// Copied from pluginlib/impl/filesystem_helper.hpp
 /// Includes std::filesystem and aliases the namespace to `camera_calibration_parsers::impl::fs`.
-/**
- * If std::filesystem is not available the necessary functions are emulated.
- */
 
 #ifndef CAMERA_CALIBRATION_PARSERS__IMPL__FILESYSTEM_HELPER_HPP_
 #define CAMERA_CALIBRATION_PARSERS__IMPL__FILESYSTEM_HELPER_HPP_
@@ -74,4 +71,4 @@ namespace fs = std::experimental::filesystem;
 # endif
 #endif
 
-#endif  // CAMERA_CALIBRATION_PARSERS__FILESYSTEM_HELPER_HPP_
+#endif  // CAMERA_CALIBRATION_PARSERS__IMPL__FILESYSTEM_HELPER_HPP_

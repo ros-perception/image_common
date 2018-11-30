@@ -39,11 +39,16 @@
 #include <ctime>
 
 #include <fstream>
+#include <string>
 
 #include "camera_calibration_parsers/impl/filesystem_helper.hpp"
-#include <rclcpp/logging.hpp>
-#include <sensor_msgs/distortion_models.hpp>
-#include <yaml-cpp/yaml.h>
+#include "rclcpp/logging.hpp"
+#include "sensor_msgs/distortion_models.hpp"
+
+#ifdef _WIN32
+#define YAML_CPP_DLL
+#endif
+#include "yaml-cpp/yaml.h"
 
 namespace camera_calibration_parsers
 {
@@ -77,7 +82,7 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const SimpleMatrix & m)
   out << YAML::BeginMap;
   out << YAML::Key << "rows" << YAML::Value << m.rows;
   out << YAML::Key << "cols" << YAML::Value << m.cols;
-  //out << YAML::Key << "dt"   << YAML::Value << "d"; // OpenCV data type specifier
+  // out << YAML::Key << "dt"   << YAML::Value << "d"; // OpenCV data type specifier
   out << YAML::Key << "data" << YAML::Value;
   out << YAML::Flow;
   out << YAML::BeginSeq;
@@ -123,12 +128,12 @@ bool writeCalibrationYml(
   time_t raw_time;
   time(&raw_time);
   emitter << YAML::Key << "calibration_time";
-  emitter << YAML::Value << asctime(localtime(&raw_time));
+  emitter << YAML::Value << asctime_r(localtime_r(&raw_time));
 #endif
 
   // Image dimensions
-  emitter << YAML::Key << WIDTH_YML_NAME << YAML::Value << (int)cam_info.width;
-  emitter << YAML::Key << HEIGHT_YML_NAME << YAML::Value << (int)cam_info.height;
+  emitter << YAML::Key << WIDTH_YML_NAME << YAML::Value << static_cast<int>(cam_info.width);
+  emitter << YAML::Key << HEIGHT_YML_NAME << YAML::Value << static_cast<int>(cam_info.height);
 
   // Camera name and intrinsics
   emitter << YAML::Key << CAM_YML_NAME << YAML::Value << camera_name;
@@ -156,11 +161,13 @@ bool writeCalibrationYml(
   if (!dir.empty() && !impl::fs::exists(dir) &&
     !impl::fs::create_directories(dir))
   {
-    RCLCPP_ERROR(kYmlLogger, "Unable to create directory for camera calibration file [%s]", dir.c_str());
+    RCLCPP_ERROR(kYmlLogger, "Unable to create directory for camera calibration file [%s]",
+      dir.c_str());
   }
   std::ofstream out(file_name.c_str());
   if (!out.is_open()) {
-    RCLCPP_ERROR(kYmlLogger, "Unable to open camera calibration file [%s] for writing", file_name.c_str());
+    RCLCPP_ERROR(kYmlLogger, "Unable to open camera calibration file [%s] for writing",
+      file_name.c_str());
     return false;
   }
   return writeCalibrationYml(out, camera_name, cam_info);
@@ -196,7 +203,8 @@ bool readCalibrationYml(
     } else {
       // Assume plumb bob for backwards compatibility
       cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
-      RCLCPP_WARN(kYmlLogger, "Camera calibration file did not specify distortion model, assuming plumb bob");
+      RCLCPP_WARN(kYmlLogger,
+        "Camera calibration file did not specify distortion model, assuming plumb bob");
     }
     const YAML::Node & D_node = doc[D_YML_NAME];
     int D_rows, D_cols;
@@ -226,7 +234,8 @@ bool readCalibrationYml(
   }
   bool success = readCalibrationYml(fin, camera_name, cam_info);
   if (!success) {
-    RCLCPP_ERROR(kYmlLogger, "Failed to parse camera calibration from file [%s]", file_name.c_str());
+    RCLCPP_ERROR(kYmlLogger, "Failed to parse camera calibration from file [%s]",
+      file_name.c_str());
   }
   return success;
 }
@@ -239,4 +248,4 @@ bool parseCalibrationYml(
   return readCalibrationYml(ss, camera_name, cam_info);
 }
 
-} //namespace camera_calibration_parsers
+}  // namespace camera_calibration_parsers
