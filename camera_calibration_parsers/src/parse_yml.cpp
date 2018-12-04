@@ -47,8 +47,16 @@
 
 #ifdef _WIN32
 #define YAML_CPP_DLL
-#endif
+// TODO(mjcarroll): This shouldn't be needed, but there are some issues
+// with MSVC and YAML-CPP that are upstream causing warnings in CI.
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#pragma warning(disable: 4275)
 #include "yaml-cpp/yaml.h"
+#pragma warning(pop)
+#else
+#include "yaml-cpp/yaml.h"
+#endif
 
 namespace camera_calibration_parsers
 {
