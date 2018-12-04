@@ -308,13 +308,13 @@ bool writeCalibrationIni(
     !impl::fs::create_directories(dir))
   {
     RCLCPP_ERROR(kIniLogger, "Unable to create directory for camera calibration file [%s]",
-      dir.c_str());
+      dir.string());
     return false;
   }
-  std::ofstream out(file_name.c_str());
+  std::ofstream out(file_name);
   if (!out.is_open()) {
     RCLCPP_ERROR(kIniLogger, "Unable to open camera calibration file [%s] for writing",
-      file_name.c_str());
+      file_name);
     return false;
   }
   return writeCalibrationIni(out, camera_name, cam_info);

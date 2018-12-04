@@ -14,6 +14,7 @@
 //
 #include <gtest/gtest.h>
 
+#include <cstdio>
 #include <string>
 
 #include "sensor_msgs/distortion_models.hpp"
@@ -124,38 +125,36 @@ TEST(ParseYml, parse_invalid_yml_calib5) {
 }
 
 TEST(ParseYml, roundtrip_calib5) {
-  auto tmpdir = fs::temp_directory_path();
-  auto calib_file = tmpdir / "calib5.yml";
+  std::string calib_file = std::tmpnam(nullptr);
 
   std::string camera_name = "roundtrip_calib5";
   auto cam_info = make_calib(sensor_msgs::distortion_models::PLUMB_BOB);
   auto ret_write = camera_calibration_parsers::writeCalibrationYml(
-    calib_file.string(), camera_name, cam_info);
+    calib_file, camera_name, cam_info);
   ASSERT_EQ(ret_write, true);
 
   std::string camera_name2;
   sensor_msgs::msg::CameraInfo cam_info2;
   auto ret_read = camera_calibration_parsers::readCalibrationYml(
-    calib_file.string(), camera_name2, cam_info2);
+    calib_file, camera_name2, cam_info2);
   ASSERT_EQ(ret_read, true);
   ASSERT_EQ(camera_name2, camera_name);
   check_calib(cam_info2);
 }
 
 TEST(ParseYml, roundtrip_calib8) {
-  auto tmpdir = fs::temp_directory_path();
-  auto calib_file = tmpdir / "calib8.yml";
+  std::string calib_file = std::tmpnam(nullptr);
 
   std::string camera_name = "roundtrip_calib8";
   auto cam_info = make_calib(sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL);
   auto ret_write = camera_calibration_parsers::writeCalibrationYml(
-    calib_file.string(), camera_name, cam_info);
+    calib_file, camera_name, cam_info);
   ASSERT_EQ(ret_write, true);
 
   std::string camera_name2;
   sensor_msgs::msg::CameraInfo cam_info2;
   auto ret_read = camera_calibration_parsers::readCalibrationYml(
-    calib_file.string(), camera_name2, cam_info2);
+    calib_file, camera_name2, cam_info2);
 
   std::cerr << cam_info.distortion_model << " " << cam_info2.distortion_model << std::endl;
 
