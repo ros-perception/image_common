@@ -32,7 +32,7 @@ std::string custom_tmpnam()
 #ifdef _WIN32
   char name[L_tmpnam_s];
   errno_t err = tmpnam_s(name, L_tmpnam_s);
-  if(err) {
+  if (err) {
     printf("Error occured creating unique filename.\n");
   }
   return std::string(name);
