@@ -30,8 +30,11 @@ namespace fs = camera_calibration_parsers::impl::fs;
 std::string custom_tmpnam()
 {
 #ifdef _WIN32
-  char name[20];
-  tmpnam_s(name, 20);
+  char name[L_tmpnam_s];
+  errno_t err = tmpnam_s(name, L_tmpnam_s);
+  if(err) {
+    printf("Error occured creating unique filename.\n");
+  }
   return std::string(name);
 #else
   char temp[] = "/tmp/calib.XXXXXX";
