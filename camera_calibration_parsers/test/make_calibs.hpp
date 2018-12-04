@@ -86,9 +86,9 @@ sensor_msgs::msg::CameraInfo make_calib(const std::string & distortion_model)
   cam_info.width = 640;
   cam_info.height = 480;
 
-  cam_info.k = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-  cam_info.r = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-  cam_info.p = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  cam_info.k = {{1, 2, 3, 4, 5, 6, 7, 8, 9}};
+  cam_info.r = {{1, 0, 0, 0, 1, 0, 0, 0, 1}};
+  cam_info.p = {{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}};
 
   if (distortion_model == sensor_msgs::distortion_models::PLUMB_BOB) {
     cam_info.d = {1, 2, 3, 4, 5};
