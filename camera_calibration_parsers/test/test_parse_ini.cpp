@@ -27,6 +27,20 @@
 
 namespace fs = camera_calibration_parsers::impl::fs;
 
+std::string custom_tmpnam()
+{
+#ifdef _WIN32
+  char name[20];
+  tmpnam_s(name, 20);
+  return std::string(name);
+#else
+  char temp[] = "/tmp/calib.XXXXXX";
+  int fd = mkstemp(temp);
+  close(fd);
+  return std::string(temp);
+#endif
+}
+
 static const char * kValidCalib5 =
   R"(
 # Comment with pound
@@ -208,7 +222,7 @@ TEST(ParseIni, parse_invalid_ini_calib5_2) {
 }
 
 TEST(ParseIni, roundtrip_calib5) {
-  std::string calib_file = std::tmpnam(nullptr);
+  std::string calib_file = custom_tmpnam();
 
   std::string camera_name = "roundtrip_calib5";
   auto cam_info = make_calib(sensor_msgs::distortion_models::PLUMB_BOB);
@@ -226,7 +240,7 @@ TEST(ParseIni, roundtrip_calib5) {
 }
 
 TEST(ParseIni, cant_write_calib8) {
-  std::string calib_file = std::tmpnam(nullptr);
+  std::string calib_file = custom_tmpnam();
 
   std::string camera_name = "roundtrip_calib8";
   auto cam_info = make_calib(sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL);

@@ -140,7 +140,9 @@ bool writeCalibrationYml(
   emitter << YAML::Key << K_YML_NAME << YAML::Value <<
     SimpleMatrix(3, 3, const_cast<double *>(&cam_info.k[0]));
   emitter << YAML::Key << DMODEL_YML_NAME << YAML::Value << cam_info.distortion_model;
-  emitter << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(1, cam_info.d.size(),
+  emitter << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(
+    1,
+    static_cast<int>(cam_info.d.size()),
     const_cast<double *>(&cam_info.d[0]));
   emitter << YAML::Key << R_YML_NAME << YAML::Value <<
     SimpleMatrix(3, 3, const_cast<double *>(&cam_info.r[0]));
@@ -162,12 +164,12 @@ bool writeCalibrationYml(
     !impl::fs::create_directories(dir))
   {
     RCLCPP_ERROR(kYmlLogger, "Unable to create directory for camera calibration file [%s]",
-      dir.string());
+      dir.string().c_str());
   }
   std::ofstream out(file_name.c_str());
   if (!out.is_open()) {
     RCLCPP_ERROR(kYmlLogger, "Unable to open camera calibration file [%s] for writing",
-      file_name);
+      file_name.c_str());
     return false;
   }
   return writeCalibrationYml(out, camera_name, cam_info);
