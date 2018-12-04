@@ -50,7 +50,9 @@ namespace fs = std::experimental::filesystem;
 # endif
 
 #elif defined(__has_include)
+// *INDENT-OFF*
 # if __has_include(<filesystem>) && __cplusplus >= 201703L  // NOLINT
+// *INDENT-ON*
 #  include <filesystem>
 
 namespace camera_calibration_parsers
@@ -62,7 +64,9 @@ namespace fs = std::filesystem;
 }  // namespace camera_calibration_parsers
 
 #  define CAMERA_CALIBRATION_PARSERS__IMPL__FILESYSYEM_HELPER__HAS_STD_FILESYSTEM
+// *INDENT-OFF*
 # elif __has_include(<experimental/filesystem>)  // NOLINT
+// *INDENT-ON*
 #  include <experimental/filesystem>
 
 namespace camera_calibration_parsers
