@@ -37,6 +37,7 @@
 
 #include <message_filters/simple_filter.h>
 #include "image_transport/image_transport.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
@@ -60,6 +61,7 @@ namespace image_transport
 void callback(const std::shared_ptr<const sensor_msgs::msg::Image>&);
 \endverbatim
  */
+IMAGE_TRANSPORT_PUBLIC
 class SubscriberFilter : public message_filters::SimpleFilter<sensor_msgs::msg::Image>
 {
 public:

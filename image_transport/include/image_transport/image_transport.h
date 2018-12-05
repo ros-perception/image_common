@@ -47,6 +47,7 @@
 #include "image_transport/publisher.h"
 #include "image_transport/subscriber.h"
 #include "image_transport/transport_hints.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
@@ -54,6 +55,7 @@ namespace image_transport
 /*!
  * \brief Advertise an image topic, free function version.
  */
+IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
   rclcpp::Node* node,
   const std::string & base_topic,
@@ -62,6 +64,7 @@ Publisher create_publisher(
 /**
  * \brief Subscribe to an image topic, free function version.
  */
+IMAGE_TRANSPORT_PUBLIC
 Subscriber create_subscription(
   rclcpp::Node* node,
   const std::string & base_topic,
@@ -72,6 +75,7 @@ Subscriber create_subscription(
 /*!
  * \brief Advertise a camera, free function version.
  */
+IMAGE_TRANSPORT_PUBLIC
 CameraPublisher create_camera_publisher(
   rclcpp::Node* node,
   const std::string & base_topic,
@@ -80,6 +84,7 @@ CameraPublisher create_camera_publisher(
 /*!
  * \brief Subscribe to a camera, free function version.
  */
+IMAGE_TRANSPORT_PUBLIC
 CameraSubscriber create_camera_subscription(
   rclcpp::Node* node,
   const std::string & base_topic,
@@ -96,6 +101,7 @@ std::vector<std::string> getLoadableTransports();
  * ImageTransport is analogous to ros::NodeHandle in that it contains advertise() and
  * subscribe() functions for creating advertisements and subscriptions of image topics.
 */
+IMAGE_TRANSPORT_PUBLIC
 class ImageTransport
 {
 public:

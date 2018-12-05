@@ -39,12 +39,15 @@
 #include <rclcpp/node.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
+#include "image_tranposrt/visibility_control.hpp"
+
 namespace image_transport
 {
 
 /**
  * \brief Base class for plugins to Subscriber.
  */
+IMAGE_TRANSPORT_PUBLIC
 class SubscriberPlugin
 {
 public:

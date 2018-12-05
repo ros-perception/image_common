@@ -43,12 +43,15 @@
 #include <string>
 #include <functional>
 
+#include "image_transport/visibility_control.hpp"
+
 namespace image_transport {
 
 /**
  * \brief Allows publication of an image to a single subscriber. Only available inside
  * subscriber connection callbacks.
  */
+IMAGE_TRANSPORT_PUBLIC
 class SingleSubscriberPublisher
 {
 private:

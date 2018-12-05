@@ -37,6 +37,7 @@
 
 #include <sensor_msgs/msg/image.hpp>
 #include "image_transport/simple_subscriber_plugin.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport {
 
@@ -46,6 +47,7 @@ namespace image_transport {
  * RawSubscriber is a simple wrapper for ros::Subscriber which listens for Image messages
  * and passes them through to the callback.
  */
+IMAGE_TRANSPORT_PUBLIC
 class RawSubscriber : public SimpleSubscriberPlugin<sensor_msgs::msg::Image>
 {
 public:

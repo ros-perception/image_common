@@ -40,6 +40,7 @@
 #include <rclcpp/logging.hpp>
 
 #include "image_transport/publisher_plugin.h"
+#include "image_transport/visibility_control.hpp"
 
 #include <memory>
 

@@ -42,6 +42,7 @@
 #include <sensor_msgs/msg/camera_info.hpp>
 
 #include "image_transport/single_subscriber_publisher.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
@@ -63,6 +64,7 @@ class ImageTransport;
  * associated with that handle will stop being called. Once all CameraPublisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
+IMAGE_TRANSPORT_PUBLIC
 class CameraPublisher
 {
 public:

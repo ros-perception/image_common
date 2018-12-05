@@ -40,12 +40,15 @@
 
 #include <rclcpp/node.hpp>
 
+#include "image_transport/visibility_control.hpp"
+
 namespace image_transport
 {
 
 /**
  * \brief Stores transport settings for an image topic subscription.
  */
+IMAGE_TRANSPORT_PUBLIC
 class TransportHints
 {
 public:

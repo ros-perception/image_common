@@ -31,14 +31,16 @@ add_library(${PROJECT_NAME}
   src/image_transport.cpp
 )
 
-ament_target_dependencies(${PROJECT_NAME}
-  "message_filters"
-  "pluginlib"
-  "rclcpp"
-  "sensor_msgs"
+ament_target_dependencies(
+  ${PROJECT_NAME}
+  message_filters
+  pluginlib
+  rclcpp
+  sensor_msgs
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+target_compile_definitions(${PROJECT_NAME} PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL")
 
 # Build image_transport_plugins library (raw)
 add_library(${PROJECT_NAME}_plugins

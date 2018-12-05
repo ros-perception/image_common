@@ -39,6 +39,7 @@
 
 #include <sensor_msgs/msg/image.hpp>
 #include "image_transport/single_subscriber_publisher.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
@@ -46,6 +47,7 @@ namespace image_transport
 /**
  * \brief Base class for plugins to Publisher.
  */
+IMAGE_TRANSPORT_PUBLIC
 class PublisherPlugin
 {
 public:

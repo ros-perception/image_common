@@ -40,6 +40,7 @@
 
 #include "image_transport/exception.h"
 #include "image_transport/loader_fwds.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
@@ -59,6 +60,7 @@ namespace image_transport
  * associated with that handle will stop being called. Once all Subscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
+IMAGE_TRANSPORT_PUBLIC
 class Subscriber
 {
 public:

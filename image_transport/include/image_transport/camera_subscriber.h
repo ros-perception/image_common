@@ -41,6 +41,7 @@
 
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <sensor_msgs/msg/image.hpp>
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport {
 
@@ -61,6 +62,7 @@ void callback(const sensor_msgs::msg::Image::ConstSharedPtr&, const sensor_msgs:
  * associated with that handle will stop being called. Once all CameraSubscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
+IMAGE_TRANSPORT_PUBLIC
 class CameraSubscriber
 {
 public:
