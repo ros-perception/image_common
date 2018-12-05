@@ -47,7 +47,6 @@ namespace image_transport
 /**
  * \brief Base class for plugins to Publisher.
  */
-IMAGE_TRANSPORT_PUBLIC
 class PublisherPlugin
 {
 public:

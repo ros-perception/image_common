@@ -37,6 +37,8 @@
 
 #include <string>
 
+#include "image_transport/visibility_control.hpp"
+
 namespace image_transport {
 
 /**
@@ -45,11 +47,13 @@ namespace image_transport {
  * \note This function assumes that the name is completely resolved. If the \c
  * base_topic is remapped the resulting camera info topic will be incorrect.
  */
+IMAGE_TRANSPORT_PUBLIC
 std::string getCameraInfoTopic(const std::string& base_topic);
 
 /**
  * \brief Replacement for uses of boost::erase_last_copy
  */
+IMAGE_TRANSPORT_PUBLIC
 std::string erase_last_copy(const std::string& input, const std::string& search);
 
 } //namespace image_transport

@@ -61,7 +61,7 @@ namespace image_transport
 void callback(const std::shared_ptr<const sensor_msgs::msg::Image>&);
 \endverbatim
  */
-IMAGE_TRANSPORT_PUBLIC
+
 class SubscriberFilter : public message_filters::SimpleFilter<sensor_msgs::msg::Image>
 {
 public:
@@ -75,6 +75,7 @@ public:
    * \param queue_size The subscription queue size
    * \param transport The transport hint to pass along
    */
+  IMAGE_TRANSPORT_PUBLIC
   SubscriberFilter(
     rclcpp::Node * node, const std::string & base_topic,
     const std::string & transport)
@@ -85,10 +86,12 @@ public:
   /**
    * \brief Empty constructor, use subscribe() to subscribe to a topic
    */
+  IMAGE_TRANSPORT_PUBLIC
   SubscriberFilter()
   {
   }
 
+  IMAGE_TRANSPORT_PUBLIC
   ~SubscriberFilter()
   {
     unsubscribe();
@@ -102,6 +105,7 @@ public:
    * \param nh The ros::NodeHandle to use to subscribe.
    * \param base_topic The topic to subscribe to.
    */
+  IMAGE_TRANSPORT_PUBLIC
   void subscribe(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -117,11 +121,13 @@ public:
   /**
    * \brief Force immediate unsubscription of this subscriber from its topic
    */
+  IMAGE_TRANSPORT_PUBLIC
   void unsubscribe()
   {
     sub_.shutdown();
   }
 
+  IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const
   {
     return sub_.getTopic();
@@ -130,6 +136,7 @@ public:
   /**
    * \brief Returns the number of publishers this subscriber is connected to.
    */
+  IMAGE_TRANSPORT_PUBLIC
   uint32_t getNumPublishers() const
   {
     return sub_.getNumPublishers();
@@ -138,6 +145,7 @@ public:
   /**
    * \brief Returns the name of the transport being used.
    */
+  IMAGE_TRANSPORT_PUBLIC
   std::string getTransport() const
   {
     return sub_.getTransport();
@@ -146,6 +154,7 @@ public:
   /**
    * \brief Returns the internal image_transport::Subscriber object.
    */
+  IMAGE_TRANSPORT_PUBLIC
   const Subscriber & getSubscriber() const
   {
     return sub_;

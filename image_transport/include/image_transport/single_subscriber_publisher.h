@@ -51,7 +51,6 @@ namespace image_transport {
  * \brief Allows publication of an image to a single subscriber. Only available inside
  * subscriber connection callbacks.
  */
-IMAGE_TRANSPORT_PUBLIC
 class SingleSubscriberPublisher
 {
 private:
@@ -62,18 +61,25 @@ public:
   typedef std::function<uint32_t()> GetNumSubscribersFn;
   typedef std::function<void(const sensor_msgs::msg::Image&)> PublishFn;
 
+  IMAGE_TRANSPORT_PUBLIC
   SingleSubscriberPublisher(
     const std::string & caller_id, const std::string & topic,
     const GetNumSubscribersFn & num_subscribers_fn,
     const PublishFn & publish_fn);
 
+  IMAGE_TRANSPORT_PUBLIC
   std::string getSubscriberName() const;
 
+  IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
 
+  IMAGE_TRANSPORT_PUBLIC
   uint32_t getNumSubscribers() const;
 
+  IMAGE_TRANSPORT_PUBLIC
   void publish(const sensor_msgs::msg::Image& message) const;
+
+  IMAGE_TRANSPORT_PUBLIC
   void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const;
 
 private:

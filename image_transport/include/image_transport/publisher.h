@@ -67,12 +67,13 @@ namespace image_transport
  * associated with that handle will stop being called. Once all Publisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
-IMAGE_TRANSPORT_PUBLIC
 class Publisher
 {
 public:
+  IMAGE_TRANSPORT_PUBLIC
   Publisher() = default;
 
+  IMAGE_TRANSPORT_PUBLIC
   Publisher(
     rclcpp::Node * nh,
     const std::string & base_topic,
@@ -85,31 +86,43 @@ public:
    *
    * Returns the total number of subscribers to all advertised topics.
    */
+  IMAGE_TRANSPORT_PUBLIC
   uint32_t getNumSubscribers() const;
 
   /*!
    * \brief Returns the base topic of this Publisher.
    */
+  IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
 
   /*!
    * \brief Publish an image on the topics associated with this Publisher.
    */
+  IMAGE_TRANSPORT_PUBLIC
   void publish(const sensor_msgs::msg::Image & message) const;
 
   /*!
    * \brief Publish an image on the topics associated with this Publisher.
    */
+  IMAGE_TRANSPORT_PUBLIC
   void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
    */
+  IMAGE_TRANSPORT_PUBLIC
   void shutdown();
 
+  IMAGE_TRANSPORT_PUBLIC
   operator void *() const;
+
+  IMAGE_TRANSPORT_PUBLIC
   bool operator<(const Publisher & rhs) const {return impl_ < rhs.impl_;}
+
+  IMAGE_TRANSPORT_PUBLIC
   bool operator!=(const Publisher & rhs) const {return impl_ != rhs.impl_;}
+
+  IMAGE_TRANSPORT_PUBLIC
   bool operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:

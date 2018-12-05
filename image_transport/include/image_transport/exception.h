@@ -44,7 +44,6 @@ namespace image_transport {
 /**
  * \brief A base class for all image_transport exceptions inheriting from std::runtime_error.
  */
-IMAGE_TRANSPORT_PUBLIC
 class Exception : public std::runtime_error
 {
 public:
@@ -54,7 +53,6 @@ public:
 /**
  * \brief An exception class thrown when image_transport is unable to load a requested transport.
  */
-IMAGE_TRANSPORT_PUBLIC
 class TransportLoadException : public Exception
 {
 public:

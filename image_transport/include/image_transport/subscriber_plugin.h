@@ -39,7 +39,7 @@
 #include <rclcpp/node.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
-#include "image_tranposrt/visibility_control.hpp"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {

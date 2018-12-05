@@ -36,16 +36,13 @@
 
 #include "camera_info_manager/camera_info_manager.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
 #include <algorithm>
 #include <cstdlib>
 #include <locale>
 #include <memory>
 #include <string>
 
+#include "filesystem_helper.hpp"
 #include "camera_calibration_parsers/parse.h"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
@@ -489,42 +486,17 @@ CameraInfoManager::saveCalibrationFile(
 {
   RCLCPP_INFO(logger_, "writing calibration data to %s", filename.c_str());
 
-  // isolate the name of the containing directory
-  size_t last_slash = filename.rfind('/');
-  if (last_slash >= filename.length()) {
-    // No slash in the name.  This should never happen, the URL
-    // parser ensures there is at least one '/' at the beginning.
-    RCLCPP_ERROR(logger_, "filename [%s] has no '/'", filename.c_str());
-    return false;                       // not a valid URL
-  }
+  camera_info_manager::impl::fs::path filepath(filename);
+  camera_info_manager::impl::fs::path parent = filepath.parent_path();
 
-  // make sure the directory exists and is writable
-  std::string dirname(filename.substr(0, last_slash + 1));
-  struct stat stat_data;
-  int rc = stat(dirname.c_str(), &stat_data);
-  if (rc != 0) {
-    if (errno == ENOENT) {
-      // directory does not exist, try to create it and its parents
-      std::string command("mkdir -p " + dirname);
-      rc = system(command.c_str());
-      if (rc != 0) {
-        // mkdir failed
-        RCLCPP_ERROR(logger_, "unable to create to path directory [%s]", dirname.c_str());
-        return false;
-      }
-    } else {
-      // not accessible, or something screwy
-      RCLCPP_ERROR(logger_, "directory [%s] not accessible", dirname.c_str());
+  if (!impl::fs::exists(parent)) {
+    if (!impl::fs::create_directories(parent)) {
+      RCLCPP_ERROR(logger_, "unable to create path directory [%s]", parent.string().c_str());
       return false;
     }
-  } else if (!S_ISDIR(stat_data.st_mode)) {
-    // dirname exists but is not a directory
-    RCLCPP_ERROR(logger_, "[%s] is not a directory", dirname.c_str());
-    return false;
   }
 
-  // Directory exists and is accessible. Permissions might still be bad.
-
+  // Directory exists. Permissions might still be bad.
   // Currently, writeCalibration() always returns true no matter what
   // (ros-pkg ticket #5010).
   return writeCalibration(filename, cname, new_info);
