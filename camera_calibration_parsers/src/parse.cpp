@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -33,42 +33,66 @@
 *********************************************************************/
 
 #include "camera_calibration_parsers/parse.h"
+
+#include <string>
+
 #include "camera_calibration_parsers/parse_ini.h"
 #include "camera_calibration_parsers/parse_yml.h"
+#include "camera_calibration_parsers/impl/filesystem_helper.hpp"
 
-#include <boost/algorithm/string/predicate.hpp>
+#include "rclcpp/rclcpp.hpp"
 
-namespace camera_calibration_parsers {
-
-bool writeCalibration(const std::string& file_name, const std::string& camera_name,
-                      const sensor_msgs::CameraInfo& cam_info)
+namespace camera_calibration_parsers
 {
-  if (boost::iends_with(file_name, ".ini"))
+
+bool writeCalibration(
+  const std::string & file_name, const std::string & camera_name,
+  const CameraInfo & cam_info)
+{
+  impl::fs::path p(file_name);
+
+  if (p.extension() == ".ini") {
     return writeCalibrationIni(file_name, camera_name, cam_info);
-  if (boost::iends_with(file_name, ".yml") || boost::iends_with(file_name, ".yaml"))
+  } else if (p.extension() == ".yml" || p.extension() == ".yaml") {
     return writeCalibrationYml(file_name, camera_name, cam_info);
-
+  } else {
+    RCLCPP_ERROR(
+      rclcpp::get_logger("camera_calibration_parsers"),
+      "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
+      p.extension().c_str());
+  }
   return false;
 }
 
-bool readCalibration(const std::string& file_name, std::string& camera_name,
-                     sensor_msgs::CameraInfo& cam_info)
+bool readCalibration(
+  const std::string & file_name, std::string & camera_name,
+  CameraInfo & cam_info)
 {
-  if (boost::iends_with(file_name, ".ini"))
+  impl::fs::path p(file_name);
+
+  if (p.extension() == ".ini") {
     return readCalibrationIni(file_name, camera_name, cam_info);
-  if (boost::iends_with(file_name, ".yml") || boost::iends_with(file_name, ".yaml"))
+  } else if (p.extension() == ".yml" || p.extension() == ".yaml") {
     return readCalibrationYml(file_name, camera_name, cam_info);
+  } else {
+    RCLCPP_ERROR(
+      rclcpp::get_logger("camera_calibration_parsers"),
+      "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
+      p.extension().c_str());
+  }
 
   return false;
 }
 
-bool parseCalibration(const std::string& buffer, const std::string& format,
-                      std::string& camera_name, sensor_msgs::CameraInfo& cam_info)
+bool parseCalibration(
+  const std::string & buffer, const std::string & format,
+  std::string & camera_name, CameraInfo & cam_info)
 {
-  if (format != "ini")
+  if (format != "ini") {
     return false;
+  }
 
   return parseCalibrationIni(buffer, camera_name, cam_info);
 }
 
-} //namespace camera_calibration_parsers
+}  // namespace camera_calibration_parsers

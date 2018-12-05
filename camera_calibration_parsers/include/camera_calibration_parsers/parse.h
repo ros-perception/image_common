@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2009, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -32,14 +32,19 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef CAMERA_CALIBRATION_PARSERS_PARSE_H
-#define CAMERA_CALIBRATION_PARSERS_PARSE_H
+#ifndef CAMERA_CALIBRATION_PARSERS__PARSE_H_
+#define CAMERA_CALIBRATION_PARSERS__PARSE_H_
 
 #include <string>
-#include <sensor_msgs/CameraInfo.h>
+
+#include "sensor_msgs/msg/camera_info.hpp"
+#include "camera_calibration_parsers/visibility_control.hpp"
 
 /// @todo: use stream-based API, so no read/parse distinction
-namespace camera_calibration_parsers {
+namespace camera_calibration_parsers
+{
+
+using CameraInfo = sensor_msgs::msg::CameraInfo;
 
 /**
  * \brief Write calibration parameters to a file.
@@ -50,8 +55,10 @@ namespace camera_calibration_parsers {
  * \param camera_name Name of the camera
  * \param cam_info Camera parameters
  */
-bool writeCalibration(const std::string& file_name, const std::string& camera_name,
-                      const sensor_msgs::CameraInfo& cam_info);
+CAMERA_CALIBRATION_PARSERS_PUBLIC
+bool writeCalibration(
+  const std::string & file_name, const std::string & camera_name,
+  const CameraInfo & cam_info);
 
 /**
  * \brief Read calibration parameters from a file.
@@ -62,8 +69,10 @@ bool writeCalibration(const std::string& file_name, const std::string& camera_na
  * \param[out] camera_name Name of the camera
  * \param[out] cam_info Camera parameters
  */
-bool readCalibration(const std::string& file_name, std::string& camera_name,
-                     sensor_msgs::CameraInfo& cam_info);
+CAMERA_CALIBRATION_PARSERS_PUBLIC
+bool readCalibration(
+  const std::string & file_name, std::string & camera_name,
+  CameraInfo & cam_info);
 
 /**
  * \brief Parse calibration parameters from a string in memory.
@@ -73,9 +82,11 @@ bool readCalibration(const std::string& file_name, std::string& camera_name,
  * \param[out] camera_name Name of the camera
  * \param[out] cam_info Camera parameters
  */
-bool parseCalibration(const std::string& buffer, const std::string& format,
-                      std::string& camera_name, sensor_msgs::CameraInfo& cam_info);
+CAMERA_CALIBRATION_PARSERS_PUBLIC
+bool parseCalibration(
+  const std::string & buffer, const std::string & format,
+  std::string & camera_name, CameraInfo & cam_info);
 
-} //namespace camera_calibration_parsers
+}  // namespace camera_calibration_parsers
 
-#endif
+#endif  // CAMERA_CALIBRATION_PARSERS__PARSE_H_

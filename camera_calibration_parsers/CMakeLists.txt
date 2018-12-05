@@ -1,38 +1,23 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
+
 project(camera_calibration_parsers)
 
-find_package(catkin REQUIRED sensor_msgs rosconsole roscpp roscpp_serialization)
-
-find_package(PythonLibs REQUIRED)
-if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
-  find_package(Boost REQUIRED COMPONENTS filesystem python)
-else()
-  find_package(Boost REQUIRED COMPONENTS filesystem python3)
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 
-catkin_python_setup()
-
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS sensor_msgs
-)
-
-find_package(PkgConfig)
-
-
-if (ANDROID)
-    find_package(yaml-cpp)
-    add_definitions(-DHAVE_NEW_YAMLCPP)
-else()
-  pkg_check_modules(YAML_CPP yaml-cpp)
-  if(${YAML_CPP_VERSION} VERSION_GREATER 0.5)
-    add_definitions(-DHAVE_NEW_YAMLCPP)
-  endif()
-  link_directories(${YAML_CPP_LIBRARY_DIRS})
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
-include_directories(${YAML_CPP_INCLUDE_DIRS})
+
+find_package(ament_cmake_ros REQUIRED)
+
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(yaml_cpp_vendor REQUIRED)
+
+include_directories(include)
 
 # define the library
 add_library(${PROJECT_NAME}
@@ -41,43 +26,88 @@ add_library(${PROJECT_NAME}
   src/parse_yml.cpp
 )
 
-add_library(${PROJECT_NAME}_wrapper
-  src/parse_wrapper.cpp)
+target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_CALIBRATION_PARSERS_BUILDING_DLL")
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY})
-target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_link_libraries(${PROJECT_NAME} stdc++fs)
+endif()
 
-# Don't prepend wrapper library name with lib and add to Python libs.
-set_target_properties(${PROJECT_NAME}_wrapper PROPERTIES
-        PREFIX ""
-        LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
-        )
-
-add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
-
-install(
-  TARGETS ${PROJECT_NAME}
-  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  COMPONENT main
+ament_target_dependencies(
+  ${PROJECT_NAME}
+  rclcpp
+  sensor_msgs
+  yaml_cpp_vendor
 )
-install(
-  DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
+
+# TODO: Reenable Python Wrapper with new serialization technique.
+#find_package(PythonLibs REQUIRED)
+#if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
+#  find_package(Boost REQUIRED COMPONENTS python)
+#else()
+#  find_package(Boost REQUIRED COMPONENTS python3)
+#endif()
+#add_library(${PROJECT_NAME}_wrapper
+#  src/parse_wrapper.cpp)
+#ament_target_dependencies(${PROJECT_NAME}_wrapper
+#  "rclcpp"
+#  "sensor_msgs"
+#)
+#target_include_directories(${PROJECT_NAME}_wrapper PUBLIC ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+#target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 # define the exe to convert
 add_executable(convert src/convert.cpp)
-target_link_libraries(convert ${PROJECT_NAME} ${rosconsole_LIBRARIES})
+target_link_libraries(convert ${PROJECT_NAME})
+
+install(
+  TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 install(
   TARGETS convert
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS ${PROJECT_NAME}_wrapper
-  DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+install(
+  DIRECTORY include/
+  DESTINATION include
 )
 
-if(CATKIN_ENABLE_TESTING)
-  add_subdirectory(test)
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(rclcpp)
+ament_export_dependencies(sensor_msgs)
+ament_export_dependencies(yaml_cpp_vendor)
+
+if(BUILD_TESTING)
+  #TODO(mjcarroll) switch back to this once I can fix copyright check
+  #find_package(ament_lint_auto REQUIRED)
+  #ament_lint_auto_find_test_dependencies()
+
+  find_package(ament_cmake_cppcheck REQUIRED)
+  find_package(ament_cmake_cpplint REQUIRED)
+  find_package(ament_cmake_lint_cmake REQUIRED)
+  find_package(ament_cmake_uncrustify REQUIRED)
+  #TODO(mjcarroll) Headers need to be .hpp for this to work properly.
+  #ament_cppcheck()
+  ament_cpplint()
+  ament_lint_cmake()
+  ament_uncrustify()
+  find_package(ament_cmake_gtest)
+
+  ament_add_gtest(${PROJECT_NAME}-parse_ini test/test_parse_ini.cpp)
+  if(TARGET ${PROJECT_NAME}-parse_ini)
+    target_link_libraries(${PROJECT_NAME}-parse_ini ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-parse_yml test/test_parse_yml.cpp)
+  if(TARGET ${PROJECT_NAME}-parse_yml)
+    target_link_libraries(${PROJECT_NAME}-parse_yml ${PROJECT_NAME})
+  endif()
 endif()
+
+ament_package()
+
