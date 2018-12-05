@@ -85,7 +85,7 @@ int main(int argc, char ** argv)
 
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::* PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr &) const;
-    PublishMemFn pub_mem_fn = &Plugin::publish;
+    PublishMemFn pub_mem_fn = &Plugin::publishPtr;
     auto sub =
       image_transport::create_subscription(node.get(), in_topic,
         std::bind(pub_mem_fn, pub.get(), std::placeholders::_1), in_transport);
