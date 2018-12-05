@@ -120,7 +120,7 @@ TEST_F(MessagePassingTesting, one_camera_message_passing)
 
   auto pub = image_transport::create_camera_publisher(node_.get(), "camera/image");
   auto sub = image_transport::create_camera_subscription(node_.get(), "camera/image",
-      [this](const sensor_msgs::msg::Image::ConstSharedPtr& image,
+      [](const sensor_msgs::msg::Image::ConstSharedPtr& image,
              const sensor_msgs::msg::CameraInfo::ConstSharedPtr& info) {
       (void) image;
       (void) info;
