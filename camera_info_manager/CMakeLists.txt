@@ -19,7 +19,6 @@ find_package(camera_calibration_parsers REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
-find_package(Boost REQUIRED)
 include_directories(include)
 
 # add a library
