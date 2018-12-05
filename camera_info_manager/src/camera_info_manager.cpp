@@ -34,18 +34,21 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include <string>
-#include <locale>
-#include <stdlib.h>
+#include "camera_info_manager/camera_info_manager.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <boost/algorithm/string.hpp>
-#include <camera_calibration_parsers/parse.h>
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <algorithm>
+#include <cstdlib>
+#include <locale>
+#include <memory>
+#include <string>
 
-#include "camera_info_manager/camera_info_manager.h"
+#include "camera_calibration_parsers/parse.h"
+#include "ament_index_cpp/get_package_share_directory.hpp"
+
 
 /** @file
 
@@ -60,7 +63,8 @@
 namespace camera_info_manager
 {
 
-using namespace camera_calibration_parsers;
+using camera_calibration_parsers::readCalibration;
+using camera_calibration_parsers::writeCalibration;
 
 /** URL to use when no other is defined. */
 const std::string
@@ -68,7 +72,7 @@ const std::string
 
 /** Constructor
  *
- * @param nh node handle, normally for the driver's streaming name
+ * @param node node, normally for the driver's streaming name
  *           space ("camera").  The service name is relative to this
  *           handle.  Nodes supporting multiple cameras may use
  *           subordinate names, like "left/camera" and "right/camera".
@@ -79,7 +83,8 @@ CameraInfoManager::CameraInfoManager(
   const rclcpp::Node::SharedPtr & node,
   const std::string & cname,
   const std::string & url)
-: camera_name_(cname),
+: logger_(node->get_logger()),
+  camera_name_(cname),
   url_(url),
   loaded_cam_info_(false)
 {
@@ -121,8 +126,7 @@ CameraInfo CameraInfoManager::getCameraInfo(void)
       // copy the name and URL strings
       url = url_;
       cname = camera_name_;
-
-    }   // release the lock
+    }  // release the lock
 
     // attempt load without the lock, it is not recursive
     loadCalibration(url, cname);
@@ -138,7 +142,7 @@ CameraInfo CameraInfoManager::getCameraInfo(void)
  */
 std::string CameraInfoManager::getPackageFileName(const std::string & url)
 {
-  //ROS_DEBUG_STREAM("camera calibration URL: " << url);
+  RCLCPP_DEBUG(logger_, "camera calibration url: %s", url.c_str());
 
   // Scan URL from after "package://" until next '/' and extract
   // package name.  The parseURL() already checked that it's present.
@@ -149,7 +153,7 @@ std::string CameraInfoManager::getPackageFileName(const std::string & url)
   // Look up the ROS package path name.
   std::string pkgPath = ament_index_cpp::get_package_share_directory(package);
   if (pkgPath.empty()) {                // package not found?
-    //ROS_WARN_STREAM("unknown package: " << package << " (ignored)");
+    RCLCPP_WARN(logger_, "unknown package: %s (ignored)", package.c_str());
     return pkgPath;
   } else {
     // Construct file name from package location and remainder of URL.
@@ -183,7 +187,6 @@ bool CameraInfoManager::isCalibrated(void)
       // copy the name and URL strings
       url = url_;
       cname = camera_name_;
-
     }   // release the lock
 
     // attempt load without the lock, it is not recursive
@@ -211,13 +214,13 @@ bool CameraInfoManager::loadCalibration(
   url_type_t url_type = parseURL(resURL);
 
   if (url_type != URL_empty) {
-    //ROS_INFO_STREAM("camera calibration URL: " << resURL);
+    RCLCPP_INFO(logger_, "camera calibration URL: %s", resURL.c_str());
   }
 
   switch (url_type) {
     case URL_empty:
       {
-        //ROS_INFO("using default calibration URL");
+        RCLCPP_INFO(logger_, "using default calibration URL");
         success = loadCalibration(default_camera_info_url, cname);
         break;
       }
@@ -228,7 +231,7 @@ bool CameraInfoManager::loadCalibration(
       }
     case URL_flash:
       {
-        //ROS_WARN("[CameraInfoManager] reading from flash not implemented yet");
+        RCLCPP_WARN(logger_, "reading from flash not implemented yet");
         break;
       }
     case URL_package:
@@ -241,7 +244,7 @@ bool CameraInfoManager::loadCalibration(
       }
     default:
       {
-        //ROS_ERROR_STREAM("Invalid camera calibration URL: " << resURL);
+        RCLCPP_ERROR(logger_, "Invalid camera calibration URL: %s", resURL.c_str());
         break;
       }
   }
@@ -265,14 +268,15 @@ bool CameraInfoManager::loadCalibrationFile(
 {
   bool success = false;
 
-  //ROS_DEBUG_STREAM("reading camera calibration from " << filename);
+  RCLCPP_DEBUG(logger_, "reading camera calibration from %s", filename.c_str());
   std::string cam_name;
   CameraInfo cam_info;
 
   if (readCalibration(filename, cam_name, cam_info)) {
     if (cname != cam_name) {
-      //ROS_WARN_STREAM("[" << cname << "] does not match name " <<
-      //  cam_name << " in file " << filename);
+      RCLCPP_WARN(logger_,
+        "[%s] does not match %s in file %s",
+        cname.c_str(), cam_name.c_str(), filename.c_str());
     }
     success = true;
     {
@@ -281,7 +285,7 @@ bool CameraInfoManager::loadCalibrationFile(
       cam_info_ = cam_info;
     }
   } else {
-    //ROS_WARN_STREAM("Camera calibration file " << filename << " not found.");
+    RCLCPP_WARN(logger_, "Camera calibration file %s not found", filename.c_str());
   }
 
   return success;
@@ -364,9 +368,7 @@ std::string CameraInfoManager::resolveURL(
       dollar += 10;
     } else {
       // not a valid substitution variable
-      //ROS_ERROR_STREAM("[CameraInfoManager]"
-      //  " invalid URL substitution (not resolved): " <<
-      //  url);
+      RCLCPP_ERROR(logger_, "invalid URL substitution (not resolved): %s", url.c_str());
       resolved += "$";                // keep the bogus '$'
     }
 
@@ -389,13 +391,25 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string & ur
   if (url == "") {
     return URL_empty;
   }
-  if (boost::iequals(url.substr(0, 8), "file:///")) {
+
+  // Easy C++14 replacement for boost::iequals from :
+  // https://stackoverflow.com/a/4119881
+  auto iequals = [](const std::string & a, const std::string & b) {
+      return std::equal(a.begin(), a.end(),
+               b.begin(), b.end(),
+               [](char a, char b) {
+                 return tolower(a) == tolower(b);
+               });
+    };
+
+
+  if (iequals(url.substr(0, 8), "file:///")) {
     return URL_file;
   }
-  if (boost::iequals(url.substr(0, 9), "flash:///")) {
+  if (iequals(url.substr(0, 9), "flash:///")) {
     return URL_flash;
   }
-  if (boost::iequals(url.substr(0, 10), "package://")) {
+  if (iequals(url.substr(0, 10), "package://")) {
     // look for a '/' following the package name, make sure it is
     // there, the name is not empty, and something follows it
     size_t rest = url.find('/', 10);
@@ -449,7 +463,7 @@ CameraInfoManager::saveCalibration(
     default:
       {
         // invalid URL, save to default location
-        //ROS_ERROR_STREAM("invalid url: " << resURL << " (ignored)");
+        RCLCPP_ERROR(logger_, "invalid url: %s (ignored)", resURL.c_str());
         success = saveCalibration(new_info, default_camera_info_url, cname);
         break;
       }
@@ -473,14 +487,14 @@ CameraInfoManager::saveCalibrationFile(
   const std::string & filename,
   const std::string & cname)
 {
-  //ROS_INFO_STREAM("writing calibration data to " << filename);
+  RCLCPP_INFO(logger_, "writing calibration data to %s", filename.c_str());
 
   // isolate the name of the containing directory
   size_t last_slash = filename.rfind('/');
   if (last_slash >= filename.length()) {
     // No slash in the name.  This should never happen, the URL
     // parser ensures there is at least one '/' at the beginning.
-    //ROS_ERROR_STREAM("filename [" << filename << "] has no '/'");
+    RCLCPP_ERROR(logger_, "filename [%s] has no '/'", filename.c_str());
     return false;                       // not a valid URL
   }
 
@@ -495,18 +509,17 @@ CameraInfoManager::saveCalibrationFile(
       rc = system(command.c_str());
       if (rc != 0) {
         // mkdir failed
-        //ROS_ERROR_STREAM("unable to create path to directory [" <<
-        //  dirname << "]");
+        RCLCPP_ERROR(logger_, "unable to create to path directory [%s]", dirname.c_str());
         return false;
       }
     } else {
       // not accessible, or something screwy
-      //ROS_ERROR_STREAM("directory [" << dirname << "] not accessible");
+      RCLCPP_ERROR(logger_, "directory [%s] not accessible", dirname.c_str());
       return false;
     }
   } else if (!S_ISDIR(stat_data.st_mode)) {
     // dirname exists but is not a directory
-    //ROS_ERROR_STREAM("[" << dirname << "] is not a directory");
+    RCLCPP_ERROR(logger_, "[%s] is not a directory", dirname.c_str());
     return false;
   }
 
@@ -542,7 +555,7 @@ CameraInfoManager::setCameraInfoService(
   }
 
   if (rclcpp::ok()) {
-    //ROS_ERROR("set_camera_info service called, but driver not running.");
+    RCLCPP_ERROR(logger_, "set_camera_info service called, but driver not running.");
     rsp->status_message = "Camera driver not running.";
     rsp->success = false;
     return;
@@ -552,7 +565,6 @@ CameraInfoManager::setCameraInfoService(
   if (!rsp->success) {
     rsp->status_message = "Error storing camera calibration.";
   }
-  return;
 }
 
 /** Set a new camera name.
@@ -618,14 +630,13 @@ bool CameraInfoManager::setCameraInfo(const CameraInfo & camera_info)
  */
 bool CameraInfoManager::validateURL(const std::string & url)
 {
-  std::string cname;                    // copy of camera name
+  std::string cname;  // copy of camera name
   {
     std::lock_guard<std::mutex> lock(mutex_);
     cname = camera_name_;
-  } // release the lock
+  }  // release the lock
 
   url_type_t url_type = parseURL(resolveURL(url, cname));
   return url_type < URL_invalid;
 }
-
-} // namespace camera_info_manager
+}  // namespace camera_info_manager

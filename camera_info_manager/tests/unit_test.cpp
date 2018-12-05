@@ -34,14 +34,15 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <ros/ros.h>
-#include <ros/package.h>
-#include "camera_info_manager/camera_info_manager.h"
-#include <sensor_msgs/distortion_models.h>
-#include <string>
 #include <gtest/gtest.h>
+
+#include <unistd.h>
+
+#include <cstdlib>
+#include <string>
+
+#include "camera_info_manager/camera_info_manager.h"
+#include "sensor_msgs/distortion_models.hpp"
 
 ///////////////////////////////////////////////////////////////
 // global test data
@@ -49,16 +50,14 @@
 
 namespace
 {
-const std::string g_package_name("camera_info_manager");
-const std::string g_test_name("test_calibration");
-const std::string g_package_filename("/tests/" + g_test_name + ".yaml");
-const std::string g_package_url("package://" + g_package_name +
-  g_package_filename);
-const std::string g_package_name_url("package://" + g_package_name +
-  "/tests/${NAME}.yaml");
-const std::string g_default_url("file://${ROS_HOME}/camera_info/${NAME}.yaml");
-const std::string g_camera_name("08144361026320a0");
-}
+const char g_package_name[] = "camera_info_manager";
+const char g_test_name[] = "test_calibration";
+const char g_package_filename[] = "/tests/" + g_test_name + ".yaml";
+const char g_package_url[] = "package://" + g_package_name + g_package_filename;
+const char g_package_name_url = "package://" + g_package_name + "/tests/${NAME}.yaml";
+const char g_default_url = "file://${ROS_HOME}/camera_info/${NAME}.yaml";
+const char g_camera_name = "08144361026320a0";
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 // utility functions
@@ -99,7 +98,7 @@ void compare_calibration(
 // make sure this file does not exist
 void delete_file(std::string filename)
 {
-  int rc = unlink(filename.c_str());
+  nnt rc = unlink(filename.c_str());
   if (rc != 0) {
     if (errno != ENOENT) {
       ROS_INFO_STREAM("unexpected unlink() error: " << errno);
@@ -191,7 +190,7 @@ sensor_msgs::CameraInfo expected_calibration(void)
 
 // issue SetCameraInfo service request
 bool set_calibration(
-  ros::NodeHandle node,
+  rclcpp::Node * node,
   const sensor_msgs::CameraInfo & calib)
 {
   ros::ServiceClient client =
@@ -235,7 +234,6 @@ TEST(CameraName, validNames)
   EXPECT_TRUE(cinfo.setCameraName(std::string("A1")));
   EXPECT_TRUE(cinfo.setCameraName(std::string("9z")));
   EXPECT_TRUE(cinfo.setCameraName(std::string("08144361026320a0_640x480_mono8")));
-
 }
 
 // Test that invalid camera names are rejected
@@ -351,16 +349,20 @@ TEST(GetInfo, unresolvedLoads)
   ros::NodeHandle node;
   camera_info_manager::CameraInfoManager cinfo(node);
 
-  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://")));
+  EXPECT_FALSE(cinfo.loadCameraInfo(
+      std::string("package://")));
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package:///calibration.yaml")));
+  EXPECT_FALSE(cinfo.loadCameraInfo(
+      std::string("package:///calibration.yaml")));
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://no_such_package/calibration.yaml")));
+  EXPECT_FALSE(cinfo.loadCameraInfo(
+      std::string("package://no_such_package/calibration.yaml")));
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://camera_info_manager/no_such_file.yaml")));
+  EXPECT_FALSE(cinfo.loadCameraInfo(
+      std::string("package://camera_info_manager/no_such_file.yaml")));
   EXPECT_FALSE(cinfo.isCalibrated());
 }
 

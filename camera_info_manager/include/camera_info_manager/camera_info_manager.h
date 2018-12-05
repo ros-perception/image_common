@@ -35,15 +35,16 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef _CAMERA_INFO_MANAGER_H_
-#define _CAMERA_INFO_MANAGER_H_
+#ifndef CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_H_
+#define CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_H_
 
+#include <memory>
 #include <mutex>
+#include <string>
 
-#include <rclcpp/node.hpp>
-
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/srv/set_camera_info.hpp>
+#include "rclcpp/node.hpp"
+#include "sensor_msgs/msg/camera_info.hpp"
+#include "sensor_msgs/srv/set_camera_info.hpp"
 
 /** @file
 
@@ -209,21 +210,27 @@ private:
 
   // private methods
   std::string getPackageFileName(const std::string & url);
+
   bool loadCalibration(
     const std::string & url,
     const std::string & cname);
+
   bool loadCalibrationFile(
     const std::string & filename,
     const std::string & cname);
+
   url_type_t parseURL(const std::string & url);
+
   bool saveCalibration(
     const CameraInfo & new_info,
     const std::string & url,
     const std::string & cname);
+
   bool saveCalibrationFile(
     const CameraInfo & new_info,
     const std::string & filename,
     const std::string & cname);
+
   void setCameraInfoService(
     const std::shared_ptr<SetCameraInfo::Request> req,
     std::shared_ptr<SetCameraInfo::Response> rsp);
@@ -240,13 +247,12 @@ private:
 
   // private data
   rclcpp::Service<SetCameraInfo>::SharedPtr info_service_;     ///< set_camera_info service
+  rclcpp::Logger logger_;               ///< logger
   std::string camera_name_;             ///< camera name
   std::string url_;                     ///< URL for calibration data
   CameraInfo cam_info_;    ///< current CameraInfo
   bool loaded_cam_info_;                ///< cam_info_ load attempted
-
-}; // class CameraInfoManager
-
+};  // class CameraInfoManager
 }  // namespace camera_info_manager
 
-#endif // _CAMERA_INFO_MANAGER_H_
+#endif  // CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_H_
