@@ -45,7 +45,7 @@ using camera_calibration_parsers::writeCalibration;
 
 int main(int argc, char ** argv)
 {
-  auto logger = rclcpp::get_logger("convert");
+  auto logger = rclcpp::get_logger("camera_calibration_parsers.convert");
   if (argc < 3) {
     printf("Usage: %s input.yml output.ini\n"
       "       %s input.ini output.yml\n", argv[0], argv[0]);

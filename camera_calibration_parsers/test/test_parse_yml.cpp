@@ -174,8 +174,6 @@ TEST(ParseYml, roundtrip_calib8) {
   auto ret_read = camera_calibration_parsers::readCalibrationYml(
     calib_file, camera_name2, cam_info2);
 
-  std::cerr << cam_info.distortion_model << " " << cam_info2.distortion_model << std::endl;
-
   ASSERT_EQ(ret_read, true);
   ASSERT_EQ(camera_name2, camera_name);
   check_calib(cam_info2);
