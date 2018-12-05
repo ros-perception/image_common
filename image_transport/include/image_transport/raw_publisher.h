@@ -47,8 +47,8 @@ namespace image_transport {
  * RawPublisher is a simple wrapper for ros::Publisher, publishing unaltered Image
  * messages on the base topic.
  */
-IMAGE_TRANSPORT_PUBLIC
-class RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
+
+class IMAGE_TRANSPORT_PUBLIC RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
 {
 public:
   virtual ~RawPublisher() {}

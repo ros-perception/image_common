@@ -47,8 +47,7 @@ namespace image_transport
 /**
  * \brief Base class for plugins to Subscriber.
  */
-IMAGE_TRANSPORT_PUBLIC
-class SubscriberPlugin
+class IMAGE_TRANSPORT_PUBLIC SubscriberPlugin
 {
 public:
   SubscriberPlugin() = default;
