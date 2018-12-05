@@ -48,7 +48,7 @@ namespace image_transport {
  * messages on the base topic.
  */
 
-class IMAGE_TRANSPORT_PUBLIC RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
+class RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
 {
 public:
   virtual ~RawPublisher() {}

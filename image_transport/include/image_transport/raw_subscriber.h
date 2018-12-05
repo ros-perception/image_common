@@ -47,7 +47,7 @@ namespace image_transport {
  * RawSubscriber is a simple wrapper for ros::Subscriber which listens for Image messages
  * and passes them through to the callback.
  */
-class IMAGE_TRANSPORT_PUBLIC RawSubscriber : public SimpleSubscriberPlugin<sensor_msgs::msg::Image>
+class RawSubscriber : public SimpleSubscriberPlugin<sensor_msgs::msg::Image>
 {
 public:
   virtual ~RawSubscriber() {}
