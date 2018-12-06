@@ -37,6 +37,7 @@
 
 #include <sensor_msgs/msg/image.hpp>
 #include "image_transport/simple_subscriber_plugin.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport {
 

@@ -39,6 +39,7 @@
 
 #include <sensor_msgs/msg/image.hpp>
 #include "image_transport/single_subscriber_publisher.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
@@ -91,7 +92,7 @@ public:
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
-  virtual void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
+  virtual void publishPtr(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
   {
     publish(*message);
   }
@@ -103,7 +104,7 @@ public:
    * @param message an image message to use information from (but not data)
    * @param data a pointer to the image data to use to fill the Image message
    */
-  virtual void publish(const sensor_msgs::msg::Image & message, const uint8_t * data) const
+  virtual void publishData(const sensor_msgs::msg::Image & message, const uint8_t * data) const
   {
     sensor_msgs::msg::Image msg;
     msg.header = message.header;

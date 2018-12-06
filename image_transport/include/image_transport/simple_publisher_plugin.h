@@ -40,6 +40,7 @@
 #include <rclcpp/logging.hpp>
 
 #include "image_transport/publisher_plugin.h"
+#include "image_transport/visibility_control.hpp"
 
 #include <memory>
 
@@ -72,7 +73,9 @@ public:
   virtual uint32_t getNumSubscribers() const
   {
     // TODO(mjcarroll) replace with publisher-specific call.
-    if (simple_impl_) {return simple_impl_->node_->count_subscribers(getTopic());}
+    if (simple_impl_) {
+      return static_cast<uint32_t>(simple_impl_->node_->count_subscribers(getTopic()));
+    }
     return 0;
   }
 
@@ -106,7 +109,7 @@ protected:
     std::string transport_topic = getTopicToAdvertise(base_topic);
     simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
 
-    RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic);
+    RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
     simple_impl_->pub_ = node->create_publisher<M>(transport_topic, custom_qos);
   }
 
@@ -138,13 +141,13 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    SimplePublisherPluginImpl(rclcpp::Node* node)
+    SimplePublisherPluginImpl(rclcpp::Node * node)
     : node_(node),
       logger_(node->get_logger())
     {
     }
 
-    rclcpp::Node* node_;
+    rclcpp::Node * node_;
     rclcpp::Logger logger_;
     typename rclcpp::Publisher<M>::SharedPtr pub_;
   };

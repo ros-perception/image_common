@@ -32,6 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include "image_transport/camera_publisher.h"
 #include "image_transport/image_transport.h"
 #include "image_transport/camera_common.h"
 

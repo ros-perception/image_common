@@ -47,6 +47,7 @@
 #include "image_transport/publisher.h"
 #include "image_transport/subscriber.h"
 #include "image_transport/transport_hints.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
@@ -54,6 +55,7 @@ namespace image_transport
 /*!
  * \brief Advertise an image topic, free function version.
  */
+IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
   rclcpp::Node* node,
   const std::string & base_topic,
@@ -62,6 +64,7 @@ Publisher create_publisher(
 /**
  * \brief Subscribe to an image topic, free function version.
  */
+IMAGE_TRANSPORT_PUBLIC
 Subscriber create_subscription(
   rclcpp::Node* node,
   const std::string & base_topic,
@@ -72,6 +75,7 @@ Subscriber create_subscription(
 /*!
  * \brief Advertise a camera, free function version.
  */
+IMAGE_TRANSPORT_PUBLIC
 CameraPublisher create_camera_publisher(
   rclcpp::Node* node,
   const std::string & base_topic,
@@ -80,6 +84,7 @@ CameraPublisher create_camera_publisher(
 /*!
  * \brief Subscribe to a camera, free function version.
  */
+IMAGE_TRANSPORT_PUBLIC
 CameraSubscriber create_camera_subscription(
   rclcpp::Node* node,
   const std::string & base_topic,
@@ -87,7 +92,10 @@ CameraSubscriber create_camera_subscription(
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+IMAGE_TRANSPORT_PUBLIC
 std::vector<std::string> getDeclaredTransports();
+
+IMAGE_TRANSPORT_PUBLIC
 std::vector<std::string> getLoadableTransports();
 
 /**
@@ -96,20 +104,24 @@ std::vector<std::string> getLoadableTransports();
  * ImageTransport is analogous to ros::NodeHandle in that it contains advertise() and
  * subscribe() functions for creating advertisements and subscriptions of image topics.
 */
-class ImageTransport
+
+class  ImageTransport
 {
 public:
   using VoidPtr = std::shared_ptr<void>;
   using ImageConstPtr = sensor_msgs::msg::Image::ConstSharedPtr;
   using CameraInfoConstPtr = sensor_msgs::msg::CameraInfo::ConstSharedPtr;
 
+  IMAGE_TRANSPORT_PUBLIC
   explicit ImageTransport(rclcpp::Node::SharedPtr node);
 
+  IMAGE_TRANSPORT_PUBLIC
   ~ImageTransport();
 
   /*!
    * \brief Advertise an image topic, simple version.
    */
+  IMAGE_TRANSPORT_PUBLIC
   Publisher advertise(const std::string & base_topic, uint32_t queue_size, bool latch = false);
 
   /*!
@@ -125,6 +137,7 @@ public:
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
+  IMAGE_TRANSPORT_PUBLIC
   Subscriber subscribe(
     const std::string & base_topic, uint32_t queue_size,
     const Subscriber::Callback & callback,
@@ -134,6 +147,7 @@ public:
   /**
    * \brief Subscribe to an image topic, version for bare function.
    */
+  IMAGE_TRANSPORT_PUBLIC
   Subscriber subscribe(
     const std::string & base_topic, uint32_t queue_size,
     void (*fp)(const ImageConstPtr &),
@@ -174,6 +188,7 @@ public:
   /*!
    * \brief Advertise a synchronized camera raw image + info topic pair, simple version.
    */
+  IMAGE_TRANSPORT_PUBLIC
   CameraPublisher advertiseCamera(
     const std::string & base_topic, uint32_t queue_size,
     bool latch = false);
@@ -198,6 +213,7 @@ public:
    * This version assumes the standard topic naming scheme, where the info topic is
    * named "camera_info" in the same namespace as the base image topic.
    */
+  IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber subscribeCamera(
     const std::string & base_topic, uint32_t queue_size,
     const CameraSubscriber::Callback & callback,
@@ -207,6 +223,7 @@ public:
   /**
    * \brief Subscribe to a synchronized image & camera info topic pair, version for bare function.
    */
+  IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber subscribeCamera(
     const std::string & base_topic, uint32_t queue_size,
     void (*fp)(const ImageConstPtr &,
@@ -255,17 +272,17 @@ public:
    * \brief Returns the names of all transports declared in the system. Declared
    * transports are not necessarily built or loadable.
    */
+  IMAGE_TRANSPORT_PUBLIC
   std::vector<std::string> getDeclaredTransports() const;
 
   /**
    * \brief Returns the names of all transports that are loadable in the system.
    */
+  IMAGE_TRANSPORT_PUBLIC
   std::vector<std::string> getLoadableTransports() const;
 
 private:
-
   std::string getTransportOrDefault(const TransportHints * transport_hints);
-
 
   struct Impl;
   std::unique_ptr<Impl> impl_;

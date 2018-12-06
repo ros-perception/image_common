@@ -73,10 +73,10 @@ int main(int /*argc*/, char** /*argv*/)
       auto pub = pub_loader.createUniqueInstance(lookup_name);
       transports[transport_name].pub_status = SUCCESS;
     }
-    catch (const LibraryLoadException& e) {
+    catch (const LibraryLoadException&) {
       transports[transport_name].pub_status = LIB_LOAD_FAILURE;
     }
-    catch (const CreateClassException& e) {
+    catch (const CreateClassException&) {
       transports[transport_name].pub_status = CREATE_FAILURE;
     }
   }
@@ -89,10 +89,10 @@ int main(int /*argc*/, char** /*argv*/)
       auto sub = sub_loader.createUniqueInstance(lookup_name);
       transports[transport_name].sub_status = SUCCESS;
     }
-    catch (const LibraryLoadException& e) {
+    catch (const LibraryLoadException&) {
       transports[transport_name].sub_status = LIB_LOAD_FAILURE;
     }
-    catch (const CreateClassException& e) {
+    catch (const CreateClassException&) {
       transports[transport_name].sub_status = CREATE_FAILURE;
     }
   }

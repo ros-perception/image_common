@@ -37,6 +37,7 @@
 
 #include <sensor_msgs/msg/image.hpp>
 #include "image_transport/simple_publisher_plugin.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport {
 
@@ -46,6 +47,7 @@ namespace image_transport {
  * RawPublisher is a simple wrapper for ros::Publisher, publishing unaltered Image
  * messages on the base topic.
  */
+
 class RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
 {
 public:

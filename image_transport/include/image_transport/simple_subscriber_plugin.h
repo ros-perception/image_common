@@ -38,8 +38,9 @@
 #include <functional>
 #include <memory>
 
-#include "image_transport/subscriber_plugin.h"
 #include "rclcpp/subscription.hpp"
+#include "image_transport/subscriber_plugin.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
@@ -94,6 +95,7 @@ protected:
    * @param message A message from the PublisherPlugin.
    * @param user_cb The user Image callback to invoke, if appropriate.
    */
+ 
   virtual void internalCallback(
     const typename std::shared_ptr<const M>& message,
     const Callback & user_cb) = 0;

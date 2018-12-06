@@ -40,6 +40,7 @@
 
 #include "image_transport/exception.h"
 #include "image_transport/loader_fwds.h"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
@@ -64,8 +65,10 @@ class Subscriber
 public:
   typedef std::function<void (const sensor_msgs::msg::Image::ConstSharedPtr &)> Callback;
 
+  IMAGE_TRANSPORT_PUBLIC
   Subscriber() = default;
 
+  IMAGE_TRANSPORT_PUBLIC
   Subscriber(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -80,26 +83,34 @@ public:
    * The Subscriber may actually be subscribed to some transport-specific topic that
    * differs from the base topic.
    */
+  IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
 
   /**
    * \brief Returns the number of publishers this subscriber is connected to.
    */
+  IMAGE_TRANSPORT_PUBLIC
   uint32_t getNumPublishers() const;
 
   /**
    * \brief Returns the name of the transport being used.
    */
+  IMAGE_TRANSPORT_PUBLIC
   std::string getTransport() const;
 
   /**
    * \brief Unsubscribe the callback associated with this Subscriber.
    */
+  IMAGE_TRANSPORT_PUBLIC
   void shutdown();
 
+  IMAGE_TRANSPORT_PUBLIC
   operator void *() const;
+  IMAGE_TRANSPORT_PUBLIC
   bool operator<(const Subscriber & rhs) const {return impl_ < rhs.impl_;}
+  IMAGE_TRANSPORT_PUBLIC
   bool operator!=(const Subscriber & rhs) const {return impl_ != rhs.impl_;}
+  IMAGE_TRANSPORT_PUBLIC
   bool operator==(const Subscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
