@@ -2,6 +2,12 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* camera_info_manager ROS2 port (`#94 <https://github.com/ros-perception/image_common/issues/94>`_)
+* Image Transport ROS2 port (`#84 <https://github.com/ros-perception/image_common/issues/84>`_)
+* Contributors: Michael Carroll
+
 1.11.13 (2017-11-05)
 --------------------
 * Fix the find_package(catkin) redundancy

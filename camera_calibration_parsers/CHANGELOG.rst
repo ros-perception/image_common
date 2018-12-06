@@ -2,6 +2,12 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Camera Calibration Parsers ROS2 Port (`#105 <https://github.com/ros-perception/image_common/issues/105>`_)
+* Image Transport ROS2 port (`#84 <https://github.com/ros-perception/image_common/issues/84>`_)
+* Contributors: Michael Carroll
+
 1.11.13 (2017-11-05)
 --------------------
 * Use Boost_LIBRARIES instead of Boost_PYTHON_LIBRARY

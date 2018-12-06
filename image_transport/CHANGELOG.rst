@@ -2,6 +2,16 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* camera_info_manager ROS2 port (`#94 <https://github.com/ros-perception/image_common/issues/94>`_)
+* Pointer api updates (`#104 <https://github.com/ros-perception/image_common/issues/104>`_)
+* Fix rcutils API change by just removing it. (`#103 <https://github.com/ros-perception/image_common/issues/103>`_)
+* [ROS2] corrections to remapping for raw images (`#97 <https://github.com/ros-perception/image_common/issues/97>`_)
+* Make ROS2 ImageTransport conform to old api (`#88 <https://github.com/ros-perception/image_common/issues/88>`_)
+* Image Transport ROS2 Port (`#84 <https://github.com/ros-perception/image_common/issues/84>`_)
+* Contributors: Michael Carroll
+
 1.11.13 (2017-11-05)
 --------------------
 * Disable image publisher plugins by name (`#60 <https://github.com/ros-perception/image_common/issues/60>`_)
