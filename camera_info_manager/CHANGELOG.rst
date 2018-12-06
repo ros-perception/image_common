@@ -2,8 +2,8 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2018-12-05)
+------------------
 * camera_info_manager ROS2 port (`#94 <https://github.com/ros-perception/image_common/issues/94>`_)
 * Image Transport ROS2 port (`#84 <https://github.com/ros-perception/image_common/issues/84>`_)
 * Contributors: Michael Carroll

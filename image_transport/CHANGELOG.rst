@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2018-12-05)
+------------------
 * camera_info_manager ROS2 port (`#94 <https://github.com/ros-perception/image_common/issues/94>`_)
 * Pointer api updates (`#104 <https://github.com/ros-perception/image_common/issues/104>`_)
 * Fix rcutils API change by just removing it. (`#103 <https://github.com/ros-perception/image_common/issues/103>`_)
