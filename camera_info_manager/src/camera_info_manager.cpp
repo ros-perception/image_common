@@ -45,6 +45,7 @@
 #include "filesystem_helper.hpp"
 #include "camera_calibration_parsers/parse.h"
 #include "ament_index_cpp/get_package_share_directory.hpp"
+#include "rcutils/get_env.h"
 
 
 /** @file
@@ -352,15 +353,23 @@ std::string CameraInfoManager::resolveURL(
     } else if (url.substr(dollar + 1, 10) == "{ROS_HOME}") {
       // substitute $ROS_HOME
       std::string ros_home;
-      char * ros_home_env;
-      if ((ros_home_env = getenv("ROS_HOME"))) {
-        // use environment variable
-        ros_home = ros_home_env;
-      } else if ((ros_home_env = getenv("HOME"))) {
-        // use "$HOME/.ros"
-        ros_home = ros_home_env;
-        ros_home += "/.ros";
+
+      const char * env_value;
+      const char * error_str;
+
+      error_str = rcutils_get_env("ROS_HOME", &env_value);
+      if (error_str == NULL) {
+        ros_home = env_value;
+      } else {
+        error_str = rcutils_get_env("HOME", &env_value);
+        if (error_str == NULL) {
+          ros_home = env_value;
+          ros_home += "/.ros";
+        } else {
+          RCLCPP_ERROR(logger_, "Could not get $ROS_HOME or $HOME");
+        }
       }
+
       resolved += ros_home;
       dollar += 10;
     } else {
