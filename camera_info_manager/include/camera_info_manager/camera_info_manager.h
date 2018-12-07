@@ -181,7 +181,7 @@ class CameraInfoManager
 {
 public:
   CameraInfoManager(
-    const rclcpp::Node::SharedPtr & nh,
+    rclcpp::Node * node,
     const std::string & cname = "camera",
     const std::string & url = "");
 

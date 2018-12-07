@@ -77,7 +77,7 @@ const std::string
  * @param url default Uniform Resource Locator for loading and saving data.
  */
 CameraInfoManager::CameraInfoManager(
-  const rclcpp::Node::SharedPtr & node,
+  rclcpp::Node * node,
   const std::string & cname,
   const std::string & url)
 : logger_(node->get_logger()),
