@@ -37,8 +37,48 @@
  */
 
 
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 #include <nodelet/loader.h>
 #include <ros/ros.h>
+
+
+namespace ns {
+  std::string validate(const std::string& name)
+  {
+    std::vector<std::string> list_all, list_nonempty;
+    std::string delim("/");
+    boost::split(list_all, name, boost::is_any_of(delim));
+    for (std::vector<std::string>::iterator it = list_all.begin(); it != list_all.end(); ++it)
+    {
+      if (!it->empty()) list_nonempty.push_back(*it);
+    }
+    return delim + boost::algorithm::join(list_nonempty, delim);
+  }
+
+  std::string join(const std::string& parent, const std::string& child)
+  {
+    return validate(parent + "/" + child);
+  }
+
+  std::string basename(const std::string& name)
+  {
+    std::vector<std::string> list;
+    boost::split(list, name,boost::is_any_of("/"));
+    if (list.size() > 0) return list[list.size() - 1];
+    else return name;
+  }
+}
+
+
+void remapToPrivate(const nodelet::M_string& src, nodelet::M_string& dst)
+{
+  for (nodelet::M_string::const_iterator it = src.begin(); it != src.end(); ++it)
+  {
+    std::string key = ns::join(ros::this_node::getName(), ns::basename(it->first));
+    dst[key] = it->second;
+  }
+}
 
 
 int main(int argc, char** argv)
@@ -51,6 +91,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
+  // set transport
   ros::param::set("~in_transport", argv[1]);
   if (argc >= 3)
   {
@@ -58,8 +99,11 @@ int main(int argc, char** argv)
   }
 
   nodelet::Loader loader;
-  nodelet::M_string remappings(ros::names::getRemappings());
   nodelet::V_string nargv;
+
+  // remap 'in', 'out' topic into ~in, ~out for backward compatibility
+  nodelet::M_string remappings;
+  remapToPrivate(ros::names::getRemappings(), remappings);
 
   loader.load(ros::this_node::getName(),
               "image_transport/Republish",

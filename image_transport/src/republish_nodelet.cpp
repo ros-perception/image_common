@@ -59,14 +59,18 @@ protected:
   {
     NodeletLazy::onInit();
 
-    pnh_->getParam("in_transport", in_transport_);
-    pnh_->param<std::string>("out_transport", out_transport_, std::string());
+    if (!pnh_->getParam("in_transport", in_transport_))
+    {
+      NODELET_FATAL("you must set '~in_transport' parameter.");
+      return;
+    }
+    pnh_->param("out_transport", out_transport_, std::string());
 
-    it_.reset(new ImageTransport(*nh_));
+    it_.reset(new ImageTransport(*pnh_));
 
     if (out_transport_.empty())
     {
-      pub_ = advertiseImage(*nh_, "out", 1);
+      pub_ = advertiseImage(*pnh_, "out", 1);
     }
     else
     {
@@ -75,7 +79,7 @@ protected:
       std::string lookup_name = PublisherPlugin::getLookupName(out_transport_);
       pub_plugin_ = loader_->createInstance(lookup_name);
 
-      advertiseImage(*nh_, "out", 1, boost::weak_ptr<PublisherPlugin>(pub_plugin_));
+      advertiseImage(*pnh_, "out", 1, boost::weak_ptr<PublisherPlugin>(pub_plugin_));
     }
 
     onInitPostProcess();
@@ -83,7 +87,7 @@ protected:
 
   virtual void subscribe()
   {
-    std::string in_topic = nh_->resolveName("in");
+    std::string in_topic = pnh_->resolveName("in");
     if (out_transport_.empty())
     {
       // Use Publisher::publish as the subscriber callback
