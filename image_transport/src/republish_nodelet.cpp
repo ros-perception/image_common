@@ -88,6 +88,12 @@ protected:
   virtual void subscribe()
   {
     std::string in_topic = pnh_->resolveName("in");
+
+    if (in_topic == pnh_->getNamespace() + "/in")
+    {
+      NODELET_WARN_ONCE("Input topic '~in' is not remapped.");
+    }
+
     if (out_transport_.empty())
     {
       // Use Publisher::publish as the subscriber callback
