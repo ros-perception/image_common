@@ -167,8 +167,8 @@ public:
   std::string extension() const
   {
     auto fname = filename();
-    auto split_fname = split(fname.string(), std::string(1, '.'));
-    return "." + *split_fname.end();
+    auto split_fname = split(fname.string(), std::string("\\."));
+    return "." + split_fname[1];
   }
 
   path operator/(const std::string & other)
