@@ -168,7 +168,7 @@ public:
   {
     auto fname = filename();
     auto split_fname = split(fname.string(), std::string("\\."));
-    return "." + split_fname[1];
+    return "." + split_fname.back();
   }
 
   path operator/(const std::string & other)
