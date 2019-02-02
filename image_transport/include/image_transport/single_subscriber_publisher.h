@@ -38,6 +38,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
 #include <sensor_msgs/Image.h>
+#include "exports.h"
 
 namespace image_transport {
 
@@ -45,7 +46,7 @@ namespace image_transport {
  * \brief Allows publication of an image to a single subscriber. Only available inside
  * subscriber connection callbacks.
  */
-class SingleSubscriberPublisher : boost::noncopyable
+class IMG_TSPT_DECL SingleSubscriberPublisher : boost::noncopyable
 {
 public:
   typedef boost::function<uint32_t()> GetNumSubscribersFn;

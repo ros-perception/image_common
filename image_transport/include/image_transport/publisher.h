@@ -40,6 +40,7 @@
 #include "image_transport/single_subscriber_publisher.h"
 #include "image_transport/exception.h"
 #include "image_transport/loader_fwds.h"
+#include "exports.h"
 
 namespace image_transport {
 
@@ -60,7 +61,7 @@ namespace image_transport {
  * associated with that handle will stop being called. Once all Publisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
-class Publisher
+class IMG_TSPT_DECL Publisher
 {
 public:
   Publisher() {}

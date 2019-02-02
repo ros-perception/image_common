@@ -43,6 +43,21 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
 
+#include <ros/macros.h>
+
+// Import/export for windows dll's and visibility for gcc shared libraries.
+
+#ifdef ROS_BUILD_SHARED_LIBS // ros is being built around shared libraries
+  #ifdef camera_info_manager_EXPORTS // we are building a shared lib/dll
+    #define CAMMGR_DECL ROS_HELPER_EXPORT
+  #else // we are using shared lib/dll
+    #define CAMMGR_DECL ROS_HELPER_IMPORT
+  #endif
+#else // ros is being built around static libraries
+  #define CAMMGR_DECL
+#endif
+
+
 /** @file
 
     @brief CameraInfo Manager interface
@@ -171,7 +186,7 @@ namespace camera_info_manager
 
 */
 
-class CameraInfoManager
+class CAMMGR_DECL CameraInfoManager
 {
  public:
 

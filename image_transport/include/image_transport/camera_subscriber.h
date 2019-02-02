@@ -39,6 +39,7 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
 #include "image_transport/transport_hints.h"
+#include "exports.h"
 
 namespace image_transport {
 
@@ -59,7 +60,7 @@ void callback(const sensor_msgs::ImageConstPtr&, const sensor_msgs::CameraInfoCo
  * associated with that handle will stop being called. Once all CameraSubscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
-class CameraSubscriber
+class IMG_TSPT_DECL CameraSubscriber
 {
 public:
   typedef boost::function<void(const sensor_msgs::ImageConstPtr&,

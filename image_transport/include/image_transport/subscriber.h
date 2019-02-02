@@ -40,6 +40,7 @@
 #include "image_transport/transport_hints.h"
 #include "image_transport/exception.h"
 #include "image_transport/loader_fwds.h"
+#include "exports.h"
 
 namespace image_transport {
 
@@ -58,7 +59,7 @@ namespace image_transport {
  * associated with that handle will stop being called. Once all Subscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
-class Subscriber
+class IMG_TSPT_DECL Subscriber
 {
 public:
   Subscriber() {}
