@@ -37,10 +37,11 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
-# Build libimage_transport_plugins                                      
+# Build libimage_transport_plugins
 add_library(${PROJECT_NAME}_plugins src/manifest.cpp src/raw_publisher.cpp)
 target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 
+# Install plugin DLL to ${CATKIN_PACKAGE_LIB_DESTINATION} according to the path in default_plugins.xml
 install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
