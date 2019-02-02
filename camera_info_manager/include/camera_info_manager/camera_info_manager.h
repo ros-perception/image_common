@@ -57,7 +57,6 @@
   #define CAMERA_INFO_MANAGER_DECL
 #endif
 
-
 /** @file
 
     @brief CameraInfo Manager interface
