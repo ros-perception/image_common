@@ -60,7 +60,7 @@ class ImageTransport;
  * associated with that handle will stop being called. Once all CameraPublisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
-class IMG_TSPT_DECL CameraPublisher
+class IMAGE_TRANSPORT_DECL CameraPublisher
 {
 public:
   CameraPublisher() {}

@@ -46,12 +46,12 @@
 
 #ifdef ROS_BUILD_SHARED_LIBS // ros is being built around shared libraries
   #ifdef polled_camera_EXPORTS // we are building a shared lib/dll
-    #define POLLED_CAM_DECL ROS_HELPER_EXPORT
+    #define POLLED_CAMERA_DECL ROS_HELPER_EXPORT
   #else // we are using shared lib/dll
-    #define POLLED_CAM_DECL ROS_HELPER_IMPORT
+    #define POLLED_CAMERA_DECL ROS_HELPER_IMPORT
   #endif
 #else // ros is being built around static libraries
-  #define POLLED_CAM_DECL
+  #define POLLED_CAMERA_DECL
 #endif
 
 namespace polled_camera {
@@ -77,7 +77,7 @@ void callback(polled_camera::GetPolledImage::Request& req,
 }
 \endcode
  */
-class POLLED_CAM_DECL PublicationServer
+class POLLED_CAMERA_DECL PublicationServer
 {
 public:
   typedef boost::function<void (polled_camera::GetPolledImage::Request&,

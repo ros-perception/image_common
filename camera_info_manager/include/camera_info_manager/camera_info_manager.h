@@ -49,12 +49,12 @@
 
 #ifdef ROS_BUILD_SHARED_LIBS // ros is being built around shared libraries
   #ifdef camera_info_manager_EXPORTS // we are building a shared lib/dll
-    #define CAMMGR_DECL ROS_HELPER_EXPORT
+    #define CAMERA_INFO_MANAGER_DECL ROS_HELPER_EXPORT
   #else // we are using shared lib/dll
-    #define CAMMGR_DECL ROS_HELPER_IMPORT
+    #define CAMERA_INFO_MANAGER_DECL ROS_HELPER_IMPORT
   #endif
 #else // ros is being built around static libraries
-  #define CAMMGR_DECL
+  #define CAMERA_INFO_MANAGER_DECL
 #endif
 
 
@@ -186,7 +186,7 @@ namespace camera_info_manager
 
 */
 
-class CAMMGR_DECL CameraInfoManager
+class CAMERA_INFO_MANAGER_DECL CameraInfoManager
 {
  public:
 

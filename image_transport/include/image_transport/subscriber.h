@@ -59,7 +59,7 @@ namespace image_transport {
  * associated with that handle will stop being called. Once all Subscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
-class IMG_TSPT_DECL Subscriber
+class IMAGE_TRANSPORT_DECL Subscriber
 {
 public:
   Subscriber() {}

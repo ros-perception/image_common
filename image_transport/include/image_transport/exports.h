@@ -1,5 +1,5 @@
-#ifndef IMG_TSPT_EXPORTDECL_H
-#define IMG_TSPT_EXPORTDECL_H
+#ifndef IMAGE_TRANSPORT_EXPORTS_H
+#define IMAGE_TRANSPORT_EXPORTS_H
 
 #include <ros/macros.h>
 
@@ -7,12 +7,12 @@
 
 #ifdef ROS_BUILD_SHARED_LIBS // ros is being built around shared libraries
   #ifdef image_transport_EXPORTS // we are building a shared lib/dll
-    #define IMG_TSPT_DECL ROS_HELPER_EXPORT
+    #define IMAGE_TRANSPORT_DECL ROS_HELPER_EXPORT
   #else // we are using shared lib/dll
-    #define IMG_TSPT_DECL ROS_HELPER_IMPORT
+    #define IMAGE_TRANSPORT_DECL ROS_HELPER_IMPORT
   #endif
 #else // ros is being built around static libraries
-  #define IMG_TSPT_DECL
+  #define IMAGE_TRANSPORT_DECL
 #endif
 
-#endif // IMG_TSPT_EXPORTDECL_H
+#endif // IMAGE_TRANSPORT_EXPORTS_H

@@ -49,7 +49,7 @@ namespace image_transport {
  * ImageTransport is analogous to ros::NodeHandle in that it contains advertise() and
  * subscribe() functions for creating advertisements and subscriptions of image topics.
  */
-class IMG_TSPT_DECL ImageTransport
+class IMAGE_TRANSPORT_DECL ImageTransport
 {
 public:
   explicit ImageTransport(const ros::NodeHandle& nh);

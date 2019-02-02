@@ -46,7 +46,7 @@ namespace image_transport {
  * \brief Allows publication of an image to a single subscriber. Only available inside
  * subscriber connection callbacks.
  */
-class IMG_TSPT_DECL SingleSubscriberPublisher : boost::noncopyable
+class IMAGE_TRANSPORT_DECL SingleSubscriberPublisher : boost::noncopyable
 {
 public:
   typedef boost::function<uint32_t()> GetNumSubscribersFn;

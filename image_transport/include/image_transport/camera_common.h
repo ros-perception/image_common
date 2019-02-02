@@ -46,7 +46,7 @@ namespace image_transport {
  * \note This function assumes that the name is completely resolved. If the \c 
  * base_topic is remapped the resulting camera info topic will be incorrect. 
  */
-IMG_TSPT_DECL std::string getCameraInfoTopic(const std::string& base_topic);
+IMAGE_TRANSPORT_DECL std::string getCameraInfoTopic(const std::string& base_topic);
 
 } //namespace image_transport
 
