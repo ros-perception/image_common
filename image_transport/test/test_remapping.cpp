@@ -15,20 +15,17 @@ class TestPublisher : public ::testing::Test
 protected:
   void SetUp()
   {
-    auto context = rclcpp::contexts::default_context::get_global_default_context();
+    node_ = rclcpp::Node::make_shared("node", "namespace");
 
     std::vector<std::string> arguments;
     arguments.push_back("old_topic:=new_topic");
-    std::vector<rclcpp::Parameter> initial_parameters;
-
-    node_ = rclcpp::Node::make_shared("node", "namespace");
+    rclcpp::NodeOptions node_options;
+    node_options.arguments(arguments);
 
     node_remap_ = rclcpp::Node::make_shared(
       "node_remap",
       "namespace",
-      context,
-      arguments,
-      initial_parameters
+      node_options
     );
   }
 
