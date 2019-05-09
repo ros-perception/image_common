@@ -2,11 +2,6 @@
 Changelog for package image_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
-* Image Transport ROS2 Port (`#84 <https://github.com/ros-perception/image_common/issues/84>`_)
-* Contributors: Michael Carroll
-
 1.11.13 (2017-11-05)
 --------------------
 

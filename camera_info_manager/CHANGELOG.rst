@@ -2,6 +2,9 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.0 (2019-05-09)
+------------------
+
 2.0.0 (2018-12-05)
 ------------------
 * camera_info_manager ROS2 port (`#94 <https://github.com/ros-perception/image_common/issues/94>`_)

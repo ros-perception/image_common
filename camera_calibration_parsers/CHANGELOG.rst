@@ -2,6 +2,9 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.0 (2019-05-09)
+------------------
+
 2.0.0 (2018-12-05)
 ------------------
 * Camera Calibration Parsers ROS2 Port (`#105 <https://github.com/ros-perception/image_common/issues/105>`_)

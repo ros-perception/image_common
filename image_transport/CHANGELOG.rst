@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.0 (2019-05-09)
+------------------
+* Update ROS2 branch to account for new NodeOptions interface (`#120 <https://github.com/ros-perception/image_common/issues/120>`_)
+* Contributors: Carl Delsey
+
 2.0.0 (2018-12-05)
 ------------------
 * camera_info_manager ROS2 port (`#94 <https://github.com/ros-perception/image_common/issues/94>`_)

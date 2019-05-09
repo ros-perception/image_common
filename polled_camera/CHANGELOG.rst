@@ -2,11 +2,6 @@
 Changelog for package polled_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
-* Image Transport ROS2 port (`#84 <https://github.com/ros-perception/image_common/issues/84>`_)
-* Contributors: Michael Carroll
-
 1.11.13 (2017-11-05)
 --------------------
 
