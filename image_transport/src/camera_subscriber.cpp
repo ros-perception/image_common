@@ -113,7 +113,8 @@ CameraSubscriber::CameraSubscriber(
   const std::string & base_topic,
   const Callback & callback,
   const std::string & transport,
-  rmw_qos_profile_t custom_qos)
+  const rclcpp::QoS & qos,
+  const rclcpp::SubscriptionOptionsBase & options)
 : impl_(std::make_shared<Impl>(node))
 {
   // Must explicitly remap the image topic since we then do some string manipulation on it
@@ -122,8 +123,8 @@ CameraSubscriber::CameraSubscriber(
       node->get_name(), node->get_namespace());
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  impl_->image_sub_.subscribe(node, image_topic, transport, custom_qos);
-  impl_->info_sub_.subscribe(node, info_topic, custom_qos);
+  impl_->image_sub_.subscribe(node, image_topic, transport, qos, options);
+  impl_->info_sub_.subscribe(node, info_topic);
 
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
   impl_->sync_.registerCallback(std::bind(callback, std::placeholders::_1, std::placeholders::_2));

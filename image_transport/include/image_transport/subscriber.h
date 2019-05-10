@@ -75,7 +75,9 @@ public:
     const Callback & callback,
     SubLoaderPtr loader,
     const std::string & transport,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::SubscriptionOptionsBase & options =
+      rclcpp::SubscriptionOptionsBase());
 
   /**
    * \brief Returns the base image topic.

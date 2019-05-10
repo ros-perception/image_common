@@ -72,11 +72,14 @@ public:
   CameraSubscriber() = default;
 
   IMAGE_TRANSPORT_PUBLIC
-  CameraSubscriber(rclcpp::Node * node,
-                   const std::string& base_topic,
-                   const Callback& callback,
-                   const std::string& transport,
-                   rmw_qos_profile_t = rmw_qos_profile_default);
+  CameraSubscriber(
+    rclcpp::Node * node,
+    const std::string& base_topic,
+    const Callback& callback,
+    const std::string& transport,
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::SubscriptionOptionsBase & options =
+      rclcpp::SubscriptionOptionsBase());
 
   /**
    * \brief Get the base topic (on which the raw image is published).

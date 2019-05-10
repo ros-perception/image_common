@@ -77,10 +77,13 @@ public:
    */
   IMAGE_TRANSPORT_PUBLIC
   SubscriberFilter(
-    rclcpp::Node * node, const std::string & base_topic,
-    const std::string & transport)
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    const std::string & transport,
+    const rclcpp::QoS & qos,
+    const rclcpp::SubscriptionOptionsBase & options)
   {
-    subscribe(node, base_topic, transport);
+    subscribe(node, base_topic, transport, qos, options);
   }
 
   /**
@@ -110,12 +113,13 @@ public:
     rclcpp::Node * node,
     const std::string & base_topic,
     const std::string & transport,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & qos,
+    const rclcpp::SubscriptionOptionsBase & options)
   {
     unsubscribe();
     sub_ =
       image_transport::create_subscription(node, base_topic,
-        std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), transport, custom_qos);
+        std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), transport, qos, options);
   }
 
   /**

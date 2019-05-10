@@ -78,7 +78,9 @@ public:
     rclcpp::Node * nh,
     const std::string & base_topic,
     PubLoaderPtr loader,
-    rmw_qos_profile_t custom_qos);
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::PublisherOptionsBase & options =
+      rclcpp::PublisherOptionsBase());
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to

@@ -70,49 +70,58 @@ public:
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     const Callback & callback,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::SubscriptionOptionsBase & options =
+      rclcpp::SubscriptionOptionsBase())
   {
-    return subscribeImpl(node, base_topic, callback, custom_qos);
+    return subscribeImpl(node, base_topic, callback, qos, options);
   }
 
   /**
    * \brief Subscribe to an image topic, version for bare function.
    */
+  template<class AllocatorT = std::allocator<void>>
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::SubscriptionOptionsBase & options =
+      rclcpp::SubscriptionOptionsBase())
   {
     return subscribe(node, base_topic,
              std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)>(fp),
-             custom_qos);
+             qos, options);
   }
 
   /**
    * \brief Subscribe to an image topic, version for class member function with bare pointer.
    */
-  template<class T>
+  template<class T, class AllocatorT = std::allocator<void>>
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::SubscriptionOptionsBase & options =
+      rclcpp::SubscriptionOptionsBase())
   {
     return subscribe(node, base_topic,
-             std::bind(fp, obj, std::placeholders::_1), custom_qos);
+             std::bind(fp, obj, std::placeholders::_1), qos, options);
   }
 
   /**
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
-  template<class T>
+  template<class T, class AllocatorT = std::allocator<void>>
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
     std::shared_ptr<T> & obj,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::SubscriptionOptionsBase & options =
+      rclcpp::SubscriptionOptionsBase())
   {
     return subscribe(node, base_topic,
-             std::bind(fp, obj, std::placeholders::_1), custom_qos);
+             std::bind(fp, obj, std::placeholders::_1), qos, options);
   }
 
   /**
@@ -146,7 +155,9 @@ protected:
   virtual void subscribeImpl(
     rclcpp::Node * node, const std::string & base_topic,
     const Callback & callback,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default) = 0;
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::SubscriptionOptionsBase & options =
+      rclcpp::SubscriptionOptionsBase()) = 0;
 };
 
 } //namespace image_transport

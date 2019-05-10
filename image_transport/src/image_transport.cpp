@@ -62,9 +62,10 @@ static Impl * kImpl = new Impl();
 Publisher create_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
-  rmw_qos_profile_t custom_qos)
+  const rclcpp::QoS & qos,
+  const rclcpp::PublisherOptionsBase & options)
 {
-  return Publisher(node, base_topic, kImpl->pub_loader_, custom_qos);
+  return Publisher(node, base_topic, kImpl->pub_loader_, qos, options);
 }
 
 Subscriber create_subscription(
@@ -72,17 +73,19 @@ Subscriber create_subscription(
   const std::string & base_topic,
   const Subscriber::Callback & callback,
   const std::string & transport,
-  rmw_qos_profile_t custom_qos)
+  const rclcpp::QoS & qos,
+  const rclcpp::SubscriptionOptionsBase & options)
 {
-  return Subscriber(node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos);
+  return Subscriber(node, base_topic, callback, kImpl->sub_loader_, transport, qos, options);
 }
 
 CameraPublisher create_camera_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
-  rmw_qos_profile_t custom_qos)
+  const rclcpp::QoS & qos,
+  const rclcpp::PublisherOptionsBase & options)
 {
-  return CameraPublisher(node, base_topic, custom_qos);
+  return CameraPublisher(node, base_topic, qos, options);
 }
 
 CameraSubscriber create_camera_subscription(
@@ -90,9 +93,10 @@ CameraSubscriber create_camera_subscription(
   const std::string & base_topic,
   const CameraSubscriber::Callback & callback,
   const std::string & transport,
-  rmw_qos_profile_t custom_qos)
+  const rclcpp::QoS & qos,
+  const rclcpp::SubscriptionOptionsBase & options)
 {
-  return CameraSubscriber(node, base_topic, callback, transport, custom_qos);
+  return CameraSubscriber(node, base_topic, callback, transport, qos, options);
 }
 
 std::vector<std::string> getDeclaredTransports()
@@ -144,9 +148,8 @@ Publisher ImageTransport::advertise(const std::string & base_topic, uint32_t que
 {
   // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
   (void) latch;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-  custom_qos.depth = queue_size;
-  return create_publisher(impl_->node_.get(), base_topic, custom_qos);
+  rclcpp::QoS qos(queue_size);
+  return create_publisher(impl_->node_.get(), base_topic, qos);
 }
 
 Subscriber ImageTransport::subscribe(
@@ -156,10 +159,9 @@ Subscriber ImageTransport::subscribe(
   const TransportHints * transport_hints)
 {
   (void) tracked_object;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-  custom_qos.depth = queue_size;
+  rclcpp::QoS qos(queue_size);
   return create_subscription(impl_->node_.get(), base_topic, callback,
-           getTransportOrDefault(transport_hints), custom_qos);
+           getTransportOrDefault(transport_hints), qos);
 }
 
 CameraPublisher ImageTransport::advertiseCamera(
@@ -168,9 +170,8 @@ CameraPublisher ImageTransport::advertiseCamera(
 {
   // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
   (void) latch;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-  custom_qos.depth = queue_size;
-  return create_camera_publisher(impl_->node_.get(), base_topic, custom_qos);
+  rclcpp::QoS qos(queue_size);
+  return create_camera_publisher(impl_->node_.get(), base_topic, qos);
 }
 
 CameraSubscriber ImageTransport::subscribeCamera(
@@ -180,10 +181,9 @@ CameraSubscriber ImageTransport::subscribeCamera(
   const TransportHints * transport_hints)
 {
   (void) tracked_object;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-  custom_qos.depth = queue_size;
+  rclcpp::QoS qos(queue_size);
   return create_camera_subscription(impl_->node_.get(), base_topic, callback,
-           getTransportOrDefault(transport_hints), custom_qos);
+           getTransportOrDefault(transport_hints), qos);
 }
 
 std::vector<std::string> ImageTransport::getDeclaredTransports() const

@@ -68,9 +68,11 @@ public:
   void advertise(
     rclcpp::Node * nh,
     const std::string & base_topic,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::PublisherOptionsBase & options =
+      rclcpp::PublisherOptionsBase())
   {
-    advertiseImpl(nh, base_topic, custom_qos);
+    advertiseImpl(nh, base_topic, qos, options);
   }
 
   /**
@@ -138,7 +140,9 @@ protected:
    */
   virtual void advertiseImpl(
     rclcpp::Node * nh, const std::string & base_topic,
-    rmw_qos_profile_t custom_qos) = 0;
+    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::PublisherOptionsBase & options =
+      rclcpp::PublisherOptionsBase()) = 0;
 };
 
 } //namespace image_transport

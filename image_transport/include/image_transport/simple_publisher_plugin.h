@@ -104,13 +104,14 @@ public:
 protected:
   virtual void advertiseImpl(
     rclcpp::Node * node, const std::string & base_topic,
-    rmw_qos_profile_t custom_qos)
+    const rclcpp::QoS & qos,
+    const rclcpp::PublisherOptionsBase & options)
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
-
     RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
-    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, custom_qos);
+    rclcpp::PublisherOptions options_with_allocator(options);
+    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos, options_with_allocator);
   }
 
   //! Generic function for publishing the internal message type.

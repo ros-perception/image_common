@@ -95,7 +95,7 @@ protected:
    * @param message A message from the PublisherPlugin.
    * @param user_cb The user Image callback to invoke, if appropriate.
    */
- 
+
   virtual void internalCallback(
     const typename std::shared_ptr<const M>& message,
     const Callback & user_cb) = 0;
@@ -114,17 +114,22 @@ protected:
     rclcpp::Node * node,
     const std::string & base_topic,
     const Callback & callback,
-    rmw_qos_profile_t custom_qos)
+    const rclcpp::QoS & qos,
+    const rclcpp::SubscriptionOptionsBase & options)
   {
     impl_ = std::make_unique<Impl>();
+
+    rclcpp::SubscriptionOptions options_with_allocator(options);
+
     // Push each group of transport-specific parameters into a separate sub-namespace
     //ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
-    //
-    impl_->sub_ = node->create_subscription<M>(getTopicToSubscribe(base_topic),
+    impl_->sub_ = node->create_subscription<M>(
+        getTopicToSubscribe(base_topic),
+        qos,
         [this, callback](const typename std::shared_ptr<const M> msg){
           internalCallback(msg, callback);
         },
-        custom_qos);
+        options_with_allocator);
   }
 
 private:
@@ -134,9 +139,6 @@ private:
   };
 
   std::unique_ptr<Impl> impl_;
-
-
-
 };
 
 } //namespace image_transport
