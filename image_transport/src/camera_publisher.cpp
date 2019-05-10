@@ -144,8 +144,8 @@ void CameraPublisher::publish(
     return;
   }
 
-  impl_->image_pub_.publish(image);
-  impl_->info_pub_->publish(info);
+  impl_->image_pub_.publish(*image.get());
+  impl_->info_pub_->publish(*info.get());
 }
 
 void CameraPublisher::shutdown()
