@@ -77,7 +77,7 @@ public:
     const std::string& base_topic,
     const Callback& callback,
     const std::string& transport,
-    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::QoS & qos,
     const rclcpp::SubscriptionOptionsBase & options =
       rclcpp::SubscriptionOptionsBase());
 

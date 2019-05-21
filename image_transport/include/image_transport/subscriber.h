@@ -75,7 +75,7 @@ public:
     const Callback & callback,
     SubLoaderPtr loader,
     const std::string & transport,
-    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::QoS & qos,
     const rclcpp::SubscriptionOptionsBase & options =
       rclcpp::SubscriptionOptionsBase());
 

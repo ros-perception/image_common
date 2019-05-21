@@ -59,7 +59,7 @@ IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
   rclcpp::Node* node,
   const std::string & base_topic,
-  const rclcpp::QoS & qos = rclcpp::QoS(10),
+  const rclcpp::QoS & qos,
   const rclcpp::PublisherOptionsBase & options =
     rclcpp::PublisherOptionsBase());
 
@@ -72,7 +72,7 @@ Subscriber create_subscription(
   const std::string & base_topic,
   const Subscriber::Callback & callback,
   const std::string & transport,
-  const rclcpp::QoS & qos = rclcpp::QoS(10),
+  const rclcpp::QoS & qos,
   const rclcpp::SubscriptionOptionsBase & options =
     rclcpp::SubscriptionOptionsBase());
 
@@ -83,7 +83,7 @@ IMAGE_TRANSPORT_PUBLIC
 CameraPublisher create_camera_publisher(
   rclcpp::Node* node,
   const std::string & base_topic,
-  const rclcpp::QoS & qos = rclcpp::QoS(10),
+  const rclcpp::QoS & qos,
   const rclcpp::PublisherOptionsBase & options =
     rclcpp::PublisherOptionsBase());
 
@@ -96,7 +96,7 @@ CameraSubscriber create_camera_subscription(
   const std::string & base_topic,
   const CameraSubscriber::Callback & callback,
   const std::string & transport,
-  const rclcpp::QoS & qos = rclcpp::QoS(10),
+  const rclcpp::QoS & qos,
   const rclcpp::SubscriptionOptionsBase & options =
     rclcpp::SubscriptionOptionsBase());
 

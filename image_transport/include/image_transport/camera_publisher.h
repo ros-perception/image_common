@@ -74,7 +74,7 @@ public:
   CameraPublisher(
     rclcpp::Node * node,
     const std::string & base_topic,
-    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::QoS & qos,
     const rclcpp::PublisherOptionsBase & options =
       rclcpp::PublisherOptionsBase());
 

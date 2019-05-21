@@ -78,7 +78,7 @@ public:
     rclcpp::Node * nh,
     const std::string & base_topic,
     PubLoaderPtr loader,
-    const rclcpp::QoS & qos = rclcpp::QoS(10),
+    const rclcpp::QoS & qos,
     const rclcpp::PublisherOptionsBase & options =
       rclcpp::PublisherOptionsBase());
 

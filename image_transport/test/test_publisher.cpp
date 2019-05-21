@@ -27,12 +27,12 @@ TEST_F(TestPublisher, ImageTransportPublisher) {
 }
 
 TEST_F(TestPublisher, CameraPublisher) {
-  //auto camera_pub = image_transport::create_camera_publisher(node_.get(), "camera/image");
+  auto camera_pub = image_transport::create_camera_publisher(node_.get(), "camera/image");
 }
 
 TEST_F(TestPublisher, ImageTransportCameraPublisher) {
-  //image_transport::ImageTransport it(node_);
-  //auto pub = it.advertiseCamera("camera/image", 1);
+  image_transport::ImageTransport it(node_);
+  auto pub = it.advertiseCamera("camera/image", 1);
 }
 
 
