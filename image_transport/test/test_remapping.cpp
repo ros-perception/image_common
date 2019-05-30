@@ -15,9 +15,7 @@ class TestPublisher : public ::testing::Test
 protected:
   void SetUp()
   {
-    rclcpp::NodeOptions node_options_pub;
-    node_ = rclcpp::Node::make_shared("node", "namespace", node_options_pub);
-
+    node_ = rclcpp::Node::make_shared("node", "namespace");
     std::vector<std::string> arguments;
     arguments.push_back("old_topic:=new_topic");
     rclcpp::NodeOptions node_options;
