@@ -77,9 +77,10 @@ public:
 
   virtual uint32_t getNumPublishers() const
   {
-    //TODO(ros2) Enable count_publisher when rcl/rmw supports it.
-    //if (simple_impl_) return simple_impl_->node_->count_publishers(getTopic());
-    return 1;
+    if (impl_) {
+      return impl_->sub_->get_publisher_count();
+    }
+    return 0;
   }
 
   virtual void shutdown()
@@ -95,7 +96,7 @@ protected:
    * @param message A message from the PublisherPlugin.
    * @param user_cb The user Image callback to invoke, if appropriate.
    */
- 
+
   virtual void internalCallback(
     const typename std::shared_ptr<const M>& message,
     const Callback & user_cb) = 0;

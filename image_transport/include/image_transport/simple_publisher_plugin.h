@@ -72,9 +72,8 @@ public:
 
   virtual uint32_t getNumSubscribers() const
   {
-    // TODO(mjcarroll) replace with publisher-specific call.
     if (simple_impl_) {
-      return static_cast<uint32_t>(simple_impl_->node_->count_subscribers(getTopic()));
+      return simple_impl_->pub_->get_subscription_count();
     }
     return 0;
   }
