@@ -104,6 +104,7 @@ Publisher::Publisher(
   // properly (#3652).
   std::string image_topic = rclcpp::expand_topic_or_service_name(base_topic,
       node->get_name(), node->get_namespace());
+  impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
   std::vector<std::string> blacklist_vec;

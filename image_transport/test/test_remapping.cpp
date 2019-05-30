@@ -15,7 +15,8 @@ class TestPublisher : public ::testing::Test
 protected:
   void SetUp()
   {
-    node_ = rclcpp::Node::make_shared("node", "namespace");
+    rclcpp::NodeOptions node_options_pub;
+    node_ = rclcpp::Node::make_shared("node", "namespace", node_options_pub);
 
     std::vector<std::string> arguments;
     arguments.push_back("old_topic:=new_topic");
@@ -33,7 +34,7 @@ protected:
   rclcpp::Node::SharedPtr node_remap_;
 };
 
-TEST_F(TestPublisher, Publisher) {
+TEST_F(TestPublisher, RemappedPublisher) {
   const size_t max_retries = 3;
   const size_t max_loops = 200;
   const std::chrono::milliseconds sleep_per_loop = std::chrono::milliseconds(10);
@@ -53,16 +54,26 @@ TEST_F(TestPublisher, Publisher) {
   auto pub = image_transport::create_publisher(node_.get(), "new_topic");
 
   ASSERT_EQ("/namespace/new_topic", sub.getTopic());
-  test_rclcpp::wait_for_subscriber(node_remap_, sub.getTopic());
+  ASSERT_EQ("/namespace/new_topic", pub.getTopic());
+
+  test_rclcpp::wait_for_subscriber(node_, sub.getTopic());
 
   ASSERT_FALSE(received);
-  ASSERT_EQ(1u, pub.getNumSubscribers());
-  ASSERT_EQ(1u, sub.getNumPublishers());
+
+  size_t retry = 0;
+  uint32_t nSub = 0;
+  uint32_t nPub = 0;
+  while (retry < max_retries && nPub == 0 && nSub == 0)
+  {
+    nSub = pub.getNumSubscribers();
+    nPub = sub.getNumPublishers();
+    std::this_thread::sleep_for(sleep_per_loop);
+  }
 
   executor.spin_node_some(node_);
   executor.spin_node_some(node_remap_);
 
-  size_t retry = 0;
+  retry = 0;
   while(retry < max_retries && !received) {
     // generate random image and publish it
     pub.publish(image);
