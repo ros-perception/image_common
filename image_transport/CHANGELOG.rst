@@ -2,6 +2,12 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.1 (2019-05-30)
+------------------
+* Update to use new count APIs (`#128 <https://github.com/ros-perception/image_common/issues/128>`_)
+* use latest ros2 API (`#127 <https://github.com/ros-perception/image_common/issues/127>`_)
+* Contributors: Karsten Knese, Michael Carroll
+
 2.1.0 (2019-05-09)
 ------------------
 * Update ROS2 branch to account for new NodeOptions interface (`#120 <https://github.com/ros-perception/image_common/issues/120>`_)
