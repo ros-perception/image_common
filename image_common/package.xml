@@ -1,27 +1,34 @@
-<package>
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <!-- TODO: Make this a metapackage, see
+       https://github.com/ros2/ros2/issues/408 -->
   <name>image_common</name>
   <version>1.11.13</version>
   <description>Common code for working with images in ROS.</description>
-  <author>Patrick Mihelich</author>
-  <author>James Bowman</author>
   <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
   <maintainer email="vincent.rabaud@gmail.com">Vincent Rabaud</maintainer>
   <license>BSD</license>
-  
+
   <url type="website">http://www.ros.org/wiki/image_common</url>
   <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>
   <url type="repository">https://github.com/ros-perception/image_common</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  
-  <!-- Old stack contents -->
-  <run_depend>camera_calibration_parsers</run_depend>
-  <run_depend>camera_info_manager</run_depend>
-  <run_depend>image_transport</run_depend>
-  <run_depend>polled_camera</run_depend>
+  <author>Patrick Mihelich</author>
+  <author>James Bowman</author>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>camera_calibration_parsers</exec_depend>
+  <exec_depend>camera_info_manager</exec_depend>
+  <exec_depend>image_transport</exec_depend>
+  <!-- exec_depend>polled_camera</exec_depend -->
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
-    <metapackage/>
+    <build_type>ament_cmake</build_type>
   </export>
 
 </package>
