@@ -526,7 +526,7 @@ CameraInfoManager::setCameraInfoService(
     loaded_cam_info_ = true;
   }
 
-  if (rclcpp::ok()) {
+  if (!rclcpp::ok()) {
     RCLCPP_ERROR(logger_, "set_camera_info service called, but driver not running.");
     rsp->status_message = "Camera driver not running.";
     rsp->success = false;
