@@ -14,6 +14,7 @@ endif()
 find_package(ament_cmake_ros REQUIRED)
 
 find_package(rclcpp REQUIRED)
+find_package(rcpputils REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(yaml_cpp_vendor REQUIRED)
 

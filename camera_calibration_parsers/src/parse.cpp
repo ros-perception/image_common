@@ -38,7 +38,7 @@
 
 #include "camera_calibration_parsers/parse_ini.h"
 #include "camera_calibration_parsers/parse_yml.h"
-#include "camera_calibration_parsers/impl/filesystem_helper.hpp"
+#include <rcpputils/filesystem_helper.hpp>
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -49,7 +49,7 @@ bool writeCalibration(
   const std::string & file_name, const std::string & camera_name,
   const CameraInfo & cam_info)
 {
-  impl::fs::path p(file_name);
+  rcpputils::fs::path p(file_name);
 
   if (p.extension() == ".ini") {
     return writeCalibrationIni(file_name, camera_name, cam_info);
@@ -68,7 +68,7 @@ bool readCalibration(
   const std::string & file_name, std::string & camera_name,
   CameraInfo & cam_info)
 {
-  impl::fs::path p(file_name);
+  rcpputils::fs::path p(file_name);
 
   if (p.extension() == ".ini") {
     return readCalibrationIni(file_name, camera_name, cam_info);

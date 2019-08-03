@@ -48,7 +48,7 @@
 #include <string>
 #include <vector>
 
-#include "camera_calibration_parsers/impl/filesystem_helper.hpp"
+#include <rcpputils/filesystem_helper.hpp>
 #include "rclcpp/logging.hpp"
 #include "sensor_msgs/distortion_models.hpp"
 
@@ -303,9 +303,9 @@ bool writeCalibrationIni(
   const std::string & file_name, const std::string & camera_name,
   const CameraInfo & cam_info)
 {
-  impl::fs::path dir(impl::fs::path(file_name).parent_path());
-  if (!dir.empty() && !impl::fs::exists(dir) &&
-    !impl::fs::create_directories(dir))
+  rcpputils::fs::path dir(rcpputils::fs::path(file_name).parent_path());
+  if (!dir.empty() && !rcpputils::fs::exists(dir) &&
+    !rcpputils::fs::create_directories(dir))
   {
     RCLCPP_ERROR(kIniLogger, "Unable to create directory for camera calibration file [%s]",
       dir.string().c_str());

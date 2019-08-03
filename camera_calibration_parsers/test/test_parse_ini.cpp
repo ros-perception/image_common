@@ -21,11 +21,9 @@
 #include "sensor_msgs/msg/camera_info.hpp"
 
 #include "camera_calibration_parsers/parse_ini.h"
-#include "camera_calibration_parsers/impl/filesystem_helper.hpp"
+#include <rcpputils/filesystem_helper.hpp>
 
 #include "make_calibs.hpp"
-
-namespace fs = camera_calibration_parsers::impl::fs;
 
 std::string custom_tmpnam()
 {
