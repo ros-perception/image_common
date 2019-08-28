@@ -51,15 +51,15 @@ bool writeCalibration(
 {
   rcpputils::fs::path p(file_name);
 
-  if (p.extension() == ".ini") {
+  if (p.extension().string() == ".ini") {
     return writeCalibrationIni(file_name, camera_name, cam_info);
-  } else if (p.extension() == ".yml" || p.extension() == ".yaml") {
+  } else if (p.extension().string() == ".yml" || p.extension().string() == ".yaml") {
     return writeCalibrationYml(file_name, camera_name, cam_info);
   } else {
     RCLCPP_ERROR(
       rclcpp::get_logger("camera_calibration_parsers"),
       "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
-      p.extension().c_str());
+      p.extension().string().c_str());
   }
   return false;
 }
@@ -70,15 +70,15 @@ bool readCalibration(
 {
   rcpputils::fs::path p(file_name);
 
-  if (p.extension() == ".ini") {
+  if (p.extension().string() == ".ini") {
     return readCalibrationIni(file_name, camera_name, cam_info);
-  } else if (p.extension() == ".yml" || p.extension() == ".yaml") {
+  } else if (p.extension().string() == ".yml" || p.extension().string() == ".yaml") {
     return readCalibrationYml(file_name, camera_name, cam_info);
   } else {
     RCLCPP_ERROR(
       rclcpp::get_logger("camera_calibration_parsers"),
       "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
-      p.extension().c_str());
+      p.extension().string().c_str());
   }
 
   return false;
