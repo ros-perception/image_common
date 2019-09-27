@@ -2,6 +2,9 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.2.0 (2019-09-27)
+------------------
+
 2.1.1 (2019-05-30)
 ------------------
 * Update to use new count APIs (`#128 <https://github.com/ros-perception/image_common/issues/128>`_)
