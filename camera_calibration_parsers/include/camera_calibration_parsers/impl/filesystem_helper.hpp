@@ -37,8 +37,10 @@
 
 #if defined(_MSC_VER)
 # if _MSC_VER >= 1900
-// std::experimental::filesystem is superseded by the C++17 <filesystem> header providing std::filesystem
-// however this project is target to C++14, so define the macro to acknowledge this warning.
+// std::experimental::filesystem is superseded by the C++17 <filesystem>
+// for std::filesystem
+// however this project is target to C++14,
+// so define the macro to acknowledge this warning.
 #  define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #  include <experimental/filesystem>
 namespace camera_calibration_parsers
