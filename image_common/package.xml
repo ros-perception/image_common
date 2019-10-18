@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <!-- TODO: Make this a metapackage, see
-       https://github.com/ros2/ros2/issues/408 -->
   <name>image_common</name>
   <version>1.11.13</version>
   <description>Common code for working with images in ROS.</description>
