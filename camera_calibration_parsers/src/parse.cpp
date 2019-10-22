@@ -38,9 +38,9 @@
 
 #include "camera_calibration_parsers/parse_ini.h"
 #include "camera_calibration_parsers/parse_yml.h"
-#include "camera_calibration_parsers/impl/filesystem_helper.hpp"
 
 #include "rclcpp/rclcpp.hpp"
+#include "rcpputils/filesystem_helper.hpp"
 
 namespace camera_calibration_parsers
 {
@@ -49,17 +49,17 @@ bool writeCalibration(
   const std::string & file_name, const std::string & camera_name,
   const CameraInfo & cam_info)
 {
-  impl::fs::path p(file_name);
+  rcpputils::fs::path p(file_name);
 
-  if (p.extension() == ".ini") {
+  if (p.extension().string() == ".ini") {
     return writeCalibrationIni(file_name, camera_name, cam_info);
-  } else if (p.extension() == ".yml" || p.extension() == ".yaml") {
+  } else if (p.extension().string() == ".yml" || p.extension().string() == ".yaml") {
     return writeCalibrationYml(file_name, camera_name, cam_info);
   } else {
     RCLCPP_ERROR(
       rclcpp::get_logger("camera_calibration_parsers"),
       "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
-      p.extension().c_str());
+      p.extension().string().c_str());
   }
   return false;
 }
@@ -68,17 +68,17 @@ bool readCalibration(
   const std::string & file_name, std::string & camera_name,
   CameraInfo & cam_info)
 {
-  impl::fs::path p(file_name);
+  rcpputils::fs::path p(file_name);
 
-  if (p.extension() == ".ini") {
+  if (p.extension().string() == ".ini") {
     return readCalibrationIni(file_name, camera_name, cam_info);
-  } else if (p.extension() == ".yml" || p.extension() == ".yaml") {
+  } else if (p.extension().string() == ".yml" || p.extension().string() == ".yaml") {
     return readCalibrationYml(file_name, camera_name, cam_info);
   } else {
     RCLCPP_ERROR(
       rclcpp::get_logger("camera_calibration_parsers"),
       "Unrecognized format '%s', calibration must be '.ini', '.yml', or '.yaml'",
-      p.extension().c_str());
+      p.extension().string().c_str());
   }
 
   return false;
