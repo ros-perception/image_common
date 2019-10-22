@@ -36,6 +36,8 @@
 #include "image_transport/publisher.h"
 #include "image_transport/publisher_plugin.h"
 
+#include <set>
+
 #include <rclcpp/expand_topic_or_service_name.hpp>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/node.hpp>
