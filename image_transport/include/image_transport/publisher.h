@@ -36,6 +36,7 @@
 #define IMAGE_TRANSPORT_PUBLISHER_H
 
 #include <memory>
+#include <set>
 
 #include <rclcpp/macros.hpp>
 #include <rclcpp/node.hpp>
