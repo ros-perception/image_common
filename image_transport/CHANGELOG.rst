@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.2.1 (2019-10-23)
+------------------
+* add missing set header (`#140 <https://github.com/ros-perception/image_common/issues/140>`_)
+* Contributors: Mikael Arguedas
+
 2.2.0 (2019-09-27)
 ------------------
 

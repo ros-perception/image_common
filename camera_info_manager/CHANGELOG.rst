@@ -2,6 +2,11 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.2.1 (2019-10-23)
+------------------
+* Fix abort criteria for setCameraInfoService callback (`#132 <https://github.com/ros-perception/image_common/issues/132>`_)
+* Contributors: Joseph Schornak
+
 2.2.0 (2019-09-27)
 ------------------
 

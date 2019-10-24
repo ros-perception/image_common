@@ -2,6 +2,12 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.2.1 (2019-10-23)
+------------------
+* ROS2 Using the filesystem helper in rcpputils (`#133 <https://github.com/ros-perception/image_common/issues/133>`_)
+* [Windows][ros2] Avoid build break for Visual Studio 2019 v16.3 (`#135 <https://github.com/ros-perception/image_common/issues/135>`_)
+* Contributors: Andreas Klintberg, Sean Yen
+
 2.2.0 (2019-09-27)
 ------------------
 
