@@ -91,6 +91,15 @@ bool writeCalibrationIni(std::ostream& out, const std::string& camera_name,
               sensor_msgs::distortion_models::PLUMB_BOB.c_str(), (int)cam_info.D.size());
     return false;
   }
+  else if ( cam_info.distortion_model != sensor_msgs::distortion_models::FISHEYE ||
+      cam_info.D.size() != 5) {
+    ROS_ERROR("Videre INI format can only save calibrations using the plumb bob distortion model. "
+              "Use the YAML format instead.\n"
+              "\tdistortion_model = '%s', expected '%s'\n"
+              "\tD.size() = %d, expected 5", cam_info.distortion_model.c_str(),
+              sensor_msgs::distortion_models::FISHEYE.c_str(), (int)cam_info.D.size());
+    return false;
+  }
   
   out.precision(5);
   out << std::fixed;
@@ -210,7 +219,12 @@ bool parseCalibrationIniRange(Iterator first, Iterator last,
 
   // Figure out the distortion model
   if (cam_info.D.size() == 5)
-    cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
+    if (cam_info.distortion_model.find(sensor_msgs::distortion_models::FISHEYE)!=std::string::npos){
+      cam_info.distortion_model = sensor_msgs::distortion_models::FISHEYE;
+    }
+    else{
+      cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
+    }
   else if (cam_info.D.size() == 8)
     cam_info.distortion_model = sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL;
 
