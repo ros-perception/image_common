@@ -16,6 +16,7 @@ find_package(Boost REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS message_filters pluginlib rosconsole roscpp roslib sensor_msgs
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
