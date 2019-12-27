@@ -8,6 +8,7 @@ catkin_package(INCLUDE_DIRS include
                LIBRARIES ${PROJECT_NAME}
                CATKIN_DEPENDS camera_calibration_parsers
                DEPENDS Boost
+               CATKIN_DEPENDS roscpp sensor_msgs
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
