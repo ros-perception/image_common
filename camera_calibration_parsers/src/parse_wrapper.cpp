@@ -63,7 +63,11 @@ boost::python::tuple readCalibrationWrapper(const std::string& file_name)
   sensor_msgs::CameraInfo camera_info;
   bool result = readCalibration(file_name, camera_name, camera_info);
   std::string cam_info = to_python(camera_info);
-  return boost::python::make_tuple(result, camera_name, cam_info);
+  PyObject * cam_info_py = PyBytes_FromStringAndSize(cam_info.c_str(), cam_info.size());
+  return boost::python::make_tuple(
+    result,
+    camera_name,
+    boost::python::object(boost::python::handle<>(cam_info_py)));
 }
 
 BOOST_PYTHON_MODULE(camera_calibration_parsers_wrapper)
