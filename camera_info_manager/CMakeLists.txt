@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0.2)
 project(camera_info_manager)
 
 find_package(catkin REQUIRED COMPONENTS camera_calibration_parsers image_transport roscpp roslib sensor_msgs)
