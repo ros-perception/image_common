@@ -121,7 +121,7 @@ protected:
     // Push each group of transport-specific parameters into a separate sub-namespace
     //ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
     //
-    auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos));
+    auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
     impl_->sub_ = node->create_subscription<M>(getTopicToSubscribe(base_topic), qos,
         [this, callback](const typename std::shared_ptr<const M> msg){
           internalCallback(msg, callback);

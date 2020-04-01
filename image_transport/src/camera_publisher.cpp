@@ -90,7 +90,7 @@ CameraPublisher::CameraPublisher(
       node->get_name(), node->get_namespace());
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos));
+  auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
   impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos);
   impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
 }
