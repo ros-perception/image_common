@@ -19,6 +19,7 @@ find_package(ament_cmake_ros REQUIRED)
 
 find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rcpputils REQUIRED)
 find_package(camera_calibration_parsers REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -34,6 +35,7 @@ ament_target_dependencies(
   ${PROJECT_NAME}
   ament_index_cpp
   rclcpp
+  rcpputils
   camera_calibration_parsers
   image_transport
   sensor_msgs

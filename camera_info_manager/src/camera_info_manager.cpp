@@ -42,7 +42,7 @@
 #include <memory>
 #include <string>
 
-#include "filesystem_helper.hpp"
+#include "rcpputils/filesystem_helper.hpp"
 #include "camera_calibration_parsers/parse.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
@@ -490,11 +490,11 @@ CameraInfoManager::saveCalibrationFile(
 {
   RCLCPP_INFO(logger_, "writing calibration data to %s", filename.c_str());
 
-  camera_info_manager::impl::fs::path filepath(filename);
-  camera_info_manager::impl::fs::path parent = filepath.parent_path();
+  rcpputils::fs::path filepath(filename);
+  rcpputils::fs::path parent = filepath.parent_path();
 
-  if (!impl::fs::exists(parent)) {
-    if (!impl::fs::create_directories(parent)) {
+  if (!rcpputils::fs::exists(parent)) {
+    if (!rcpputils::fs::create_directories(parent)) {
       RCLCPP_ERROR(logger_, "unable to create path directory [%s]", parent.string().c_str());
       return false;
     }
