@@ -32,12 +32,12 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "camera_calibration_parsers/parse.h"
+#include "camera_calibration_parsers/parse.hpp"
 
 #include <string>
 
-#include "camera_calibration_parsers/parse_ini.h"
-#include "camera_calibration_parsers/parse_yml.h"
+#include "camera_calibration_parsers/parse_ini.hpp"
+#include "camera_calibration_parsers/parse_yml.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rcpputils/filesystem_helper.hpp"

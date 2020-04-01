@@ -38,7 +38,7 @@
 
 #include "rclcpp/logging.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
-#include "camera_calibration_parsers/parse.h"
+#include "camera_calibration_parsers/parse.hpp"
 
 using camera_calibration_parsers::readCalibration;
 using camera_calibration_parsers::writeCalibration;
@@ -47,7 +47,8 @@ int main(int argc, char ** argv)
 {
   auto logger = rclcpp::get_logger("camera_calibration_parsers.convert");
   if (argc < 3) {
-    printf("Usage: %s input.yml output.ini\n"
+    printf(
+      "Usage: %s input.yml output.ini\n"
       "       %s input.ini output.yml\n", argv[0], argv[0]);
     return 0;
   }

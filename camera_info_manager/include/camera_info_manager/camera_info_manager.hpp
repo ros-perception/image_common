@@ -35,8 +35,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_H_
-#define CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_H_
+#ifndef CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_HPP_
+#define CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_HPP_
 
 #include <memory>
 #include <mutex>
@@ -256,4 +256,4 @@ private:
 };  // class CameraInfoManager
 }  // namespace camera_info_manager
 
-#endif  // CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_H_
+#endif  // CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_HPP_

@@ -34,7 +34,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "camera_info_manager/camera_info_manager.h"
+#include "camera_info_manager/camera_info_manager.hpp"
 
 #include <algorithm>
 #include <cstdlib>
@@ -43,7 +43,7 @@
 #include <string>
 
 #include "filesystem_helper.hpp"
-#include "camera_calibration_parsers/parse.h"
+#include "camera_calibration_parsers/parse.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
 
@@ -86,8 +86,10 @@ CameraInfoManager::CameraInfoManager(
   loaded_cam_info_(false)
 {
   // register callback for camera calibration service request
-  info_service_ = node->create_service<SetCameraInfo>("set_camera_info",
-      std::bind(&CameraInfoManager::setCameraInfoService, this, std::placeholders::_1,
+  info_service_ = node->create_service<SetCameraInfo>(
+    "set_camera_info",
+    std::bind(
+      &CameraInfoManager::setCameraInfoService, this, std::placeholders::_1,
       std::placeholders::_2));
 }
 
@@ -271,7 +273,8 @@ bool CameraInfoManager::loadCalibrationFile(
 
   if (readCalibration(filename, cam_name, cam_info)) {
     if (cname != cam_name) {
-      RCLCPP_WARN(logger_,
+      RCLCPP_WARN(
+        logger_,
         "[%s] does not match %s in file %s",
         cname.c_str(), cam_name.c_str(), filename.c_str());
     }
@@ -392,11 +395,12 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string & ur
   // Easy C++14 replacement for boost::iequals from :
   // https://stackoverflow.com/a/4119881
   auto iequals = [](const std::string & a, const std::string & b) {
-      return std::equal(a.begin(), a.end(),
-               b.begin(), b.end(),
-               [](char a, char b) {
-                 return tolower(a) == tolower(b);
-               });
+      return std::equal(
+        a.begin(), a.end(),
+        b.begin(), b.end(),
+        [](char a, char b) {
+          return tolower(a) == tolower(b);
+        });
     };
 
 

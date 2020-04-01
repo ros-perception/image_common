@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef CAMERA_CALIBRATION_PARSERS__PARSE_H_
-#define CAMERA_CALIBRATION_PARSERS__PARSE_H_
+#ifndef CAMERA_CALIBRATION_PARSERS__PARSE_HPP_
+#define CAMERA_CALIBRATION_PARSERS__PARSE_HPP_
 
 #include <string>
 
@@ -89,4 +89,4 @@ bool parseCalibration(
 
 }  // namespace camera_calibration_parsers
 
-#endif  // CAMERA_CALIBRATION_PARSERS__PARSE_H_
+#endif  // CAMERA_CALIBRATION_PARSERS__PARSE_HPP_

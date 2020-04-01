@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "camera_calibration_parsers/parse_yml.h"
+#include "camera_calibration_parsers/parse_yml.hpp"
 
 #include <cassert>
 #include <cstring>
@@ -171,12 +171,14 @@ bool writeCalibrationYml(
   if (!dir.empty() && !rcpputils::fs::exists(dir) &&
     !rcpputils::fs::create_directories(dir))
   {
-    RCLCPP_ERROR(kYmlLogger, "Unable to create directory for camera calibration file [%s]",
+    RCLCPP_ERROR(
+      kYmlLogger, "Unable to create directory for camera calibration file [%s]",
       dir.string().c_str());
   }
   std::ofstream out(file_name.c_str());
   if (!out.is_open()) {
-    RCLCPP_ERROR(kYmlLogger, "Unable to open camera calibration file [%s] for writing",
+    RCLCPP_ERROR(
+      kYmlLogger, "Unable to open camera calibration file [%s] for writing",
       file_name.c_str());
     return false;
   }
@@ -213,7 +215,8 @@ bool readCalibrationYml(
     } else {
       // Assume plumb bob for backwards compatibility
       cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
-      RCLCPP_WARN(kYmlLogger,
+      RCLCPP_WARN(
+        kYmlLogger,
         "Camera calibration file did not specify distortion model, assuming plumb bob");
     }
     const YAML::Node & D_node = doc[D_YML_NAME];
@@ -244,7 +247,8 @@ bool readCalibrationYml(
   }
   bool success = readCalibrationYml(fin, camera_name, cam_info);
   if (!success) {
-    RCLCPP_ERROR(kYmlLogger, "Failed to parse camera calibration from file [%s]",
+    RCLCPP_ERROR(
+      kYmlLogger, "Failed to parse camera calibration from file [%s]",
       file_name.c_str());
   }
   return success;
