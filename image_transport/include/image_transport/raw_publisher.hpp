@@ -32,11 +32,12 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_RAW_PUBLISHER_H
-#define IMAGE_TRANSPORT_RAW_PUBLISHER_H
+#ifndef IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
+#define IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
 
 #include <sensor_msgs/msg/image.hpp>
-#include "image_transport/simple_publisher_plugin.h"
+
+#include "image_transport/simple_publisher_plugin.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport {
@@ -70,6 +71,6 @@ protected:
   }
 };
 
-} //namespace image_transport
+}  // namespace image_transport
 
-#endif
+#endif  // IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_

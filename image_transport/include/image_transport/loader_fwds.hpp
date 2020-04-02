@@ -32,11 +32,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_LOADER_FWDS_H
-#define IMAGE_TRANSPORT_LOADER_FWDS_H
+#ifndef IMAGE_TRANSPORT__LOADER_FWDS_HPP_
+#define IMAGE_TRANSPORT__LOADER_FWDS_HPP_
 
 // Forward-declare some classes most users shouldn't care about so that
-// image_transport.h doesn't bring them in.
+// image_transport.hpp doesn't bring them in.
 
 namespace pluginlib {
   template<class T> class ClassLoader;
@@ -53,4 +53,4 @@ namespace image_transport {
   typedef std::shared_ptr<SubLoader> SubLoaderPtr;
 }
 
-#endif
+#endif  // IMAGE_TRANSPORT__LOADER_FWDS_HPP_

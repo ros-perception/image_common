@@ -32,9 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "image_transport/camera_common.h"
-#include "image_transport/publisher.h"
-#include "image_transport/publisher_plugin.h"
+#include "image_transport/publisher.hpp"
 
 #include <set>
 
@@ -43,6 +41,9 @@
 #include <rclcpp/node.hpp>
 
 #include <pluginlib/class_loader.hpp>
+
+#include "image_transport/camera_common.hpp"
+#include "image_transport/publisher_plugin.hpp"
 
 namespace image_transport
 {

@@ -32,13 +32,13 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
-#define IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
+#ifndef IMAGE_TRANSPORT__PUBLISHER_PLUGIN_HPP_
+#define IMAGE_TRANSPORT__PUBLISHER_PLUGIN_HPP_
 
 #include <rclcpp/node.hpp>
-
 #include <sensor_msgs/msg/image.hpp>
-#include "image_transport/single_subscriber_publisher.h"
+
+#include "image_transport/single_subscriber_publisher.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
@@ -141,6 +141,6 @@ protected:
     rmw_qos_profile_t custom_qos) = 0;
 };
 
-} //namespace image_transport
+}  // namespace image_transport
 
-#endif
+#endif  // IMAGE_TRANSPORT__PUBLISHER_PLUGIN_HPP_

@@ -32,42 +32,30 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_EXCEPTION_H
-#define IMAGE_TRANSPORT_EXCEPTION_H
+#ifndef IMAGE_TRANSPORT__CAMERA_COMMON_HPP_
+#define IMAGE_TRANSPORT__CAMERA_COMMON_HPP_
 
-#include <stdexcept>
+#include <string>
 
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport {
 
 /**
- * \brief A base class for all image_transport exceptions inheriting from std::runtime_error.
+ * \brief Form the camera info topic name, sibling to the base topic.
+ *
+ * \note This function assumes that the name is completely resolved. If the \c
+ * base_topic is remapped the resulting camera info topic will be incorrect.
  */
-class Exception : public std::runtime_error
-{
-public:
-  Exception(const std::string& message) : std::runtime_error(message) {}
-};
+IMAGE_TRANSPORT_PUBLIC
+std::string getCameraInfoTopic(const std::string& base_topic);
 
 /**
- * \brief An exception class thrown when image_transport is unable to load a requested transport.
+ * \brief Replacement for uses of boost::erase_last_copy
  */
-class TransportLoadException : public Exception
-{
-public:
-  TransportLoadException(const std::string& transport, const std::string& message)
-    : Exception("Unable to load plugin for transport '" + transport + "', error string:\n" + message),
-      transport_(transport.c_str())
-  {
-  }
+IMAGE_TRANSPORT_PUBLIC
+std::string erase_last_copy(const std::string& input, const std::string& search);
 
-  std::string getTransport() const { return transport_; }
+}  // namespace image_transport
 
-protected:
-  const char* transport_;
-};
-
-} //namespace image_transport
-
-#endif
+#endif  // IMAGE_TRANSPORT__CAMERA_COMMON_HPP_

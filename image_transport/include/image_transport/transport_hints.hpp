@@ -32,30 +32,56 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_CAMERA_COMMON_H
-#define IMAGE_TRANSPORT_CAMERA_COMMON_H
+#ifndef IMAGE_TRANSPORT__TRANSPORT_HINTS_HPP_
+#define IMAGE_TRANSPORT__TRANSPORT_HINTS_HPP_
 
+#include <memory>
 #include <string>
+
+#include <rclcpp/node.hpp>
 
 #include "image_transport/visibility_control.hpp"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
- * \brief Form the camera info topic name, sibling to the base topic.
- *
- * \note This function assumes that the name is completely resolved. If the \c
- * base_topic is remapped the resulting camera info topic will be incorrect.
+ * \brief Stores transport settings for an image topic subscription.
  */
-IMAGE_TRANSPORT_PUBLIC
-std::string getCameraInfoTopic(const std::string& base_topic);
+class TransportHints
+{
+public:
+  /**
+   * \brief Constructor.
+   *
+   * The default transport can be overridden by setting a certain parameter to the
+   * name of the desired transport. By default this parameter is named "image_transport"
+   * in the node's local namespace. For consistency across ROS applications, the
+   * name of this parameter should not be changed without good reason.
+   *
+   * @param node Node to use when looking up the transport parameter.
+   * @param default_transport Preferred transport to use
+   * @param parameter_name The name of the transport parameter
+   */
+  IMAGE_TRANSPORT_PUBLIC
+  TransportHints(
+    const rclcpp::Node * node,
+    const std::string & default_transport = "raw",
+    const std::string & parameter_name = "image_transport")
+  {
+    node->get_parameter_or<std::string>(parameter_name, transport_, default_transport);
+  }
 
-/**
- * \brief Replacement for uses of boost::erase_last_copy
- */
-IMAGE_TRANSPORT_PUBLIC
-std::string erase_last_copy(const std::string& input, const std::string& search);
+  IMAGE_TRANSPORT_PUBLIC
+  const std::string & getTransport() const
+  {
+    return transport_;
+  }
 
-} //namespace image_transport
+private:
+  std::string transport_;
+};
 
-#endif
+}  // namespace image_transport
+
+#endif  // IMAGE_TRANSPORT__TRANSPORT_HINTS_HPP_

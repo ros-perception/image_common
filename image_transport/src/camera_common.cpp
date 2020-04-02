@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "image_transport/camera_common.h"
+#include "image_transport/camera_common.hpp"
 
 #include <vector>
 

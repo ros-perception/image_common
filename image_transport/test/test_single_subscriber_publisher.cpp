@@ -7,7 +7,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
-#include "image_transport/single_subscriber_publisher.h"
+#include "image_transport/single_subscriber_publisher.hpp"
 
 class TestPublisher : public ::testing::Test
 {

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TEST_RCLCPP__UTILS_HPP_
-#define TEST_RCLCPP__UTILS_HPP_
+#ifndef UTILS_HPP_
+#define UTILS_HPP_
 
 #include <cinttypes>
 #include <memory>
@@ -67,5 +67,5 @@ void wait_for_subscriber(
 
 }  // namespace test_rclcpp
 
-#endif  // TEST_RCLCPP__UTILS_HPP_
+#endif  // UTILS_HPP_
 

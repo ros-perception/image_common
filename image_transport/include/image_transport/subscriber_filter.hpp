@@ -32,11 +32,12 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_SUBSCRIBER_FILTER_H
-#define IMAGE_TRANSPORT_SUBSCRIBER_FILTER_H
+#ifndef IMAGE_TRANSPORT__SUBSCRIBER_FILTER_HPP_
+#define IMAGE_TRANSPORT__SUBSCRIBER_FILTER_HPP_
 
 #include <message_filters/simple_filter.h>
-#include "image_transport/image_transport.h"
+
+#include "image_transport/image_transport.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
@@ -171,4 +172,4 @@ private:
 
 }
 
-#endif
+#endif  // IMAGE_TRANSPORT__SUBSCRIBER_FILTER_HPP_

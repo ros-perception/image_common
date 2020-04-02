@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_IMAGE_TRANSPORT_H
-#define IMAGE_TRANSPORT_IMAGE_TRANSPORT_H
+#ifndef IMAGE_TRANSPORT__IMAGE_TRANSPORT_HPP_
+#define IMAGE_TRANSPORT__IMAGE_TRANSPORT_HPP_
 
 #include <functional>
 #include <memory>
@@ -42,11 +42,11 @@
 
 #include <rclcpp/node.hpp>
 
-#include "image_transport/camera_publisher.h"
-#include "image_transport/camera_subscriber.h"
-#include "image_transport/publisher.h"
-#include "image_transport/subscriber.h"
-#include "image_transport/transport_hints.h"
+#include "image_transport/camera_publisher.hpp"
+#include "image_transport/camera_subscriber.hpp"
+#include "image_transport/publisher.hpp"
+#include "image_transport/subscriber.hpp"
+#include "image_transport/transport_hints.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
@@ -288,6 +288,6 @@ private:
   std::unique_ptr<Impl> impl_;
 };
 
-} //namespace image_transport
+}  // namespace image_transport
 
-#endif
+#endif  // IMAGE_TRANSPORT__IMAGE_TRANSPORT_HPP_

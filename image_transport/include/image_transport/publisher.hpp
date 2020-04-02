@@ -32,100 +32,80 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_CAMERA_PUBLISHER_H
-#define IMAGE_TRANSPORT_CAMERA_PUBLISHER_H
+#ifndef IMAGE_TRANSPORT__PUBLISHER_HPP_
+#define IMAGE_TRANSPORT__PUBLISHER_HPP_
+
+#include <memory>
 
 #include <rclcpp/macros.hpp>
 #include <rclcpp/node.hpp>
 
 #include <sensor_msgs/msg/image.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
 
-#include "image_transport/single_subscriber_publisher.h"
+#include "image_transport/exception.hpp"
+#include "image_transport/loader_fwds.hpp"
+#include "image_transport/single_subscriber_publisher.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
 
-class ImageTransport;
-
 /**
- * \brief Manages advertisements for publishing camera images.
+ * \brief Manages advertisements of multiple transport options on an Image topic.
  *
- * CameraPublisher is a convenience class for publishing synchronized image and
- * camera info topics using the standard topic naming convention, where the info
- * topic name is "camera_info" in the same namespace as the base image topic.
+ * Publisher is a drop-in replacement for ros::Publisher when publishing
+ * Image topics. In a minimally built environment, they behave the same; however,
+ * Publisher is extensible via plugins to publish alternative representations of
+ * the image on related subtopics. This is especially useful for limiting bandwidth and
+ * latency over a network connection, when you might (for example) use the theora plugin
+ * to transport the images as streamed video. All topics are published only on demand
+ * (i.e. if there are subscribers).
  *
- * On the client side, CameraSubscriber simplifies subscribing to camera images.
- *
- * A CameraPublisher should always be created through a call to
- * ImageTransport::advertiseCamera(), or copied from one that was.
- * Once all copies of a specific CameraPublisher go out of scope, any subscriber callbacks
- * associated with that handle will stop being called. Once all CameraPublisher for a
+ * A Publisher should always be created through a call to ImageTransport::advertise(),
+ * or copied from one that was.
+ * Once all copies of a specific Publisher go out of scope, any subscriber callbacks
+ * associated with that handle will stop being called. Once all Publisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
-class CameraPublisher
+class Publisher
 {
 public:
   IMAGE_TRANSPORT_PUBLIC
-  CameraPublisher() = default;
+  Publisher() = default;
 
   IMAGE_TRANSPORT_PUBLIC
-  CameraPublisher(
-    rclcpp::Node * node,
+  Publisher(
+    rclcpp::Node * nh,
     const std::string & base_topic,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
-
-  //TODO(ros2) Restore support for SubscriberStatusCallbacks when available.
+    PubLoaderPtr loader,
+    rmw_qos_profile_t custom_qos);
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to
-   * this CameraPublisher.
+   * this Publisher.
    *
-   * Returns max(image topic subscribers, info topic subscribers).
+   * Returns the total number of subscribers to all advertised topics.
    */
   IMAGE_TRANSPORT_PUBLIC
   uint32_t getNumSubscribers() const;
 
   /*!
-   * \brief Returns the base (image) topic of this CameraPublisher.
+   * \brief Returns the base topic of this Publisher.
    */
   IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
 
-  /**
-   * \brief Returns the camera info topic of this CameraPublisher.
+  /*!
+   * \brief Publish an image on the topics associated with this Publisher.
    */
   IMAGE_TRANSPORT_PUBLIC
-  std::string getInfoTopic() const;
+  void publish(const sensor_msgs::msg::Image & message) const;
 
   /*!
-   * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
+   * \brief Publish an image on the topics associated with this Publisher.
    */
   IMAGE_TRANSPORT_PUBLIC
-  void publish(
-    const sensor_msgs::msg::Image & image,
-    const sensor_msgs::msg::CameraInfo & info) const;
-
-  /*!
-   * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
-   */
-  IMAGE_TRANSPORT_PUBLIC
-  void publish(
-    const sensor_msgs::msg::Image::ConstSharedPtr & image,
-    const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const;
-
-  /*!
-   * \brief Publish an (image, info) pair with given timestamp on the topics associated with
-   * this CameraPublisher.
-   *
-   * Convenience version, which sets the timestamps of both image and info to stamp before
-   * publishing.
-   */
-  IMAGE_TRANSPORT_PUBLIC
-  void publish(
-    sensor_msgs::msg::Image & image, sensor_msgs::msg::CameraInfo & info,
-    rclcpp::Time stamp) const;
+  void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const;
 
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
@@ -137,19 +117,19 @@ public:
   operator void *() const;
 
   IMAGE_TRANSPORT_PUBLIC
-  bool operator<(const CameraPublisher & rhs) const {return impl_ < rhs.impl_;}
+  bool operator<(const Publisher & rhs) const {return impl_ < rhs.impl_;}
 
   IMAGE_TRANSPORT_PUBLIC
-  bool operator!=(const CameraPublisher & rhs) const {return impl_ != rhs.impl_;}
+  bool operator!=(const Publisher & rhs) const {return impl_ != rhs.impl_;}
 
   IMAGE_TRANSPORT_PUBLIC
-  bool operator==(const CameraPublisher & rhs) const {return impl_ == rhs.impl_;}
+  bool operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };
 
-} //namespace image_transport
+}  // namespace image_transport
 
-#endif
+#endif  // IMAGE_TRANSPORT__PUBLISHER_HPP_

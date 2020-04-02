@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
-#define IMAGE_TRANSPORT_SUBSCRIBER_PLUGIN_H
+#ifndef IMAGE_TRANSPORT__SUBSCRIBER_PLUGIN_HPP_
+#define IMAGE_TRANSPORT__SUBSCRIBER_PLUGIN_HPP_
 
 #include <rclcpp/macros.hpp>
 #include <rclcpp/node.hpp>
@@ -149,6 +149,6 @@ protected:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default) = 0;
 };
 
-} //namespace image_transport
+}  // namespace image_transport
 
-#endif
+#endif  // IMAGE_TRANSPORT__SUBSCRIBER_PLUGIN_HPP_

@@ -32,13 +32,14 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "image_transport/camera_publisher.h"
-#include "image_transport/image_transport.h"
-#include "image_transport/camera_common.h"
+#include "image_transport/camera_publisher.hpp"
 
 #include <rclcpp/expand_topic_or_service_name.hpp>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/node.hpp>
+
+#include "image_transport/camera_common.hpp"
+#include "image_transport/image_transport.hpp"
 
 namespace image_transport
 {

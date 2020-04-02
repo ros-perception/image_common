@@ -32,104 +32,92 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_PUBLISHER_H
-#define IMAGE_TRANSPORT_PUBLISHER_H
+#ifndef IMAGE_TRANSPORT__SUBSCRIBER_HPP_
+#define IMAGE_TRANSPORT__SUBSCRIBER_HPP_
 
-#include <memory>
-
-#include <rclcpp/macros.hpp>
 #include <rclcpp/node.hpp>
-
 #include <sensor_msgs/msg/image.hpp>
 
-#include "image_transport/single_subscriber_publisher.h"
-#include "image_transport/exception.h"
-#include "image_transport/loader_fwds.h"
+#include "image_transport/exception.hpp"
+#include "image_transport/loader_fwds.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {
 
 /**
- * \brief Manages advertisements of multiple transport options on an Image topic.
+ * \brief Manages a subscription callback on a specific topic that can be interpreted
+ * as an Image topic.
  *
- * Publisher is a drop-in replacement for ros::Publisher when publishing
- * Image topics. In a minimally built environment, they behave the same; however,
- * Publisher is extensible via plugins to publish alternative representations of
- * the image on related subtopics. This is especially useful for limiting bandwidth and
- * latency over a network connection, when you might (for example) use the theora plugin
- * to transport the images as streamed video. All topics are published only on demand
- * (i.e. if there are subscribers).
+ * Subscriber is the client-side counterpart to Publisher. By loading the
+ * appropriate plugin, it can subscribe to a base image topic using any available
+ * transport. The complexity of what transport is actually used is hidden from the user,
+ * who sees only a normal Image callback.
  *
- * A Publisher should always be created through a call to ImageTransport::advertise(),
+ * A Subscriber should always be created through a call to ImageTransport::subscribe(),
  * or copied from one that was.
- * Once all copies of a specific Publisher go out of scope, any subscriber callbacks
- * associated with that handle will stop being called. Once all Publisher for a
- * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
+ * Once all copies of a specific Subscriber go out of scope, the subscription callback
+ * associated with that handle will stop being called. Once all Subscriber for a given
+ * topic go out of scope the topic will be unsubscribed.
  */
-class Publisher
+class Subscriber
 {
 public:
-  IMAGE_TRANSPORT_PUBLIC
-  Publisher() = default;
+  typedef std::function<void (const sensor_msgs::msg::Image::ConstSharedPtr &)> Callback;
 
   IMAGE_TRANSPORT_PUBLIC
-  Publisher(
-    rclcpp::Node * nh,
+  Subscriber() = default;
+
+  IMAGE_TRANSPORT_PUBLIC
+  Subscriber(
+    rclcpp::Node * node,
     const std::string & base_topic,
-    PubLoaderPtr loader,
-    rmw_qos_profile_t custom_qos);
+    const Callback & callback,
+    SubLoaderPtr loader,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
-  /*!
-   * \brief Returns the number of subscribers that are currently connected to
-   * this Publisher.
+  /**
+   * \brief Returns the base image topic.
    *
-   * Returns the total number of subscribers to all advertised topics.
-   */
-  IMAGE_TRANSPORT_PUBLIC
-  uint32_t getNumSubscribers() const;
-
-  /*!
-   * \brief Returns the base topic of this Publisher.
+   * The Subscriber may actually be subscribed to some transport-specific topic that
+   * differs from the base topic.
    */
   IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
 
-  /*!
-   * \brief Publish an image on the topics associated with this Publisher.
+  /**
+   * \brief Returns the number of publishers this subscriber is connected to.
    */
   IMAGE_TRANSPORT_PUBLIC
-  void publish(const sensor_msgs::msg::Image & message) const;
+  uint32_t getNumPublishers() const;
 
-  /*!
-   * \brief Publish an image on the topics associated with this Publisher.
+  /**
+   * \brief Returns the name of the transport being used.
    */
   IMAGE_TRANSPORT_PUBLIC
-  void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const;
+  std::string getTransport() const;
 
-  /*!
-   * \brief Shutdown the advertisements associated with this Publisher.
+  /**
+   * \brief Unsubscribe the callback associated with this Subscriber.
    */
   IMAGE_TRANSPORT_PUBLIC
   void shutdown();
 
   IMAGE_TRANSPORT_PUBLIC
   operator void *() const;
-
   IMAGE_TRANSPORT_PUBLIC
-  bool operator<(const Publisher & rhs) const {return impl_ < rhs.impl_;}
-
+  bool operator<(const Subscriber & rhs) const {return impl_ < rhs.impl_;}
   IMAGE_TRANSPORT_PUBLIC
-  bool operator!=(const Publisher & rhs) const {return impl_ != rhs.impl_;}
-
+  bool operator!=(const Subscriber & rhs) const {return impl_ != rhs.impl_;}
   IMAGE_TRANSPORT_PUBLIC
-  bool operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
+  bool operator==(const Subscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };
 
-} //namespace image_transport
+}  // namespace image_transport
 
-#endif
+#endif  // IMAGE_TRANSPORT__SUBSCRIBER_HPP_

@@ -32,59 +32,63 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_SUBSCRIBER_H
-#define IMAGE_TRANSPORT_SUBSCRIBER_H
+#ifndef IMAGE_TRANSPORT__CAMERA_SUBSCRIBER_HPP_
+#define IMAGE_TRANSPORT__CAMERA_SUBSCRIBER_HPP_
+
+#include <functional>
 
 #include <rclcpp/node.hpp>
-#include <sensor_msgs/msg/image.hpp>
 
-#include "image_transport/exception.h"
-#include "image_transport/loader_fwds.h"
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <sensor_msgs/msg/image.hpp>
 #include "image_transport/visibility_control.hpp"
 
-namespace image_transport
-{
+namespace image_transport {
+
+class ImageTransport;
 
 /**
- * \brief Manages a subscription callback on a specific topic that can be interpreted
- * as an Image topic.
+ * \brief Manages a subscription callback on synchronized Image and CameraInfo topics.
  *
- * Subscriber is the client-side counterpart to Publisher. By loading the
- * appropriate plugin, it can subscribe to a base image topic using any available
- * transport. The complexity of what transport is actually used is hidden from the user,
- * who sees only a normal Image callback.
+ * CameraSubscriber is the client-side counterpart to CameraPublisher, and assumes the
+ * same topic naming convention. The callback is of type:
+\verbatim
+void callback(const sensor_msgs::msg::Image::ConstSharedPtr&, const sensor_msgs::msg::CameraInfo::ConstSharedPtr&);
+\endverbatim
  *
- * A Subscriber should always be created through a call to ImageTransport::subscribe(),
- * or copied from one that was.
- * Once all copies of a specific Subscriber go out of scope, the subscription callback
- * associated with that handle will stop being called. Once all Subscriber for a given
+ * A CameraSubscriber should always be created through a call to
+ * ImageTransport::subscribeCamera(), or copied from one that was.
+ * Once all copies of a specific CameraSubscriber go out of scope, the subscription callback
+ * associated with that handle will stop being called. Once all CameraSubscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
-class Subscriber
+class CameraSubscriber
 {
 public:
-  typedef std::function<void (const sensor_msgs::msg::Image::ConstSharedPtr &)> Callback;
+  typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&,
+                             const sensor_msgs::msg::CameraInfo::ConstSharedPtr&)> Callback;
 
   IMAGE_TRANSPORT_PUBLIC
-  Subscriber() = default;
+  CameraSubscriber() = default;
 
   IMAGE_TRANSPORT_PUBLIC
-  Subscriber(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const Callback & callback,
-    SubLoaderPtr loader,
-    const std::string & transport,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+  CameraSubscriber(rclcpp::Node * node,
+                   const std::string& base_topic,
+                   const Callback& callback,
+                   const std::string& transport,
+                   rmw_qos_profile_t = rmw_qos_profile_default);
 
   /**
-   * \brief Returns the base image topic.
-   *
-   * The Subscriber may actually be subscribed to some transport-specific topic that
-   * differs from the base topic.
+   * \brief Get the base topic (on which the raw image is published).
    */
   IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
+
+  /**
+   * \brief Get the camera info topic.
+   */
+  IMAGE_TRANSPORT_PUBLIC
+  std::string getInfoTopic() const;
 
   /**
    * \brief Returns the number of publishers this subscriber is connected to.
@@ -99,25 +103,28 @@ public:
   std::string getTransport() const;
 
   /**
-   * \brief Unsubscribe the callback associated with this Subscriber.
+   * \brief Unsubscribe the callback associated with this CameraSubscriber.
    */
   IMAGE_TRANSPORT_PUBLIC
   void shutdown();
 
   IMAGE_TRANSPORT_PUBLIC
-  operator void *() const;
+  operator void*() const;
+
   IMAGE_TRANSPORT_PUBLIC
-  bool operator<(const Subscriber & rhs) const {return impl_ < rhs.impl_;}
+  bool operator< (const CameraSubscriber& rhs) const { return impl_ <  rhs.impl_; }
+
   IMAGE_TRANSPORT_PUBLIC
-  bool operator!=(const Subscriber & rhs) const {return impl_ != rhs.impl_;}
+  bool operator!=(const CameraSubscriber& rhs) const { return impl_ != rhs.impl_; }
+
   IMAGE_TRANSPORT_PUBLIC
-  bool operator==(const Subscriber & rhs) const {return impl_ == rhs.impl_;}
+  bool operator==(const CameraSubscriber& rhs) const { return impl_ == rhs.impl_; }
 
 private:
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };
 
-} //namespace image_transport
+}  // namespace image_transport
 
 #endif
