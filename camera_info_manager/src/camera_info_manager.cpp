@@ -316,6 +316,17 @@ bool CameraInfoManager::loadCameraInfo(const std::string & url)
   return loadCalibration(url, cname);
 }
 
+std::string get_env(const char * env_var)
+{
+  char * output_env_var = nullptr;
+#ifndef _WIN32
+  output_env_var = getenv(env_var);
+#else
+  size_t env_var_size;
+  _dupenv_s(&output_env_var, &env_var_size, env_var);
+#endif
+  return std::string(output_env_var);
+}
 
 /** Resolve Uniform Resource Locator string.
  *
@@ -355,13 +366,14 @@ std::string CameraInfoManager::resolveURL(
     } else if (url.substr(dollar + 1, 10) == "{ROS_HOME}") {
       // substitute $ROS_HOME
       std::string ros_home;
-      char * ros_home_env;
-      if ((ros_home_env = getenv("ROS_HOME"))) {
+      std::string ros_home_env = get_env("ROS_HOME");
+      std::string home_env = get_env("HOME");
+      if (!ros_home_env.empty()) {
         // use environment variable
         ros_home = ros_home_env;
-      } else if ((ros_home_env = getenv("HOME"))) {
+      } else if (!home_env.empty()) {
         // use "$HOME/.ros"
-        ros_home = ros_home_env;
+        ros_home = home_env;
         ros_home += "/.ros";
       }
       resolved += ros_home;
