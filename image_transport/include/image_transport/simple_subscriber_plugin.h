@@ -75,7 +75,7 @@ public:
     return std::string();
   }
 
-  virtual uint32_t getNumPublishers() const
+  virtual size_t getNumPublishers() const
   {
     if (impl_) {
       return impl_->sub_->get_publisher_count();

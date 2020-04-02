@@ -77,7 +77,7 @@ public:
    * \brief Returns the number of subscribers that are currently connected to
    * this PublisherPlugin.
    */
-  virtual uint32_t getNumSubscribers() const = 0;
+  virtual size_t getNumSubscribers() const = 0;
 
   /**
    * \brief Returns the communication topic that this PublisherPlugin will publish on.

@@ -70,7 +70,7 @@ class SimplePublisherPlugin : public PublisherPlugin
 public:
   virtual ~SimplePublisherPlugin() {}
 
-  virtual uint32_t getNumSubscribers() const
+  virtual size_t getNumSubscribers() const
   {
     if (simple_impl_) {
       return simple_impl_->pub_->get_subscription_count();
