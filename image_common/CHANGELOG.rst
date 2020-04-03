@@ -2,6 +2,11 @@
 Changelog for package image_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Noetic release image_common (`#155 <https://github.com/ros-perception/image_common/issues/155>`_)
+* Contributors: Alejandro Hernández Cordero
+
 1.11.14 (2020-04-03)
 --------------------
 

@@ -2,6 +2,11 @@
 Changelog for package polled_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Noetic release image_common (`#155 <https://github.com/ros-perception/image_common/issues/155>`_)
+* Contributors: Alejandro Hernández Cordero
+
 1.11.14 (2020-04-03)
 --------------------
 * export runtime binaries correctly on Windows (`#116 <https://github.com/ros-perception/image_common/issues/116>`_)

@@ -2,6 +2,19 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Noetic release image_common (`#155 <https://github.com/ros-perception/image_common/issues/155>`_)
+  * noetic - Porting Python to Python3
+  Signed-off-by: ahcorde <ahcorde@gmail.com>
+  * Updated cmake_minimum_required to 3.0.2
+  Signed-off-by: ahcorde <ahcorde@gmail.com>
+  * changed diskutils.core for setuptools
+  Signed-off-by: ahcorde <ahcorde@gmail.com>
+  * ported to noetic image_transport tutorial
+  Signed-off-by: ahcorde <ahcorde@gmail.com>
+* Contributors: Alejandro Hernández Cordero
+
 1.11.14 (2020-04-03)
 --------------------
 * export runtime binaries correctly on Windows (`#116 <https://github.com/ros-perception/image_common/issues/116>`_)
