@@ -2,8 +2,8 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.12.0 (2020-04-03)
+-------------------
 * Noetic release image_common (`#155 <https://github.com/ros-perception/image_common/issues/155>`_)
   * noetic - Porting Python to Python3
   Signed-off-by: ahcorde <ahcorde@gmail.com>
