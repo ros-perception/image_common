@@ -2,8 +2,8 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.11.14 (2020-04-03)
+--------------------
 * export runtime binaries correctly on Windows (`#116 <https://github.com/ros-perception/image_common/issues/116>`_)
 * add indentation, and use _WIN32 instead of WIN32 (`#117 <https://github.com/ros-perception/image_common/issues/117>`_)
 * add DLL import/export macro (`#118 <https://github.com/ros-perception/image_common/issues/118>`_)
