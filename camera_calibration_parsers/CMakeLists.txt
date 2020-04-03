@@ -1,14 +1,10 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0.2)
 project(camera_calibration_parsers)
 
 find_package(catkin REQUIRED sensor_msgs rosconsole roscpp roscpp_serialization)
 
 find_package(PythonLibs REQUIRED)
-if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
-  find_package(Boost REQUIRED COMPONENTS filesystem python)
-else()
-  find_package(Boost REQUIRED COMPONENTS filesystem python3)
-endif()
+find_package(Boost REQUIRED COMPONENTS filesystem python)
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 
 catkin_python_setup()
