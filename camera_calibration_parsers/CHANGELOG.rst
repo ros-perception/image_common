@@ -2,6 +2,9 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.11.13 (2017-11-05)
 --------------------
 * Use Boost_LIBRARIES instead of Boost_PYTHON_LIBRARY

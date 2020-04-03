@@ -2,6 +2,13 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* export runtime binaries correctly on Windows (`#116 <https://github.com/ros-perception/image_common/issues/116>`_)
+* add indentation, and use _WIN32 instead of WIN32 (`#117 <https://github.com/ros-perception/image_common/issues/117>`_)
+* add DLL import/export macro (`#118 <https://github.com/ros-perception/image_common/issues/118>`_)
+* Contributors: James Xu
+
 1.11.13 (2017-11-05)
 --------------------
 * Fix the find_package(catkin) redundancy

@@ -2,6 +2,12 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* export runtime binaries correctly on Windows (`#116 <https://github.com/ros-perception/image_common/issues/116>`_)
+* add DLL import/export macro (`#118 <https://github.com/ros-perception/image_common/issues/118>`_)
+* Contributors: James Xu
+
 1.11.13 (2017-11-05)
 --------------------
 * Disable image publisher plugins by name (`#60 <https://github.com/ros-perception/image_common/issues/60>`_)
