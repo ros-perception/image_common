@@ -45,6 +45,7 @@
 #include "rclcpp/node.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "sensor_msgs/srv/set_camera_info.hpp"
+#include "camera_info_manager/visibility_control.h"
 
 /** @file
 
@@ -177,7 +178,7 @@ using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
 
 */
 
-class CameraInfoManager
+class CAMERA_INFO_MANAGER_PUBLIC CameraInfoManager
 {
 public:
   CameraInfoManager(
