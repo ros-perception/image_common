@@ -318,14 +318,20 @@ bool CameraInfoManager::loadCameraInfo(const std::string & url)
 
 std::string get_env(const char * env_var)
 {
-  char * output_env_var = nullptr;
 #ifndef _WIN32
-  output_env_var = getenv(env_var);
+  auto env_variable = getenv(env_var);
 #else
+  char * output_env_var = nullptr;
   size_t env_var_size;
   _dupenv_s(&output_env_var, &env_var_size, env_var);
+
+  std::string env_variable = "";
+  if (output_env_var) {
+    env_variable = std::string(output_env_var);
+    free(output_env_var);
+  }
 #endif
-  return std::string(output_env_var);
+  return env_variable;
 }
 
 /** Resolve Uniform Resource Locator string.
