@@ -87,7 +87,7 @@ public:
    * Returns the total number of subscribers to all advertised topics.
    */
   IMAGE_TRANSPORT_PUBLIC
-  uint32_t getNumSubscribers() const;
+  size_t getNumSubscribers() const;
 
   /*!
    * \brief Returns the base topic of this Publisher.

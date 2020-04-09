@@ -96,7 +96,7 @@ CameraPublisher::CameraPublisher(
   impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
 }
 
-uint32_t CameraPublisher::getNumSubscribers() const
+size_t CameraPublisher::getNumSubscribers() const
 {
   //TODO(ros2) add support when rcl/rmw support it.
   //if (impl_ && impl_->isValid())

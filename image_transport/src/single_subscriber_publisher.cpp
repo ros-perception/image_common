@@ -61,7 +61,7 @@ std::string SingleSubscriberPublisher::getTopic() const
   return topic_;
 }
 
-uint32_t SingleSubscriberPublisher::getNumSubscribers() const
+size_t SingleSubscriberPublisher::getNumSubscribers() const
 {
   return num_subscribers_fn_();
 }

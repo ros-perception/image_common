@@ -134,7 +134,7 @@ std::string Subscriber::getTopic() const
   return std::string();
 }
 
-uint32_t Subscriber::getNumPublishers() const
+size_t Subscriber::getNumPublishers() const
 {
   if (impl_) {return impl_->subscriber_->getNumPublishers();}
   return 0;

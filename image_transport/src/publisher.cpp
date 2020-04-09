@@ -61,9 +61,9 @@ struct Publisher::Impl
     shutdown();
   }
 
-  uint32_t getNumSubscribers() const
+  size_t getNumSubscribers() const
   {
-    uint32_t count = 0;
+    size_t count = 0;
     for (const auto & pub: publishers_) {
       count += pub->getNumSubscribers();
     }
@@ -139,7 +139,7 @@ Publisher::Publisher(
   }
 }
 
-uint32_t Publisher::getNumSubscribers() const
+size_t Publisher::getNumSubscribers() const
 {
   if (impl_ && impl_->isValid()) {return impl_->getNumSubscribers();}
   return 0;

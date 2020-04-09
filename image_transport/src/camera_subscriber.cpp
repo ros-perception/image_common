@@ -151,7 +151,7 @@ std::string CameraSubscriber::getInfoTopic() const
   return std::string();
 }
 
-uint32_t CameraSubscriber::getNumPublishers() const
+size_t CameraSubscriber::getNumPublishers() const
 {
   // TODO(ros2) Fix this when ros2 has better subscriber counting.
   /// @todo Fix this when message_filters::Subscriber has getNumPublishers()

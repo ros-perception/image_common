@@ -94,7 +94,7 @@ public:
    * \brief Returns the number of publishers this subscriber is connected to.
    */
   IMAGE_TRANSPORT_PUBLIC
-  uint32_t getNumPublishers() const;
+  size_t getNumPublishers() const;
 
   /**
    * \brief Returns the name of the transport being used.

@@ -85,7 +85,7 @@ public:
    * Returns max(image topic subscribers, info topic subscribers).
    */
   IMAGE_TRANSPORT_PUBLIC
-  uint32_t getNumSubscribers() const;
+  size_t getNumSubscribers() const;
 
   /*!
    * \brief Returns the base (image) topic of this CameraPublisher.

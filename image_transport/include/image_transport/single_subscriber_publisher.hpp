@@ -58,7 +58,7 @@ private:
   SingleSubscriberPublisher& operator=( const SingleSubscriberPublisher& ) = delete;
 
 public:
-  typedef std::function<uint32_t()> GetNumSubscribersFn;
+  typedef std::function<size_t()> GetNumSubscribersFn;
   typedef std::function<void(const sensor_msgs::msg::Image&)> PublishFn;
 
   IMAGE_TRANSPORT_PUBLIC
@@ -74,7 +74,7 @@ public:
   std::string getTopic() const;
 
   IMAGE_TRANSPORT_PUBLIC
-  uint32_t getNumSubscribers() const;
+  size_t getNumSubscribers() const;
 
   IMAGE_TRANSPORT_PUBLIC
   void publish(const sensor_msgs::msg::Image& message) const;

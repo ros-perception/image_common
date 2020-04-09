@@ -59,8 +59,8 @@ TEST_F(TestPublisher, RemappedPublisher) {
   ASSERT_FALSE(received);
 
   size_t retry = 0;
-  uint32_t nSub = 0;
-  uint32_t nPub = 0;
+  size_t nSub = 0;
+  size_t nPub = 0;
   while (retry < max_retries && nPub == 0 && nSub == 0)
   {
     nSub = pub.getNumSubscribers();
