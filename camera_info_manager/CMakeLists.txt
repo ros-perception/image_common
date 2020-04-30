@@ -11,6 +11,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+if(MSVC)
+  add_compile_definitions(_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING)
+endif()
+
 find_package(ament_cmake_ros REQUIRED)
 
 find_package(ament_index_cpp REQUIRED)
@@ -23,6 +27,8 @@ include_directories(include)
 
 # add a library
 add_library(${PROJECT_NAME} src/camera_info_manager.cpp)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_INFO_MANAGER_BUILDING_DLL")
 
 ament_target_dependencies(
   ${PROJECT_NAME}
