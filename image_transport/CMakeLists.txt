@@ -85,9 +85,14 @@ ament_export_libraries(${PROJECT_NAME})
 ament_export_dependencies(message_filters rclcpp sensor_msgs pluginlib)
 
 if(BUILD_TESTING)
-  #TODO(ros2) enable linting
-  #find_package(ament_lint_auto REQUIRED)
-  #ament_lint_auto_find_test_dependencies()
+  find_package(ament_lint_auto REQUIRED)
+
+  list(APPEND AMENT_LINT_AUTO_EXCLUDE
+    ament_cmake_cppcheck
+  )
+  ament_lint_auto_find_test_dependencies()
+
+  ament_cppcheck(LANGUAGE "c++")
 
   find_package(ament_cmake_gtest)
 
