@@ -83,7 +83,8 @@ TEST_F(MessagePassingTesting, one_message_passing)
   rclcpp::executors::SingleThreadedExecutor executor;
 
   auto pub = image_transport::create_publisher(node_.get(), "camera/image");
-  auto sub = image_transport::create_subscription(node_.get(), "camera/image", imageCallback, "raw");
+  auto sub =
+    image_transport::create_subscription(node_.get(), "camera/image", imageCallback, "raw");
 
   test_rclcpp::wait_for_subscriber(node_, sub.getTopic());
 
@@ -95,7 +96,7 @@ TEST_F(MessagePassingTesting, one_message_passing)
   ASSERT_EQ(0, total_images_received);
 
   size_t retry = 0;
-  while(retry < max_retries && total_images_received == 0) {
+  while (retry < max_retries && total_images_received == 0) {
     // generate random image and publish it
     pub.publish(generate_random_image());
 
@@ -120,13 +121,13 @@ TEST_F(MessagePassingTesting, one_camera_message_passing)
 
   auto pub = image_transport::create_camera_publisher(node_.get(), "camera/image");
   auto sub = image_transport::create_camera_subscription(node_.get(), "camera/image",
-      [](const sensor_msgs::msg::Image::ConstSharedPtr& image,
-             const sensor_msgs::msg::CameraInfo::ConstSharedPtr& info) {
-      (void) image;
-      (void) info;
-      total_images_received++;
-    },
-    "raw"
+      [](const sensor_msgs::msg::Image::ConstSharedPtr & image,
+      const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) {
+        (void) image;
+        (void) info;
+        total_images_received++;
+      },
+      "raw"
   );
 
   test_rclcpp::wait_for_subscriber(node_, sub.getTopic());
@@ -136,7 +137,7 @@ TEST_F(MessagePassingTesting, one_camera_message_passing)
   ASSERT_EQ(0, total_images_received);
 
   size_t retry = 0;
-  while(retry < max_retries && total_images_received == 0) {
+  while (retry < max_retries && total_images_received == 0) {
     // generate random image and publish it
     pub.publish(*generate_random_image().get(), sensor_msgs::msg::CameraInfo());
 

@@ -45,7 +45,8 @@
 
 #include "image_transport/visibility_control.hpp"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief Allows publication of an image to a single subscriber. Only available inside
@@ -54,12 +55,12 @@ namespace image_transport {
 class SingleSubscriberPublisher
 {
 private:
-  SingleSubscriberPublisher(const SingleSubscriberPublisher&) = delete;
-  SingleSubscriberPublisher& operator=( const SingleSubscriberPublisher& ) = delete;
+  SingleSubscriberPublisher(const SingleSubscriberPublisher &) = delete;
+  SingleSubscriberPublisher & operator=(const SingleSubscriberPublisher &) = delete;
 
 public:
   typedef std::function<uint32_t()> GetNumSubscribersFn;
-  typedef std::function<void(const sensor_msgs::msg::Image&)> PublishFn;
+  typedef std::function<void (const sensor_msgs::msg::Image &)> PublishFn;
 
   IMAGE_TRANSPORT_PUBLIC
   SingleSubscriberPublisher(
@@ -77,10 +78,10 @@ public:
   uint32_t getNumSubscribers() const;
 
   IMAGE_TRANSPORT_PUBLIC
-  void publish(const sensor_msgs::msg::Image& message) const;
+  void publish(const sensor_msgs::msg::Image & message) const;
 
   IMAGE_TRANSPORT_PUBLIC
-  void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const;
+  void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const;
 
 private:
   std::string caller_id_;

@@ -39,7 +39,8 @@
 #include "image_transport/simple_subscriber_plugin.h"
 #include "image_transport/visibility_control.hpp"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief The default SubscriberPlugin.
@@ -58,12 +59,14 @@ public:
   }
 
 protected:
-  virtual void internalCallback(const std::shared_ptr<const sensor_msgs::msg::Image>& message, const Callback& user_cb)
+  virtual void internalCallback(
+    const std::shared_ptr<const sensor_msgs::msg::Image> & message,
+    const Callback & user_cb)
   {
     user_cb(message);
   }
 
-  virtual std::string getTopicToSubscribe(const std::string& base_topic) const
+  virtual std::string getTopicToSubscribe(const std::string & base_topic) const
   {
     return base_topic;
   }

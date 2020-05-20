@@ -47,7 +47,7 @@ enum PluginStatus {SUCCESS, CREATE_FAILURE, LIB_LOAD_FAILURE, DOES_NOT_EXIST};
 struct TransportDesc
 {
   TransportDesc()
-    : pub_status(DOES_NOT_EXIST), sub_status(DOES_NOT_EXIST)
+  : pub_status(DOES_NOT_EXIST), sub_status(DOES_NOT_EXIST)
   {}
 
   std::string package_name;
@@ -58,76 +58,75 @@ struct TransportDesc
 };
 /// \endcond
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int /*argc*/, char ** /*argv*/)
 {
   ClassLoader<PublisherPlugin> pub_loader("image_transport", "image_transport::PublisherPlugin");
   ClassLoader<SubscriberPlugin> sub_loader("image_transport", "image_transport::SubscriberPlugin");
   typedef std::map<std::string, TransportDesc> StatusMap;
   StatusMap transports;
 
-  for(const std::string& lookup_name: pub_loader.getDeclaredClasses()) {
+  for (const std::string & lookup_name: pub_loader.getDeclaredClasses()) {
     std::string transport_name = erase_last_copy(lookup_name, "_pub");
     transports[transport_name].pub_name = lookup_name;
     transports[transport_name].package_name = pub_loader.getClassPackage(lookup_name);
     try {
       auto pub = pub_loader.createUniqueInstance(lookup_name);
       transports[transport_name].pub_status = SUCCESS;
-    }
-    catch (const LibraryLoadException&) {
+    } catch (const LibraryLoadException &) {
       transports[transport_name].pub_status = LIB_LOAD_FAILURE;
-    }
-    catch (const CreateClassException&) {
+    } catch (const CreateClassException &) {
       transports[transport_name].pub_status = CREATE_FAILURE;
     }
   }
 
-  for(const std::string& lookup_name: sub_loader.getDeclaredClasses()) {
+  for (const std::string & lookup_name: sub_loader.getDeclaredClasses()) {
     std::string transport_name = erase_last_copy(lookup_name, "_sub");
     transports[transport_name].sub_name = lookup_name;
     transports[transport_name].package_name = sub_loader.getClassPackage(lookup_name);
     try {
       auto sub = sub_loader.createUniqueInstance(lookup_name);
       transports[transport_name].sub_status = SUCCESS;
-    }
-    catch (const LibraryLoadException&) {
+    } catch (const LibraryLoadException &) {
       transports[transport_name].sub_status = LIB_LOAD_FAILURE;
-    }
-    catch (const CreateClassException&) {
+    } catch (const CreateClassException &) {
       transports[transport_name].sub_status = CREATE_FAILURE;
     }
   }
 
   printf("Declared transports:\n");
-  for(const StatusMap::value_type& value: transports) {
-    const TransportDesc& td = value.second;
+  for (const StatusMap::value_type & value: transports) {
+    const TransportDesc & td = value.second;
     printf("%s", value.first.c_str());
     if ((td.pub_status == CREATE_FAILURE || td.pub_status == LIB_LOAD_FAILURE) ||
-        (td.sub_status == CREATE_FAILURE || td.sub_status == LIB_LOAD_FAILURE)) {
+      (td.sub_status == CREATE_FAILURE || td.sub_status == LIB_LOAD_FAILURE))
+    {
       printf(" (*): Not available. Try 'catkin_make --pkg %s'.", td.package_name.c_str());
     }
     printf("\n");
   }
 
   printf("\nDetails:\n");
-  for(const auto& value: transports) {
-    const TransportDesc& td = value.second;
+  for (const auto & value: transports) {
+    const TransportDesc & td = value.second;
     printf("----------\n");
     printf("\"%s\"\n", value.first.c_str());
     if (td.pub_status == CREATE_FAILURE || td.sub_status == CREATE_FAILURE) {
-      printf("*** Plugins are built, but could not be loaded. The package may need to be rebuilt or may not be compatible with this release of image_common. ***\n");
-    }
-    else if (td.pub_status == LIB_LOAD_FAILURE || td.sub_status == LIB_LOAD_FAILURE) {
+      printf(
+        "*** Plugins are built, but could not be loaded. The package may need to be rebuilt or may not be compatible with this release of image_common. ***\n");
+    } else if (td.pub_status == LIB_LOAD_FAILURE || td.sub_status == LIB_LOAD_FAILURE) {
       printf("*** Plugins are not built. ***\n");
     }
     printf(" - Provided by package: %s\n", td.package_name.c_str());
-    if (td.pub_status == DOES_NOT_EXIST)
+    if (td.pub_status == DOES_NOT_EXIST) {
       printf(" - No publisher provided\n");
-    else
+    } else {
       printf(" - Publisher: %s\n", pub_loader.getClassDescription(td.pub_name).c_str());
-    if (td.sub_status == DOES_NOT_EXIST)
+    }
+    if (td.sub_status == DOES_NOT_EXIST) {
       printf(" - No subscriber provided\n");
-    else
+    } else {
       printf(" - Subscriber: %s\n", sub_loader.getClassDescription(td.sub_name).c_str());
+    }
   }
 
   return 0;

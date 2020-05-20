@@ -38,19 +38,22 @@
 // Forward-declare some classes most users shouldn't care about so that
 // image_transport.h doesn't bring them in.
 
-namespace pluginlib {
-  template<class T> class ClassLoader;
+namespace pluginlib
+{
+template<class T>
+class ClassLoader;
 }
 
-namespace image_transport {
-  class PublisherPlugin;
-  class SubscriberPlugin;
+namespace image_transport
+{
+class PublisherPlugin;
+class SubscriberPlugin;
 
-  typedef pluginlib::ClassLoader<PublisherPlugin> PubLoader;
-  typedef std::shared_ptr<PubLoader> PubLoaderPtr;
+typedef pluginlib::ClassLoader<PublisherPlugin> PubLoader;
+typedef std::shared_ptr<PubLoader> PubLoaderPtr;
 
-  typedef pluginlib::ClassLoader<SubscriberPlugin> SubLoader;
-  typedef std::shared_ptr<SubLoader> SubLoaderPtr;
+typedef pluginlib::ClassLoader<SubscriberPlugin> SubLoader;
+typedef std::shared_ptr<SubLoader> SubLoaderPtr;
 }
 
 #endif

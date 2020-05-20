@@ -39,7 +39,8 @@
 
 #include "image_transport/visibility_control.hpp"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief A base class for all image_transport exceptions inheriting from std::runtime_error.
@@ -47,7 +48,8 @@ namespace image_transport {
 class Exception : public std::runtime_error
 {
 public:
-  Exception(const std::string& message) : std::runtime_error(message) {}
+  Exception(const std::string & message)
+  : std::runtime_error(message) {}
 };
 
 /**
@@ -56,16 +58,16 @@ public:
 class TransportLoadException : public Exception
 {
 public:
-  TransportLoadException(const std::string& transport, const std::string& message)
-    : Exception("Unable to load plugin for transport '" + transport + "', error string:\n" + message),
-      transport_(transport.c_str())
+  TransportLoadException(const std::string & transport, const std::string & message)
+  : Exception("Unable to load plugin for transport '" + transport + "', error string:\n" + message),
+    transport_(transport.c_str())
   {
   }
 
-  std::string getTransport() const { return transport_; }
+  std::string getTransport() const {return transport_;}
 
 protected:
-  const char* transport_;
+  const char * transport_;
 };
 
 } //namespace image_transport

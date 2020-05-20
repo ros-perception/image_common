@@ -39,8 +39,9 @@
 namespace image_transport
 {
 
-std::vector<std::string> split(std::string input,
-                               const std::string & delim)
+std::vector<std::string> split(
+  std::string input,
+  const std::string & delim)
 {
   size_t pos = 0;
   std::vector<std::string> out;
@@ -63,7 +64,7 @@ std::string getCameraInfoTopic(const std::string & base_topic)
   auto tokens = split(base_topic, "/");
 
   if (tokens.size() > 0) {
-    for(size_t ii = 0; ii < tokens.size() - 1; ++ii) {
+    for (size_t ii = 0; ii < tokens.size() - 1; ++ii) {
       info_topic.append("/");
       info_topic.append(tokens[ii]);
     }

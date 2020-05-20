@@ -52,8 +52,8 @@ struct CameraSubscriber::Impl
   using CameraInfo = sensor_msgs::msg::CameraInfo;
   using TimeSync = message_filters::TimeSynchronizer<Image, CameraInfo>;
 
-  Impl(rclcpp::Node* node)
-  : logger_(node->get_logger()) ,
+  Impl(rclcpp::Node * node)
+  : logger_(node->get_logger()),
     sync_(10),
     unsubscribed_(false),
     image_received_(0), info_received_(0), both_received_(0)

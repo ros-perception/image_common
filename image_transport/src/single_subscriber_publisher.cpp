@@ -70,7 +70,8 @@ void SingleSubscriberPublisher::publish(const sensor_msgs::msg::Image & message)
   publish_fn_(message);
 }
 
-void SingleSubscriberPublisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
+void SingleSubscriberPublisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message)
+const
 {
   publish_fn_(*message);
 }

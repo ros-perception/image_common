@@ -39,7 +39,8 @@
 #include "image_transport/simple_publisher_plugin.h"
 #include "image_transport/visibility_control.hpp"
 
-namespace image_transport {
+namespace image_transport
+{
 
 /**
  * \brief The default PublisherPlugin.
@@ -59,12 +60,12 @@ public:
   }
 
 protected:
-  virtual void publish(const sensor_msgs::msg::Image& message, const PublishFn& publish_fn) const
+  virtual void publish(const sensor_msgs::msg::Image & message, const PublishFn & publish_fn) const
   {
     publish_fn(message);
   }
 
-  virtual std::string getTopicToAdvertise(const std::string& base_topic) const
+  virtual std::string getTopicToAdvertise(const std::string & base_topic) const
   {
     return base_topic;
   }

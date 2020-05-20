@@ -43,7 +43,8 @@
 #include <sensor_msgs/msg/image.hpp>
 #include "image_transport/visibility_control.hpp"
 
-namespace image_transport {
+namespace image_transport
+{
 
 class ImageTransport;
 
@@ -65,18 +66,19 @@ void callback(const sensor_msgs::msg::Image::ConstSharedPtr&, const sensor_msgs:
 class CameraSubscriber
 {
 public:
-  typedef std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr&,
-                             const sensor_msgs::msg::CameraInfo::ConstSharedPtr&)> Callback;
+  typedef std::function<void (const sensor_msgs::msg::Image::ConstSharedPtr &,
+      const sensor_msgs::msg::CameraInfo::ConstSharedPtr &)> Callback;
 
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber() = default;
 
   IMAGE_TRANSPORT_PUBLIC
-  CameraSubscriber(rclcpp::Node * node,
-                   const std::string& base_topic,
-                   const Callback& callback,
-                   const std::string& transport,
-                   rmw_qos_profile_t = rmw_qos_profile_default);
+  CameraSubscriber(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    const Callback & callback,
+    const std::string & transport,
+    rmw_qos_profile_t = rmw_qos_profile_default);
 
   /**
    * \brief Get the base topic (on which the raw image is published).
@@ -109,16 +111,16 @@ public:
   void shutdown();
 
   IMAGE_TRANSPORT_PUBLIC
-  operator void*() const;
+  operator void *() const;
 
   IMAGE_TRANSPORT_PUBLIC
-  bool operator< (const CameraSubscriber& rhs) const { return impl_ <  rhs.impl_; }
+  bool operator<(const CameraSubscriber & rhs) const {return impl_ < rhs.impl_;}
 
   IMAGE_TRANSPORT_PUBLIC
-  bool operator!=(const CameraSubscriber& rhs) const { return impl_ != rhs.impl_; }
+  bool operator!=(const CameraSubscriber & rhs) const {return impl_ != rhs.impl_;}
 
   IMAGE_TRANSPORT_PUBLIC
-  bool operator==(const CameraSubscriber& rhs) const { return impl_ == rhs.impl_; }
+  bool operator==(const CameraSubscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
   struct Impl;

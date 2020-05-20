@@ -57,7 +57,7 @@ namespace image_transport
  */
 IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
-  rclcpp::Node* node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
@@ -66,7 +66,7 @@ Publisher create_publisher(
  */
 IMAGE_TRANSPORT_PUBLIC
 Subscriber create_subscription(
-  rclcpp::Node* node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   const Subscriber::Callback & callback,
   const std::string & transport,
@@ -77,7 +77,7 @@ Subscriber create_subscription(
  */
 IMAGE_TRANSPORT_PUBLIC
 CameraPublisher create_camera_publisher(
-  rclcpp::Node* node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
@@ -86,7 +86,7 @@ CameraPublisher create_camera_publisher(
  */
 IMAGE_TRANSPORT_PUBLIC
 CameraSubscriber create_camera_subscription(
-  rclcpp::Node* node,
+  rclcpp::Node * node,
   const std::string & base_topic,
   const CameraSubscriber::Callback & callback,
   const std::string & transport,
@@ -105,7 +105,7 @@ std::vector<std::string> getLoadableTransports();
  * subscribe() functions for creating advertisements and subscriptions of image topics.
 */
 
-class  ImageTransport
+class ImageTransport
 {
 public:
   using VoidPtr = std::shared_ptr<void>;
@@ -150,7 +150,7 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Subscriber subscribe(
     const std::string & base_topic, uint32_t queue_size,
-    void (*fp)(const ImageConstPtr &),
+    void (* fp)(const ImageConstPtr &),
     const TransportHints * transport_hints = nullptr)
   {
     return subscribe(base_topic, queue_size,
@@ -226,8 +226,8 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber subscribeCamera(
     const std::string & base_topic, uint32_t queue_size,
-    void (*fp)(const ImageConstPtr &,
-               const CameraInfoConstPtr &),
+    void (* fp)(const ImageConstPtr &,
+    const CameraInfoConstPtr &),
     const TransportHints * transport_hints = nullptr)
   {
     return subscribeCamera(base_topic, queue_size, CameraSubscriber::Callback(fp), VoidPtr(),
@@ -242,7 +242,7 @@ public:
   CameraSubscriber subscribeCamera(
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(const ImageConstPtr &,
-                   const CameraInfoConstPtr &), T * obj,
+    const CameraInfoConstPtr &), T * obj,
     const TransportHints * transport_hints = nullptr)
   {
     return subscribeCamera(base_topic, queue_size,
@@ -258,7 +258,7 @@ public:
   CameraSubscriber subscribeCamera(
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(const ImageConstPtr &,
-                   const CameraInfoConstPtr &),
+    const CameraInfoConstPtr &),
     const std::shared_ptr<T> & obj,
     const TransportHints * transport_hints = nullptr)
   {

@@ -2,18 +2,17 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <cv_bridge/cv_bridge.h>
 
-void ResizedPublisher::publish(const sensor_msgs::Image& message,
-                               const PublishFn& publish_fn) const
+void ResizedPublisher::publish(
+  const sensor_msgs::Image & message,
+  const PublishFn & publish_fn) const
 {
   cv::Mat cv_image;
   boost::shared_ptr<void const> tracked_object;
-  try
-  {
+  try {
     cv_image = cv_bridge::toCvShare(message, tracked_object, message.encoding)->image;
-  }
-  catch (cv::Exception &e)
-  {
-    ROS_ERROR("Could not convert from '%s' to '%s'.", message.encoding.c_str(), message.encoding.c_str());
+  } catch (cv::Exception & e) {
+    ROS_ERROR("Could not convert from '%s' to '%s'.",
+      message.encoding.c_str(), message.encoding.c_str());
     return;
   }
 

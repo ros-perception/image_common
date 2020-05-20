@@ -80,7 +80,7 @@ public:
    */
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
-    void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
+    void (* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
     return subscribe(node, base_topic,

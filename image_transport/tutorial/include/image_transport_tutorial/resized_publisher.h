@@ -10,6 +10,7 @@ public:
   }
 
 protected:
-  virtual void publish(const sensor_msgs::Image& message,
-                       const PublishFn& publish_fn) const;
+  virtual void publish(
+    const sensor_msgs::Image & message,
+    const PublishFn & publish_fn) const;
 };

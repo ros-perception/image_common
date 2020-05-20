@@ -43,10 +43,10 @@ TEST_F(TestPublisher, RemappedPublisher) {
   // Subscribe
   bool received{false};
   auto sub = image_transport::create_subscription(node_remap_.get(), "old_topic",
-    [&received](const sensor_msgs::msg::Image::ConstSharedPtr & msg) {
-      (void)msg;
-      received = true;
-    }, "raw");
+      [&received](const sensor_msgs::msg::Image::ConstSharedPtr & msg) {
+        (void)msg;
+        received = true;
+      }, "raw");
 
   // Publish
   auto pub = image_transport::create_publisher(node_.get(), "new_topic");
@@ -61,8 +61,7 @@ TEST_F(TestPublisher, RemappedPublisher) {
   size_t retry = 0;
   uint32_t nSub = 0;
   uint32_t nPub = 0;
-  while (retry < max_retries && nPub == 0 && nSub == 0)
-  {
+  while (retry < max_retries && nPub == 0 && nSub == 0) {
     nSub = pub.getNumSubscribers();
     nPub = sub.getNumPublishers();
     std::this_thread::sleep_for(sleep_per_loop);
@@ -72,7 +71,7 @@ TEST_F(TestPublisher, RemappedPublisher) {
   executor.spin_node_some(node_remap_);
 
   retry = 0;
-  while(retry < max_retries && !received) {
+  while (retry < max_retries && !received) {
     // generate random image and publish it
     pub.publish(image);
 
@@ -90,7 +89,8 @@ TEST_F(TestPublisher, RemappedPublisher) {
   EXPECT_TRUE(received);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char ** argv)
+{
   rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

@@ -37,7 +37,8 @@ TEST_F(TestPublisher, ImageTransportCameraPublisher) {
 }
 
 
-int main(int argc, char** argv) {
+int main(int argc, char ** argv)
+{
   rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();

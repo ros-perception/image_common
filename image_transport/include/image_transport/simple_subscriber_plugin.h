@@ -67,11 +67,11 @@ template<class M>
 class SimpleSubscriberPlugin : public SubscriberPlugin
 {
 public:
-  virtual ~SimpleSubscriberPlugin() {};
+  virtual ~SimpleSubscriberPlugin() {}
 
   virtual std::string getTopic() const
   {
-    if (impl_) return impl_->sub_->get_topic_name();
+    if (impl_) {return impl_->sub_->get_topic_name();}
     return std::string();
   }
 
@@ -98,7 +98,7 @@ protected:
    */
 
   virtual void internalCallback(
-    const typename std::shared_ptr<const M>& message,
+    const typename std::shared_ptr<const M> & message,
     const Callback & user_cb) = 0;
 
   /**
@@ -123,7 +123,7 @@ protected:
     //
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
     impl_->sub_ = node->create_subscription<M>(getTopicToSubscribe(base_topic), qos,
-        [this, callback](const typename std::shared_ptr<const M> msg){
+        [this, callback](const typename std::shared_ptr<const M> msg) {
           internalCallback(msg, callback);
         });
   }
@@ -135,7 +135,6 @@ private:
   };
 
   std::unique_ptr<Impl> impl_;
-
 
 
 };

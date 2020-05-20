@@ -68,4 +68,3 @@ void wait_for_subscriber(
 }  // namespace test_rclcpp
 
 #endif  // TEST_RCLCPP__UTILS_HPP_
-

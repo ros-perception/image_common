@@ -118,9 +118,9 @@ std::vector<std::string> getLoadableTransports()
         kImpl->sub_loader_->createUniqueInstance(transportPlugin);
       loadableTransports.push_back(erase_last_copy(transportPlugin, "_sub")); // Remove the "_sub" at the end of each class name.
     } catch (const pluginlib::LibraryLoadException & e) {
-		(void) e;
+      (void) e;
     } catch (const pluginlib::CreateClassException & e) {
-		(void) e;
+      (void) e;
     }
   }
 

@@ -35,4 +35,3 @@ TEST(CameraCommon, erase_last_copy) {
   EXPECT_EQ("/image_pub/image", image_transport::erase_last_copy("/image_pub/image_pub", "_pub"));
   EXPECT_EQ("/image/image", image_transport::erase_last_copy("/image_pub/image", "_pub"));
 }
-
