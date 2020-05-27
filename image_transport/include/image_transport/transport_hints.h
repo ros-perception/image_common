@@ -1,7 +1,10 @@
+/* -*- mode: C++ -*- */
+/* $Id$ */
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2009, Willow Garage, Inc.
+*  Copyright (c) 2020 Martin Idel
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,9 +17,9 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*   * Neither the name of the author nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,56 +35,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_TRANSPORT_HINTS_H
-#define IMAGE_TRANSPORT_TRANSPORT_HINTS_H
+#ifndef IMAGE_TRANSPORT__TRANSPORT_HINTS_H_
+#define IMAGE_TRANSPORT__TRANSPORT_HINTS_H_
 
-#include <memory>
-#include <string>
+#pragma message ("Warning: This header is deprecated. Use 'transport_hints.hpp' instead")
 
-#include <rclcpp/node.hpp>
+#include "transport_hints.hpp"
 
-#include "image_transport/visibility_control.hpp"
-
-namespace image_transport
-{
-
-/**
- * \brief Stores transport settings for an image topic subscription.
- */
-class TransportHints
-{
-public:
-  /**
-   * \brief Constructor.
-   *
-   * The default transport can be overridden by setting a certain parameter to the
-   * name of the desired transport. By default this parameter is named "image_transport"
-   * in the node's local namespace. For consistency across ROS applications, the
-   * name of this parameter should not be changed without good reason.
-   *
-   * @param node Node to use when looking up the transport parameter.
-   * @param default_transport Preferred transport to use
-   * @param parameter_name The name of the transport parameter
-   */
-  IMAGE_TRANSPORT_PUBLIC
-  TransportHints(
-    const rclcpp::Node * node,
-    const std::string & default_transport = "raw",
-    const std::string & parameter_name = "image_transport")
-  {
-    node->get_parameter_or<std::string>(parameter_name, transport_, default_transport);
-  }
-
-  IMAGE_TRANSPORT_PUBLIC
-  const std::string & getTransport() const
-  {
-    return transport_;
-  }
-
-private:
-  std::string transport_;
-};
-
-} //namespace image_transport
-
-#endif
+#endif  // IMAGE_TRANSPORT__TRANSPORT_HINTS_H_

@@ -29,11 +29,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "camera_calibration_parsers/parse_wrapper.h"
+#include "camera_calibration_parsers/parse_wrapper.hpp"
 
 #include <string>
 
-#include "camera_calibration_parsers/parse.h"
+#include "camera_calibration_parsers/parse.hpp"
 #include "boost/python.hpp"
 #include "ros/serialization.h"
 
@@ -70,7 +70,8 @@ boost::python::tuple readCalibrationWrapper(const std::string & file_name)
 
 BOOST_PYTHON_MODULE(camera_calibration_parsers_wrapper)
 {
-  boost::python::def("__readCalibrationWrapper", readCalibrationWrapper,
+  boost::python::def(
+    "__readCalibrationWrapper", readCalibrationWrapper,
     boost::python::args("file_name"), "");
 }
 

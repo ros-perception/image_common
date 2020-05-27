@@ -82,10 +82,7 @@ install(
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 
-ament_export_dependencies(message_filters)
-ament_export_dependencies(rclcpp)
-ament_export_dependencies(sensor_msgs)
-ament_export_dependencies(pluginlib)
+ament_export_dependencies(message_filters rclcpp sensor_msgs pluginlib)
 
 if(BUILD_TESTING)
   #TODO(ros2) enable linting

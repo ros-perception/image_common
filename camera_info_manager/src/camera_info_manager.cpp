@@ -34,7 +34,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "camera_info_manager/camera_info_manager.h"
+#include "camera_info_manager/camera_info_manager.hpp"
 
 #include <algorithm>
 #include <cstdlib>
@@ -42,8 +42,9 @@
 #include <memory>
 #include <string>
 
-#include "filesystem_helper.hpp"
-#include "camera_calibration_parsers/parse.h"
+#include "rcpputils/filesystem_helper.hpp"
+#include "rcpputils/get_env.hpp"
+#include "camera_calibration_parsers/parse.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
 
@@ -86,8 +87,10 @@ CameraInfoManager::CameraInfoManager(
   loaded_cam_info_(false)
 {
   // register callback for camera calibration service request
-  info_service_ = node->create_service<SetCameraInfo>("set_camera_info",
-      std::bind(&CameraInfoManager::setCameraInfoService, this, std::placeholders::_1,
+  info_service_ = node->create_service<SetCameraInfo>(
+    "set_camera_info",
+    std::bind(
+      &CameraInfoManager::setCameraInfoService, this, std::placeholders::_1,
       std::placeholders::_2));
 }
 
@@ -271,7 +274,8 @@ bool CameraInfoManager::loadCalibrationFile(
 
   if (readCalibration(filename, cam_name, cam_info)) {
     if (cname != cam_name) {
-      RCLCPP_WARN(logger_,
+      RCLCPP_WARN(
+        logger_,
         "[%s] does not match %s in file %s",
         cname.c_str(), cam_name.c_str(), filename.c_str());
     }
@@ -313,7 +317,6 @@ bool CameraInfoManager::loadCameraInfo(const std::string & url)
   return loadCalibration(url, cname);
 }
 
-
 /** Resolve Uniform Resource Locator string.
  *
  * @param url a copy of the Uniform Resource Locator, which may
@@ -352,13 +355,14 @@ std::string CameraInfoManager::resolveURL(
     } else if (url.substr(dollar + 1, 10) == "{ROS_HOME}") {
       // substitute $ROS_HOME
       std::string ros_home;
-      char * ros_home_env;
-      if ((ros_home_env = getenv("ROS_HOME"))) {
+      std::string ros_home_env = rcpputils::get_env_var("ROS_HOME");
+      std::string home_env = rcpputils::get_env_var("HOME");
+      if (!ros_home_env.empty()) {
         // use environment variable
         ros_home = ros_home_env;
-      } else if ((ros_home_env = getenv("HOME"))) {
+      } else if (!home_env.empty()) {
         // use "$HOME/.ros"
-        ros_home = ros_home_env;
+        ros_home = home_env;
         ros_home += "/.ros";
       }
       resolved += ros_home;
@@ -392,11 +396,12 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string & ur
   // Easy C++14 replacement for boost::iequals from :
   // https://stackoverflow.com/a/4119881
   auto iequals = [](const std::string & a, const std::string & b) {
-      return std::equal(a.begin(), a.end(),
-               b.begin(), b.end(),
-               [](char a, char b) {
-                 return tolower(a) == tolower(b);
-               });
+      return std::equal(
+        a.begin(), a.end(),
+        b.begin(), b.end(),
+        [](char a, char b) {
+          return tolower(a) == tolower(b);
+        });
     };
 
 
@@ -486,11 +491,11 @@ CameraInfoManager::saveCalibrationFile(
 {
   RCLCPP_INFO(logger_, "writing calibration data to %s", filename.c_str());
 
-  camera_info_manager::impl::fs::path filepath(filename);
-  camera_info_manager::impl::fs::path parent = filepath.parent_path();
+  rcpputils::fs::path filepath(filename);
+  rcpputils::fs::path parent = filepath.parent_path();
 
-  if (!impl::fs::exists(parent)) {
-    if (!impl::fs::create_directories(parent)) {
+  if (!rcpputils::fs::exists(parent)) {
+    if (!rcpputils::fs::create_directories(parent)) {
       RCLCPP_ERROR(logger_, "unable to create path directory [%s]", parent.string().c_str());
       return false;
     }

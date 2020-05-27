@@ -1,7 +1,10 @@
+/* -*- mode: C++ -*- */
+/* $Id$ */
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2009, Willow Garage, Inc.
+*  Copyright (c) 2020 Martin Idel
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,9 +17,9 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*   * Neither the name of the author nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,67 +35,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_SINGLE_SUBSCRIBER_PUBLISHER
-#define IMAGE_TRANSPORT_SINGLE_SUBSCRIBER_PUBLISHER
+#ifndef IMAGE_TRANSPORT__SINGLE_SUBSCRIBER_PUBLISHER_H_
+#define IMAGE_TRANSPORT__SINGLE_SUBSCRIBER_PUBLISHER_H_
 
-#include "rclcpp/macros.hpp"
-#include "sensor_msgs/msg/image.hpp"
+#pragma message("Warning: This header is deprecated. Use 'single_subscriber_publisher.hpp' instead")
 
-#include <sensor_msgs/msg/image.hpp>
+#include "single_subscriber_publisher.hpp"
 
-#include <string>
-#include <functional>
-
-#include "image_transport/visibility_control.hpp"
-
-namespace image_transport {
-
-/**
- * \brief Allows publication of an image to a single subscriber. Only available inside
- * subscriber connection callbacks.
- */
-class SingleSubscriberPublisher
-{
-private:
-  SingleSubscriberPublisher(const SingleSubscriberPublisher&) = delete;
-  SingleSubscriberPublisher& operator=( const SingleSubscriberPublisher& ) = delete;
-
-public:
-  typedef std::function<uint32_t()> GetNumSubscribersFn;
-  typedef std::function<void(const sensor_msgs::msg::Image&)> PublishFn;
-
-  IMAGE_TRANSPORT_PUBLIC
-  SingleSubscriberPublisher(
-    const std::string & caller_id, const std::string & topic,
-    const GetNumSubscribersFn & num_subscribers_fn,
-    const PublishFn & publish_fn);
-
-  IMAGE_TRANSPORT_PUBLIC
-  std::string getSubscriberName() const;
-
-  IMAGE_TRANSPORT_PUBLIC
-  std::string getTopic() const;
-
-  IMAGE_TRANSPORT_PUBLIC
-  uint32_t getNumSubscribers() const;
-
-  IMAGE_TRANSPORT_PUBLIC
-  void publish(const sensor_msgs::msg::Image& message) const;
-
-  IMAGE_TRANSPORT_PUBLIC
-  void publish(const sensor_msgs::msg::Image::ConstSharedPtr& message) const;
-
-private:
-  std::string caller_id_;
-  std::string topic_;
-  GetNumSubscribersFn num_subscribers_fn_;
-  PublishFn publish_fn_;
-
-  friend class Publisher; // to get publish_fn_ directly
-};
-
-typedef std::function<void (const SingleSubscriberPublisher &)> SubscriberStatusCallback;
-
-} //namespace image_transport
-
-#endif
+#endif  // IMAGE_TRANSPORT__SINGLE_SUBSCRIBER_PUBLISHER_H_

@@ -34,7 +34,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "camera_calibration_parsers/parse_ini.h"
+#include "camera_calibration_parsers/parse_ini.hpp"
 
 #include <cassert>
 #include <cctype>
@@ -82,12 +82,16 @@ std::ostream & operator<<(std::ostream & out, const SimpleMatrix & m)
 // Remove whitespace from both ends of a string.
 void trim(std::string & s)
 {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-      return !std::isspace(ch);
-    }));
-  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-      return !std::isspace(ch);
-    }).base(), s.end());
+  s.erase(
+    s.begin(), std::find_if(
+      s.begin(), s.end(), [](int ch) {
+        return !std::isspace(ch);
+      }));
+  s.erase(
+    std::find_if(
+      s.rbegin(), s.rend(), [](int ch) {
+        return !std::isspace(ch);
+      }).base(), s.end());
 }
 
 // Determine if a given string is an INI section header
@@ -218,9 +222,10 @@ bool parse_camera_section(
   }
 
   auto array_has_nan = [](auto a) {
-      return std::end(a) != std::find_if(std::begin(a), std::end(a), [](double v) {
-                 return std::isnan(v);
-               });
+      return std::end(a) != std::find_if(
+        std::begin(a), std::end(a), [](double v) {
+          return std::isnan(v);
+        });
     };
 
   cam_info.k = parse_matrix<3, 3>(++camera_matrix);
@@ -307,13 +312,15 @@ bool writeCalibrationIni(
   if (!dir.empty() && !rcpputils::fs::exists(dir) &&
     !rcpputils::fs::create_directories(dir))
   {
-    RCLCPP_ERROR(kIniLogger, "Unable to create directory for camera calibration file [%s]",
+    RCLCPP_ERROR(
+      kIniLogger, "Unable to create directory for camera calibration file [%s]",
       dir.string().c_str());
     return false;
   }
   std::ofstream out(file_name);
   if (!out.is_open()) {
-    RCLCPP_ERROR(kIniLogger, "Unable to open camera calibration file [%s] for writing",
+    RCLCPP_ERROR(
+      kIniLogger, "Unable to open camera calibration file [%s] for writing",
       file_name.c_str());
     return false;
   }

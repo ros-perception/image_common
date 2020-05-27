@@ -32,8 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "image_transport/subscriber.h"
-#include "image_transport/subscriber_plugin.h"
+#include "image_transport/subscriber.hpp"
 
 #include <rclcpp/expand_topic_or_service_name.hpp>
 #include <rclcpp/logging.hpp>
@@ -41,6 +40,8 @@
 #include <sensor_msgs/msg/image.hpp>
 
 #include <pluginlib/class_loader.hpp>
+
+#include "image_transport/subscriber_plugin.hpp"
 
 namespace image_transport
 {
@@ -133,7 +134,7 @@ std::string Subscriber::getTopic() const
   return std::string();
 }
 
-uint32_t Subscriber::getNumPublishers() const
+size_t Subscriber::getNumPublishers() const
 {
   if (impl_) {return impl_->subscriber_->getNumPublishers();}
   return 0;

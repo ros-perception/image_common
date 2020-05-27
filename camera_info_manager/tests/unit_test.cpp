@@ -41,7 +41,7 @@
 #include <cstdlib>
 #include <string>
 
-#include "camera_info_manager/camera_info_manager.h"
+#include "camera_info_manager/camera_info_manager.hpp"
 #include "sensor_msgs/distortion_models.hpp"
 
 ///////////////////////////////////////////////////////////////
@@ -349,19 +349,17 @@ TEST(GetInfo, unresolvedLoads)
   ros::NodeHandle node;
   camera_info_manager::CameraInfoManager cinfo(node);
 
-  EXPECT_FALSE(cinfo.loadCameraInfo(
-      std::string("package://")));
+  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://")));
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  EXPECT_FALSE(cinfo.loadCameraInfo(
-      std::string("package:///calibration.yaml")));
+  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package:///calibration.yaml")));
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  EXPECT_FALSE(cinfo.loadCameraInfo(
-      std::string("package://no_such_package/calibration.yaml")));
+  EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://no_such_package/calibration.yaml")));
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  EXPECT_FALSE(cinfo.loadCameraInfo(
+  EXPECT_FALSE(
+    cinfo.loadCameraInfo(
       std::string("package://camera_info_manager/no_such_file.yaml")));
   EXPECT_FALSE(cinfo.isCalibrated());
 }

@@ -1,7 +1,10 @@
+/* -*- mode: C++ -*- */
+/* $Id$ */
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2009, Willow Garage, Inc.
+*  Copyright (c) 2020 Martin Idel
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,9 +17,9 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*   * Neither the name of the author nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,42 +35,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_EXCEPTION_H
-#define IMAGE_TRANSPORT_EXCEPTION_H
+#ifndef IMAGE_TRANSPORT__EXCEPTION_H_
+#define IMAGE_TRANSPORT__EXCEPTION_H_
 
-#include <stdexcept>
+#pragma message ("Warning: This header is deprecated. Use 'exception.hpp' instead")
 
-#include "image_transport/visibility_control.hpp"
+#include "exception.hpp"
 
-namespace image_transport {
-
-/**
- * \brief A base class for all image_transport exceptions inheriting from std::runtime_error.
- */
-class Exception : public std::runtime_error
-{
-public:
-  Exception(const std::string& message) : std::runtime_error(message) {}
-};
-
-/**
- * \brief An exception class thrown when image_transport is unable to load a requested transport.
- */
-class TransportLoadException : public Exception
-{
-public:
-  TransportLoadException(const std::string& transport, const std::string& message)
-    : Exception("Unable to load plugin for transport '" + transport + "', error string:\n" + message),
-      transport_(transport.c_str())
-  {
-  }
-
-  std::string getTransport() const { return transport_; }
-
-protected:
-  const char* transport_;
-};
-
-} //namespace image_transport
-
-#endif
+#endif  // IMAGE_TRANSPORT__EXCEPTION_H_

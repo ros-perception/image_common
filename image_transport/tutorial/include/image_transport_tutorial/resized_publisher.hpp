@@ -1,4 +1,4 @@
-#include <image_transport/simple_publisher_plugin.h>
+#include <image_transport/simple_publisher_plugin.hpp>
 #include <image_transport_tutorial/ResizedImage.h>
 
 class ResizedPublisher : public image_transport::SimplePublisherPlugin<image_transport_tutorial::ResizedImage>

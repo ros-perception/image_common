@@ -7,7 +7,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
-#include "image_transport/single_subscriber_publisher.h"
+#include "image_transport/single_subscriber_publisher.hpp"
 
 class TestPublisher : public ::testing::Test
 {
@@ -36,7 +36,7 @@ protected:
 };
 
 TEST_F(TestPublisher, construction_and_destruction) {
-  auto get_num_subscribers = []() -> uint32_t { return 0; };
+  auto get_num_subscribers = []() -> size_t { return 0; };
   auto publish_fn= [](const sensor_msgs::msg::Image& /*image*/){};
 
   image_transport::SingleSubscriberPublisher ssp(caller_id, topic,
@@ -44,9 +44,9 @@ TEST_F(TestPublisher, construction_and_destruction) {
 }
 
 TEST_F(TestPublisher, getNumSubscribers) {
-  uint32_t nSub = 0;
+  size_t nSub = 0;
 
-  auto get_num_subscribers = [&nSub]() -> uint32_t { return nSub; };
+  auto get_num_subscribers = [&nSub]() -> size_t { return nSub; };
   auto publish_fn= [](const sensor_msgs::msg::Image& /*image*/){};
 
   image_transport::SingleSubscriberPublisher ssp(caller_id, topic,

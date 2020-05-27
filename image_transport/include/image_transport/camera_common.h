@@ -1,7 +1,10 @@
+/* -*- mode: C++ -*- */
+/* $Id$ */
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2009, Willow Garage, Inc.
+*  Copyright (c) 2020 Martin Idel
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,9 +17,9 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*   * Neither the name of the author nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,30 +35,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_CAMERA_COMMON_H
-#define IMAGE_TRANSPORT_CAMERA_COMMON_H
+#ifndef IMAGE_TRANSPORT__CAMERA_COMMON_H_
+#define IMAGE_TRANSPORT__CAMERA_COMMON_H_
 
-#include <string>
+#pragma message ("Warning: This header is deprecated. Use 'camera_common.hpp' instead")
 
-#include "image_transport/visibility_control.hpp"
+#include "camera_common.hpp"
 
-namespace image_transport {
-
-/**
- * \brief Form the camera info topic name, sibling to the base topic.
- *
- * \note This function assumes that the name is completely resolved. If the \c
- * base_topic is remapped the resulting camera info topic will be incorrect.
- */
-IMAGE_TRANSPORT_PUBLIC
-std::string getCameraInfoTopic(const std::string& base_topic);
-
-/**
- * \brief Replacement for uses of boost::erase_last_copy
- */
-IMAGE_TRANSPORT_PUBLIC
-std::string erase_last_copy(const std::string& input, const std::string& search);
-
-} //namespace image_transport
-
-#endif
+#endif  // IMAGE_TRANSPORT__CAMERA_COMMON_H_

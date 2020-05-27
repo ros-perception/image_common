@@ -32,15 +32,16 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include "image_transport/image_transport.hpp"
+
 #include <memory>
 
 #include <pluginlib/class_loader.hpp>
 
-#include "image_transport/camera_common.h"
-#include "image_transport/image_transport.h"
-#include "image_transport/publisher_plugin.h"
-#include "image_transport/subscriber_plugin.h"
-#include "image_transport/loader_fwds.h"
+#include "image_transport/camera_common.hpp"
+#include "image_transport/loader_fwds.hpp"
+#include "image_transport/publisher_plugin.hpp"
+#include "image_transport/subscriber_plugin.hpp"
 
 namespace image_transport
 {

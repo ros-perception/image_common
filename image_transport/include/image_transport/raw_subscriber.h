@@ -1,7 +1,10 @@
+/* -*- mode: C++ -*- */
+/* $Id$ */
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2009, Willow Garage, Inc.
+*  Copyright (c) 2020 Martin Idel
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,9 +17,9 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*   * Neither the name of the author nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,43 +35,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_RAW_SUBSCRIBER_H
-#define IMAGE_TRANSPORT_RAW_SUBSCRIBER_H
+#ifndef IMAGE_TRANSPORT__RAW_SUBSCRIBER_H_
+#define IMAGE_TRANSPORT__RAW_SUBSCRIBER_H_
 
-#include <sensor_msgs/msg/image.hpp>
-#include "image_transport/simple_subscriber_plugin.h"
-#include "image_transport/visibility_control.hpp"
+#pragma message ("Warning: This header is deprecated. Use 'raw_subscriber.hpp' instead")
 
-namespace image_transport {
+#include "raw_subscriber.hpp"
 
-/**
- * \brief The default SubscriberPlugin.
- *
- * RawSubscriber is a simple wrapper for ros::Subscriber which listens for Image messages
- * and passes them through to the callback.
- */
-class RawSubscriber : public SimpleSubscriberPlugin<sensor_msgs::msg::Image>
-{
-public:
-  virtual ~RawSubscriber() {}
-
-  virtual std::string getTransportName() const
-  {
-    return "raw";
-  }
-
-protected:
-  virtual void internalCallback(const std::shared_ptr<const sensor_msgs::msg::Image>& message, const Callback& user_cb)
-  {
-    user_cb(message);
-  }
-
-  virtual std::string getTopicToSubscribe(const std::string& base_topic) const
-  {
-    return base_topic;
-  }
-};
-
-} //namespace image_transport
-
-#endif
+#endif  // IMAGE_TRANSPORT__RAW_SUBSCRIBER_H_

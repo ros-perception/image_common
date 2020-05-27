@@ -1,7 +1,10 @@
+/* -*- mode: C++ -*- */
+/* $Id$ */
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2009, Willow Garage, Inc.
+*  Copyright (c) 2020 Martin Idel
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,9 +17,9 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*   * Neither the name of the author nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,115 +35,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
-#define IMAGE_TRANSPORT_PUBLISHER_PLUGIN_H
+#ifndef IMAGE_TRANSPORT__PUBLISHER_PLUGIN_H_
+#define IMAGE_TRANSPORT__PUBLISHER_PLUGIN_H_
 
-#include <rclcpp/node.hpp>
+#pragma message ("Warning: This header is deprecated. Use 'publisher_plugin.hpp' instead")
 
-#include <sensor_msgs/msg/image.hpp>
-#include "image_transport/single_subscriber_publisher.h"
-#include "image_transport/visibility_control.hpp"
+#include "publisher_plugin.hpp"
 
-namespace image_transport
-{
-
-/**
- * \brief Base class for plugins to Publisher.
- */
-class PublisherPlugin
-{
-public:
-  PublisherPlugin() = default;
-  PublisherPlugin(const PublisherPlugin &) = delete;
-  PublisherPlugin & operator=(const PublisherPlugin &) = delete;
-
-  virtual ~PublisherPlugin() {}
-
-  /**
-   * \brief Get a string identifier for the transport provided by
-   * this plugin.
-   */
-  virtual std::string getTransportName() const = 0;
-
-  /**
-   * \brief Advertise a topic, simple version.
-   */
-  void advertise(
-    rclcpp::Node * nh,
-    const std::string & base_topic,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
-  {
-    advertiseImpl(nh, base_topic, custom_qos);
-  }
-
-  /**
-   * \brief Returns the number of subscribers that are currently connected to
-   * this PublisherPlugin.
-   */
-  virtual uint32_t getNumSubscribers() const = 0;
-
-  /**
-   * \brief Returns the communication topic that this PublisherPlugin will publish on.
-   */
-  virtual std::string getTopic() const = 0;
-
-  /**
-   * \brief Publish an image using the transport associated with this PublisherPlugin.
-   */
-  virtual void publish(const sensor_msgs::msg::Image & message) const = 0;
-
-  /**
-   * \brief Publish an image using the transport associated with this PublisherPlugin.
-   */
-  virtual void publishPtr(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
-  {
-    publish(*message);
-  }
-
-  /**
-   * \brief Publish an image using the transport associated with this PublisherPlugin.
-   * This version of the function can be used to optimize cases where you don't want to
-   * fill a ROS message first to avoid useless copies.
-   * @param message an image message to use information from (but not data)
-   * @param data a pointer to the image data to use to fill the Image message
-   */
-  virtual void publishData(const sensor_msgs::msg::Image & message, const uint8_t * data) const
-  {
-    sensor_msgs::msg::Image msg;
-    msg.header = message.header;
-    msg.height = message.height;
-    msg.width = message.width;
-    msg.encoding = message.encoding;
-    msg.is_bigendian = message.is_bigendian;
-    msg.step = message.step;
-    msg.data = std::vector<uint8_t>(data, data + msg.step * msg.height);
-
-    publish(msg);
-  }
-
-  /**
-   * \brief Shutdown any advertisements associated with this PublisherPlugin.
-   */
-  virtual void shutdown() = 0;
-
-  /**
-   * \brief Return the lookup name of the PublisherPlugin associated with a specific
-   * transport identifier.
-   */
-  static std::string getLookupName(const std::string & transport_name)
-  {
-    return "image_transport/" + transport_name + "_pub";
-  }
-
-protected:
-  /**
-   * \brief Advertise a topic. Must be implemented by the subclass.
-   */
-  virtual void advertiseImpl(
-    rclcpp::Node * nh, const std::string & base_topic,
-    rmw_qos_profile_t custom_qos) = 0;
-};
-
-} //namespace image_transport
-
-#endif
+#endif  // IMAGE_TRANSPORT__PUBLISHER_PLUGIN_H_

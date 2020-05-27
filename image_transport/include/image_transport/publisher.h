@@ -1,7 +1,10 @@
+/* -*- mode: C++ -*- */
+/* $Id$ */
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2009, Willow Garage, Inc.
+*  Copyright (c) 2020 Martin Idel
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,9 +17,9 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*   * Neither the name of the author nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,104 +35,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_PUBLISHER_H
-#define IMAGE_TRANSPORT_PUBLISHER_H
+#ifndef IMAGE_TRANSPORT__PUBLISHER_H_
+#define IMAGE_TRANSPORT__PUBLISHER_H_
 
-#include <memory>
+#pragma message ("Warning: This header is deprecated. Use 'publisher.hpp' instead")
 
-#include <rclcpp/macros.hpp>
-#include <rclcpp/node.hpp>
+#include "publisher.hpp"
 
-#include <sensor_msgs/msg/image.hpp>
-
-#include "image_transport/single_subscriber_publisher.h"
-#include "image_transport/exception.h"
-#include "image_transport/loader_fwds.h"
-#include "image_transport/visibility_control.hpp"
-
-namespace image_transport
-{
-
-/**
- * \brief Manages advertisements of multiple transport options on an Image topic.
- *
- * Publisher is a drop-in replacement for ros::Publisher when publishing
- * Image topics. In a minimally built environment, they behave the same; however,
- * Publisher is extensible via plugins to publish alternative representations of
- * the image on related subtopics. This is especially useful for limiting bandwidth and
- * latency over a network connection, when you might (for example) use the theora plugin
- * to transport the images as streamed video. All topics are published only on demand
- * (i.e. if there are subscribers).
- *
- * A Publisher should always be created through a call to ImageTransport::advertise(),
- * or copied from one that was.
- * Once all copies of a specific Publisher go out of scope, any subscriber callbacks
- * associated with that handle will stop being called. Once all Publisher for a
- * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
- */
-class Publisher
-{
-public:
-  IMAGE_TRANSPORT_PUBLIC
-  Publisher() = default;
-
-  IMAGE_TRANSPORT_PUBLIC
-  Publisher(
-    rclcpp::Node * nh,
-    const std::string & base_topic,
-    PubLoaderPtr loader,
-    rmw_qos_profile_t custom_qos);
-
-  /*!
-   * \brief Returns the number of subscribers that are currently connected to
-   * this Publisher.
-   *
-   * Returns the total number of subscribers to all advertised topics.
-   */
-  IMAGE_TRANSPORT_PUBLIC
-  uint32_t getNumSubscribers() const;
-
-  /*!
-   * \brief Returns the base topic of this Publisher.
-   */
-  IMAGE_TRANSPORT_PUBLIC
-  std::string getTopic() const;
-
-  /*!
-   * \brief Publish an image on the topics associated with this Publisher.
-   */
-  IMAGE_TRANSPORT_PUBLIC
-  void publish(const sensor_msgs::msg::Image & message) const;
-
-  /*!
-   * \brief Publish an image on the topics associated with this Publisher.
-   */
-  IMAGE_TRANSPORT_PUBLIC
-  void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const;
-
-  /*!
-   * \brief Shutdown the advertisements associated with this Publisher.
-   */
-  IMAGE_TRANSPORT_PUBLIC
-  void shutdown();
-
-  IMAGE_TRANSPORT_PUBLIC
-  operator void *() const;
-
-  IMAGE_TRANSPORT_PUBLIC
-  bool operator<(const Publisher & rhs) const {return impl_ < rhs.impl_;}
-
-  IMAGE_TRANSPORT_PUBLIC
-  bool operator!=(const Publisher & rhs) const {return impl_ != rhs.impl_;}
-
-  IMAGE_TRANSPORT_PUBLIC
-  bool operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
-
-private:
-  struct Impl;
-  std::shared_ptr<Impl> impl_;
-};
-
-} //namespace image_transport
-
-#endif
+#endif  // IMAGE_TRANSPORT__PUBLISHER_H_

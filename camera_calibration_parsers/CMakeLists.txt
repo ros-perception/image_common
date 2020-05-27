@@ -36,6 +36,7 @@ endif()
 ament_target_dependencies(
   ${PROJECT_NAME}
   rclcpp
+  rcpputils
   sensor_msgs
   yaml_cpp_vendor
 )
@@ -79,9 +80,8 @@ install(
 
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
-ament_export_dependencies(rclcpp)
-ament_export_dependencies(sensor_msgs)
-ament_export_dependencies(yaml_cpp_vendor)
+ament_export_dependencies(rclcpp rcpputils sensor_msgs yaml_cpp_vendor)
+
 
 if(BUILD_TESTING)
   #TODO(mjcarroll) switch back to this once I can fix copyright check
@@ -111,4 +111,3 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
-

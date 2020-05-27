@@ -1,7 +1,10 @@
+/* -*- mode: C++ -*- */
+/* $Id$ */
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2009, Willow Garage, Inc.
+*  Copyright (c) 2020 Martin Idel
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,9 +17,9 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*   * Neither the name of the author nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -35,78 +38,8 @@
 #ifndef CAMERA_CALIBRATION_PARSERS__PARSE_YML_H_
 #define CAMERA_CALIBRATION_PARSERS__PARSE_YML_H_
 
-#include <string>
-#include <istream>
-#include <ostream>
+#pragma message ("Warning: This header is deprecated. Use 'parse_yml.hpp' instead")
 
-#include "sensor_msgs/msg/camera_info.hpp"
-#include "camera_calibration_parsers/visibility_control.hpp"
-
-namespace camera_calibration_parsers
-{
-
-using CameraInfo = sensor_msgs::msg::CameraInfo;
-
-/**
- * \brief Write calibration parameters to a file in YAML format.
- *
- * \param out Output stream to write to
- * \param camera_name Name of the camera
- * \param cam_info Camera parameters
- */
-CAMERA_CALIBRATION_PARSERS_PUBLIC
-bool writeCalibrationYml(
-  std::ostream & out, const std::string & camera_name,
-  const CameraInfo & cam_info);
-
-/**
- * \brief Read calibration parameters from a YAML file.
- *
- * \param in Input stream to read from
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
- */
-CAMERA_CALIBRATION_PARSERS_PUBLIC
-bool readCalibrationYml(
-  std::istream & in, std::string & camera_name,
-  CameraInfo & cam_info);
-
-/**
- * \brief Write calibration parameters to a file in YAML format.
- *
- * \param file_name File to write
- * \param camera_name Name of the camera
- * \param cam_info Camera parameters
- */
-CAMERA_CALIBRATION_PARSERS_PUBLIC
-bool writeCalibrationYml(
-  const std::string & file_name, const std::string & camera_name,
-  const CameraInfo & cam_info);
-
-/**
- * \brief Read calibration parameters from a YAML file.
- *
- * \param file_name File to read
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
- */
-CAMERA_CALIBRATION_PARSERS_PUBLIC
-bool readCalibrationYml(
-  const std::string & file_name, std::string & camera_name,
-  CameraInfo & cam_info);
-
-/**
- * \brief Parse calibration parameters from a string in memory of yaml format.
- *
- * \param buffer Calibration string
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
- */
-CAMERA_CALIBRATION_PARSERS_PUBLIC
-bool parseCalibrationYml(
-  const std::string & buffer, std::string & camera_name,
-  CameraInfo & cam_info);
-
-}  // namespace camera_calibration_parsers
+#include "parse_yml.hpp"
 
 #endif  // CAMERA_CALIBRATION_PARSERS__PARSE_YML_H_

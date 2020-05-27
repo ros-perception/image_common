@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "image_transport/camera_common.h"
+#include "image_transport/camera_common.hpp"
 
 TEST(CameraCommon, getCameraInfoTopic_namespaced_topic) {
   const auto topic_name = "/this/is/a/topic";

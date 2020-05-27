@@ -8,7 +8,7 @@
 #include "rclcpp/node.hpp"
 #include "utils.hpp"
 
-#include "image_transport/image_transport.h"
+#include "image_transport/image_transport.hpp"
 
 class TestPublisher : public ::testing::Test
 {
@@ -16,8 +16,9 @@ protected:
   void SetUp()
   {
     node_ = rclcpp::Node::make_shared("node", "namespace");
-    std::vector<std::string> arguments;
-    arguments.push_back("old_topic:=new_topic");
+    std::vector<std::string> arguments{
+      "--ros-args", "-r", "old_topic:=new_topic"
+    };
     rclcpp::NodeOptions node_options;
     node_options.arguments(arguments);
 
@@ -59,8 +60,8 @@ TEST_F(TestPublisher, RemappedPublisher) {
   ASSERT_FALSE(received);
 
   size_t retry = 0;
-  uint32_t nSub = 0;
-  uint32_t nPub = 0;
+  size_t nSub = 0;
+  size_t nPub = 0;
   while (retry < max_retries && nPub == 0 && nSub == 0)
   {
     nSub = pub.getNumSubscribers();

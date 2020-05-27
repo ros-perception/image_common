@@ -1,7 +1,10 @@
+/* -*- mode: C++ -*- */
+/* $Id$ */
+
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2009, Willow Garage, Inc.
+*  Copyright (c) 2020 Martin Idel
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,9 +17,9 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*   * Neither the name of the author nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,25 +35,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef IMAGE_TRANSPORT_LOADER_FWDS_H
-#define IMAGE_TRANSPORT_LOADER_FWDS_H
+#ifndef IMAGE_TRANSPORT__LOADER_FWDS_H_
+#define IMAGE_TRANSPORT__LOADER_FWDS_H_
 
-// Forward-declare some classes most users shouldn't care about so that
-// image_transport.h doesn't bring them in.
+#pragma message ("Warning: This header is deprecated. Use 'loader_fwds.hpp' instead")
 
-namespace pluginlib {
-  template<class T> class ClassLoader;
-}
+#include "loader_fwds.hpp"
 
-namespace image_transport {
-  class PublisherPlugin;
-  class SubscriberPlugin;
-
-  typedef pluginlib::ClassLoader<PublisherPlugin> PubLoader;
-  typedef std::shared_ptr<PubLoader> PubLoaderPtr;
-
-  typedef pluginlib::ClassLoader<SubscriberPlugin> SubLoader;
-  typedef std::shared_ptr<SubLoader> SubLoaderPtr;
-}
-
-#endif
+#endif  // IMAGE_TRANSPORT__LOADER_FWDS_H_

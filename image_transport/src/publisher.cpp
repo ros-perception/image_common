@@ -32,9 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "image_transport/camera_common.h"
-#include "image_transport/publisher.h"
-#include "image_transport/publisher_plugin.h"
+#include "image_transport/publisher.hpp"
 
 #include <set>
 
@@ -43,6 +41,9 @@
 #include <rclcpp/node.hpp>
 
 #include <pluginlib/class_loader.hpp>
+
+#include "image_transport/camera_common.hpp"
+#include "image_transport/publisher_plugin.hpp"
 
 namespace image_transport
 {
@@ -60,9 +61,9 @@ struct Publisher::Impl
     shutdown();
   }
 
-  uint32_t getNumSubscribers() const
+  size_t getNumSubscribers() const
   {
-    uint32_t count = 0;
+    size_t count = 0;
     for (const auto & pub: publishers_) {
       count += pub->getNumSubscribers();
     }
@@ -138,7 +139,7 @@ Publisher::Publisher(
   }
 }
 
-uint32_t Publisher::getNumSubscribers() const
+size_t Publisher::getNumSubscribers() const
 {
   if (impl_ && impl_->isValid()) {return impl_->getNumSubscribers();}
   return 0;

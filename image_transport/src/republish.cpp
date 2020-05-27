@@ -32,11 +32,12 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include <pluginlib/class_loader.hpp>
+
 #include "rclcpp/rclcpp.hpp"
 
-#include "image_transport/image_transport.h"
-#include "image_transport/publisher_plugin.h"
-#include <pluginlib/class_loader.hpp>
+#include "image_transport/image_transport.hpp"
+#include "image_transport/publisher_plugin.hpp"
 
 int main(int argc, char ** argv)
 {

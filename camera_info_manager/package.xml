@@ -19,9 +19,10 @@
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
 
+  <depend>ament_index_cpp</depend>
   <depend>camera_calibration_parsers</depend>
-  <depend>image_transport</depend>
   <depend>rclcpp</depend>
+  <depend>rcpputils</depend>
   <depend>sensor_msgs</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>

@@ -32,10 +32,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include "image_transport/single_subscriber_publisher.hpp"
+
 #include <sensor_msgs/msg/image.hpp>
 
-#include "image_transport/single_subscriber_publisher.h"
-#include "image_transport/publisher.h"
+#include "image_transport/publisher.hpp"
 
 namespace image_transport
 {
@@ -60,7 +61,7 @@ std::string SingleSubscriberPublisher::getTopic() const
   return topic_;
 }
 
-uint32_t SingleSubscriberPublisher::getNumSubscribers() const
+size_t SingleSubscriberPublisher::getNumSubscribers() const
 {
   return num_subscribers_fn_();
 }

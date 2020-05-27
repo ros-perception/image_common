@@ -32,11 +32,13 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include "image_transport/camera_subscriber.h"
-#include "image_transport/subscriber_filter.h"
-#include "image_transport/camera_common.h"
+#include "image_transport/camera_subscriber.hpp"
+
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
+
+#include "image_transport/camera_common.hpp"
+#include "image_transport/subscriber_filter.hpp"
 
 inline void increment(int * value)
 {
@@ -149,7 +151,7 @@ std::string CameraSubscriber::getInfoTopic() const
   return std::string();
 }
 
-uint32_t CameraSubscriber::getNumPublishers() const
+size_t CameraSubscriber::getNumPublishers() const
 {
   // TODO(ros2) Fix this when ros2 has better subscriber counting.
   /// @todo Fix this when message_filters::Subscriber has getNumPublishers()
