@@ -178,22 +178,36 @@ using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
 
 */
 
-class CAMERA_INFO_MANAGER_PUBLIC CameraInfoManager
+class CameraInfoManager
 {
 public:
+  CAMERA_INFO_MANAGER_PUBLIC
   CameraInfoManager(
     rclcpp::Node * node,
     const std::string & cname = "camera",
     const std::string & url = "");
 
+  CAMERA_INFO_MANAGER_PUBLIC
   CameraInfo getCameraInfo(void);
+
+  CAMERA_INFO_MANAGER_PUBLIC
   bool isCalibrated(void);
+
+  CAMERA_INFO_MANAGER_PUBLIC
   bool loadCameraInfo(const std::string & url);
+
+  CAMERA_INFO_MANAGER_PUBLIC
   std::string resolveURL(
     const std::string & url,
     const std::string & cname);
+
+  CAMERA_INFO_MANAGER_PUBLIC
   bool setCameraName(const std::string & cname);
+
+  CAMERA_INFO_MANAGER_PUBLIC
   bool setCameraInfo(const CameraInfo & camera_info);
+
+  CAMERA_INFO_MANAGER_PUBLIC
   bool validateURL(const std::string & url);
 
 private:
