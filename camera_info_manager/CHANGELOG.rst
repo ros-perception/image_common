@@ -2,6 +2,12 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.3.0 (2020-05-27)
+------------------
+* Fix formatting and include paths for linters (`#157 <https://github.com/ros-perception/image_common/issues/157>`_)
+* Enable Windows build. (`#159 <https://github.com/ros-perception/image_common/issues/159>`_)
+* Contributors: Martin Idel, Sean Yen
+
 2.2.1 (2019-10-23)
 ------------------
 * Fix abort criteria for setCameraInfoService callback (`#132 <https://github.com/ros-perception/image_common/issues/132>`_)

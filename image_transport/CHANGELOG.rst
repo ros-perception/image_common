@@ -2,6 +2,12 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.3.0 (2020-05-27)
+------------------
+* Fix formatting and include paths for linters (`#157 <https://github.com/ros-perception/image_common/issues/157>`_)
+* Fix QoS initialization from RMW QoS profile (`#158 <https://github.com/ros-perception/image_common/issues/158>`_)
+* Contributors: Jacob Perron, Martin Idel
+
 2.2.1 (2019-10-23)
 ------------------
 * add missing set header (`#140 <https://github.com/ros-perception/image_common/issues/140>`_)

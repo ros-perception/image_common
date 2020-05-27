@@ -2,6 +2,9 @@
 Changelog for package image_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.3.0 (2020-05-27)
+------------------
+
 2.2.1 (2019-10-23)
 ------------------
 * [ros2] image_common metapackage (`#129 <https://github.com/ros-perception/image_common/issues/129>`_)

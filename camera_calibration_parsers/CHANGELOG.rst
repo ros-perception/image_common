@@ -2,6 +2,11 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.3.0 (2020-05-27)
+------------------
+* Fix formatting and include paths for linters (`#157 <https://github.com/ros-perception/image_common/issues/157>`_)
+* Contributors: Martin Idel
+
 2.2.1 (2019-10-23)
 ------------------
 * ROS2 Using the filesystem helper in rcpputils (`#133 <https://github.com/ros-perception/image_common/issues/133>`_)
