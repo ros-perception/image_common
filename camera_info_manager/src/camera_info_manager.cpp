@@ -43,6 +43,7 @@
 #include <string>
 
 #include "rcpputils/filesystem_helper.hpp"
+#include "rcpputils/get_env.hpp"
 #include "camera_calibration_parsers/parse.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
@@ -316,24 +317,6 @@ bool CameraInfoManager::loadCameraInfo(const std::string & url)
   return loadCalibration(url, cname);
 }
 
-std::string get_env(const char * env_var)
-{
-#ifndef _WIN32
-  auto env_variable = getenv(env_var);
-#else
-  char * output_env_var = nullptr;
-  size_t env_var_size;
-  _dupenv_s(&output_env_var, &env_var_size, env_var);
-
-  std::string env_variable = "";
-  if (output_env_var) {
-    env_variable = std::string(output_env_var);
-    free(output_env_var);
-  }
-#endif
-  return env_variable;
-}
-
 /** Resolve Uniform Resource Locator string.
  *
  * @param url a copy of the Uniform Resource Locator, which may
@@ -372,8 +355,8 @@ std::string CameraInfoManager::resolveURL(
     } else if (url.substr(dollar + 1, 10) == "{ROS_HOME}") {
       // substitute $ROS_HOME
       std::string ros_home;
-      std::string ros_home_env = get_env("ROS_HOME");
-      std::string home_env = get_env("HOME");
+      std::string ros_home_env = rcpputils::get_env_var("ROS_HOME");
+      std::string home_env = rcpputils::get_env_var("HOME");
       if (!ros_home_env.empty()) {
         // use environment variable
         ros_home = ros_home_env;
