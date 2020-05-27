@@ -38,7 +38,8 @@
 #include <functional>
 #include <memory>
 
-#include "rclcpp/subscription.hpp"
+#include <rclcpp/subscription.hpp>
+
 #include "image_transport/subscriber_plugin.hpp"
 #include "image_transport/visibility_control.hpp"
 

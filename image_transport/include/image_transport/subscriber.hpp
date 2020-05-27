@@ -35,6 +35,10 @@
 #ifndef IMAGE_TRANSPORT__SUBSCRIBER_HPP_
 #define IMAGE_TRANSPORT__SUBSCRIBER_HPP_
 
+#include <functional>
+#include <memory>
+#include <string>
+
 #include <rclcpp/node.hpp>
 #include <sensor_msgs/msg/image.hpp>
 

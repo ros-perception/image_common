@@ -35,13 +35,11 @@
 #ifndef IMAGE_TRANSPORT__SINGLE_SUBSCRIBER_PUBLISHER_HPP_
 #define IMAGE_TRANSPORT__SINGLE_SUBSCRIBER_PUBLISHER_HPP_
 
-#include "rclcpp/macros.hpp"
-#include "sensor_msgs/msg/image.hpp"
-
+#include <rclcpp/macros.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
-#include <string>
 #include <functional>
+#include <string>
 
 #include "image_transport/visibility_control.hpp"
 
