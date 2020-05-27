@@ -16,8 +16,9 @@ protected:
   void SetUp()
   {
     node_ = rclcpp::Node::make_shared("node", "namespace");
-    std::vector<std::string> arguments;
-    arguments.push_back("old_topic:=new_topic");
+    std::vector<std::string> arguments{
+      "--ros-args", "-r", "old_topic:=new_topic"
+    };
     rclcpp::NodeOptions node_options;
     node_options.arguments(arguments);
 
