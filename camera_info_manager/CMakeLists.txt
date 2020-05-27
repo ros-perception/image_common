@@ -20,6 +20,7 @@ find_package(ament_cmake_ros REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(camera_calibration_parsers REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rcpputils REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
 include_directories(include)
@@ -34,6 +35,7 @@ ament_target_dependencies(
   ament_index_cpp
   camera_calibration_parsers
   rclcpp
+  rcpputils
   sensor_msgs
 )
 
@@ -50,7 +52,7 @@ install(
 )
 
 ament_export_include_directories(include)
-ament_export_dependencies(ament_index_cpp camera_calibration_parsers rclcpp sensor_msgs)
+ament_export_dependencies(ament_index_cpp camera_calibration_parsers rclcpp rcpputils sensor_msgs)
 ament_export_libraries(${PROJECT_NAME})
 
 if(BUILD_TESTING)
@@ -58,7 +60,7 @@ if(BUILD_TESTING)
   #find_package(ament_lint_auto REQUIRED)
   #ament_lint_auto_find_test_dependencies()
 
-  find_package(ament_cmake_cppcheck REQUIRED)
+  #find_package(ament_cmake_cppcheck REQUIRED)
   find_package(ament_cmake_cpplint REQUIRED)
   find_package(ament_cmake_lint_cmake REQUIRED)
   find_package(ament_cmake_uncrustify REQUIRED)
