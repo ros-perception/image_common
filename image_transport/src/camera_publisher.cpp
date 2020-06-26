@@ -98,9 +98,8 @@ CameraPublisher::CameraPublisher(
 
 size_t CameraPublisher::getNumSubscribers() const
 {
-  //TODO(ros2) add support when rcl/rmw support it.
-  //if (impl_ && impl_->isValid())
-  //return std::max(impl_->image_pub_.getNumSubscribers(), impl_->info_pub_.getNumSubscribers());
+  if (impl_ && impl_->isValid())
+    return std::max(impl_->image_pub_.getNumSubscribers(), impl_->info_pub_->get_subscription_count());
   return 0;
 }
 
