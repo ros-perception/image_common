@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(image_transport)
 
 find_package(catkin REQUIRED
@@ -37,12 +37,15 @@ target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
-# Build libimage_transport_plugins                                      
+# Build libimage_transport_plugins
 add_library(${PROJECT_NAME}_plugins src/manifest.cpp src/raw_publisher.cpp)
 target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 
+# Install plugin DLL to ${CATKIN_PACKAGE_LIB_DESTINATION} according to the path in default_plugins.xml
 install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_plugins
-        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         COMPONENT main
 )
 install(DIRECTORY include/${PROJECT_NAME}/

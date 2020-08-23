@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0.2)
 project(camera_info_manager)
 
 find_package(catkin REQUIRED COMPONENTS camera_calibration_parsers image_transport roscpp roslib sensor_msgs)
@@ -18,7 +18,9 @@ add_library(${PROJECT_NAME} src/camera_info_manager.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
-        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
         COMPONENT main
 )
 install(DIRECTORY include/${PROJECT_NAME}/
