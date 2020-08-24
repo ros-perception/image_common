@@ -61,12 +61,30 @@ Publisher create_publisher(
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+IMAGE_TRANSPORT_PUBLIC
+Publisher create_publisher(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
 /**
  * \brief Subscribe to an image topic, free function version.
  */
 IMAGE_TRANSPORT_PUBLIC
 Subscriber create_subscription(
   rclcpp::Node* node,
+  const std::string & base_topic,
+  const Subscriber::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+IMAGE_TRANSPORT_PUBLIC
+Subscriber create_subscription(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
   const std::string & base_topic,
   const Subscriber::Callback & callback,
   const std::string & transport,
@@ -81,12 +99,30 @@ CameraPublisher create_camera_publisher(
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+IMAGE_TRANSPORT_PUBLIC
+CameraPublisher create_camera_publisher(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
 /*!
  * \brief Subscribe to a camera, free function version.
  */
 IMAGE_TRANSPORT_PUBLIC
 CameraSubscriber create_camera_subscription(
   rclcpp::Node* node,
+  const std::string & base_topic,
+  const CameraSubscriber::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+IMAGE_TRANSPORT_PUBLIC
+CameraSubscriber create_camera_subscription(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
   const std::string & base_topic,
   const CameraSubscriber::Callback & callback,
   const std::string & transport,
@@ -114,6 +150,17 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   explicit ImageTransport(rclcpp::Node::SharedPtr node);
+
+  IMAGE_TRANSPORT_PUBLIC
+  ImageTransport(
+    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+    rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+    rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface);
+
+  template<class NodeT>
+  explicit ImageTransport(NodeT && node)
+  : ImageTransport(node->get_node_base_interface(), node->get_node_topics_interface(), node->get_node_logging_interface())
+  {}
 
   IMAGE_TRANSPORT_PUBLIC
   ~ImageTransport();

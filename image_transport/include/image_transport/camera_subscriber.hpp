@@ -79,6 +79,25 @@ public:
                    const std::string& transport,
                    rmw_qos_profile_t = rmw_qos_profile_default);
 
+  IMAGE_TRANSPORT_PUBLIC
+  CameraSubscriber(
+                   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+                   rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+                   rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+                   const std::string& base_topic,
+                   const Callback& callback,
+                   const std::string& transport,
+                   rmw_qos_profile_t = rmw_qos_profile_default);
+
+  template<class NodeT>
+  CameraSubscriber(NodeT && node,
+                  const std::string& base_topic,
+                  const Callback& callback,
+                  const std::string& transport,
+                  rmw_qos_profile_t = rmw_qos_profile_default)
+  : CameraSubscriber(node->get_node_base_interface(), node->get_node_topics_interface(), node->get_node_logging_interface(), base_topic, callback, transport)
+  {}
+
   /**
    * \brief Get the base topic (on which the raw image is published).
    */

@@ -81,6 +81,26 @@ public:
     const std::string & transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+  IMAGE_TRANSPORT_PUBLIC
+  Subscriber(
+    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+    rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+    rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+    const std::string & base_topic,
+    const Callback & callback,
+    SubLoaderPtr loader,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+  template<class NodeT>
+  Subscriber(NodeT && node,
+                  const std::string& base_topic,
+                  const Callback& callback,
+                  const std::string& transport,
+                  rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  : Subscriber(node->get_node_base_interface(), node->get_node_topics_interface(), node->get_node_logging_interface(), base_topic, callback, transport, custom_qos)
+  {}
+
   /**
    * \brief Returns the base image topic.
    *

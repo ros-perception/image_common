@@ -75,10 +75,31 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   Publisher(
-    rclcpp::Node * nh,
+    rclcpp::Node * node,
     const std::string & base_topic,
     PubLoaderPtr loader,
     rmw_qos_profile_t custom_qos);
+
+  template<class NodeT>
+  Publisher(
+    NodeT && node,
+    const std::string & base_topic,
+    PubLoaderPtr loader,
+    rmw_qos_profile_t custom_qos)
+  : Publisher(
+      node->get_node_base_interface(),
+      node->get_node_topics_interface(),
+      node->get_node_logging_interface(),
+      base_topic, loader, custom_qos)
+  {}
+
+  IMAGE_TRANSPORT_PUBLIC
+  Publisher(
+    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+    rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+    rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+    const std::string & base_topic,
+    PubLoaderPtr loader, rmw_qos_profile_t custom_qos);
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to

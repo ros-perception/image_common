@@ -61,11 +61,33 @@ struct Impl
 static Impl * kImpl = new Impl();
 
 Publisher create_publisher(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos)
+{
+  return Publisher(node_base_interface, node_topics_interface, node_logging_interface, base_topic, kImpl->pub_loader_, custom_qos);
+}
+
+Publisher create_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos)
 {
   return Publisher(node, base_topic, kImpl->pub_loader_, custom_qos);
+}
+
+Subscriber create_subscription(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+  const std::string & base_topic,
+  const Subscriber::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos)
+{
+  return Subscriber(node_base_interface, node_topics_interface, node_logging_interface, base_topic, callback, kImpl->sub_loader_, transport, custom_qos);
 }
 
 Subscriber create_subscription(
@@ -79,11 +101,33 @@ Subscriber create_subscription(
 }
 
 CameraPublisher create_camera_publisher(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos)
+{
+  return CameraPublisher(node_base_interface, node_topics_interface, node_logging_interface, base_topic, custom_qos);
+}
+
+CameraPublisher create_camera_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos)
 {
   return CameraPublisher(node, base_topic, custom_qos);
+}
+
+CameraSubscriber create_camera_subscription(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+  const std::string & base_topic,
+  const CameraSubscriber::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos)
+{
+  return CameraSubscriber(node_base_interface, node_topics_interface, node_logging_interface, base_topic, callback, transport, custom_qos);
 }
 
 CameraSubscriber create_camera_subscription(
@@ -130,13 +174,25 @@ std::vector<std::string> getLoadableTransports()
 
 struct ImageTransport::Impl
 {
-  rclcpp::Node::SharedPtr node_;
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface_;
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface_;
+  //rclcpp::Node::SharedPtr node_;
 };
 
 ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
+: ImageTransport(node->get_node_base_interface(), node->get_node_topics_interface(), node->get_node_logging_interface())
+{}
+
+ImageTransport::ImageTransport(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface)
 : impl_(std::make_unique<ImageTransport::Impl>())
 {
-  impl_->node_ = node;
+  impl_->node_base_interface_ = node_base_interface;
+  impl_->node_topics_interface_ = node_topics_interface;
+  impl_->node_logging_interface_ = node_logging_interface;
 }
 
 ImageTransport::~ImageTransport() = default;
@@ -147,7 +203,7 @@ Publisher ImageTransport::advertise(const std::string & base_topic, uint32_t que
   (void) latch;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_publisher(impl_->node_.get(), base_topic, custom_qos);
+  return create_publisher(impl_->node_base_interface_, impl_->node_topics_interface_, impl_->node_logging_interface_, base_topic, custom_qos);
 }
 
 Subscriber ImageTransport::subscribe(
@@ -159,7 +215,7 @@ Subscriber ImageTransport::subscribe(
   (void) tracked_object;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_subscription(impl_->node_.get(), base_topic, callback,
+  return create_subscription(impl_->node_base_interface_, impl_->node_topics_interface_, impl_->node_logging_interface_, base_topic, callback,
            getTransportOrDefault(transport_hints), custom_qos);
 }
 
@@ -171,7 +227,7 @@ CameraPublisher ImageTransport::advertiseCamera(
   (void) latch;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_camera_publisher(impl_->node_.get(), base_topic, custom_qos);
+  return create_camera_publisher(impl_->node_base_interface_, impl_->node_topics_interface_, impl_->node_logging_interface_, base_topic, custom_qos);
 }
 
 CameraSubscriber ImageTransport::subscribeCamera(
@@ -183,7 +239,7 @@ CameraSubscriber ImageTransport::subscribeCamera(
   (void) tracked_object;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_camera_subscription(impl_->node_.get(), base_topic, callback,
+  return create_camera_subscription(impl_->node_base_interface_, impl_->node_topics_interface_, impl_->node_logging_interface_, base_topic, callback,
            getTransportOrDefault(transport_hints), custom_qos);
 }
 
@@ -201,8 +257,10 @@ std::string ImageTransport::getTransportOrDefault(const TransportHints * transpo
 {
   std::string ret;
   if (nullptr == transport_hints) {
-    TransportHints th(impl_->node_.get());
-    ret = th.getTransport();
+    //TransportHints th(impl_->node_.get());
+    //ret = th.getTransport();
+    // TODO(karsten1987) fix
+    ret = transport_hints->getTransport();
   } else {
     ret = transport_hints->getTransport();
   }

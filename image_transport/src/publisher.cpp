@@ -50,8 +50,8 @@ namespace image_transport
 
 struct Publisher::Impl
 {
-  Impl(rclcpp::Node * node)
-  : logger_(node->get_logger()),
+  Impl(rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr logging_interface)
+  : logger_(logging_interface->get_logger()),
     unadvertised_(false)
   {
   }
@@ -101,12 +101,25 @@ struct Publisher::Impl
 Publisher::Publisher(
   rclcpp::Node * node, const std::string & base_topic,
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos)
-: impl_(std::make_shared<Impl>(node))
+: Publisher(
+    node->get_node_base_interface(),
+    node->get_node_topics_interface(),
+    node->get_node_logging_interface(),
+    base_topic, loader, custom_qos)
+{}
+
+Publisher::Publisher(
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+  rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+  rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+  const std::string & base_topic,
+  PubLoaderPtr loader, rmw_qos_profile_t custom_qos)
+: impl_(std::make_shared<Impl>(node_logging_interface))
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
   std::string image_topic = rclcpp::expand_topic_or_service_name(base_topic,
-      node->get_name(), node->get_namespace());
+      node_base_interface->get_name(), node_base_interface->get_namespace());
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
@@ -125,7 +138,10 @@ Publisher::Publisher(
 
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
-      pub->advertise(node, image_topic, custom_qos);
+      // FIXME(karsten1987): Plugin also has to cope for lifecycle nodes
+      // pub->advertise(node, image_topic, custom_qos);
+      (void) node_topics_interface;
+      (void) custom_qos;
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {
       RCLCPP_ERROR(impl_->logger_, "Failed to load plugin %s, error string: %s\n",
