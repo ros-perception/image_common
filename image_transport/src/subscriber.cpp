@@ -35,7 +35,7 @@
 #include "image_transport/subscriber.h"
 #include "image_transport/subscriber_plugin.h"
 #include <ros/names.h>
-#include <pluginlib/class_loader.h>
+#include <pluginlib/class_loader.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace image_transport {

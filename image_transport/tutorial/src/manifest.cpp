@@ -1,4 +1,4 @@
-#include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_list_macros.hpp>
 #include <image_transport_tutorial/resized_publisher.h>
 #include <image_transport_tutorial/resized_subscriber.h>
 

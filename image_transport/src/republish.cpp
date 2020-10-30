@@ -34,7 +34,7 @@
 
 #include "image_transport/image_transport.h"
 #include "image_transport/publisher_plugin.h"
-#include <pluginlib/class_loader.h>
+#include <pluginlib/class_loader.hpp>
 
 int main(int argc, char** argv)
 {
