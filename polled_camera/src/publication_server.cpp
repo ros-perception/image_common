@@ -86,7 +86,7 @@ public:
     if (!pub) {
       // Create a latching camera publisher.
       pub = it_.advertiseCamera(image_topic, 1, image_transport::SubscriberStatusCallback(),
-                                boost::bind(&Impl::disconnectCallback, this, _1),
+                                boost::bind(&Impl::disconnectCallback, this, boost::placeholders::_1),
                                 ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(),
                                 ros::VoidPtr(), true /*latch*/);
       ROS_INFO("Advertising %s", pub.getTopic().c_str());
