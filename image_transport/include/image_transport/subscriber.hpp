@@ -79,7 +79,7 @@ public:
     const Callback & callback,
     SubLoaderPtr loader,
     const std::string & transport,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+    const rclcpp::QoS & custom_qos = rclcpp::SensorDataQoS());
 
   /**
    * \brief Returns the base image topic.

@@ -77,7 +77,7 @@ public:
                    const std::string& base_topic,
                    const Callback& callback,
                    const std::string& transport,
-                   rmw_qos_profile_t = rmw_qos_profile_default);
+                   const rclcpp::QoS& qos = rclcpp::SensorDataQoS());
 
   /**
    * \brief Get the base topic (on which the raw image is published).

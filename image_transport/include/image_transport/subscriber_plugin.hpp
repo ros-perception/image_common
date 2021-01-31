@@ -70,7 +70,7 @@ public:
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     const Callback & callback,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & custom_qos = rclcpp::SensorDataQoS())
   {
     return subscribeImpl(node, base_topic, callback, custom_qos);
   }
@@ -81,7 +81,7 @@ public:
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & custom_qos = rclcpp::SensorDataQoS())
   {
     return subscribe(node, base_topic,
              std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)>(fp),
@@ -95,7 +95,7 @@ public:
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & custom_qos = rclcpp::SensorDataQoS())
   {
     return subscribe(node, base_topic,
              std::bind(fp, obj, std::placeholders::_1), custom_qos);
@@ -109,7 +109,7 @@ public:
     rclcpp::Node * node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
     std::shared_ptr<T> & obj,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & custom_qos = rclcpp::SensorDataQoS())
   {
     return subscribe(node, base_topic,
              std::bind(fp, obj, std::placeholders::_1), custom_qos);
@@ -146,7 +146,7 @@ protected:
   virtual void subscribeImpl(
     rclcpp::Node * node, const std::string & base_topic,
     const Callback & callback,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default) = 0;
+    const rclcpp::QoS & custom_qos) = 0;
 };
 
 }  // namespace image_transport

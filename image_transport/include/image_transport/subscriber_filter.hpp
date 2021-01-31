@@ -83,9 +83,10 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   SubscriberFilter(
     rclcpp::Node * node, const std::string & base_topic,
-    const std::string & transport)
+    const std::string & transport,
+    const rclcpp::QoS & custom_qos = rclcpp::SensorDataQoS())
   {
-    subscribe(node, base_topic, transport);
+    subscribe(node, base_topic, transport, custom_qos);
   }
 
   /**
@@ -115,7 +116,7 @@ public:
     rclcpp::Node * node,
     const std::string & base_topic,
     const std::string & transport,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    const rclcpp::QoS & custom_qos = rclcpp::SensorDataQoS())
   {
     unsubscribe();
     sub_ =

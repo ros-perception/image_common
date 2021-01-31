@@ -74,7 +74,7 @@ public:
   CameraPublisher(
     rclcpp::Node * node,
     const std::string & base_topic,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+    const rclcpp::QoS & custom_qos = rclcpp::SensorDataQoS());
 
   //TODO(ros2) Restore support for SubscriberStatusCallbacks when available.
 
