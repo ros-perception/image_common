@@ -126,7 +126,7 @@ CameraSubscriber::CameraSubscriber(
 
   impl_->image_sub_.subscribe(node, image_topic, transport, custom_qos);
   rclcpp::QoS custom_qos_transient = custom_qos;
-  custom_qos_transient.transient_local();
+  custom_qos_transient.transient_local().reliable();
   impl_->info_sub_.subscribe(node, info_topic, custom_qos_transient);
 
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);

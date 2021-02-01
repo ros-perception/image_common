@@ -145,7 +145,7 @@ Publisher ImageTransport::advertise(const std::string & base_topic, uint32_t que
 {
   // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
   (void) latch;
-  return create_publisher(impl_->node_.get(), base_topic, rclcpp::QoS(queue_size));
+  return create_publisher(impl_->node_.get(), base_topic, rclcpp::SensorDataQoS());
 }
 
 Subscriber ImageTransport::subscribe(
@@ -156,7 +156,7 @@ Subscriber ImageTransport::subscribe(
 {
   (void) tracked_object;
   return create_subscription(impl_->node_.get(), base_topic, callback,
-           getTransportOrDefault(transport_hints), rclcpp::QoS(queue_size));
+           getTransportOrDefault(transport_hints), rclcpp::SensorDataQoS());
 }
 
 CameraPublisher ImageTransport::advertiseCamera(
@@ -165,7 +165,7 @@ CameraPublisher ImageTransport::advertiseCamera(
 {
   // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
   (void) latch;
-  return create_camera_publisher(impl_->node_.get(), base_topic, rclcpp::QoS(queue_size));
+  return create_camera_publisher(impl_->node_.get(), base_topic, rclcpp::SensorDataQoS());
 }
 
 CameraSubscriber ImageTransport::subscribeCamera(
@@ -176,7 +176,7 @@ CameraSubscriber ImageTransport::subscribeCamera(
 {
   (void) tracked_object;
   return create_camera_subscription(impl_->node_.get(), base_topic, callback,
-           getTransportOrDefault(transport_hints), rclcpp::QoS(queue_size));
+           getTransportOrDefault(transport_hints), rclcpp::SensorDataQoS());
 }
 
 std::vector<std::string> ImageTransport::getDeclaredTransports() const

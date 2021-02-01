@@ -93,7 +93,7 @@ CameraPublisher::CameraPublisher(
 
   impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos);
   rclcpp::QoS custom_qos_transient = custom_qos;
-  custom_qos_transient.transient_local();
+  custom_qos_transient.transient_local().reliable();
   impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, custom_qos_transient);
 }
 
