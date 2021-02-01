@@ -1,0 +1,92 @@
+version: 2.1
+
+commands:
+  test_ros:
+    description: 'Build and test ROS packages'
+    parameters:
+      rosinstall_file:
+        type: string
+        default: .travis.rosinstall
+    steps:
+      - restore_cache:
+          keys:
+            - ccache-{{ .Branch }}-{{ .Revision }}
+            - ccache-{{ .Branch }}-
+            - ccache-
+      - run:
+          # Install git and ssh before checkout. Because larger
+          name: install git and ssh
+          command: |
+            # Creat .ssh/config in order to disable host key prompt
+            mkdir -p ~/.ssh
+            echo "Host *" >> ~/.ssh/config
+            echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+      - run:
+          name: Larger ccache storage
+          command: |
+            ccache -M 5G
+      - checkout
+      - add_ssh_keys
+      - run:
+          name: update submodules (if needed)
+          command: |
+            git submodule update --init
+      - run:
+          name: Clone other repositories
+          command: |
+            if [ -n "<<parameters.rosinstall_file>>" -a -e <<parameters.rosinstall_file>> ]; then
+              cd ..
+              wstool init --shallow
+              wstool merge project/<<parameters.rosinstall_file>>
+              wstool update -j10
+            fi
+      - run:
+          name: rosdep install
+          command: |
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep update
+            rosdep install --from-paths .. --ignore-src -rny || true
+      - run:
+          name: catkin init
+          command: |
+            cd ../..
+            catkin init
+            catkin config --extend /opt/ros/$ROS_DISTRO
+            catkin config --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER_LAUNCHER=ccache
+      - run:
+          name: Build
+          command: |
+            cd ../..
+            catkin build --no-status -j4 --summarize
+      - run:
+          name: Run Tests
+          command: |
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            cd ../..
+            catkin run_tests -j4 --no-deps --no-status --summarize $(cd src && catkin_topological_order . --only-names)
+            catkin_test_results --all --verbose
+
+      - save_cache:
+          key: ccache-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.ccache
+
+jobs:
+  melodic:
+    docker:
+      - image: gitaiinc/gitai-ci:melodic
+    working_directory: ~/src/project
+    steps:
+      - test_ros
+  noetic:
+    docker:
+      - image: gitaiinc/gitai-ci:noetic
+    working_directory: ~/src/project
+    steps:
+      - test_ros
+
+workflows:
+  tests:
+    jobs:
+      - melodic
+      - noetic
