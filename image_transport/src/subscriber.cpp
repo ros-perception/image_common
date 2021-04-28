@@ -89,7 +89,8 @@ Subscriber::Subscriber(
   const Callback & callback,
   SubLoaderPtr loader,
   const std::string & transport,
-  rmw_qos_profile_t custom_qos)
+  rmw_qos_profile_t custom_qos,
+  SubscriptionOptionsWithVoidAllocator options)
 : impl_(std::make_shared<Impl>(node, loader))
 {
   // Load the plugin for the chosen transport.
@@ -125,7 +126,7 @@ Subscriber::Subscriber(
 
   // Tell plugin to subscribe.
   RCLCPP_DEBUG(impl_->logger_, "Subscribing to: %s\n", base_topic.c_str());
-  impl_->subscriber_->subscribe(node, base_topic, callback, custom_qos);
+  impl_->subscriber_->subscribe(node, base_topic, callback, custom_qos, options);
 }
 
 std::string Subscriber::getTopic() const
