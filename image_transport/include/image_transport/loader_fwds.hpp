@@ -35,7 +35,6 @@
 #ifndef IMAGE_TRANSPORT__LOADER_FWDS_HPP_
 #define IMAGE_TRANSPORT__LOADER_FWDS_HPP_
 
-
 #include <rclcpp/rclcpp.hpp>
 
 // Forward-declare some classes most users shouldn't care about so that
