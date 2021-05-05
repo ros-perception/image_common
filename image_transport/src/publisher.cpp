@@ -105,8 +105,14 @@ Publisher::Publisher(
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
+
+  // FIXME: once https://github.com/ros2/rclcpp/issues/1656 is resolved, see #187
+  std::string effective_namespace = node->get_effective_namespace();
+  if (effective_namespace.length() > 1 && effective_namespace.back() == '/')
+    effective_namespace.pop_back();
+
   std::string image_topic = rclcpp::expand_topic_or_service_name(base_topic,
-      node->get_name(), node->get_namespace());
+      node->get_name(), effective_namespace);
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 

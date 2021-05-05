@@ -120,8 +120,14 @@ CameraSubscriber::CameraSubscriber(
 {
   // Must explicitly remap the image topic since we then do some string manipulation on it
   // to figure out the sibling camera_info topic.
+
+  // FIXME: once https://github.com/ros2/rclcpp/issues/1656 is resolved, see #187
+  std::string effective_namespace = node->get_effective_namespace();
+  if (effective_namespace.length() > 1 && effective_namespace.back() == '/')
+    effective_namespace.pop_back();
+
   std::string image_topic = rclcpp::expand_topic_or_service_name(base_topic,
-      node->get_name(), node->get_namespace());
+      node->get_name(), effective_namespace);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   impl_->image_sub_.subscribe(node, image_topic, transport, custom_qos);

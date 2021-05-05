@@ -87,8 +87,14 @@ CameraPublisher::CameraPublisher(
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
   // image topic is remapped (#4539).
+
+  // FIXME: once https://github.com/ros2/rclcpp/issues/1656 is resolved, see #187
+  std::string effective_namespace = node->get_effective_namespace();
+  if (effective_namespace.length() > 1 && effective_namespace.back() == '/')
+    effective_namespace.pop_back();
+
   std::string image_topic = rclcpp::expand_topic_or_service_name(base_topic,
-      node->get_name(), node->get_namespace());
+      node->get_name(), effective_namespace);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
