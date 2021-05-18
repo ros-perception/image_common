@@ -90,7 +90,7 @@ Subscriber::Subscriber(
   SubLoaderPtr loader,
   const std::string & transport,
   rmw_qos_profile_t custom_qos,
-  SubscriptionOptionsWithVoidAllocator options)
+  rclcpp::SubscriptionOptions options)
 : impl_(std::make_shared<Impl>(node, loader))
 {
   // Load the plugin for the chosen transport.

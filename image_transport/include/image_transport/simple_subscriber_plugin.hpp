@@ -40,7 +40,6 @@
 
 #include <rclcpp/subscription.hpp>
 
-#include "image_transport/loader_fwds.hpp"
 #include "image_transport/subscriber_plugin.hpp"
 #include "image_transport/visibility_control.hpp"
 
@@ -118,7 +117,7 @@ protected:
     const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos,
-    SubscriptionOptionsWithVoidAllocator options)
+    rclcpp::SubscriptionOptions options)
   {
     impl_ = std::make_unique<Impl>();
     // Push each group of transport-specific parameters into a separate sub-namespace

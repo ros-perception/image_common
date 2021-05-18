@@ -39,7 +39,6 @@
 #include <rclcpp/node.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
-#include "image_transport/loader_fwds.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
@@ -72,7 +71,7 @@ public:
     rclcpp::Node * node, const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    SubscriptionOptionsWithVoidAllocator options = SubscriptionOptionsWithVoidAllocator())
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribeImpl(node, base_topic, callback, custom_qos, options);
   }
@@ -84,7 +83,7 @@ public:
     rclcpp::Node * node, const std::string & base_topic,
     void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    SubscriptionOptionsWithVoidAllocator options = SubscriptionOptionsWithVoidAllocator())
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(node, base_topic,
              std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)>(fp),
@@ -99,7 +98,7 @@ public:
     rclcpp::Node * node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    SubscriptionOptionsWithVoidAllocator options = SubscriptionOptionsWithVoidAllocator())
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(node, base_topic,
              std::bind(fp, obj, std::placeholders::_1), custom_qos, options);
@@ -151,7 +150,7 @@ protected:
     rclcpp::Node * node, const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    SubscriptionOptionsWithVoidAllocator options = SubscriptionOptionsWithVoidAllocator()) = 0;
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions()) = 0;
 };
 
 }  // namespace image_transport

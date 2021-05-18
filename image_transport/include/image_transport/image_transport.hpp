@@ -71,7 +71,7 @@ Subscriber create_subscription(
   const Subscriber::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-  SubscriptionOptionsWithVoidAllocator options = SubscriptionOptionsWithVoidAllocator());
+  rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
 
 /*!
  * \brief Advertise a camera, free function version.

@@ -35,8 +35,6 @@
 #ifndef IMAGE_TRANSPORT__LOADER_FWDS_HPP_
 #define IMAGE_TRANSPORT__LOADER_FWDS_HPP_
 
-#include <rclcpp/rclcpp.hpp>
-
 // Forward-declare some classes most users shouldn't care about so that
 // image_transport.hpp doesn't bring them in.
 
@@ -47,8 +45,6 @@ namespace pluginlib {
 namespace image_transport {
   class PublisherPlugin;
   class SubscriberPlugin;
-
-  using SubscriptionOptionsWithVoidAllocator = rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>>;
 
   typedef pluginlib::ClassLoader<PublisherPlugin> PubLoader;
   typedef std::shared_ptr<PubLoader> PubLoaderPtr;

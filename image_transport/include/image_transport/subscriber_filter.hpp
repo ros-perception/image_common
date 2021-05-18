@@ -41,7 +41,6 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <message_filters/simple_filter.h>
 
-#include "image_transport/loader_fwds.hpp"
 #include "image_transport/image_transport.hpp"
 #include "image_transport/visibility_control.hpp"
 
@@ -117,7 +116,7 @@ public:
     const std::string & base_topic,
     const std::string & transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    SubscriptionOptionsWithVoidAllocator options = SubscriptionOptionsWithVoidAllocator())
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     unsubscribe();
     sub_ =
