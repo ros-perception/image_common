@@ -121,12 +121,12 @@ protected:
     this->subscribeImpl(node, base_topic, callback, custom_qos, rclcpp::SubscriptionOptions());
   }
 
-  virtual void subscribeImpl(
+  void subscribeImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos,
-    rclcpp::SubscriptionOptions options)
+    rclcpp::SubscriptionOptions options) override
   {
     impl_ = std::make_unique<Impl>();
     // Push each group of transport-specific parameters into a separate sub-namespace
