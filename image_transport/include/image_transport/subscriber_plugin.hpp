@@ -70,9 +70,10 @@ public:
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     const Callback & callback,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
-    return subscribeImpl(node, base_topic, callback, custom_qos);
+    return subscribeImpl(node, base_topic, callback, custom_qos, options);
   }
 
   /**
@@ -81,11 +82,12 @@ public:
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (*fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(node, base_topic,
              std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)>(fp),
-             custom_qos);
+             custom_qos, options);
   }
 
   /**
@@ -95,10 +97,11 @@ public:
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(node, base_topic,
-             std::bind(fp, obj, std::placeholders::_1), custom_qos);
+             std::bind(fp, obj, std::placeholders::_1), custom_qos, options);
   }
 
   /**
@@ -144,9 +147,24 @@ protected:
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
   virtual void subscribeImpl(
-    rclcpp::Node * node, const std::string & base_topic,
+    rclcpp::Node * node,
+    const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default) = 0;
+
+  virtual void subscribeImpl(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    const Callback & callback,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::SubscriptionOptions options)
+  {
+    (void) options;
+    RCLCPP_ERROR(
+      node->get_logger(),
+      "SubscriberPlugin::subscribeImpl with five arguments has not been overridden");
+    this->subscribeImpl(node, base_topic, callback, custom_qos);
+    }
 };
 
 }  // namespace image_transport
