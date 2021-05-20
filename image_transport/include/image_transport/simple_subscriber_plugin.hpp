@@ -70,13 +70,13 @@ class SimpleSubscriberPlugin : public SubscriberPlugin
 public:
   virtual ~SimpleSubscriberPlugin() {};
 
-  virtual std::string getTopic() const
+  virtual std::string getTopic() const override
   {
     if (impl_) return impl_->sub_->get_topic_name();
     return std::string();
   }
 
-  virtual size_t getNumPublishers() const
+  virtual size_t getNumPublishers() const override
   {
     if (impl_) {
       return impl_->sub_->get_publisher_count();
@@ -84,7 +84,7 @@ public:
     return 0;
   }
 
-  virtual void shutdown()
+  virtual void shutdown() override
   {
     // TODO(ros2) Enable shutdown when rcl/rmw supports it.
     //if (simple_impl_) simple_impl_->sub_.shutdown();
@@ -116,7 +116,7 @@ protected:
     rclcpp::Node * node,
     const std::string & base_topic,
     const Callback & callback,
-    rmw_qos_profile_t custom_qos)
+    rmw_qos_profile_t custom_qos) override
   {
     this->subscribeImpl(node, base_topic, callback, custom_qos, rclcpp::SubscriptionOptions());
   }
