@@ -2,6 +2,15 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.0.0 (2021-05-26)
+------------------
+* Make sure to mark overridden methods as 'override'. (`#192 <https://github.com/ros-perception/image_common/issues/192>`_)
+* Expose subscription options (`#186 <https://github.com/ros-perception/image_common/issues/186>`_)
+* fix mistyping 'cammera_publisher.hpp -> camera_publisher.hpp' (`#177 <https://github.com/ros-perception/image_common/issues/177>`_)
+* Update maintainers (`#173 <https://github.com/ros-perception/image_common/issues/173>`_)
+* make CameraPublisher::getNumSubscribers() work (`#163 <https://github.com/ros-perception/image_common/issues/163>`_)
+* Contributors: Alejandro Hernández Cordero, Audrow Nash, Chris Lalancette, Hye-Jong KIM, Michael Ferguson
+
 2.3.0 (2020-05-27)
 ------------------
 * Fix formatting and include paths for linters (`#157 <https://github.com/ros-perception/image_common/issues/157>`_)
