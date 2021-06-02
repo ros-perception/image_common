@@ -76,6 +76,26 @@ public:
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+  IMAGE_TRANSPORT_PUBLIC
+  CameraPublisher(
+    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+    rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface,
+    rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logging_interface,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+  template<class NodeT>
+  CameraPublisher(
+    NodeT && node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  : CameraPublisher(
+      node->get_node_base_interface(),
+      node->get_node_topics_interface(),
+      node->get_node_logging_interface(),
+      base_topic, custom_qos)
+  {}
+
   //TODO(ros2) Restore support for SubscriberStatusCallbacks when available.
 
   /*!
