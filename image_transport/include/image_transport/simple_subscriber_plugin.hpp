@@ -118,9 +118,12 @@ protected:
     const Callback & callback,
     rmw_qos_profile_t custom_qos) override
   {
+    impl_ = std::make_unique<Impl>();
+    // Push each group of transport-specific parameters into a separate sub-namespace
+    //ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
+    //
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    auto topic_to_subscribe = getTopicToSubscribe(base_topic);
-    impl_->sub_ = node->create_subscription<M>(topic_to_subscribe, qos,
+    impl_->sub_ = node->create_subscription<M>(getTopicToSubscribe(base_topic), qos,
         [this, callback](const typename std::shared_ptr<const M> msg){
           internalCallback(msg, callback);
         });
@@ -132,7 +135,7 @@ private:
     rclcpp::SubscriptionBase::SharedPtr sub_;
   };
 
-  std::unique_ptr<Impl> impl_ = std::make_unique<Impl>();
+  std::unique_ptr<Impl> impl_;
 };
 
 }  // namespace image_transport
