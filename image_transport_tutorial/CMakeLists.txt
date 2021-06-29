@@ -31,12 +31,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     DEPENDENCIES sensor_msgs
 )
 
-# Build image_transport_plugins library (raw)
-add_library(${PROJECT_NAME}_plugins SHARED
-  src/manifest.cpp
-)
-target_link_libraries(${PROJECT_NAME}_plugins ${rclcpp_LIBRARIES} ${OpenCV_LIBRARIES})
-
 # add the publisher example
 add_executable(my_publisher src/my_publisher.cpp)
 ament_target_dependencies(my_publisher
@@ -56,6 +50,8 @@ pluginlib_export_plugin_description_file(${PROJECT_NAME} resized_plugins.xml)
 
 # add the plugin example
 add_library(resized_publisher src/manifest.cpp src/resized_publisher.cpp src/resized_subscriber.cpp)
+ament_target_dependencies(resized_publisher
+  "pluginlib")
 target_link_libraries(resized_publisher ${rclcpp_LIBRARIES} ${OpenCV_LIBRARIES})
 
 ### link ###
@@ -67,14 +63,6 @@ rosidl_target_interfaces(my_subscriber
 
 rosidl_target_interfaces(resized_publisher
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
-
-# Install libraries
-install(
-  TARGETS ${PROJECT_NAME}_plugins
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
 
 # Install executables
 install(
@@ -89,8 +77,6 @@ install(
 )
 
 ament_export_include_directories(include)
-ament_export_libraries(${PROJECT_NAME}_plugins)
-
 ament_export_dependencies(rclcpp std_msgs sensor_msgs cvbridge image_transport pluginlib message_filters rosidl_default_runtime)
 
 ament_package()
