@@ -1,4 +1,4 @@
-#include <image_transport_tutorial/resized_subscriber.hpp>
+#include "image_transport_tutorial/resized_subscriber.hpp"
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/imgproc/imgproc.hpp>
 

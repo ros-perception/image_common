@@ -1,8 +1,8 @@
-#include <image_transport_tutorial/resized_publisher.hpp>
+#include "image_transport_tutorial/resized_publisher.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <cv_bridge/cv_bridge.h>
 
-void ResizedPublisher::publish(const sensor_msgs::Image& message,
+/*void ResizedPublisher::publish(const sensor_msgs::Image& message,
                                const PublishFn& publish_fn) const
 {
   cv::Mat cv_image;
@@ -34,4 +34,4 @@ void ResizedPublisher::publish(const sensor_msgs::Image& message,
   resized_image.original_width = cv_image.cols;
   resized_image.image = *(cv_bridge::CvImage(message.header, "bgr8", cv_image).toImageMsg());
   publish_fn(resized_image);
-}
+}*/
