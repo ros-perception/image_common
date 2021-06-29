@@ -53,20 +53,31 @@ class RawSubscriber : public SimpleSubscriberPlugin<sensor_msgs::msg::Image>
 public:
   virtual ~RawSubscriber() {}
 
-  virtual std::string getTransportName() const
+  std::string getTransportName() const override
   {
     return "raw";
   }
 
 protected:
-  virtual void internalCallback(const std::shared_ptr<const sensor_msgs::msg::Image>& message, const Callback& user_cb)
+  void internalCallback(
+    const std::shared_ptr<const sensor_msgs::msg::Image>& message, const Callback& user_cb) override
   {
     user_cb(message);
   }
 
-  virtual std::string getTopicToSubscribe(const std::string& base_topic) const
+  std::string getTopicToSubscribe(const std::string& base_topic) const override
   {
     return base_topic;
+  }
+
+  void subscribeImpl(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    const Callback & callback,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::SubscriptionOptions options) override
+  {
+    this->subscribeImplWithOptions(node, base_topic, callback, custom_qos, options);
   }
 };
 

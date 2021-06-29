@@ -164,7 +164,7 @@ protected:
       node->get_logger(),
       "SubscriberPlugin::subscribeImpl with five arguments has not been overridden");
     this->subscribeImpl(node, base_topic, callback, custom_qos);
-    }
+  }
 };
 
 }  // namespace image_transport
