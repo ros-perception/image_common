@@ -2,6 +2,9 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.0 (2021-06-29)
+------------------
+
 3.0.0 (2021-05-26)
 ------------------
 * Update maintainers (`#173 <https://github.com/ros-perception/image_common/issues/173>`_)
