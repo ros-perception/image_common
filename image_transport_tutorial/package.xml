@@ -9,14 +9,12 @@
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
 
-  <build_depend>builtin_interfaces</build_depend>
   <build_depend>cv_bridge</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>opencv2</build_depend>
   <build_depend>sensor_msgs</build_depend>
 
-  <exec_depend>builtin_interfaces</exec_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>image_transport</exec_depend>
