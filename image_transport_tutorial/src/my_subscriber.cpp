@@ -14,12 +14,10 @@ void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& msg)
   }
   catch (cv_bridge::Exception& e)
   {
-    auto logger = rclcpp::get_logger("camera_calibration_parsers.convert");
+    auto logger = rclcpp::get_logger("my_subscriber");
     RCLCPP_ERROR(logger, "Could not convert from '%s' to 'bgr8'.", msg->encoding.c_str());
   }
 }
-
-//image_transport::Subscriber::Callback &callback = std::function<void> imageCallback;
 
 int main(int argc, char **argv)
 {
