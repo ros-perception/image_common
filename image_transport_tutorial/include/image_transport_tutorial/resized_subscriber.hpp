@@ -31,6 +31,7 @@ public:
     return "resized";
   }
 
+protected:
   void subscribeImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -41,7 +42,6 @@ public:
     this->subscribeImplWithOptions(node, base_topic, callback, custom_qos, options);
   }
 
-protected:
   virtual void internalCallback(
     const typename image_transport_tutorial::msg::ResizedImage::ConstSharedPtr & message,
     const Callback & user_cb);

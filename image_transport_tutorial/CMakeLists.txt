@@ -45,6 +45,8 @@ target_link_libraries(my_subscriber ${rclcpp_LIBRARIES} ${OpenCV_LIBRARIES})
 
 # add the plugin example
 add_library(resized_publisher src/manifest.cpp src/resized_publisher.cpp src/resized_subscriber.cpp)
+ament_target_dependencies(resized_publisher
+  "image_transport")
 target_link_libraries(resized_publisher ${rclcpp_LIBRARIES} ${OpenCV_LIBRARIES})
 
 # add the publisher from video example
