@@ -70,6 +70,8 @@ protected:
     return base_topic;
   }
 
+  using SubscriberPlugin::subscribeImpl;
+
   void subscribeImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
