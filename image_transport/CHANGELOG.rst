@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.0 (2021-06-29)
+------------------
+* Fix SimpleSubscriberPlugin (`#195 <https://github.com/ros-perception/image_common/issues/195>`_)
+* Contributors: Ivan Santiago Paunovic
+
 3.0.0 (2021-05-26)
 ------------------
 * Make sure to mark overridden methods as 'override'. (`#192 <https://github.com/ros-perception/image_common/issues/192>`_)
