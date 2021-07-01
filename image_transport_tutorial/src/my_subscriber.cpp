@@ -39,6 +39,6 @@ int main(int argc, char ** argv)
   cv::startWindowThread();
   image_transport::ImageTransport it(node);
   image_transport::Subscriber sub = it.subscribe("camera/image", 1, imageCallback);
-  rclcpp::spin_some(node);
+  rclcpp::spin(node);
   cv::destroyWindow("view");
 }

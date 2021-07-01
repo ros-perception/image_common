@@ -47,6 +47,13 @@ target_link_libraries(my_subscriber ${rclcpp_LIBRARIES} ${OpenCV_LIBRARIES})
 add_library(resized_publisher src/manifest.cpp src/resized_publisher.cpp src/resized_subscriber.cpp)
 target_link_libraries(resized_publisher ${rclcpp_LIBRARIES} ${OpenCV_LIBRARIES})
 
+# add the publisher from video example
+add_executable(publisher_from_video src/publisher_from_video.cpp)
+ament_target_dependencies(publisher_from_video
+  "cv_bridge"
+  "image_transport")
+target_link_libraries(publisher_from_video ${rclcpp_LIBRARIES} ${OpenCV_LIBRARIES})
+
 # Install plugin descriptions
 pluginlib_export_plugin_description_file(${PROJECT_NAME} resized_plugins.xml)
 
@@ -56,7 +63,7 @@ rosidl_target_interfaces(resized_publisher
 
 # Install executables
 install(
-  TARGETS my_publisher my_subscriber resized_publisher
+  TARGETS my_publisher my_subscriber resized_publisher publisher_from_video
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
