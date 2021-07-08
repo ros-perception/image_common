@@ -66,7 +66,7 @@ sensor_msgs::msg::Image::SharedPtr msg;
 msg = cv_bridge::CvImage(hdr, "bgr8", image).toImageMsg();
 ```
 
-We load a user-specified (on the command line) color image from disk using OpenCV, then convert it to the ROS type `sensor_msgs/Image`.
+We load a user-specified (on the command line) color image from disk using OpenCV, then convert it to the ROS type `sensor_msgs/msg/Image`.
 
 ```
 rclcpp::WallRate loop_rate(5);
@@ -121,7 +121,7 @@ void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 ```
 
 This is the callback function that will be called when a new image has arrived on the `camera/image` topic. 
-Although the image may have been sent in some arbitrary transport-specific message type, notice that the callback need only handle the normal `sensor_msgs/Image` type. 
+Although the image may have been sent in some arbitrary transport-specific message type, notice that the callback need only handle the normal `sensor_msgs/msg/Image` type. 
 All image encoding/decoding is handled automatically for you.
 
 ```
@@ -150,7 +150,7 @@ image_transport::Subscriber sub = it.subscribe("camera/image", 1, imageCallback)
 
 Subscribe to the `camera/image` base topic. 
 The actual ROS topic subscribed to depends on which transport is used. 
-In the default case, "raw" transport, the topic is `camera/image` with type `sensor_msgs/Image`. 
+In the default case, "raw" transport, the topic is `camera/image` with type `sensor_msgs/msg/Image`. 
 ROS will call the `imageCallback` function whenever a new image arrives. 
 The 2nd argument is the queue size.
 
@@ -232,7 +232,7 @@ This the expected output for an otherwise new ROS installation after completing 
 Depending on your setup, you may already have "theora" or other transports available.
 
 ### Adding new transports
-Our nodes are currently communicating raw `sensor_msgs/Image` messages, so we are not gaining anything over using `rclcpp::Publisher` and `rclcpp::Subscriber`. 
+Our nodes are currently communicating raw `sensor_msgs/msg/Image` messages, so we are not gaining anything over using `rclcpp::Publisher` and `rclcpp::Subscriber`. 
 Let's change that by introducing a new transport.
 
 The `compressed_image_transport` package provides plugins for the "compressed" transport, which sends images over the wire in either JPEG- or PNG-compressed form. 
@@ -267,12 +267,13 @@ You should see an identical image window pop up.
 
 ### Changing transport-specific behavior
 For a particular transport, we may want to tweak settings such as compression level, bit rate, etc. 
-Transport plugins can expose such settings through `rqt_reconfigure`. 
+Transport plugins can expose such settings through ROS parameters. 
 For example, `/camera/image/compressed` allows you to change the compression format and quality on the fly; see the package documentation for full details.
 
 For now let's adjust the JPEG quality. 
 By default, the "compressed" transport uses JPEG compression at 80% quality. 
-Let's change it to 15%:
+Let's change it to 15%.
+We can use the GUI, `rqt_reconfigure`, to change the quality:
 
 ```
 $ ros2 run rqt_reconfigure rqt_reconfigure
@@ -281,7 +282,7 @@ $ ros2 run rqt_reconfigure rqt_reconfigure
 Now pick `/image_publisher` in the drop-down menu and move the `jpeg_quality` slider down to 15%. 
 Do you see the compression artifacts in your second view window?
 
-Dynamic Reconfigure has updated the dynamically reconfigurable parameter `/image_publisher/jpeg_quality`. 
+The `rqt_reconfigure` GUI has updated the ROS parameter `/image_publisher/jpeg_quality`. 
 You can verify this by running:
 
 ```
