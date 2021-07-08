@@ -1,0 +1,32 @@
+<package format="3">
+  <name>image_transport_tutorial</name>
+  <version>3.1.0</version>
+  <description>Tutorial for image_transport.</description>
+  <author>Vincent Rabaud</author>
+  <maintainer email="michael@openrobotics.org">Michael Carroll</maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>ament_cmake_ros</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>image_transport</build_depend>
+  <build_depend>libopencv-dev</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>image_transport</exec_depend>
+  <exec_depend>libopencv-dev</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <image_transport plugin="${prefix}/resized_plugins.xml"/>
+  </export>
+</package>
