@@ -10,8 +10,8 @@ catkin_package(INCLUDE_DIRS include
                DEPENDS Boost roscpp sensor_msgs
 )
 
-include_directories(${catkin_INCLUDE_DIRS})
 include_directories(include)
+include_directories(${catkin_INCLUDE_DIRS})
 
 # add a library
 add_library(${PROJECT_NAME} src/camera_info_manager.cpp)
