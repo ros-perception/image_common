@@ -49,6 +49,7 @@ ament_target_dependencies(my_subscriber
 # add the plugin example
 add_library(resized_plugins src/manifest.cpp src/resized_publisher.cpp src/resized_subscriber.cpp)
 ament_target_dependencies(resized_plugins
+  "cv_bridge"
   "image_transport"
   "OpenCV")
 
