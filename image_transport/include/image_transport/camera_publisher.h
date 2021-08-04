@@ -38,8 +38,8 @@
 #ifndef IMAGE_TRANSPORT__CAMERA_PUBLISHER_H_
 #define IMAGE_TRANSPORT__CAMERA_PUBLISHER_H_
 
-#pragma message ("Warning: This header is deprecated. Use 'cammera_publisher.hpp' instead")
+#pragma message ("Warning: This header is deprecated. Use 'camera_publisher.hpp' instead")
 
-#include "cammera_publisher.hpp"
+#include "camera_publisher.hpp"
 
 #endif  // IMAGE_TRANSPORT__CAMERA_PUBLISHER_H_
