@@ -65,9 +65,10 @@ public:
   void advertise(
     rclcpp::Node * nh,
     const std::string & base_topic,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    advertiseImpl(nh, base_topic, custom_qos);
+    advertiseImpl(nh, base_topic, custom_qos, options);
   }
 
   /**
@@ -136,6 +137,19 @@ protected:
   virtual void advertiseImpl(
     rclcpp::Node * nh, const std::string & base_topic,
     rmw_qos_profile_t custom_qos) = 0;
+
+  virtual void advertiseImpl(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options)
+  {
+    (void) options;
+    RCLCPP_ERROR(
+      node->get_logger(),
+      "PublisherPlugin::advertiseImpl with four arguments has not been overridden");
+    this->advertiseImpl(node, base_topic, custom_qos);
+  }
 };
 
 }  // namespace image_transport

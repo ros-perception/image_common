@@ -98,7 +98,8 @@ struct Publisher::Impl
 
 Publisher::Publisher(
   rclcpp::Node * node, const std::string & base_topic,
-  PubLoaderPtr loader, rmw_qos_profile_t custom_qos)
+  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions options)
 : impl_(std::make_shared<Impl>(node))
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
@@ -124,7 +125,7 @@ Publisher::Publisher(
 
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
-      pub->advertise(node, image_topic, custom_qos);
+      pub->advertise(node, image_topic, custom_qos, options);
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {
       RCLCPP_ERROR(

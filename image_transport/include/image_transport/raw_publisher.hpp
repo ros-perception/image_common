@@ -66,6 +66,17 @@ protected:
   {
     return base_topic;
   }
+
+  using PublisherPlugin::advertiseImpl;
+
+  void advertiseImpl(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options) override
+  {
+    this->advertiseImplWithOptions(node, base_topic, custom_qos, options);
+  }
 };
 
 }  // namespace image_transport
