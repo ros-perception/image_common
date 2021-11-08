@@ -11,6 +11,8 @@
   <author>Patrick Mihelich</author>
   <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
   <maintainer email="vincent.rabaud@gmail.com">Vincent Rabaud</maintainer>
+  <maintainer email="alejandro@openrobotics.org">Alejandro Hernández Cordero</maintainer>
+  <maintainer email="geoff@openrobotics.org">Geoffrey Biggs</maintainer>
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/image_transport</url>

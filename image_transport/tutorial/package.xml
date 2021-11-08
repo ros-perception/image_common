@@ -4,6 +4,8 @@
   <description>Tutorial for image_transport. This is useful for the tutorials at http://wiki.ros.org/image_transport/Tutorials/</description>
   <author>Vincent Rabaud</author>
   <maintainer email="vincent.rabaud@gmail.com">Vincent Rabaud</maintainer>
+  <maintainer email="alejandro@openrobotics.org">Alejandro Hernández Cordero</maintainer>
+  <maintainer email="geoff@openrobotics.org">Geoffrey Biggs</maintainer>
   <license>Apache 2.0</license>
 
   <build_depend>cv_bridge</build_depend>
