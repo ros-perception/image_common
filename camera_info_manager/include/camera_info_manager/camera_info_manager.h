@@ -252,6 +252,6 @@ class CAMERA_INFO_MANAGER_DECL CameraInfoManager
 
 }; // class CameraInfoManager
 
-}; // namespace camera_info_manager
+} // namespace camera_info_manager
 
 #endif // _CAMERA_INFO_MANAGER_H_
