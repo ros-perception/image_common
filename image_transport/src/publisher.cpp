@@ -181,6 +181,21 @@ void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message)
   }
 }
 
+void Publisher::publishUnique(sensor_msgs::msg::Image::UniquePtr message) const
+{
+  if (!impl_ || !impl_->isValid()) {
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    RCLCPP_FATAL(impl_->logger_, "Call to publish() on an invalid image_transport::Publisher");
+    return;
+  }
+
+  for (const auto & pub: impl_->publishers_) {
+    if (pub->getNumSubscribers() > 0) {
+      pub->publishUnique(std::move(message));
+    }
+  }
+}
+
 void Publisher::shutdown()
 {
   if (impl_) {

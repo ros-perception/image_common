@@ -111,6 +111,11 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-message_passing ${PROJECT_NAME})
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-ipc test/test_ipc.cpp)
+  if(TARGET ${PROJECT_NAME}-ipc)
+    target_link_libraries(${PROJECT_NAME}-ipc ${PROJECT_NAME})
+  endif()
+
   ament_add_gtest(${PROJECT_NAME}-remapping test/test_remapping.cpp)
   if(TARGET ${PROJECT_NAME}-remapping)
     target_link_libraries(${PROJECT_NAME}-remapping ${PROJECT_NAME})

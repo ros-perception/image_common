@@ -146,6 +146,21 @@ void CameraPublisher::publish(
   impl_->info_pub_->publish(*info);
 }
 
+void CameraPublisher::publishUnique(
+  sensor_msgs::msg::Image::UniquePtr image,
+  sensor_msgs::msg::CameraInfo::UniquePtr info) const
+{
+  if (!impl_ || !impl_->isValid()) {
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    RCLCPP_FATAL(impl_->logger_,
+      "Call to publish() on an invalid image_transport::CameraPublisher");
+    return;
+  }
+
+  impl_->image_pub_.publishUnique(std::move(image));
+  impl_->info_pub_->publish(std::move(info));
+}
+
 void CameraPublisher::shutdown()
 {
   if (impl_) {

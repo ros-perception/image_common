@@ -116,6 +116,14 @@ public:
     const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const;
 
   /*!
+   * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
+   */
+  IMAGE_TRANSPORT_PUBLIC
+  void publishUnique(
+    sensor_msgs::msg::Image::UniquePtr image,
+    sensor_msgs::msg::CameraInfo::UniquePtr info) const;
+
+  /*!
    * \brief Publish an (image, info) pair with given timestamp on the topics associated with
    * this CameraPublisher.
    *

@@ -65,6 +65,11 @@ protected:
     publish_fn(message);
   }
 
+  virtual void publishUnique(sensor_msgs::msg::Image::UniquePtr message, const UniqueFn& publish_fn) const
+  {
+    publish_fn(std::move(message));
+  }
+
   virtual std::string getTopicToAdvertise(const std::string& base_topic) const
   {
     return base_topic;

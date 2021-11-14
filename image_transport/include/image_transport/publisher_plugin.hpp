@@ -92,6 +92,11 @@ public:
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
    */
+  virtual void publishUnique(sensor_msgs::msg::Image::UniquePtr message) const = 0;
+
+  /**
+   * \brief Publish an image using the transport associated with this PublisherPlugin.
+   */
   virtual void publishPtr(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
   {
     publish(*message);

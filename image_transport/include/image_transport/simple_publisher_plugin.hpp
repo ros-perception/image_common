@@ -95,6 +95,17 @@ public:
     publish(message, bindInternalPublisher(simple_impl_->pub_.get()));
   }
 
+  virtual void publishUnique(sensor_msgs::msg::Image::UniquePtr message) const
+  {
+    if (!simple_impl_ || !simple_impl_->pub_) {
+      RCLCPP_ERROR(simple_impl_->logger_,
+        "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
+      return;
+    }
+
+    publishUnique(std::move(message), bindUniquePublisher(simple_impl_->pub_.get()));
+  }
+
   virtual void shutdown()
   {
     //if (simple_impl_) simple_impl_->pub_.shutdown();
@@ -116,6 +127,9 @@ protected:
   //! Generic function for publishing the internal message type.
   typedef std::function<void (const M &)> PublishFn;
 
+  //! Generic function for std::unique_ptr<M>.
+  typedef std::function<void (std::unique_ptr<M>)> UniqueFn;
+
   /**
    * \brief Publish an image using the specified publish function. Must be implemented by
    * the subclass.
@@ -127,6 +141,18 @@ protected:
   virtual void publish(
     const sensor_msgs::msg::Image & message,
     const PublishFn & publish_fn) const = 0;
+
+  /**
+   * \brief Publish an image using the specified publish function. Must be implemented by
+   * the subclass.
+   *
+   * The UniqueFn publishes the transport-specific message type. This indirection allows
+   * SimpleSubscriberPlugin to use this function for both normal broadcast publishing and
+   * single subscriber publishing (in subscription callbacks).
+   */
+  virtual void publishUnique(
+    sensor_msgs::msg::Image::UniquePtr message,
+    const UniqueFn & publish_fn) const = 0;
 
   /**
    * \brief Return the communication topic name for a given base topic.
@@ -167,6 +193,15 @@ private:
   {
     // Bind PubT::publish(const Message&) as PublishFn
     typedef void (PubT::* InternalPublishMemFn)(const M &);
+    InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
+    return std::bind(internal_pub_mem_fn, pub, std::placeholders::_1);
+  }
+
+  template<class PubT>
+  UniqueFn bindUniquePublisher(PubT * pub) const
+  {
+    // Bind PubT::publish(Message::UniquePtr) as UniqueFn
+    typedef void (PubT::* InternalPublishMemFn)(std::unique_ptr<M>);
     InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
     return std::bind(internal_pub_mem_fn, pub, std::placeholders::_1);
   }
