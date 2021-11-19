@@ -1,7 +1,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2018 Open Robotics
+*  Copyright (c) 2021 Open Robotics
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
