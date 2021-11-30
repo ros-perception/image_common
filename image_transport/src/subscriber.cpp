@@ -1,36 +1,30 @@
-/*********************************************************************
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2009, Willow Garage, Inc.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
+// Copyright (c) 2009, Willow Garage, Inc.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 #include "image_transport/subscriber.hpp"
 
@@ -41,7 +35,11 @@
 
 #include <pluginlib/class_loader.hpp>
 
-#include "image_transport/subscriber_plugin.hpp"
+#include <image_transport/subscriber_plugin.hpp>
+
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace image_transport
 {
@@ -80,7 +78,7 @@ struct Subscriber::Impl
   SubLoaderPtr loader_;
   std::shared_ptr<SubscriberPlugin> subscriber_;
   bool unsubscribed_;
-  //double constructed_;
+  // double constructed_;
 };
 
 Subscriber::Subscriber(
@@ -103,7 +101,7 @@ Subscriber::Subscriber(
 
   // Try to catch if user passed in a transport-specific topic as base_topic.
   // TODO(ros2) use rclcpp to clean
-  //std::string clean_topic = ros::names::clean(base_topic);
+  // std::string clean_topic = ros::names::clean(base_topic);
   std::string clean_topic = base_topic;
 
   size_t found = clean_topic.rfind('/');
@@ -114,7 +112,8 @@ Subscriber::Subscriber(
     if (std::find(plugins.begin(), plugins.end(), plugin_name) != plugins.end()) {
       std::string real_base_topic = clean_topic.substr(0, found);
 
-      RCLCPP_WARN(impl_->logger_,
+      RCLCPP_WARN(
+        impl_->logger_,
         "[image_transport] It looks like you are trying to subscribe directly to a "
         "transport-specific image topic '%s', in which case you will likely get a connection "
         "error. Try subscribing to the base topic '%s' instead with parameter ~image_transport "
@@ -154,7 +153,7 @@ void Subscriber::shutdown()
 
 Subscriber::operator void *() const
 {
-  return (impl_ && impl_->isValid()) ? (void *)1 : (void *)0;
+  return (impl_ && impl_->isValid()) ? reinterpret_cast<void *>(1) : reinterpret_cast<void *>(0);
 }
 
-} //namespace image_transport
+}  // namespace image_transport

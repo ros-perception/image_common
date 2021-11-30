@@ -59,7 +59,8 @@ void wait_for_subscriber(
   }
   int64_t time_slept_count =
     std::chrono::duration_cast<std::chrono::microseconds>(time_slept).count();
-  printf("Waited %" PRId64 " microseconds for the subscriber to %s topic '%s'\n",
+  printf(
+    "Waited %" PRId64 " microseconds for the subscriber to %s topic '%s'\n",
     time_slept_count,
     to_be_available ? "connect to" : "disconnect from",
     topic_name.c_str());
@@ -68,4 +69,3 @@ void wait_for_subscriber(
 }  // namespace test_rclcpp
 
 #endif  // UTILS_HPP_
-
