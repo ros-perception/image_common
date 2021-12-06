@@ -18,28 +18,28 @@ find_package(rcpputils REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(yaml_cpp_vendor REQUIRED)
 
-include_directories(include)
-
 # define the library
 add_library(${PROJECT_NAME}
   src/parse.cpp
   src/parse_ini.cpp
   src/parse_yml.cpp
 )
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  rclcpp::rclcpp
+  rcpputils::rcpputils
+  ${sensor_msgs_TARGETS}
+  ${yaml_cpp_vendor_TARGETS})
+target_include_directories(${PROJECT_NAME} PUBLIC
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+  "$<INSTALL_INTERFACE:include>")
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_CALIBRATION_PARSERS_BUILDING_DLL")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  target_link_libraries(${PROJECT_NAME} stdc++fs)
+  target_link_libraries(${PROJECT_NAME} PUBLIC stdc++fs)
 endif()
 
-ament_target_dependencies(
-  ${PROJECT_NAME}
-  rclcpp
-  rcpputils
-  sensor_msgs
-  yaml_cpp_vendor
-)
+ament_export_targets(export_${PROJECT_NAME})
 
 # TODO: Reenable Python Wrapper with new serialization technique.
 #find_package(PythonLibs REQUIRED)
@@ -62,7 +62,7 @@ add_executable(convert src/convert.cpp)
 target_link_libraries(convert ${PROJECT_NAME})
 
 install(
-  TARGETS ${PROJECT_NAME}
+  TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -78,8 +78,6 @@ install(
   DESTINATION include
 )
 
-ament_export_include_directories(include)
-ament_export_libraries(${PROJECT_NAME})
 ament_export_dependencies(rclcpp rcpputils sensor_msgs yaml_cpp_vendor)
 
 
