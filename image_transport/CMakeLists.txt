@@ -45,8 +45,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL
 add_library(${PROJECT_NAME}_plugins
   src/manifest.cpp
 )
-target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME}_plugins PRIVATE
+  ${PROJECT_NAME}
   pluginlib::pluginlin)
 
 # Build list_transports
@@ -76,7 +76,7 @@ install(
 )
 
 # Install include directories
-install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME)
+install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
 ament_export_targets(export${PROJECT_NAME})
 
