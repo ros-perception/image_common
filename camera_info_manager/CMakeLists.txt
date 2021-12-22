@@ -23,37 +23,32 @@ find_package(rclcpp REQUIRED)
 find_package(rcpputils REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
-include_directories(include)
-
 # add a library
 add_library(${PROJECT_NAME} src/camera_info_manager.cpp)
-
+target_include_directories(${PROJECT_NAME} PUBLIC
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>"
 target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_INFO_MANAGER_BUILDING_DLL")
-
-ament_target_dependencies(
-  ${PROJECT_NAME}
-  ament_index_cpp
-  camera_calibration_parsers
-  rclcpp
-  rcpputils
-  sensor_msgs
-)
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  rclcpp::rclcpp
+  ${sensor_msgs_TARGETS})
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  ament_index_cpp::ament_index_cpp
+  camera_calibration_parser::camera_calibration_parsers
+  rcpputils::rcpputils)
 
 install(
   TARGETS ${PROJECT_NAME}
+  EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
 
-install(
-  DIRECTORY include/
-  DESTINATION include
-)
+install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
-ament_export_include_directories(include)
 ament_export_dependencies(ament_index_cpp camera_calibration_parsers rclcpp rcpputils sensor_msgs)
-ament_export_libraries(${PROJECT_NAME})
+ament_export_targets(export_${PROJECT_NAME})
 
 if(BUILD_TESTING)
   #TODO(mjcarroll) switch back to this once I can fix copyright check

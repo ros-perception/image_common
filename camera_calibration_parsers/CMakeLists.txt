@@ -25,13 +25,15 @@ add_library(${PROJECT_NAME}
   src/parse_yml.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  rclcpp::rclcpp
-  rcpputils::rcpputils
   ${sensor_msgs_TARGETS}
   ${yaml_cpp_vendor_TARGETS})
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  rclcpp::rclcpp
+  rcpputils::rcpputils)
+
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-  "$<INSTALL_INTERFACE:include>")
+  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_CALIBRATION_PARSERS_BUILDING_DLL")
 
@@ -75,11 +77,10 @@ install(
 
 install(
   DIRECTORY include/
-  DESTINATION include
+  DESTINATION include/${PROJECT_NAME}
 )
 
 ament_export_dependencies(rclcpp rcpputils sensor_msgs yaml_cpp_vendor)
-
 
 if(BUILD_TESTING)
   #TODO(mjcarroll) switch back to this once I can fix copyright check
