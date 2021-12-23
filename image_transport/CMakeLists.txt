@@ -51,7 +51,9 @@ target_link_libraries(${PROJECT_NAME}_plugins PRIVATE
 
 # Build list_transports
 add_executable(list_transports src/list_transports.cpp)
-target_link_libraries(list_transports ${PROJECT_NAME})
+target_link_libraries(list_transports
+  ${PROJECT_NAME}
+  pluginlib::pluginlib)
 
 # Build republish
 add_executable(republish src/republish.cpp)
