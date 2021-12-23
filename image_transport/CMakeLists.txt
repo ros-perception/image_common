@@ -36,7 +36,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   rclcpp::rclcpp
   ${sensor_msgs_TARGETS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  pluginlib::pluginlin)
+  pluginlib::pluginlib)
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 target_compile_definitions(${PROJECT_NAME} PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL")
