@@ -78,7 +78,7 @@ install(
 # Install include directories
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
-ament_export_targets(export${PROJECT_NAME})
+ament_export_targets(export_${PROJECT_NAME})
 
 ament_export_dependencies(message_filters rclcpp sensor_msgs pluginlib)
 
