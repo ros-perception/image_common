@@ -5,7 +5,6 @@
      camera_calibration_parsers contains routines for reading and writing camera calibration parameters.
   </description>
   <author>Patrick Mihelich</author>
-  <maintainer email="alejandro@openrobotics.org">Alejandro Hernandez Cordero</maintainer>
   <maintainer email="michael@openrobotics.org">Michael Carroll</maintainer>
   <license>BSD</license>
 
