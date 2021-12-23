@@ -34,7 +34,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   ${sensor_msgs_TARGETS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ament_index_cpp::ament_index_cpp
-  camera_calibration_parser::camera_calibration_parsers
+  camera_calibration_parsers::camera_calibration_parsers
   rcpputils::rcpputils)
 
 install(
