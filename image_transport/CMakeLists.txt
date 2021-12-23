@@ -55,7 +55,9 @@ target_link_libraries(list_transports ${PROJECT_NAME})
 
 # Build republish
 add_executable(republish src/republish.cpp)
-target_link_libraries(republish ${PROJECT_NAME})
+target_link_libraries(republish
+  ${PROJECT_NAME}
+  pluginlib::pluginlib)
 
 # Install plugin descriptions
 pluginlib_export_plugin_description_file(image_transport default_plugins.xml)
