@@ -61,7 +61,9 @@ ament_export_targets(export_${PROJECT_NAME})
 
 # define the exe to convert
 add_executable(convert src/convert.cpp)
-target_link_libraries(convert ${PROJECT_NAME})
+target_link_libraries(convert
+  ${PROJECT_NAME}
+  rclcpp::rclcpp)
 
 install(
   TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME}
