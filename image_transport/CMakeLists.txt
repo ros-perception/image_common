@@ -47,7 +47,7 @@ add_library(${PROJECT_NAME}_plugins
 )
 target_link_libraries(${PROJECT_NAME}_plugins PRIVATE
   ${PROJECT_NAME}
-  pluginlib::pluginlin)
+  pluginlib::pluginlib)
 
 # Build list_transports
 add_executable(list_transports src/list_transports.cpp)
