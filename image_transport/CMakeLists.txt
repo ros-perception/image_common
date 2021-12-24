@@ -18,8 +18,6 @@ find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
-include_directories(include)
-
 # Build image_transport library
 add_library(${PROJECT_NAME}
   src/camera_common.cpp
@@ -30,14 +28,15 @@ add_library(${PROJECT_NAME}
   src/camera_subscriber.cpp
   src/image_transport.cpp
 )
-
-ament_target_dependencies(
-  ${PROJECT_NAME}
-  message_filters
-  pluginlib
-  rclcpp
-  sensor_msgs
-)
+target_include_directories(${PROJECT_NAME} PUBLIC
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  message_filters::message_filters
+  rclcpp::rclcpp
+  ${sensor_msgs_TARGETS})
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  pluginlib::pluginlib)
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 target_compile_definitions(${PROJECT_NAME} PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL")
@@ -46,15 +45,21 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL
 add_library(${PROJECT_NAME}_plugins
   src/manifest.cpp
 )
-target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_plugins PRIVATE
+  ${PROJECT_NAME}
+  pluginlib::pluginlib)
 
 # Build list_transports
 add_executable(list_transports src/list_transports.cpp)
-target_link_libraries(list_transports ${PROJECT_NAME})
+target_link_libraries(list_transports
+  ${PROJECT_NAME}
+  pluginlib::pluginlib)
 
 # Build republish
 add_executable(republish src/republish.cpp)
-target_link_libraries(republish ${PROJECT_NAME})
+target_link_libraries(republish
+  ${PROJECT_NAME}
+  pluginlib::pluginlib)
 
 # Install plugin descriptions
 pluginlib_export_plugin_description_file(image_transport default_plugins.xml)
@@ -66,6 +71,7 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
+install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME})
 
 # Install executables
 install(
@@ -74,13 +80,9 @@ install(
 )
 
 # Install include directories
-install(
-  DIRECTORY include/
-  DESTINATION include
-)
+install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
-ament_export_include_directories(include)
-ament_export_libraries(${PROJECT_NAME})
+ament_export_targets(export_${PROJECT_NAME})
 
 ament_export_dependencies(message_filters rclcpp sensor_msgs pluginlib)
 
