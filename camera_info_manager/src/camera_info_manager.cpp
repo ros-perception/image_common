@@ -86,6 +86,14 @@ CameraInfoManager::CameraInfoManager(
 }
 
 CameraInfoManager::CameraInfoManager(
+  rclcpp_lifecycle::LifecycleNode * node,
+  const std::string & cname, const std::string & url)
+: CameraInfoManager(node->get_node_base_interface(),
+    node->get_node_services_interface(), node->get_node_logging_interface(), cname, url)
+{
+}
+
+CameraInfoManager::CameraInfoManager(
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
   rclcpp::node_interfaces::NodeServicesInterface::SharedPtr node_services_interface,
   rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logger_interface,
