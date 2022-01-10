@@ -26,16 +26,16 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
-
-#include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/image.hpp>
-
-#include <image_transport/single_subscriber_publisher.hpp>
-
 #include <functional>
 #include <string>
 #include <memory>
+
+#include "gtest/gtest.h"
+
+#include "rclcpp/rclcpp.hpp"
+#include "sensor_msgs/msg/image.hpp"
+
+#include "image_transport/single_subscriber_publisher.hpp"
 
 class TestPublisher : public ::testing::Test
 {

@@ -26,16 +26,16 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
-
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp/node.hpp>
-
-#include <image_transport/image_transport.hpp>
-#include <sensor_msgs/msg/image.hpp>
-
 #include <chrono>
 #include <memory>
+
+#include "gtest/gtest.h"
+
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/node.hpp"
+
+#include "image_transport/image_transport.hpp"
+#include "sensor_msgs/msg/image.hpp"
 
 #include "utils.hpp"
 

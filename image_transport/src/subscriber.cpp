@@ -28,18 +28,18 @@
 
 #include "image_transport/subscriber.hpp"
 
-#include <rclcpp/expand_topic_or_service_name.hpp>
-#include <rclcpp/logging.hpp>
-
-#include <sensor_msgs/msg/image.hpp>
-
-#include <pluginlib/class_loader.hpp>
-
-#include <image_transport/subscriber_plugin.hpp>
-
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "rclcpp/expand_topic_or_service_name.hpp"
+#include "rclcpp/logging.hpp"
+
+#include "sensor_msgs/msg/image.hpp"
+
+#include "pluginlib/class_loader.hpp"
+
+#include "image_transport/subscriber_plugin.hpp"
 
 namespace image_transport
 {

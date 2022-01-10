@@ -28,14 +28,14 @@
 
 #include "image_transport/camera_subscriber.hpp"
 
-#include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
-
-#include <image_transport/camera_common.hpp>
-#include <image_transport/subscriber_filter.hpp>
-
 #include <memory>
 #include <string>
+
+#include "message_filters/subscriber.h"
+#include "message_filters/time_synchronizer.h"
+
+#include "image_transport/camera_common.hpp"
+#include "image_transport/subscriber_filter.hpp"
 
 inline void increment(int * value)
 {
