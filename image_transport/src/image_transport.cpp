@@ -28,16 +28,16 @@
 
 #include "image_transport/image_transport.hpp"
 
-#include <pluginlib/class_loader.hpp>
-
-#include <image_transport/camera_common.hpp>
-#include <image_transport/loader_fwds.hpp>
-#include <image_transport/publisher_plugin.hpp>
-#include <image_transport/subscriber_plugin.hpp>
-
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "pluginlib/class_loader.hpp"
+
+#include "image_transport/camera_common.hpp"
+#include "image_transport/loader_fwds.hpp"
+#include "image_transport/publisher_plugin.hpp"
+#include "image_transport/subscriber_plugin.hpp"
 
 namespace image_transport
 {

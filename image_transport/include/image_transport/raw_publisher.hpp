@@ -29,12 +29,12 @@
 #ifndef IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
 #define IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
 
-#include <sensor_msgs/msg/image.hpp>
-
-#include <image_transport/simple_publisher_plugin.hpp>
-#include <image_transport/visibility_control.hpp>
-
 #include <string>
+
+#include "sensor_msgs/msg/image.hpp"
+
+#include "image_transport/simple_publisher_plugin.hpp"
+#include "image_transport/visibility_control.hpp"
 
 namespace image_transport
 {

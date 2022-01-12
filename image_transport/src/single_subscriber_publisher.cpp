@@ -28,11 +28,11 @@
 
 #include "image_transport/single_subscriber_publisher.hpp"
 
-#include <sensor_msgs/msg/image.hpp>
-
-#include <image_transport/publisher.hpp>
-
 #include <string>
+
+#include "sensor_msgs/msg/image.hpp"
+
+#include "image_transport/publisher.hpp"
 
 namespace image_transport
 {

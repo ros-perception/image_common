@@ -26,14 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <pluginlib/class_loader.hpp>
-
-#include <image_transport/camera_common.hpp>
-#include <image_transport/publisher_plugin.hpp>
-#include <image_transport/subscriber_plugin.hpp>
-
 #include <map>
 #include <string>
+
+#include "pluginlib/class_loader.hpp"
+
+#include "image_transport/camera_common.hpp"
+#include "image_transport/publisher_plugin.hpp"
+#include "image_transport/subscriber_plugin.hpp"
 
 enum PluginStatus {SUCCESS, CREATE_FAILURE, LIB_LOAD_FAILURE, DOES_NOT_EXIST};
 
