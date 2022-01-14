@@ -2,6 +2,13 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.2 (2022-01-14)
+------------------
+* Fix include order for cpplint (`#221 <https://github.com/ros-perception/image_common/issues/221>`_)
+  Relates to https://github.com/ament/ament_lint/pull/324
+* Export a modern CMake target instead of variables and install includes to include/${PROJECT_NAME} (`#218 <https://github.com/ros-perception/image_common/issues/218>`_)
+* Contributors: Jacob Perron, Shane Loretz
+
 3.1.0 (2021-06-29)
 ------------------
 * Fix SimpleSubscriberPlugin (`#195 <https://github.com/ros-perception/image_common/issues/195>`_)
