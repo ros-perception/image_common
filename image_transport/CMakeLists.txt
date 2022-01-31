@@ -11,7 +11,7 @@ find_package(catkin REQUIRED
     sensor_msgs
 )
 
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
 catkin_package(
   INCLUDE_DIRS include
