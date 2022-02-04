@@ -64,6 +64,17 @@ TEST_F(TestPublisher, ImageTransportCameraPublisher) {
   auto pub = it.advertiseCamera("camera/image", 1);
 }
 
+TEST_F(TestPublisher, Shutdown) {
+  std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
+    [](const auto & msg) {(void)msg;};
+
+  image_transport::ImageTransport it(node_);
+  auto pub = it.advertiseCamera("camera/image", 1);
+  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 1u);
+  pub.shutdown();
+  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 0u);
+}
+
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
