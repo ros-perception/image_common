@@ -28,7 +28,18 @@ TEST_F(TestPublisher, construction_and_destruction) {
   executor.spin_node_some(node_);
 }
 
-int main(int argc, char** argv) {
+TEST_F(TestPublisher, shutdown) {
+  std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
+    [](const auto & msg) {(void)msg;};
+
+  auto sub = image_transport::create_subscription(node_.get(), "camera/image", fcn, "raw");
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 1u);
+  sub.shutdown();
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 0u);
+}
+
+int main(int argc, char ** argv)
+{
   rclcpp::init(argc, argv);
   testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
