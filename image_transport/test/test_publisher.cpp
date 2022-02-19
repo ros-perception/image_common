@@ -64,6 +64,13 @@ TEST_F(TestPublisher, ImageTransportCameraPublisher) {
   auto pub = it.advertiseCamera("camera/image", 1);
 }
 
+TEST_F(TestPublisher, Shutdown) {
+  auto pub = image_transport::create_publisher(node_.get(), "camera/image");
+  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 1u);
+  pub.shutdown();
+  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 0u);
+}
+
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
