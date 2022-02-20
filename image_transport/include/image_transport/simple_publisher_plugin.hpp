@@ -97,7 +97,7 @@ public:
 
   virtual void shutdown()
   {
-    //if (simple_impl_) simple_impl_->pub_.shutdown();
+    simple_impl_.reset();
   }
 
 protected:
