@@ -86,8 +86,7 @@ public:
 
   virtual void shutdown()
   {
-    // TODO(ros2) Enable shutdown when rcl/rmw supports it.
-    //if (simple_impl_) simple_impl_->sub_.shutdown();
+    impl_.reset();
   }
 
 protected:
