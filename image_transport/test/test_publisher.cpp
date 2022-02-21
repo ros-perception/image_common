@@ -46,7 +46,7 @@ protected:
   rclcpp::Node::SharedPtr node_;
 };
 
-TEST_F(TestPublisher, Publisher) {
+TEST_F(TestPublisher, publisher) {
   auto pub = image_transport::create_publisher(node_.get(), "camera/image");
   EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 1u);
   pub.shutdown();
@@ -56,12 +56,12 @@ TEST_F(TestPublisher, Publisher) {
   pub.publish(sensor_msgs::msg::Image::ConstSharedPtr());
 }
 
-TEST_F(TestPublisher, ImageTransportPublisher) {
+TEST_F(TestPublisher, image_transport_publisher) {
   image_transport::ImageTransport it(node_);
   auto pub = it.advertise("camera/image", 1);
 }
 
-TEST_F(TestPublisher, CameraPublisher) {
+TEST_F(TestPublisher, camera_publisher) {
   auto camera_pub = image_transport::create_camera_publisher(node_.get(), "camera/image");
   EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 1u);
   EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/camera_info"), 1u);
@@ -75,9 +75,39 @@ TEST_F(TestPublisher, CameraPublisher) {
     sensor_msgs::msg::CameraInfo::ConstSharedPtr());
 }
 
-TEST_F(TestPublisher, ImageTransportCameraPublisher) {
+TEST_F(TestPublisher, image_transport_camera_publisher) {
   image_transport::ImageTransport it(node_);
   auto pub = it.advertiseCamera("camera/image", 1);
+}
+
+TEST_F(TestPublisher, qos_override) {
+  rclcpp::PublisherOptions options;
+  options.qos_overriding_options = rclcpp::QosOverridingOptions(
+  {
+    rclcpp::QosPolicyKind::Depth,
+    rclcpp::QosPolicyKind::Durability,
+    rclcpp::QosPolicyKind::History,
+    rclcpp::QosPolicyKind::Reliability,
+  });
+  auto pub = image_transport::create_publisher(
+    node_.get(), "camera/image", rmw_qos_profile_default, options);
+  auto endpoint_info_vec = node_->get_publishers_info_by_topic("camera/image");
+  EXPECT_EQ(endpoint_info_vec[0].qos_profile().reliability(), rclcpp::ReliabilityPolicy::Reliable);
+  pub.shutdown();
+
+  node_ = rclcpp::Node::make_shared(
+    "test_publisher", rclcpp::NodeOptions().parameter_overrides(
+  {
+    rclcpp::Parameter(
+      "qos_overrides./camera/image.publisher.reliability", "best_effort"),
+  }));
+  pub = image_transport::create_publisher(
+    node_.get(), "camera/image", rmw_qos_profile_default, options);
+
+  endpoint_info_vec = node_->get_publishers_info_by_topic("camera/image");
+  EXPECT_EQ(
+    endpoint_info_vec[0].qos_profile().reliability(),
+    rclcpp::ReliabilityPolicy::BestEffort);
 }
 
 int main(int argc, char ** argv)

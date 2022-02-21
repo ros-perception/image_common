@@ -35,7 +35,7 @@
 
 #include "image_transport/image_transport.hpp"
 
-class TestPublisher : public ::testing::Test
+class TestSubscriber : public ::testing::Test
 {
 protected:
   void SetUp()
@@ -46,7 +46,7 @@ protected:
   rclcpp::Node::SharedPtr node_;
 };
 
-TEST_F(TestPublisher, construction_and_destruction) {
+TEST_F(TestSubscriber, construction_and_destruction) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
@@ -56,7 +56,7 @@ TEST_F(TestPublisher, construction_and_destruction) {
   executor.spin_node_some(node_);
 }
 
-TEST_F(TestPublisher, shutdown) {
+TEST_F(TestSubscriber, shutdown) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
@@ -66,7 +66,7 @@ TEST_F(TestPublisher, shutdown) {
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 0u);
 }
 
-TEST_F(TestPublisher, camera_sub_shutdown) {
+TEST_F(TestSubscriber, camera_sub_shutdown) {
   std::function<void(
       const sensor_msgs::msg::Image::ConstSharedPtr &,
       const sensor_msgs::msg::CameraInfo::ConstSharedPtr &)> fcn =
@@ -78,6 +78,38 @@ TEST_F(TestPublisher, camera_sub_shutdown) {
   sub.shutdown();
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 0u);
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/camera_info"), 0u);
+}
+
+TEST_F(TestSubscriber, qos_override) {
+  rclcpp::SubscriptionOptions options;
+  options.qos_overriding_options = rclcpp::QosOverridingOptions(
+  {
+    rclcpp::QosPolicyKind::Depth,
+    rclcpp::QosPolicyKind::Durability,
+    rclcpp::QosPolicyKind::History,
+    rclcpp::QosPolicyKind::Reliability,
+  });
+  std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
+    [](const auto & msg) {(void)msg;};
+  auto sub = image_transport::create_subscription(
+    node_.get(), "camera/image", fcn, "raw", rmw_qos_profile_default, options);
+  auto endpoint_info_vec = node_->get_subscriptions_info_by_topic("camera/image");
+  EXPECT_EQ(endpoint_info_vec[0].qos_profile().reliability(), rclcpp::ReliabilityPolicy::Reliable);
+  sub.shutdown();
+
+  node_ = rclcpp::Node::make_shared(
+    "test_subscriber", rclcpp::NodeOptions().parameter_overrides(
+  {
+    rclcpp::Parameter(
+      "qos_overrides./camera/image.subscription.reliability", "best_effort"),
+  }));
+  sub = image_transport::create_subscription(
+    node_.get(), "camera/image", fcn, "raw", rmw_qos_profile_default, options);
+
+  endpoint_info_vec = node_->get_subscriptions_info_by_topic("camera/image");
+  EXPECT_EQ(
+    endpoint_info_vec[0].qos_profile().reliability(),
+    rclcpp::ReliabilityPolicy::BestEffort);
 }
 
 int main(int argc, char ** argv)
