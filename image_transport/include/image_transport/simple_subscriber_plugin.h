@@ -109,7 +109,7 @@ protected:
     simple_impl_.reset(new SimpleSubscriberPluginImpl(param_nh));
 
     simple_impl_->sub_ = nh.subscribe<M>(getTopicToSubscribe(base_topic), queue_size,
-                                         boost::bind(&SimpleSubscriberPlugin::internalCallback, this, _1, callback),
+                                         boost::bind(&SimpleSubscriberPlugin::internalCallback, this, boost::placeholders::_1, callback),
                                          tracked_object, transport_hints.getRosHints());
   }
 

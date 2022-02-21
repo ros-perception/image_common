@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     // Use Publisher::publish as the subscriber callback
     typedef void (image_transport::Publisher::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
-    sub = it.subscribe(in_topic, 1, boost::bind(pub_mem_fn, &pub, _1), ros::VoidPtr(), in_transport);
+    sub = it.subscribe(in_topic, 1, boost::bind(pub_mem_fn, &pub, boost::placeholders::_1), ros::VoidPtr(), in_transport);
 
     ros::spin();
   }
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::*PublishMemFn)(const sensor_msgs::ImageConstPtr&) const;
     PublishMemFn pub_mem_fn = &Plugin::publish;
-    sub = it.subscribe(in_topic, 1, boost::bind(pub_mem_fn, pub.get(), _1), pub, in_transport);
+    sub = it.subscribe(in_topic, 1, boost::bind(pub_mem_fn, pub.get(), boost::placeholders::_1), pub, in_transport);
 
     ros::spin();
   }

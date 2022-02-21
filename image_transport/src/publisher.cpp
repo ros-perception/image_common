@@ -208,7 +208,7 @@ SubscriberStatusCallback Publisher::rebindCB(const SubscriberStatusCallback& use
   if (user_cb)
   {
     ImplWPtr impl_wptr(impl_);
-    return boost::bind(&Publisher::weakSubscriberCb, impl_wptr, _1, user_cb);
+    return boost::bind(&Publisher::weakSubscriberCb, impl_wptr, boost::placeholders::_1, user_cb);
   }
   else
     return SubscriberStatusCallback();
