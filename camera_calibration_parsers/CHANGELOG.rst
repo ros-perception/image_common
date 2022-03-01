@@ -2,8 +2,8 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.1.3 (2022-03-01)
+------------------
 * Remove YAML_CPP_DLL define (`#231 <https://github.com/ros-perception/image_common/issues/231>`_)
 * Contributors: Akash
 
