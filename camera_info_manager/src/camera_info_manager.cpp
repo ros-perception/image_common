@@ -244,7 +244,7 @@ bool CameraInfoManager::loadCalibration(const std::string &url,
       }
     case URL_flash:
       {
-	success = loadCalibrationFlash(resURL.substr(8), cname);
+        success = loadCalibrationFlash(resURL.substr(8), cname);
         break;
       }
     case URL_package:
@@ -262,12 +262,6 @@ bool CameraInfoManager::loadCalibration(const std::string &url,
     }
 
   return success;
-}
-
-bool CameraInfoManager::loadCalibrationFlash(const std::string &flashURL,
-					     const std::string &cname) {
-  ROS_WARN("[CameraInfoManager] reading from flash not implemented for this CameraInfoManager");
-  return false;
 }
 
 /** Load CameraInfo calibration data from a file.
@@ -309,6 +303,12 @@ bool CameraInfoManager::loadCalibrationFile(const std::string &filename,
     }
 
   return success;
+}
+
+bool CameraInfoManager::loadCalibrationFlash(const std::string &flashURL,
+                                             const std::string &cname) {
+  ROS_WARN("[CameraInfoManager] reading from flash not implemented for this CameraInfoManager");
+  return false;
 }
 
 /** Set a new URL and load its calibration data (if any).
@@ -485,8 +485,8 @@ CameraInfoManager::saveCalibration(const sensor_msgs::CameraInfo &new_info,
       }
     case URL_flash:
       {
-	success = saveCalibrationFlash(new_info, resURL.substr(8), cname);
-        break;	
+        success = saveCalibrationFlash(new_info, resURL.substr(8), cname);
+        break;  
       }
     default:
       {
@@ -498,13 +498,6 @@ CameraInfoManager::saveCalibration(const sensor_msgs::CameraInfo &new_info,
     }
 
   return success;
-}
-
-bool CameraInfoManager::saveCalibrationFlash(const sensor_msgs::CameraInfo &new_info,
-				  const std::string &flashURL,
-				  const std::string &cname) {
-  ROS_ERROR_STREAM("flash url: " << flashURL << " (ignored)");
-  return saveCalibration(new_info, default_camera_info_url, cname);
 }
 
 /** Save CameraInfo calibration data to a file.
@@ -571,6 +564,13 @@ CameraInfoManager::saveCalibrationFile(const sensor_msgs::CameraInfo &new_info,
   // Currently, writeCalibration() always returns true no matter what
   // (ros-pkg ticket #5010).
   return writeCalibration(filename, cname, new_info);
+}
+
+bool CameraInfoManager::saveCalibrationFlash(const sensor_msgs::CameraInfo &new_info,
+                                  const std::string &flashURL,
+                                  const std::string &cname) {
+  ROS_ERROR_STREAM("flash url: " << flashURL << " (ignored)");
+  return saveCalibration(new_info, default_camera_info_url, cname);
 }
 
 /** Callback for SetCameraInfo request.
