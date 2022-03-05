@@ -266,7 +266,7 @@ bool CameraInfoManager::loadCalibration(const std::string &url,
 
 bool CameraInfoManager::loadCalibrationFlash(const std::string &flashURL,
 					     const std::string &cname) {
-  ROS_WARN("[CameraInfoManager] reading from flash not implemented yet");
+  ROS_WARN("[CameraInfoManager] reading from flash not implemented for this CameraInfoManager");
   return false;
 }
 
