@@ -126,8 +126,9 @@ void CameraPublisher::publish(
 {
   if (!impl_ || !impl_->isValid()) {
     // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(
-      impl_->logger_,
+      logger,
       "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
@@ -142,8 +143,9 @@ void CameraPublisher::publish(
 {
   if (!impl_ || !impl_->isValid()) {
     // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(
-      impl_->logger_,
+      logger,
       "Call to publish() on an invalid image_transport::CameraPublisher");
     return;
   }
