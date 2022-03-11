@@ -2,6 +2,11 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.3 (2022-03-01)
+------------------
+* Remove YAML_CPP_DLL define (`#231 <https://github.com/ros-perception/image_common/issues/231>`_)
+* Contributors: Akash
+
 3.1.2 (2022-01-14)
 ------------------
 * Export a modern CMake target instead of variables and install includes to include/${PROJECT_NAME} (`#218 <https://github.com/ros-perception/image_common/issues/218>`_)

@@ -2,6 +2,12 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.3 (2022-03-01)
+------------------
+* Simple IT plugins shutdown (`#225 <https://github.com/ros-perception/image_common/issues/225>`_)
+* Remove PLUGINLIB__DISABLE_BOOST_FUNCTIONS definition. (`#226 <https://github.com/ros-perception/image_common/issues/226>`_)
+* Contributors: Chris Lalancette, RoboTech Vision
+
 3.1.2 (2022-01-14)
 ------------------
 * Fix include order for cpplint (`#221 <https://github.com/ros-perception/image_common/issues/221>`_)

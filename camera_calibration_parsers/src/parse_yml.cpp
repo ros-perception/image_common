@@ -46,7 +46,6 @@
 #include "sensor_msgs/distortion_models.hpp"
 
 #ifdef _WIN32
-#define YAML_CPP_DLL
 // TODO(mjcarroll): This shouldn't be needed, but there are some issues
 // with MSVC and YAML-CPP that are upstream causing warnings in CI.
 #pragma warning(push)
