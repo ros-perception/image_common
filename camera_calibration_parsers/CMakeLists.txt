@@ -102,12 +102,12 @@ if(BUILD_TESTING)
 
   ament_add_gtest(${PROJECT_NAME}-parse_ini test/test_parse_ini.cpp)
   if(TARGET ${PROJECT_NAME}-parse_ini)
-    target_link_libraries(${PROJECT_NAME}-parse_ini ${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME}-parse_ini ${PROJECT_NAME} rcpputils::rcpputils)
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-parse_yml test/test_parse_yml.cpp)
   if(TARGET ${PROJECT_NAME}-parse_yml)
-    target_link_libraries(${PROJECT_NAME}-parse_yml ${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME}-parse_yml ${PROJECT_NAME} rcpputils::rcpputils)
   endif()
 endif()
 
