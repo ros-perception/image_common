@@ -73,9 +73,8 @@ struct CameraSubscriber::Impl
   {
     if (!unsubscribed_) {
       unsubscribed_ = true;
-      // TODO(ros2) Use unsubscribe when rcl/rmw support it.
-      // image_sub_.unsubscribe();
-      // info_sub_.unsubscribe();
+      image_sub_.unsubscribe();
+      info_sub_.unsubscribe();
     }
   }
 

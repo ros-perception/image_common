@@ -64,8 +64,7 @@ struct CameraPublisher::Impl
     if (!unadvertised_) {
       unadvertised_ = true;
       image_pub_.shutdown();
-      // TODO(ros2) publishers don't have "shutdown"
-      // info_pub_.shutdown();
+      info_pub_.reset();
     }
   }
 
