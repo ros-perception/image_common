@@ -81,6 +81,33 @@ TEST_F(TestSubscriber, camera_sub_shutdown) {
 }
 
 TEST_F(TestSubscriber, qos_override) {
+  std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
+    [](const auto & msg) {(void)msg;};
+
+  // without options
+  auto sub = image_transport::create_subscription(
+    node_.get(), "camera/image", fcn, "raw", rmw_qos_profile_default);
+  auto endpoint_info_vec = node_->get_subscriptions_info_by_topic("camera/image");
+  EXPECT_EQ(endpoint_info_vec[0].qos_profile().reliability(), rclcpp::ReliabilityPolicy::Reliable);
+  sub.shutdown();
+
+  node_ = rclcpp::Node::make_shared(
+    "test_subscriber", rclcpp::NodeOptions().parameter_overrides(
+  {
+    rclcpp::Parameter(
+      "qos_overrides./camera/image.subscription.reliability", "best_effort"),
+  }));
+  sub = image_transport::create_subscription(
+    node_.get(), "camera/image", fcn, "raw", rmw_qos_profile_default);
+
+  endpoint_info_vec = node_->get_subscriptions_info_by_topic("camera/image");
+  EXPECT_EQ(
+    endpoint_info_vec[0].qos_profile().reliability(),
+    rclcpp::ReliabilityPolicy::Reliable);
+
+  // with options
+  node_ = rclcpp::Node::make_shared("test_subscriber");
+
   rclcpp::SubscriptionOptions options;
   options.qos_overriding_options = rclcpp::QosOverridingOptions(
   {
@@ -89,11 +116,10 @@ TEST_F(TestSubscriber, qos_override) {
     rclcpp::QosPolicyKind::History,
     rclcpp::QosPolicyKind::Reliability,
   });
-  std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
-    [](const auto & msg) {(void)msg;};
-  auto sub = image_transport::create_subscription(
+
+  sub = image_transport::create_subscription(
     node_.get(), "camera/image", fcn, "raw", rmw_qos_profile_default, options);
-  auto endpoint_info_vec = node_->get_subscriptions_info_by_topic("camera/image");
+  endpoint_info_vec = node_->get_subscriptions_info_by_topic("camera/image");
   EXPECT_EQ(endpoint_info_vec[0].qos_profile().reliability(), rclcpp::ReliabilityPolicy::Reliable);
   sub.shutdown();
 

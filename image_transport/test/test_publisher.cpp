@@ -81,6 +81,30 @@ TEST_F(TestPublisher, image_transport_camera_publisher) {
 }
 
 TEST_F(TestPublisher, qos_override) {
+  // without options
+  auto pub =
+    image_transport::create_publisher(node_.get(), "camera/image", rmw_qos_profile_default);
+  auto endpoint_info_vec = node_->get_publishers_info_by_topic("camera/image");
+  EXPECT_EQ(endpoint_info_vec[0].qos_profile().reliability(), rclcpp::ReliabilityPolicy::Reliable);
+  pub.shutdown();
+
+  node_ = rclcpp::Node::make_shared(
+    "test_publisher", rclcpp::NodeOptions().parameter_overrides(
+  {
+    rclcpp::Parameter(
+      "qos_overrides./camera/image.publisher.reliability", "best_effort"),
+  }));
+  pub = image_transport::create_publisher(node_.get(), "camera/image", rmw_qos_profile_default);
+
+  endpoint_info_vec = node_->get_publishers_info_by_topic("camera/image");
+  EXPECT_EQ(
+    endpoint_info_vec[0].qos_profile().reliability(),
+    rclcpp::ReliabilityPolicy::Reliable);
+  pub.shutdown();
+
+  // with options
+  node_ = rclcpp::Node::make_shared("test_publisher");
+
   rclcpp::PublisherOptions options;
   options.qos_overriding_options = rclcpp::QosOverridingOptions(
   {
@@ -89,9 +113,10 @@ TEST_F(TestPublisher, qos_override) {
     rclcpp::QosPolicyKind::History,
     rclcpp::QosPolicyKind::Reliability,
   });
-  auto pub = image_transport::create_publisher(
+
+  pub = image_transport::create_publisher(
     node_.get(), "camera/image", rmw_qos_profile_default, options);
-  auto endpoint_info_vec = node_->get_publishers_info_by_topic("camera/image");
+  endpoint_info_vec = node_->get_publishers_info_by_topic("camera/image");
   EXPECT_EQ(endpoint_info_vec[0].qos_profile().reliability(), rclcpp::ReliabilityPolicy::Reliable);
   pub.shutdown();
 
@@ -108,6 +133,7 @@ TEST_F(TestPublisher, qos_override) {
   EXPECT_EQ(
     endpoint_info_vec[0].qos_profile().reliability(),
     rclcpp::ReliabilityPolicy::BestEffort);
+  pub.shutdown();
 }
 
 int main(int argc, char ** argv)
