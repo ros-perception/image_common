@@ -67,8 +67,6 @@ protected:
     return base_topic;
   }
 
-  using PublisherPlugin::advertiseImpl;
-
   void advertiseImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
