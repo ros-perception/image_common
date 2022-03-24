@@ -48,7 +48,7 @@ add_library(${PROJECT_NAME}_plugins
 )
 target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 
-# Build list_trasnports
+# Build list_transports
 add_executable(list_transports src/list_transports.cpp)
 target_link_libraries(list_transports ${PROJECT_NAME})
 
