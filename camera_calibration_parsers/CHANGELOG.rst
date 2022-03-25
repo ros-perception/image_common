@@ -2,6 +2,11 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Tests depend on rcpputils (`#236 <https://github.com/ros-perception/image_common/issues/236>`_)
+* Contributors: Shane Loretz
+
 3.1.3 (2022-03-01)
 ------------------
 * Remove YAML_CPP_DLL define (`#231 <https://github.com/ros-perception/image_common/issues/231>`_)

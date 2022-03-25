@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Image transport publisher crash fixes (`#235 <https://github.com/ros-perception/image_common/issues/235>`_)
+* Contributors: RoboTech Vision
+
 3.1.3 (2022-03-01)
 ------------------
 * Simple IT plugins shutdown (`#225 <https://github.com/ros-perception/image_common/issues/225>`_)
