@@ -82,8 +82,9 @@ public:
   virtual void publish(const sensor_msgs::msg::Image & message) const
   {
     if (!simple_impl_ || !simple_impl_->pub_) {
+      auto logger = simple_impl_ ? simple_impl_->logger_ : rclcpp::get_logger("image_transport");
       RCLCPP_ERROR(
-        simple_impl_->logger_,
+        logger,
         "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
       return;
     }

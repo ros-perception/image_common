@@ -66,6 +66,20 @@ TEST_F(TestPublisher, shutdown) {
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 0u);
 }
 
+TEST_F(TestPublisher, camera_sub_shutdown) {
+  std::function<void(
+      const sensor_msgs::msg::Image::ConstSharedPtr &,
+      const sensor_msgs::msg::CameraInfo::ConstSharedPtr &)> fcn =
+    [](const auto & msg, const auto &) {(void)msg;};
+
+  auto sub = image_transport::create_camera_subscription(node_.get(), "camera/image", fcn, "raw");
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 1u);
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/camera_info"), 1u);
+  sub.shutdown();
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 0u);
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/camera_info"), 0u);
+}
+
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
