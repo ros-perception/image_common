@@ -97,6 +97,17 @@ void compare_calibration(const sensor_msgs::CameraInfo &exp,
     {
       EXPECT_EQ(exp.P[i], ci.P[i]);
     }
+
+  // check binning
+  EXPECT_EQ(exp.binning_x, ci.binning_x);
+  EXPECT_EQ(exp.binning_y, ci.binning_y);
+
+  // check region of interest
+  EXPECT_EQ(exp.roi.x_offset, ci.roi.x_offset);
+  EXPECT_EQ(exp.roi.y_offset, ci.roi.y_offset);
+  EXPECT_EQ(exp.roi.height, ci.roi.height);
+  EXPECT_EQ(exp.roi.width, ci.roi.width);
+  EXPECT_EQ(exp.roi.do_rectify, ci.roi.do_rectify);
 }
 
 // make sure this file does not exist
@@ -187,6 +198,14 @@ sensor_msgs::CameraInfo expected_calibration(void)
   ci.P[9] = ci.K[7];
   ci.P[10] = ci.K[8];
   ci.P[11] = 0.0;
+
+  ci.binning_x = 1;
+  ci.binning_y = 2;
+
+  ci.roi.x_offset = 20;
+  ci.roi.y_offset = 40;
+  ci.roi.height = 400;
+  ci.roi.width = 600;
 
   return ci;
 }
