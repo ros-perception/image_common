@@ -151,7 +151,7 @@ bool writeCalibrationYml(std::ostream& out, const std::string& camera_name,
   emitter << YAML::Key << ROI_Y_OFFSET_YML_NAME << YAML::Value << cam_info.roi.y_offset;
   emitter << YAML::Key << ROI_HEIGHT_YML_NAME << YAML::Value << cam_info.roi.height;
   emitter << YAML::Key << ROI_WIDTH_YML_NAME << YAML::Value << cam_info.roi.width;
-  emitter << YAML::Key << ROI_DO_RECTIFY_YML_NAME << YAML::Value << cam_info.roi.do_rectify;
+  emitter << YAML::Key << ROI_DO_RECTIFY_YML_NAME << YAML::Value << (bool)cam_info.roi.do_rectify;
   emitter << YAML::EndMap;
 
   emitter << YAML::EndMap;
@@ -248,7 +248,9 @@ bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs:
       roi_node[ROI_Y_OFFSET_YML_NAME] >> cam_info.roi.y_offset;
       roi_node[ROI_HEIGHT_YML_NAME] >> cam_info.roi.height;
       roi_node[ROI_WIDTH_YML_NAME] >> cam_info.roi.width;
-      roi_node[ROI_DO_RECTIFY_YML_NAME] >> cam_info.roi.do_rectify;
+      bool do_rectify;
+      roi_node[ROI_DO_RECTIFY_YML_NAME] >> do_rectify;
+      cam_info.roi.do_rectify = do_rectify;
     }
 
     return true;
