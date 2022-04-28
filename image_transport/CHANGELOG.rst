@@ -2,6 +2,13 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Simple IT plugins shutdown (`#225 <https://github.com/ros-perception/image_common/issues/225>`_) (`#228 <https://github.com/ros-perception/image_common/issues/228>`_)
+* Update maintainers (`#173 <https://github.com/ros-perception/image_common/issues/173>`_)
+* make CameraPublisher::getNumSubscribers() work (`#163 <https://github.com/ros-perception/image_common/issues/163>`_)
+* Contributors: Alejandro Hernández Cordero, Geoffrey Biggs, Michael Ferguson
+
 2.3.0 (2020-05-27)
 ------------------
 * Fix formatting and include paths for linters (`#157 <https://github.com/ros-perception/image_common/issues/157>`_)
