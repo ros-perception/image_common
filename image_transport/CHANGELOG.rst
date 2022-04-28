@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.3.1 (2022-04-28)
+------------------
 * Simple IT plugins shutdown (`#225 <https://github.com/ros-perception/image_common/issues/225>`_) (`#228 <https://github.com/ros-perception/image_common/issues/228>`_)
 * Update maintainers (`#173 <https://github.com/ros-perception/image_common/issues/173>`_)
 * make CameraPublisher::getNumSubscribers() work (`#163 <https://github.com/ros-perception/image_common/issues/163>`_)
