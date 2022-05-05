@@ -122,6 +122,11 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-remapping ${PROJECT_NAME})
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-qos_override test/test_qos_override.cpp)
+  if(TARGET ${PROJECT_NAME}-qos_override)
+    target_link_libraries(${PROJECT_NAME}-qos_override ${PROJECT_NAME})
+  endif()
+
   ament_add_gtest(${PROJECT_NAME}-single_subscriber_publisher test/test_single_subscriber_publisher.cpp)
   if(TARGET ${PROJECT_NAME}-single_subscriber_publisher)
     target_link_libraries(${PROJECT_NAME}-single_subscriber_publisher ${PROJECT_NAME})

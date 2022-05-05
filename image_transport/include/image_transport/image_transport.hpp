@@ -53,7 +53,8 @@ IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+  rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
 
 /**
  * \brief Subscribe to an image topic, free function version.
