@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.2.0 (2022-05-10)
+------------------
+* Add qos option to override qos (`#208 <https://github.com/ros-perception/image_common/issues/208>`_)
+* Contributors: Daisuke Nishimatsu
+
 3.1.4 (2022-03-25)
 ------------------
 * Image transport publisher crash fixes (`#235 <https://github.com/ros-perception/image_common/issues/235>`_)
