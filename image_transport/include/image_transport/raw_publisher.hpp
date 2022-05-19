@@ -49,6 +49,8 @@ namespace image_transport
 class RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
 {
 public:
+  using Base = SimplePublisherPlugin<sensor_msgs::msg::Image>;
+
   virtual ~RawPublisher() {}
 
   virtual std::string getTransportName() const
@@ -73,7 +75,7 @@ protected:
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
-    this->advertiseImpl(node, base_topic, custom_qos, options);
+    Base::advertiseImpl(node, base_topic, custom_qos, options);
   }
 };
 
