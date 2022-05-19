@@ -54,7 +54,7 @@ Publisher create_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-  rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
+  std::optional<rclcpp::PublisherOptions> options = {});
 
 /**
  * \brief Subscribe to an image topic, free function version.

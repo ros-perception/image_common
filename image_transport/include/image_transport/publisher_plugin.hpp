@@ -66,9 +66,13 @@ public:
     rclcpp::Node * nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
+    std::optional<rclcpp::PublisherOptions> options = {})
   {
-    advertiseImpl(nh, base_topic, custom_qos, options);
+    if (options) {
+      advertiseImpl(nh, base_topic, custom_qos, *options);
+    } else {
+      advertiseImpl(nh, base_topic, custom_qos);
+    }
   }
 
   /**
