@@ -99,7 +99,7 @@ struct Publisher::Impl
 Publisher::Publisher(
   rclcpp::Node * node, const std::string & base_topic,
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
-  rclcpp::PublisherOptions options)
+  std::optional<rclcpp::PublisherOptions> options)
 : impl_(std::make_shared<Impl>(node))
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap

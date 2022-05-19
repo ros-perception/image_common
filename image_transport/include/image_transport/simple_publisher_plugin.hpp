@@ -110,11 +110,11 @@ protected:
     simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos);
   }
 
-  void advertiseImplWithOptions(
+  void advertiseImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
-    rclcpp::PublisherOptions options)
+    rclcpp::PublisherOptions options) override
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
