@@ -73,7 +73,7 @@ protected:
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
-    this->advertiseImplWithOptions(node, base_topic, custom_qos, options);
+    this->advertiseImpl(node, base_topic, custom_qos, options);
   }
 };
 
