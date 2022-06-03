@@ -61,16 +61,30 @@ int main(int argc, char ** argv)
 
   if (vargv.size() < 3) {
     // Use all available transports for output
-    auto pub = image_transport::create_publisher(node.get(), out_topic);
+    rclcpp::PublisherOptions pub_options;
+    auto qos_override_options = rclcpp::QosOverridingOptions(
+    {
+      rclcpp::QosPolicyKind::Depth,
+      rclcpp::QosPolicyKind::Durability,
+      rclcpp::QosPolicyKind::History,
+    });
+
+    pub_options.qos_overriding_options = qos_override_options;
+    auto pub = image_transport::create_publisher(
+      node.get(), out_topic,
+      rmw_qos_profile_default, pub_options);
 
     // Use Publisher::publish as the subscriber callback
     typedef void (image_transport::Publisher::* PublishMemFn)(
       const sensor_msgs::msg::Image::ConstSharedPtr &) const;
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
 
+    rclcpp::SubscriptionOptions sub_options;
+    sub_options.qos_overriding_options = qos_override_options;
+
     auto sub = image_transport::create_subscription(
-      node.get(), in_topic,
-      std::bind(pub_mem_fn, &pub, std::placeholders::_1), in_transport);
+      node.get(), in_topic, std::bind(pub_mem_fn, &pub, std::placeholders::_1),
+      in_transport, rmw_qos_profile_default, sub_options);
     rclcpp::spin(node);
   } else {
     // Use one specific transport for output
