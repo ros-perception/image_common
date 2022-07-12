@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* opt-in to qos overriding for publisher (`#246 <https://github.com/ros-perception/image_common/issues/246>`_)
+* Contributors: Brian
+
 3.2.0 (2022-05-10)
 ------------------
 * Add qos option to override qos (`#208 <https://github.com/ros-perception/image_common/issues/208>`_)
