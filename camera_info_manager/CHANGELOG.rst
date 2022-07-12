@@ -2,6 +2,9 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.3.0 (2020-05-27)
 ------------------
 * Fix formatting and include paths for linters (`#157 <https://github.com/ros-perception/image_common/issues/157>`_)

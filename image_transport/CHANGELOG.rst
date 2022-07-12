@@ -2,6 +2,12 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* getNumSubscribers working method to foxy (`#220 <https://github.com/ros-perception/image_common/issues/220>`_)
+* Simple IT plugins shutdown (`#225 <https://github.com/ros-perception/image_common/issues/225>`_) (`#230 <https://github.com/ros-perception/image_common/issues/230>`_)
+* Contributors: Michael Ferguson, Alejandro Hernández Cordero, vladimirilin, Matej Vargovcik, RoboTech Vision
+
 2.3.0 (2020-05-27)
 ------------------
 * Fix formatting and include paths for linters (`#157 <https://github.com/ros-perception/image_common/issues/157>`_)
