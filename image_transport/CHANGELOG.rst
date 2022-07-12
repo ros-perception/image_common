@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.4.0 (2022-07-12)
+------------------
 * getNumSubscribers working method to foxy (`#220 <https://github.com/ros-perception/image_common/issues/220>`_)
 * Simple IT plugins shutdown (`#225 <https://github.com/ros-perception/image_common/issues/225>`_) (`#230 <https://github.com/ros-perception/image_common/issues/230>`_)
 * Contributors: Michael Ferguson, Alejandro Hernández Cordero, vladimirilin, Matej Vargovcik, RoboTech Vision
