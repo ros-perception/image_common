@@ -132,24 +132,24 @@ public:
 
 protected:
   /**
-   * \brief Advertise a topic. Must be implemented by the subclass.
+   * \deprecated Use advertiseImpl with four parameters instead
    */
+  [[deprecated("Use advertiseImpl with four parameters instead")]]
   virtual void advertiseImpl(
     rclcpp::Node * nh, const std::string & base_topic,
-    rmw_qos_profile_t custom_qos) = 0;
+    rmw_qos_profile_t custom_qos)
+  {
+    advertiseImpl(nh, base_topic, custom_qos, rclcpp::PublisherOptions());
+  }
 
+  /**
+   * \brief Advertise a topic. Must be implemented by the subclass.
+   */
   virtual void advertiseImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
-    rclcpp::PublisherOptions options)
-  {
-    (void) options;
-    RCLCPP_ERROR(
-      node->get_logger(),
-      "PublisherPlugin::advertiseImpl with four arguments has not been overridden");
-    this->advertiseImpl(node, base_topic, custom_qos);
-  }
+    rclcpp::PublisherOptions options) = 0;
 };
 
 }  // namespace image_transport
