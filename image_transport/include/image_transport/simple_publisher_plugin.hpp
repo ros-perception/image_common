@@ -102,7 +102,7 @@ protected:
                "rclcpp::PublisherOptions as fourth argument.")]]
   void advertiseImpl(
     rclcpp::Node * node, const std::string & base_topic,
-    rmw_qos_profile_t custom_qos) override final
+    rmw_qos_profile_t custom_qos) override
   {
     advertiseImpl(node, base_topic, custom_qos, rclcpp::PublisherOptions{});
   }
