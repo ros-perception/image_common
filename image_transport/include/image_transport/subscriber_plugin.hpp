@@ -154,9 +154,9 @@ protected:
     const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
-    {
-      subscribeImpl(node, base_topic, callback, custom_qos, rclcpp::SubscriptionOptions());
-    }
+  {
+    subscribeImpl(node, base_topic, callback, custom_qos, rclcpp::SubscriptionOptions());
+  }
 
   /**
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
