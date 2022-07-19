@@ -98,7 +98,8 @@ public:
   }
 
 protected:
-  [[deprecated("Use advertiseImpl with four parameters instead")]]
+  [[deprecated("Use advertiseImpl with four parameters instead by providing "
+               "rclcpp::PublisherOptions as fourth argument.")]]
   void advertiseImpl(
     rclcpp::Node * node, const std::string & base_topic,
     rmw_qos_profile_t custom_qos) override final
