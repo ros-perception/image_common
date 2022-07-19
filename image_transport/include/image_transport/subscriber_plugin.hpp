@@ -144,6 +144,16 @@ public:
 
 protected:
   /**
+   * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
+   */
+  virtual void subscribeImpl(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    const Callback & callback,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::SubscriptionOptions options) = 0;
+
+  /**
    * \deprecated Use subscribeImpl with five parameters instead by providing
    * rclcpp::SubscriptionOptions as fifth argument.
    */
@@ -157,16 +167,6 @@ protected:
   {
     subscribeImpl(node, base_topic, callback, custom_qos, rclcpp::SubscriptionOptions());
   }
-
-  /**
-   * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
-   */
-  virtual void subscribeImpl(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const Callback & callback,
-    rmw_qos_profile_t custom_qos,
-    rclcpp::SubscriptionOptions options) = 0;
 };
 
 }  // namespace image_transport

@@ -132,6 +132,15 @@ public:
 
 protected:
   /**
+   * \brief Advertise a topic. Must be implemented by the subclass.
+   */
+  virtual void advertiseImpl(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options) = 0;
+
+  /**
    * \deprecated Use advertiseImpl with four parameters instead by providing
    * rclcpp::PublisherOptions as fourth argument.
    */
@@ -143,15 +152,6 @@ protected:
   {
     advertiseImpl(nh, base_topic, custom_qos, rclcpp::PublisherOptions());
   }
-
-  /**
-   * \brief Advertise a topic. Must be implemented by the subclass.
-   */
-  virtual void advertiseImpl(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    rmw_qos_profile_t custom_qos,
-    rclcpp::PublisherOptions options) = 0;
 };
 
 }  // namespace image_transport
