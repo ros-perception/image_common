@@ -135,20 +135,22 @@ protected:
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
   virtual void advertiseImpl(
-    rclcpp::Node * nh, const std::string & base_topic,
-    rmw_qos_profile_t custom_qos) = 0;
-
-  virtual void advertiseImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
-    rclcpp::PublisherOptions options)
+    rclcpp::PublisherOptions options) = 0;
+
+  /**
+   * \deprecated Use advertiseImpl with four parameters instead by providing
+   * rclcpp::PublisherOptions as fourth argument.
+   */
+  [[deprecated("Use advertiseImpl with four parameters instead by providing "
+               "rclcpp::PublisherOptions as fourth argument.")]]
+  virtual void advertiseImpl(
+    rclcpp::Node * nh, const std::string & base_topic,
+    rmw_qos_profile_t custom_qos)
   {
-    (void) options;
-    RCLCPP_ERROR(
-      node->get_logger(),
-      "PublisherPlugin::advertiseImpl with four arguments has not been overridden");
-    this->advertiseImpl(node, base_topic, custom_qos);
+    advertiseImpl(nh, base_topic, custom_qos, rclcpp::PublisherOptions());
   }
 };
 

@@ -99,22 +99,10 @@ public:
 
 protected:
   void advertiseImpl(
-    rclcpp::Node * node, const std::string & base_topic,
-    rmw_qos_profile_t custom_qos) override
-  {
-    std::string transport_topic = getTopicToAdvertise(base_topic);
-    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
-
-    RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
-    auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos);
-  }
-
-  void advertiseImplWithOptions(
     rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
-    rclcpp::PublisherOptions options)
+    rclcpp::PublisherOptions options) override
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
@@ -122,6 +110,25 @@ protected:
     RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
     simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos, options);
+  }
+
+  [[deprecated("Use advertiseImpl with four parameters instead by providing "
+               "rclcpp::PublisherOptions as fourth argument.")]]
+  void advertiseImpl(
+    rclcpp::Node * node, const std::string & base_topic,
+    rmw_qos_profile_t custom_qos) override
+  {
+    advertiseImpl(node, base_topic, custom_qos, rclcpp::PublisherOptions{});
+  }
+
+  [[deprecated("Use advertiseImpl with four parameters instead.")]]
+  void advertiseImplWithOptions(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options)
+  {
+    advertiseImpl(node, base_topic, custom_qos, options);
   }
 
   //! Generic function for publishing the internal message type.
