@@ -152,21 +152,6 @@ protected:
     const Callback & callback,
     rmw_qos_profile_t custom_qos,
     rclcpp::SubscriptionOptions options) = 0;
-
-  /**
-   * \deprecated Use subscribeImpl with five parameters instead by providing
-   * rclcpp::SubscriptionOptions as fifth argument.
-   */
-  [[deprecated("Use subscribeImpl with five arguments instead by providing "
-               "rclcpp::SubscriptionOptions as fifth argument")]]
-  virtual void subscribeImpl(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const Callback & callback,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
-  {
-    subscribeImpl(node, base_topic, callback, custom_qos, rclcpp::SubscriptionOptions());
-  }
 };
 
 }  // namespace image_transport
