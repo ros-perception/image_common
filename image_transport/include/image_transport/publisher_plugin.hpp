@@ -139,19 +139,6 @@ protected:
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) = 0;
-
-  /**
-   * \deprecated Use advertiseImpl with four parameters instead by providing
-   * rclcpp::PublisherOptions as fourth argument.
-   */
-  [[deprecated("Use advertiseImpl with four parameters instead by providing "
-               "rclcpp::PublisherOptions as fourth argument.")]]
-  virtual void advertiseImpl(
-    rclcpp::Node * nh, const std::string & base_topic,
-    rmw_qos_profile_t custom_qos)
-  {
-    advertiseImpl(nh, base_topic, custom_qos, rclcpp::PublisherOptions());
-  }
 };
 
 }  // namespace image_transport

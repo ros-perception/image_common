@@ -128,28 +128,6 @@ protected:
       options);
   }
 
-  [[deprecated("Use subscribeImpl with five arguments instead by providing "
-               "rclcpp::SubscriptionOptions as fifth argument")]]
-  void subscribeImpl(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const Callback & callback,
-    rmw_qos_profile_t custom_qos) override
-  {
-    subscribeImpl(node, base_topic, callback, custom_qos, rclcpp::SubscriptionOptions());
-  }
-
-  [[deprecated("Use subscribeImpl with five arguments instead.")]]
-  void subscribeImplWithOptions(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const Callback & callback,
-    rmw_qos_profile_t custom_qos,
-    rclcpp::SubscriptionOptions options)
-  {
-    subscribeImpl(node, base_topic, callback, custom_qos, options);
-  }
-
 private:
   struct Impl
   {
