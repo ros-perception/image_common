@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.0.0 (2022-08-11)
+------------------
 * Remove subscriber and publisher impl methods without options (`#252 <https://github.com/ros-perception/image_common/issues/252>`_)
 * Deprecate impl without options (`#249 <https://github.com/ros-perception/image_common/issues/249>`_)
 * Contributors: Kenji Brameld
