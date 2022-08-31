@@ -32,6 +32,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_INFO_MANAGER_BUILDING_DLL")
 target_link_libraries(${PROJECT_NAME} PUBLIC
   rclcpp::rclcpp
+  rclcpp_lifecycle::rclcpp_lifecycle
   ${sensor_msgs_TARGETS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ament_index_cpp::ament_index_cpp
