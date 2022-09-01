@@ -27,6 +27,7 @@
   <depend>ament_index_cpp</depend>
   <depend>camera_calibration_parsers</depend>
   <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
   <depend>rcpputils</depend>
   <depend>sensor_msgs</depend>
 

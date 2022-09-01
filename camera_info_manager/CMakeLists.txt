@@ -20,6 +20,7 @@ find_package(ament_cmake_ros REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(camera_calibration_parsers REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
 find_package(rcpputils REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
@@ -31,6 +32,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_INFO_MANAGER_BUILDING_DLL")
 target_link_libraries(${PROJECT_NAME} PUBLIC
   rclcpp::rclcpp
+  rclcpp_lifecycle::rclcpp_lifecycle
   ${sensor_msgs_TARGETS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ament_index_cpp::ament_index_cpp
@@ -47,7 +49,7 @@ install(
 
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
-ament_export_dependencies(ament_index_cpp camera_calibration_parsers rclcpp rcpputils sensor_msgs)
+ament_export_dependencies(ament_index_cpp camera_calibration_parsers rclcpp rclcpp_lifecycle rcpputils sensor_msgs)
 ament_export_targets(export_${PROJECT_NAME})
 
 if(BUILD_TESTING)
