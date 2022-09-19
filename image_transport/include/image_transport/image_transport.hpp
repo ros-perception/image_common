@@ -116,6 +116,9 @@ public:
   explicit ImageTransport(rclcpp::Node::SharedPtr node);
 
   IMAGE_TRANSPORT_PUBLIC
+  explicit ImageTransport(rclcpp::Node* node);
+
+  IMAGE_TRANSPORT_PUBLIC
   ~ImageTransport();
 
   /*!
