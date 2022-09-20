@@ -78,9 +78,22 @@ void check_calib(sensor_msgs::msg::CameraInfo cam_info)
   } else {
     ADD_FAILURE() << "Unknown camera distortion model " << cam_info.distortion_model;
   }
+
+  if (cam_info.binning_x != 0 || cam_info.binning_y != 0) {
+    ASSERT_EQ(cam_info.binning_x, 1U);
+    ASSERT_EQ(cam_info.binning_y, 2U);
+  }
+
+  if (cam_info.roi.width != 0 || cam_info.roi.height != 0) {
+    ASSERT_EQ(cam_info.roi.width, 600U);
+    ASSERT_EQ(cam_info.roi.height, 300U);
+    ASSERT_EQ(cam_info.roi.x_offset, 20U);
+    ASSERT_EQ(cam_info.roi.y_offset, 180U);
+    ASSERT_EQ(cam_info.roi.do_rectify, true);
+  }
 }
 
-sensor_msgs::msg::CameraInfo make_calib(const std::string & distortion_model)
+sensor_msgs::msg::CameraInfo make_calib(const std::string & distortion_model, bool extended = false)
 {
   sensor_msgs::msg::CameraInfo cam_info;
   cam_info.width = 640;
@@ -97,6 +110,17 @@ sensor_msgs::msg::CameraInfo make_calib(const std::string & distortion_model)
     cam_info.d = {1, 2, 3, 4, 5, 6, 7, 8};
     cam_info.distortion_model = sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL;
   }
+
+  if (extended) {
+    cam_info.binning_x = 1;
+    cam_info.binning_y = 2;
+    cam_info.roi.width = 600;
+    cam_info.roi.height = 300;
+    cam_info.roi.x_offset = 20;
+    cam_info.roi.y_offset = 180;
+    cam_info.roi.do_rectify = true;
+  }
+
   return cam_info;
 }
 
