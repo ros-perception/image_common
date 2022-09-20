@@ -175,3 +175,62 @@ TEST(ParseYml, roundtrip_calib8) {
   ASSERT_EQ(camera_name2, camera_name);
   check_calib(cam_info2);
 }
+
+static const char * kValidCalibRoi =
+  R"(
+image_width: 640
+image_height: 480
+camera_name: mono_left
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [1, 2, 3, 4, 5]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+binning_x: 1
+binning_y: 2
+roi:
+  width: 600
+  height: 300
+  x_offset: 20
+  y_offset: 180
+  do_rectify: true
+)";
+
+TEST(ParseYml, kValidCalibRoi) {
+  std::string camera_name;
+  sensor_msgs::msg::CameraInfo cam_info;
+  auto ret = camera_calibration_parsers::parseCalibrationYml(kValidCalibRoi, camera_name, cam_info);
+  ASSERT_EQ(ret, true);
+  ASSERT_EQ(camera_name, "mono_left");
+  check_calib(cam_info);
+}
+
+TEST(ParseYml, roundtrip_calib_roi) {
+  std::string calib_file = custom_tmpnam();
+
+  std::string camera_name = "roundtrip_calib_roi";
+  auto cam_info = make_calib(sensor_msgs::distortion_models::PLUMB_BOB, true);
+  auto ret_write = camera_calibration_parsers::writeCalibrationYml(
+    calib_file, camera_name, cam_info);
+  ASSERT_EQ(ret_write, true);
+
+  std::string camera_name2;
+  sensor_msgs::msg::CameraInfo cam_info2;
+  auto ret_read = camera_calibration_parsers::readCalibrationYml(
+    calib_file, camera_name2, cam_info2);
+  ASSERT_EQ(ret_read, true);
+  ASSERT_EQ(camera_name2, camera_name);
+  check_calib(cam_info2);
+}
