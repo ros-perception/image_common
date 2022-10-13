@@ -112,11 +112,9 @@ public:
   using ImageConstPtr = sensor_msgs::msg::Image::ConstSharedPtr;
   using CameraInfoConstPtr = sensor_msgs::msg::CameraInfo::ConstSharedPtr;
 
+  template <typename NodeT>
   IMAGE_TRANSPORT_PUBLIC
-  explicit ImageTransport(rclcpp::Node::SharedPtr node);
-
-  IMAGE_TRANSPORT_PUBLIC
-  explicit ImageTransport(rclcpp::Node* node);
+  explicit ImageTransport(NodeT node);
 
   IMAGE_TRANSPORT_PUBLIC
   ~ImageTransport();
@@ -290,6 +288,19 @@ private:
   struct Impl;
   std::unique_ptr<Impl> impl_;
 };
+
+struct ImageTransport::Impl
+{
+  rclcpp::Node::SharedPtr node_;
+};
+
+template <typename NodeT>
+ImageTransport::ImageTransport(NodeT node)
+  : impl_(std::make_unique<ImageTransport::Impl>())
+{
+  std::shared_ptr<rclcpp::Node> ptr{node};
+  impl_->node_ = ptr;
+}
 
 }  // namespace image_transport
 

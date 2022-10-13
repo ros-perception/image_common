@@ -128,24 +128,6 @@ std::vector<std::string> getLoadableTransports()
   return loadableTransports;
 }
 
-struct ImageTransport::Impl
-{
-  rclcpp::Node::SharedPtr node_;
-};
-
-ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
-: impl_(std::make_unique<ImageTransport::Impl>())
-{
-  impl_->node_ = node;
-}
-
-ImageTransport::ImageTransport(rclcpp::Node* node)
-: impl_(std::make_unique<ImageTransport::Impl>())
-{
-  std::shared_ptr<rclcpp::Node> ptr{node};
-  impl_->node_ = ptr;
-}
-
 ImageTransport::~ImageTransport() = default;
 
 Publisher ImageTransport::advertise(const std::string & base_topic, uint32_t queue_size, bool latch)
