@@ -109,7 +109,7 @@ protected:
   }
 
   void subscribeImpl(
-    rclcpp::Node * node,
+    NodeInterfaces::SharedPtr node_interfaces,
     const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos,
@@ -120,7 +120,8 @@ protected:
     // ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
     //
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    impl_->sub_ = node->create_subscription<M>(
+    impl_->sub_ = rclcpp::create_subscription<M>(
+      node_interfaces->parameters, node_interfaces->topics,
       getTopicToSubscribe(base_topic), qos,
       [this, callback](const typename std::shared_ptr<const M> msg) {
         internalCallback(msg, callback);

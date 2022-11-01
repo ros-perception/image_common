@@ -48,11 +48,9 @@ namespace image_transport
 
 struct Publisher::Impl
 {
-  explicit Impl(rclcpp::Node * node)
-  : logger_(node->get_logger()),
-    unadvertised_(false)
-  {
-  }
+  explicit Impl(const NodeInterfaces::SharedPtr & node_interfaces)
+  : logger_(node_interfaces->logging->get_logger()),
+    unadvertised_(false) {}
 
   ~Impl()
   {
@@ -89,6 +87,7 @@ struct Publisher::Impl
     }
   }
 
+
   rclcpp::Logger logger_;
   std::string base_topic_;
   PubLoaderPtr loader_;
@@ -97,16 +96,17 @@ struct Publisher::Impl
 };
 
 Publisher::Publisher(
-  rclcpp::Node * node, const std::string & base_topic,
+  NodeInterfaces::SharedPtr node_interfaces,
+  const std::string & base_topic,
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
-: impl_(std::make_shared<Impl>(node))
+: impl_(std::make_shared<Impl>(node_interfaces))
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
   std::string image_topic = rclcpp::expand_topic_or_service_name(
     base_topic,
-    node->get_name(), node->get_namespace());
+    node_interfaces->base->get_name(), node_interfaces->base->get_namespace());
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
@@ -125,7 +125,7 @@ Publisher::Publisher(
 
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
-      pub->advertise(node, image_topic, custom_qos, options);
+      pub->advertise(node_interfaces, image_topic, custom_qos, options);
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {
       RCLCPP_ERROR(

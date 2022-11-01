@@ -33,6 +33,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "rclcpp/node.hpp"
 
@@ -41,6 +42,7 @@
 #include "image_transport/publisher.hpp"
 #include "image_transport/subscriber.hpp"
 #include "image_transport/transport_hints.hpp"
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
@@ -51,22 +53,47 @@ namespace image_transport
  */
 IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
-  rclcpp::Node * node,
+  NodeInterfaces::SharedPtr node_interfaces,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
+
+template<typename NodeT>
+Publisher create_publisher(
+  NodeT && node,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+  rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
+{
+  return create_publisher(
+    create_node_interfaces(std::forward<NodeT>(node)), base_topic, custom_qos, options);
+}
 
 /**
  * \brief Subscribe to an image topic, free function version.
  */
 IMAGE_TRANSPORT_PUBLIC
 Subscriber create_subscription(
-  rclcpp::Node * node,
+  NodeInterfaces::SharedPtr node_interfaces,
   const std::string & base_topic,
   const Subscriber::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
+
+template<typename NodeT>
+Subscriber create_subscription(
+  NodeT && node,
+  const std::string & base_topic,
+  const Subscriber::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+  rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
+{
+  return create_subscription(
+    create_node_interfaces(std::forward<NodeT>(node)),
+    base_topic, callback, transport, custom_qos, options);
+}
 
 /*!
  * \brief Advertise a camera, free function version.
