@@ -2,8 +2,8 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.1.0 (2022-11-02)
+------------------
 * Add support for missing ROI and binning fields (`#254 <https://github.com/ros-perception/image_common/issues/254>`_)
 * Contributors: AndreasR30
 

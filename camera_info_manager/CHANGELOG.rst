@@ -2,8 +2,8 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.1.0 (2022-11-02)
+------------------
 * Add lifecycle node compatibility to camera_info_manager (`#190 <https://github.com/ros-perception/image_common/issues/190>`_)
 * Contributors: Ramon Wijnands
 
