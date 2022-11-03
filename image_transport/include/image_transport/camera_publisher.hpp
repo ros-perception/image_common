@@ -46,8 +46,6 @@
 namespace image_transport
 {
 
-class ImageTransport;
-
 /**
  * \brief Manages advertisements for publishing camera images.
  *
