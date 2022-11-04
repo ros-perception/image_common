@@ -31,9 +31,9 @@
 #include <utility>
 
 #include "pluginlib/class_loader.hpp"
-
 #include "rclcpp/rclcpp.hpp"
 
+#include "image_transport/create_publisher.hpp"
 #include "image_transport/image_transport.hpp"
 #include "image_transport/publisher_plugin.hpp"
 

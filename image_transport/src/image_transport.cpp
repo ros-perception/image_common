@@ -34,6 +34,10 @@
 
 #include "pluginlib/class_loader.hpp"
 
+#include "image_transport/create_subscription.hpp"
+#include "image_transport/create_publisher.hpp"
+#include "image_transport/create_camera_publisher.hpp"
+#include "image_transport/create_camera_subscription.hpp"
 #include "image_transport/camera_common.hpp"
 #include "image_transport/loader_fwds.hpp"
 #include "image_transport/publisher_plugin.hpp"
@@ -85,10 +89,10 @@ CameraPublisher create_camera_publisher(
   return CameraPublisher(node, base_topic, custom_qos);
 }
 
-CameraSubscriber create_camera_subscription(
+CameraSubscriber<rclcpp::Node> create_camera_subscription(
   rclcpp::Node * node,
   const std::string & base_topic,
-  const CameraSubscriber::Callback & callback,
+  const CameraSubscriber<rclcpp::Node>::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos)
 {

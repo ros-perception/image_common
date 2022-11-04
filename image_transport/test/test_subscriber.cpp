@@ -33,6 +33,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 
+#include "image_transport/create_camera_subscription.hpp"
 #include "image_transport/image_transport.hpp"
 
 class TestSubscriber : public ::testing::Test

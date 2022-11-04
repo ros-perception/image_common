@@ -36,6 +36,7 @@
 #include "rclcpp/node.hpp"
 
 #include "image_transport/camera_common.hpp"
+#include "image_transport/create_publisher.hpp"
 #include "image_transport/image_transport.hpp"
 
 namespace image_transport
