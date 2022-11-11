@@ -27,6 +27,8 @@ add_library(${PROJECT_NAME}
   src/parse_yml.cpp
 )
 
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_CALIBRATION_PARSERS_BUILDING_DLL")
 
 if(CMAKE_COMPILER_IS_GNUCXX)

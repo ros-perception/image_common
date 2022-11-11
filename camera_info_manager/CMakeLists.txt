@@ -27,7 +27,7 @@ include_directories(include)
 
 # add a library
 add_library(${PROJECT_NAME} src/camera_info_manager.cpp)
-
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_INFO_MANAGER_BUILDING_DLL")
 
 ament_target_dependencies(
