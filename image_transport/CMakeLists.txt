@@ -28,6 +28,7 @@ add_library(${PROJECT_NAME}
   src/camera_subscriber.cpp
   src/image_transport.cpp
 )
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
@@ -44,6 +45,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL
 add_library(${PROJECT_NAME}_plugins
   src/manifest.cpp
 )
+add_library(${PROJECT_NAME}::${PROJECT_NAME}_plugins ALIAS ${PROJECT_NAME}_plugins)
+
 target_link_libraries(${PROJECT_NAME}_plugins PRIVATE
   ${PROJECT_NAME}
   pluginlib::pluginlib)
