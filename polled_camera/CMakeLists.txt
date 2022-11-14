@@ -16,13 +16,13 @@ catkin_package(CATKIN_DEPENDS image_transport message_runtime roscpp sensor_msgs
 
 
 # create some library and exe
-include_directories(include
-                    ${catkin_INCLUDE_DIRS} 
-                    ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
-)
-
 add_library(${PROJECT_NAME} src/publication_server.cpp)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+target_include_directories(${PROJECT_NAME}
+                           PUBLIC
+                           ${catkin_INCLUDE_DIRS}
+                           ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+)
 add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
