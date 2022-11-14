@@ -24,6 +24,9 @@ add_library(${PROJECT_NAME}
   src/parse_ini.cpp
   src/parse_yml.cpp
 )
+
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
 target_link_libraries(${PROJECT_NAME} PUBLIC
   ${sensor_msgs_TARGETS}
   ${yaml_cpp_vendor_TARGETS})
