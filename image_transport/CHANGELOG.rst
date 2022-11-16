@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add alias library targets for all libraries (`#260 <https://github.com/ros-perception/image_common/issues/260>`_)
+* Contributors: Geoffrey Biggs
+
 3.1.4 (2022-03-25)
 ------------------
 * Image transport publisher crash fixes (`#235 <https://github.com/ros-perception/image_common/issues/235>`_)

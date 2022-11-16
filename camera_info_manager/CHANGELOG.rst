@@ -2,6 +2,11 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add alias library targets for all libraries (`#260 <https://github.com/ros-perception/image_common/issues/260>`_)
+* Contributors: Geoffrey Biggs
+
 3.1.4 (2022-03-25)
 ------------------
 
