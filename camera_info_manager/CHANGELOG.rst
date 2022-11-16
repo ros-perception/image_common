@@ -2,6 +2,11 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add alias library targets for all libraries (`#259 <https://github.com/ros-perception/image_common/issues/259>`_)
+* Contributors: RFRIEDM-Trimble
+
 4.1.0 (2022-11-02)
 ------------------
 * Add lifecycle node compatibility to camera_info_manager (`#190 <https://github.com/ros-perception/image_common/issues/190>`_)
