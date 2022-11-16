@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.12.2)
 
 project(image_transport)
 
@@ -30,6 +30,7 @@ add_library(${PROJECT_NAME}
   src/camera_subscriber.cpp
   src/image_transport.cpp
 )
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 ament_target_dependencies(
   ${PROJECT_NAME}
@@ -46,6 +47,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL
 add_library(${PROJECT_NAME}_plugins
   src/manifest.cpp
 )
+add_library(${PROJECT_NAME}::${PROJECT_NAME}_plugins ALIAS ${PROJECT_NAME}_plugins)
 target_link_libraries(${PROJECT_NAME}_plugins ${PROJECT_NAME})
 
 # Build list_transports
