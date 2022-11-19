@@ -110,18 +110,21 @@ Publisher::Publisher(
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
+  uint ns_len = node->get_effective_namespace().length();
+  std::string param_base_name = image_topic.substr(ns_len);
+  std::replace(param_base_name.begin(), param_base_name.end(), '/', '.');
   std::vector<std::string> blacklist_vec;
   std::set<std::string> blacklist;
   try {
     blacklist_vec = node->declare_parameter<std::vector<std::string>>(
-      impl_->base_topic_ + ".disable_pub_plugins", std::vector<std::string>{});
+      param_base_name + ".disable_pub_plugins", std::vector<std::string>{});
   } catch (const rclcpp::exceptions::ParameterAlreadyDeclaredException &) {
     RCLCPP_DEBUG_STREAM(
-      node->get_logger(), impl_->base_topic_ << ".disable_pub_plugins" << " was previously declared"
+      node->get_logger(), param_base_name << ".disable_pub_plugins" << " was previously declared"
     );
     blacklist_vec =
       node->get_parameter(
-      impl_->base_topic_ +
+      param_base_name +
       ".disable_pub_plugins").get_value<std::vector<std::string>>();
   }
   for (size_t i = 0; i < blacklist_vec.size(); ++i) {
