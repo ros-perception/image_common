@@ -112,7 +112,18 @@ Publisher::Publisher(
 
   std::vector<std::string> blacklist_vec;
   std::set<std::string> blacklist;
-  // nh.getParam(impl_->base_topic_ + "/disable_pub_plugins", blacklist_vec);
+  try {
+    blacklist_vec = node->declare_parameter<std::vector<std::string>>(
+      impl_->base_topic_ + ".disable_pub_plugins", std::vector<std::string>{});
+  } catch (const rclcpp::exceptions::ParameterAlreadyDeclaredException &) {
+    RCLCPP_DEBUG_STREAM(
+      node->get_logger(), impl_->base_topic_ << ".disable_pub_plugins" << " was previously declared"
+    );
+    blacklist_vec =
+      node->get_parameter(
+      impl_->base_topic_ +
+      ".disable_pub_plugins").get_value<std::vector<std::string>>();
+  }
   for (size_t i = 0; i < blacklist_vec.size(); ++i) {
     blacklist.insert(blacklist_vec[i]);
   }
