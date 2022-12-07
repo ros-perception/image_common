@@ -113,38 +113,39 @@ Publisher::Publisher(
   uint ns_len = node->get_effective_namespace().length();
   std::string param_base_name = image_topic.substr(ns_len);
   std::replace(param_base_name.begin(), param_base_name.end(), '/', '.');
-  std::vector<std::string> blacklist_vec;
-  std::set<std::string> blacklist;
+  std::vector<std::string> whitelist_vec;
+  std::set<std::string> whitelist;
   try {
-    blacklist_vec = node->declare_parameter<std::vector<std::string>>(
-      param_base_name + ".disable_pub_plugins", std::vector<std::string>{});
+    whitelist_vec = node->declare_parameter<std::vector<std::string>>(
+      param_base_name + ".enable_pub_plugins", std::vector<std::string>{});
   } catch (const rclcpp::exceptions::ParameterAlreadyDeclaredException &) {
     RCLCPP_DEBUG_STREAM(
-      node->get_logger(), param_base_name << ".disable_pub_plugins" << " was previously declared"
+      node->get_logger(), param_base_name << ".enable_pub_plugins" << " was previously declared"
     );
-    blacklist_vec =
+    whitelist_vec =
       node->get_parameter(
       param_base_name +
-      ".disable_pub_plugins").get_value<std::vector<std::string>>();
+      ".enable_pub_plugins").get_value<std::vector<std::string>>();
   }
-  for (size_t i = 0; i < blacklist_vec.size(); ++i) {
-    blacklist.insert(blacklist_vec[i]);
+  for (size_t i = 0; i < whitelist_vec.size(); ++i) {
+    whitelist.insert(whitelist_vec[i]);
   }
+  
+  // add default raw publisher
+  whitelist.insert("image_transport/raw");
 
   for (const auto & lookup_name : loader->getDeclaredClasses()) {
     const std::string transport_name = erase_last_copy(lookup_name, "_pub");
-    if (blacklist.count(transport_name)) {
-      continue;
-    }
-
-    try {
-      auto pub = loader->createUniqueInstance(lookup_name);
-      pub->advertise(node, image_topic, custom_qos, options);
-      impl_->publishers_.push_back(std::move(pub));
-    } catch (const std::runtime_error & e) {
-      RCLCPP_ERROR(
-        impl_->logger_, "Failed to load plugin %s, error string: %s\n",
-        lookup_name.c_str(), e.what());
+    if (whitelist.count(transport_name)) {
+      try {
+        auto pub = loader->createUniqueInstance(lookup_name);
+        pub->advertise(node, image_topic, custom_qos, options);
+        impl_->publishers_.push_back(std::move(pub));
+      } catch (const std::runtime_error & e) {
+        RCLCPP_ERROR(
+          impl_->logger_, "Failed to load plugin %s, error string: %s\n",
+          lookup_name.c_str(), e.what());
+      }
     }
   }
 
