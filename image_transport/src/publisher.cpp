@@ -113,6 +113,9 @@ Publisher::Publisher(
   uint ns_len = node->get_effective_namespace().length();
   std::string param_base_name = image_topic.substr(ns_len);
   std::replace(param_base_name.begin(), param_base_name.end(), '/', '.');
+  if (param_base_name.front() == '.') {
+    param_base_name = param_base_name.substr(1);
+  }
   std::vector<std::string> whitelist_vec;
   std::set<std::string> whitelist;
   try {
