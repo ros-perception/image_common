@@ -133,7 +133,7 @@ Publisher::Publisher(
   for (size_t i = 0; i < whitelist_vec.size(); ++i) {
     whitelist.insert(whitelist_vec[i]);
   }
-  
+
   // add default raw publisher
   whitelist.insert("image_transport/raw");
 
