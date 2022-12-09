@@ -118,9 +118,13 @@ Publisher::Publisher(
   }
   std::vector<std::string> whitelist_vec;
   std::set<std::string> whitelist;
+  std::vector<std::string> all_transport_names;
+  for (const auto & lookup_name : loader->getDeclaredClasses()) {
+    all_transport_names.emplace_back(erase_last_copy(lookup_name, "_pub"));
+  }
   try {
     whitelist_vec = node->declare_parameter<std::vector<std::string>>(
-      param_base_name + ".enable_pub_plugins", std::vector<std::string>{});
+      param_base_name + ".enable_pub_plugins", all_transport_names);
   } catch (const rclcpp::exceptions::ParameterAlreadyDeclaredException &) {
     RCLCPP_DEBUG_STREAM(
       node->get_logger(), param_base_name << ".enable_pub_plugins" << " was previously declared"
@@ -133,9 +137,6 @@ Publisher::Publisher(
   for (size_t i = 0; i < whitelist_vec.size(); ++i) {
     whitelist.insert(whitelist_vec[i]);
   }
-
-  // add default raw publisher
-  whitelist.insert("image_transport/raw");
 
   for (const auto & lookup_name : loader->getDeclaredClasses()) {
     const std::string transport_name = erase_last_copy(lookup_name, "_pub");
