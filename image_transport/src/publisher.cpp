@@ -138,18 +138,16 @@ Publisher::Publisher(
     whitelist.insert(whitelist_vec[i]);
   }
 
-  for (const auto & lookup_name : loader->getDeclaredClasses()) {
-    const std::string transport_name = erase_last_copy(lookup_name, "_pub");
-    if (whitelist.count(transport_name)) {
-      try {
-        auto pub = loader->createUniqueInstance(lookup_name);
-        pub->advertise(node, image_topic, custom_qos, options);
-        impl_->publishers_.push_back(std::move(pub));
-      } catch (const std::runtime_error & e) {
-        RCLCPP_ERROR(
-          impl_->logger_, "Failed to load plugin %s, error string: %s\n",
-          lookup_name.c_str(), e.what());
-      }
+  for (const auto & transport_name : whitelist) {
+    const auto & lookup_name = transport_name + "_pub";
+    try {
+      auto pub = loader->createUniqueInstance(lookup_name);
+      pub->advertise(node, image_topic, custom_qos, options);
+      impl_->publishers_.push_back(std::move(pub));
+    } catch (const std::runtime_error & e) {
+      RCLCPP_ERROR(
+        impl_->logger_, "Failed to load plugin %s, error string: %s\n",
+        lookup_name.c_str(), e.what());
     }
   }
 
