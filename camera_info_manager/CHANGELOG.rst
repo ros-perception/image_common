@@ -2,8 +2,8 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.2.0 (2023-02-14)
+------------------
 * Update image_common to C++17. (`#267 <https://github.com/ros-perception/image_common/issues/267>`_)
 * Contributors: Chris Lalancette
 
