@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update image_common to C++17. (`#267 <https://github.com/ros-perception/image_common/issues/267>`_)
+* Contributors: Chris Lalancette
+
 4.1.1 (2022-11-16)
 ------------------
 * Add alias library targets for all libraries (`#259 <https://github.com/ros-perception/image_common/issues/259>`_)
