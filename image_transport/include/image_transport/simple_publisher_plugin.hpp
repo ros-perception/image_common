@@ -31,10 +31,12 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "rclcpp/node.hpp"
 #include "rclcpp/logger.hpp"
 #include "rclcpp/logging.hpp"
+#include "rclcpp/create_publisher.hpp"
 
 #include "image_transport/publisher_plugin.hpp"
 #include "image_transport/visibility_control.hpp"
@@ -63,9 +65,10 @@ template<class M>
 class SimplePublisherPlugin : public PublisherPlugin
 {
 public:
-  virtual ~SimplePublisherPlugin() {}
+  ~SimplePublisherPlugin() = default;
 
-  virtual size_t getNumSubscribers() const
+public:
+  size_t getNumSubscribers() const override
   {
     if (simple_impl_) {
       return simple_impl_->pub_->get_subscription_count();
@@ -73,13 +76,13 @@ public:
     return 0;
   }
 
-  virtual std::string getTopic() const
+  std::string getTopic() const override
   {
     if (simple_impl_) {return simple_impl_->pub_->get_topic_name();}
     return std::string();
   }
 
-  virtual void publish(const sensor_msgs::msg::Image & message) const
+  void publish(const sensor_msgs::msg::Image & message) const override
   {
     if (!simple_impl_ || !simple_impl_->pub_) {
       auto logger = simple_impl_ ? simple_impl_->logger_ : rclcpp::get_logger("image_transport");
@@ -92,24 +95,26 @@ public:
     publish(message, bindInternalPublisher(simple_impl_->pub_.get()));
   }
 
-  virtual void shutdown()
+  void shutdown() override
   {
     simple_impl_.reset();
   }
 
 protected:
   void advertiseImpl(
-    rclcpp::Node * node,
+    NodeInterfaces::SharedPtr node_interfaces,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
-    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
+    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node_interfaces);
 
     RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos, options);
+
+    simple_impl_->pub_ = rclcpp::create_publisher<M>(
+      node_interfaces->parameters, node_interfaces->topics, transport_topic, qos, options);
   }
 
   //! Generic function for publishing the internal message type.
@@ -140,13 +145,12 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    explicit SimplePublisherPluginImpl(rclcpp::Node * node)
-    : node_(node),
-      logger_(node->get_logger())
-    {
-    }
+    explicit SimplePublisherPluginImpl(NodeInterfaces::SharedPtr node_interfaces)
+    : node_interfaces_(std::move(node_interfaces)),
+      logger_(node_interfaces_->logging->get_logger())
+    {}
 
-    rclcpp::Node * node_;
+    NodeInterfaces::SharedPtr node_interfaces_;
     rclcpp::Logger logger_;
     typename rclcpp::Publisher<M>::SharedPtr pub_;
   };

@@ -31,6 +31,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "rclcpp/macros.hpp"
 #include "rclcpp/node.hpp"
@@ -41,6 +42,7 @@
 #include "image_transport/loader_fwds.hpp"
 #include "image_transport/single_subscriber_publisher.hpp"
 #include "image_transport/visibility_control.hpp"
+#include "image_transport/node_interfaces.hpp"
 
 namespace image_transport
 {
@@ -70,11 +72,20 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   Publisher(
-    rclcpp::Node * nh,
+    NodeInterfaces::SharedPtr node_interfaces,
     const std::string & base_topic,
     PubLoaderPtr loader,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
+
+  template<class NodeT>
+  Publisher(
+    NodeT && node,
+    const std::string & base_topic,
+    PubLoaderPtr loader,
+    rmw_qos_profile_t custom_qos)
+  : Publisher(create_node_interfaces(std::forward<NodeT>(node)), base_topic, loader, custom_qos)
+  {}
 
   /*!
    * \brief Returns the number of subscribers that are currently connected to

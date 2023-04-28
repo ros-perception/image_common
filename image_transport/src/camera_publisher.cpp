@@ -36,6 +36,7 @@
 #include "rclcpp/node.hpp"
 
 #include "image_transport/camera_common.hpp"
+#include "image_transport/create_publisher.hpp"
 #include "image_transport/image_transport.hpp"
 
 namespace image_transport
@@ -43,8 +44,8 @@ namespace image_transport
 
 struct CameraPublisher::Impl
 {
-  explicit Impl(rclcpp::Node * node)
-  : logger_(node->get_logger()),
+  explicit Impl(const NodeInterfaces::SharedPtr node_interfaces)
+  : logger_(node_interfaces->logging->get_logger()),
     unadvertised_(false)
   {
   }
@@ -76,21 +77,22 @@ struct CameraPublisher::Impl
 
 // TODO(ros2) Add support for SubscriberStatusCallbacks when rcl/rmw support it.
 CameraPublisher::CameraPublisher(
-  rclcpp::Node * node,
+  NodeInterfaces::SharedPtr node_interfaces,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos)
-: impl_(std::make_shared<Impl>(node))
+: impl_(std::make_shared<Impl>(node_interfaces))
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
   // image topic is remapped (#4539).
   std::string image_topic = rclcpp::expand_topic_or_service_name(
     base_topic,
-    node->get_name(), node->get_namespace());
+    node_interfaces->base->get_name(), node_interfaces->base->get_namespace());
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-  impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos);
-  impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
+  impl_->image_pub_ = image_transport::create_publisher(node_interfaces, image_topic, custom_qos);
+  impl_->info_pub_ = rclcpp::create_publisher<sensor_msgs::msg::CameraInfo>(
+    node_interfaces->topics, info_topic, qos);
 }
 
 size_t CameraPublisher::getNumSubscribers() const

@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 
+#include "image_transport/node_interfaces.hpp"
 #include "rclcpp/expand_topic_or_service_name.hpp"
 #include "rclcpp/logging.hpp"
 
@@ -46,8 +47,8 @@ namespace image_transport
 
 struct Subscriber::Impl
 {
-  Impl(rclcpp::Node * node, SubLoaderPtr loader)
-  : logger_(node->get_logger()),
+  Impl(const NodeInterfaces::SharedPtr & node_interfaces, SubLoaderPtr loader)
+  : logger_(node_interfaces->logging->get_logger()),
     loader_(loader),
     unsubscribed_(false)
   {
@@ -82,14 +83,14 @@ struct Subscriber::Impl
 };
 
 Subscriber::Subscriber(
-  rclcpp::Node * node,
+  NodeInterfaces::SharedPtr node_interfaces,
   const std::string & base_topic,
   const Callback & callback,
   SubLoaderPtr loader,
   const std::string & transport,
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
-: impl_(std::make_shared<Impl>(node, loader))
+: impl_(std::make_shared<Impl>(node_interfaces, loader))
 {
   // Load the plugin for the chosen transport.
   impl_->lookup_name_ = SubscriberPlugin::getLookupName(transport);
@@ -125,7 +126,7 @@ Subscriber::Subscriber(
 
   // Tell plugin to subscribe.
   RCLCPP_DEBUG(impl_->logger_, "Subscribing to: %s\n", base_topic.c_str());
-  impl_->subscriber_->subscribe(node, base_topic, callback, custom_qos, options);
+  impl_->subscriber_->subscribe(node_interfaces, base_topic, callback, custom_qos, options);
 }
 
 std::string Subscriber::getTopic() const

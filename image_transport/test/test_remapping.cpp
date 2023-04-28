@@ -37,6 +37,7 @@
 #include "rclcpp/node.hpp"
 #include "utils.hpp"
 
+#include "image_transport/create_publisher.hpp"
 #include "image_transport/image_transport.hpp"
 
 class TestPublisher : public ::testing::Test

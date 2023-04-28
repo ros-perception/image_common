@@ -33,6 +33,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 
+#include "image_transport/create_publisher.hpp"
 #include "image_transport/image_transport.hpp"
 
 class TestQosOverride : public ::testing::Test

@@ -34,6 +34,10 @@
 
 #include "pluginlib/class_loader.hpp"
 
+#include "image_transport/create_subscription.hpp"
+#include "image_transport/create_publisher.hpp"
+#include "image_transport/create_camera_publisher.hpp"
+#include "image_transport/create_camera_subscription.hpp"
 #include "image_transport/camera_common.hpp"
 #include "image_transport/loader_fwds.hpp"
 #include "image_transport/publisher_plugin.hpp"
@@ -57,23 +61,24 @@ struct Impl
 static Impl * kImpl = new Impl();
 
 Publisher create_publisher(
-  rclcpp::Node * node,
+  NodeInterfaces::SharedPtr node_interfaces,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 {
-  return Publisher(node, base_topic, kImpl->pub_loader_, custom_qos, options);
+  return Publisher(node_interfaces, base_topic, kImpl->pub_loader_, custom_qos, options);
 }
 
 Subscriber create_subscription(
-  rclcpp::Node * node,
+  NodeInterfaces::SharedPtr node_interfaces,
   const std::string & base_topic,
   const Subscriber::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
 {
-  return Subscriber(node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos, options);
+  return Subscriber(
+    node_interfaces, base_topic, callback, kImpl->sub_loader_, transport, custom_qos, options);
 }
 
 CameraPublisher create_camera_publisher(
@@ -84,10 +89,10 @@ CameraPublisher create_camera_publisher(
   return CameraPublisher(node, base_topic, custom_qos);
 }
 
-CameraSubscriber create_camera_subscription(
+CameraSubscriber<rclcpp::Node> create_camera_subscription(
   rclcpp::Node * node,
   const std::string & base_topic,
-  const CameraSubscriber::Callback & callback,
+  const CameraSubscriber<rclcpp::Node>::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos)
 {
@@ -125,89 +130,6 @@ std::vector<std::string> getLoadableTransports()
   }
 
   return loadableTransports;
-}
-
-struct ImageTransport::Impl
-{
-  rclcpp::Node::SharedPtr node_;
-};
-
-ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
-: impl_(std::make_unique<ImageTransport::Impl>())
-{
-  impl_->node_ = node;
-}
-
-ImageTransport::~ImageTransport() = default;
-
-Publisher ImageTransport::advertise(const std::string & base_topic, uint32_t queue_size, bool latch)
-{
-  // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
-  (void) latch;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-  custom_qos.depth = queue_size;
-  return create_publisher(impl_->node_.get(), base_topic, custom_qos);
-}
-
-Subscriber ImageTransport::subscribe(
-  const std::string & base_topic, uint32_t queue_size,
-  const Subscriber::Callback & callback,
-  const VoidPtr & tracked_object,
-  const TransportHints * transport_hints)
-{
-  (void) tracked_object;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-  custom_qos.depth = queue_size;
-  return create_subscription(
-    impl_->node_.get(), base_topic, callback,
-    getTransportOrDefault(transport_hints), custom_qos);
-}
-
-CameraPublisher ImageTransport::advertiseCamera(
-  const std::string & base_topic, uint32_t queue_size,
-  bool latch)
-{
-  // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
-  (void) latch;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-  custom_qos.depth = queue_size;
-  return create_camera_publisher(impl_->node_.get(), base_topic, custom_qos);
-}
-
-CameraSubscriber ImageTransport::subscribeCamera(
-  const std::string & base_topic, uint32_t queue_size,
-  const CameraSubscriber::Callback & callback,
-  const VoidPtr & tracked_object,
-  const TransportHints * transport_hints)
-{
-  (void) tracked_object;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-  custom_qos.depth = queue_size;
-  return create_camera_subscription(
-    impl_->node_.get(), base_topic, callback,
-    getTransportOrDefault(transport_hints), custom_qos);
-}
-
-std::vector<std::string> ImageTransport::getDeclaredTransports() const
-{
-  return image_transport::getDeclaredTransports();
-}
-
-std::vector<std::string> ImageTransport::getLoadableTransports() const
-{
-  return image_transport::getLoadableTransports();
-}
-
-std::string ImageTransport::getTransportOrDefault(const TransportHints * transport_hints)
-{
-  std::string ret;
-  if (nullptr == transport_hints) {
-    TransportHints th(impl_->node_.get());
-    ret = th.getTransport();
-  } else {
-    ret = transport_hints->getTransport();
-  }
-  return ret;
 }
 
 }  // namespace image_transport

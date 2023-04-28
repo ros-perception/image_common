@@ -26,7 +26,6 @@ add_library(${PROJECT_NAME}
   src/subscriber.cpp
   src/single_subscriber_publisher.cpp
   src/camera_publisher.cpp
-  src/camera_subscriber.cpp
   src/image_transport.cpp
 )
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
