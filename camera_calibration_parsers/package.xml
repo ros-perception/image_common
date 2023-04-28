@@ -1,6 +1,6 @@
 <package format="2">
   <name>camera_calibration_parsers</name>
-  <version>4.2.0</version>
+  <version>4.3.0</version>
   <description>
      camera_calibration_parsers contains routines for reading and writing camera calibration parameters.
   </description>
