@@ -79,9 +79,10 @@ Subscriber create_subscription(
 CameraPublisher create_camera_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
-  rmw_qos_profile_t custom_qos)
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
 {
-  return CameraPublisher(node, base_topic, custom_qos);
+  return CameraPublisher(node, base_topic, custom_qos, pub_options);
 }
 
 CameraSubscriber create_camera_subscription(
