@@ -17,6 +17,7 @@ find_package(ament_cmake_ros REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
 # Build image_transport library
@@ -58,11 +59,33 @@ target_link_libraries(list_transports
   ${PROJECT_NAME}
   pluginlib::pluginlib)
 
-# Build republish
-add_executable(republish src/republish.cpp)
+# # Build republish
+add_library(republish_node SHARED
+	src/republish.cpp
+)
+target_link_libraries(republish_node
+  ${PROJECT_NAME}
+)
+ament_target_dependencies(republish_node
+  pluginlib
+  rclcpp_components
+  rclcpp
+)
+rclcpp_components_register_nodes(republish_node "image_transport::Republisher")
+
+add_executable(republish
+	src/republish.cpp
+	src/republish_program.cpp
+	src/utilities/utilities.cpp
+)
 target_link_libraries(republish
   ${PROJECT_NAME}
-  pluginlib::pluginlib)
+)
+ament_target_dependencies(republish
+  pluginlib
+  rclcpp
+	rclcpp_components
+)
 
 # Install plugin descriptions
 pluginlib_export_plugin_description_file(image_transport default_plugins.xml)
