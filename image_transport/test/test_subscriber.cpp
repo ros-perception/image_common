@@ -80,6 +80,25 @@ TEST_F(TestSubscriber, camera_sub_shutdown) {
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/camera_info"), 0u);
 }
 
+TEST_F(TestSubscriber, callback_groups) {
+  std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn1 =
+    [](const auto & msg) {(void)msg;};
+  std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn2 =
+    [](const auto & msg) {(void)msg;};
+
+  auto cb_group = node_->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+  rclcpp::SubscriptionOptions sub_options;
+  sub_options.callback_group = cb_group;
+
+  image_transport::ImageTransport it(node_);
+
+  auto subscriber1 = it.subscribe("camera/image", 1, fcn1, nullptr, sub_options);
+  auto subscriber2 = it.subscribe("camera/image", 1, fcn2, nullptr, sub_options);
+
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.spin_node_some(node_);
+}
+
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
