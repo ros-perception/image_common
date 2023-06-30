@@ -92,8 +92,8 @@ TEST_F(TestSubscriber, callback_groups) {
 
   image_transport::ImageTransport it(node_);
 
-  auto subscriber1 = it.subscribe("camera/image", 1, fcn1, nullptr, sub_options);
-  auto subscriber2 = it.subscribe("camera/image", 1, fcn2, nullptr, sub_options);
+  auto subscriber1 = it.subscribe("camera/image", 1, fcn1, nullptr, nullptr, sub_options);
+  auto subscriber2 = it.subscribe("camera/image", 1, fcn2, nullptr, nullptr, sub_options);
 
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.spin_node_some(node_);

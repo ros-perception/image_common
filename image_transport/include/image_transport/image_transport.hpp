@@ -164,7 +164,8 @@ public:
   Subscriber subscribe(
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(const ImageConstPtr &), T * obj,
-    const TransportHints * transport_hints = nullptr)
+    const TransportHints * transport_hints = nullptr,
+    const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(
       base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1),
@@ -179,7 +180,8 @@ public:
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(const ImageConstPtr &),
     const std::shared_ptr<T> & obj,
-    const TransportHints * transport_hints = nullptr)
+    const TransportHints * transport_hints = nullptr,
+    const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(
       base_topic, queue_size, std::bind(fp, obj.get(), std::placeholders::_1),
