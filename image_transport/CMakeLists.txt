@@ -61,7 +61,7 @@ target_link_libraries(list_transports
 
 # # Build republish
 add_library(republish_node SHARED
-	src/republish.cpp
+  src/republish.cpp
 )
 target_link_libraries(republish_node
   ${PROJECT_NAME}
@@ -74,9 +74,9 @@ ament_target_dependencies(republish_node
 rclcpp_components_register_nodes(republish_node "image_transport::Republisher")
 
 add_executable(republish
-	src/republish.cpp
-	src/republish_program.cpp
-	src/utilities/utilities.cpp
+  src/republish.cpp
+  src/republish_program.cpp
+  src/utilities/utilities.cpp
 )
 target_link_libraries(republish
   ${PROJECT_NAME}
@@ -84,7 +84,7 @@ target_link_libraries(republish
 ament_target_dependencies(republish
   pluginlib
   rclcpp
-	rclcpp_components
+  rclcpp_components
 )
 
 # Install plugin descriptions
