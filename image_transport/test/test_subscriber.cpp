@@ -81,10 +81,29 @@ TEST_F(TestSubscriber, camera_sub_shutdown) {
 }
 
 TEST_F(TestSubscriber, callback_groups) {
+  using namespace std::chrono_literals;
+
+  // Create a publisher node.
+  auto node_publisher = rclcpp::Node::make_shared("image_publisher", rclcpp::NodeOptions());
+  image_transport::ImageTransport it_publisher(node_publisher);
+  image_transport::Publisher pub = it_publisher.advertise("camera/image", 1);
+
+  auto msg = sensor_msgs::msg::Image();
+  auto timer = node_publisher->create_wall_timer(100ms, [&](){ pub.publish(msg); });
+
+  // Create a subscriber to read the images.
+  std::atomic<bool> flag_1 = false;
+  std::atomic<bool> flag_2 = false;
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn1 =
-    [](const auto & msg) {(void)msg;};
+    [&](const auto & msg) {
+      (void)msg;
+      flag_1 = true;
+    };
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn2 =
-    [](const auto & msg) {(void)msg;};
+    [&](const auto & msg) {
+      (void)msg;
+      flag_2 = true;
+    };
 
   auto cb_group = node_->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
   rclcpp::SubscriptionOptions sub_options;
@@ -92,11 +111,16 @@ TEST_F(TestSubscriber, callback_groups) {
 
   image_transport::ImageTransport it(node_);
 
-  auto subscriber1 = it.subscribe("camera/image", 1, fcn1, nullptr, nullptr, sub_options);
-  auto subscriber2 = it.subscribe("camera/image", 1, fcn2, nullptr, nullptr, sub_options);
+  auto subscriber_1 = it.subscribe("camera/image", 1, fcn1, nullptr, nullptr, sub_options);
+  auto subscriber_2 = it.subscribe("camera/image", 1, fcn2, nullptr, nullptr, sub_options);
 
   rclcpp::executors::MultiThreadedExecutor executor;
-  executor.spin_node_some(node_);
+  executor.add_node(node_);
+  executor.add_node(node_publisher);
+  // Both callbacks should be executed and the flags should be set.
+  while (!(flag_1 && flag_2)) {
+    executor.spin_some();
+  }
 }
 
 int main(int argc, char ** argv)

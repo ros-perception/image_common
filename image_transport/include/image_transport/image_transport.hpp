@@ -169,7 +169,7 @@ public:
   {
     return subscribe(
       base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1),
-      VoidPtr(), transport_hints);
+      VoidPtr(), transport_hints, options);
   }
 
   /**
@@ -185,7 +185,7 @@ public:
   {
     return subscribe(
       base_topic, queue_size, std::bind(fp, obj.get(), std::placeholders::_1),
-      obj, transport_hints);
+      obj, transport_hints, options);
   }
 
   /*!
