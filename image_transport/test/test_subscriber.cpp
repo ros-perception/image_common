@@ -98,11 +98,13 @@ TEST_F(TestSubscriber, callback_groups) {
     [&](const auto & msg) {
       (void)msg;
       flag_1 = true;
+      std::this_thread::sleep_for(5s);
     };
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn2 =
     [&](const auto & msg) {
       (void)msg;
       flag_2 = true;
+      std::this_thread::sleep_for(5s);
     };
 
   auto cb_group = node_->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
@@ -118,9 +120,22 @@ TEST_F(TestSubscriber, callback_groups) {
   executor.add_node(node_);
   executor.add_node(node_publisher);
   // Both callbacks should be executed and the flags should be set.
-  while (!(flag_1 && flag_2)) {
-    executor.spin_some();
+  std::thread executor_thread([&](){executor.spin();});
+
+  // The callbacks sleep for 5 seconds and mutually exclusive callbacks should be blocked.
+  // However, because of the the multithreaded executor and renentrant callback group,
+  // the flags should be set, as the callbacks should be in different threads.
+  auto timeout_elapsed = 0;
+  auto sleep_duration = 0.1;
+  auto timeout = 0.5;
+
+  while(!(flag_1 && flag_2)) {
+    sleep(sleep_duration);
+    timeout_elapsed += sleep_duration;
   }
+  executor.cancel();
+
+  EXPECT_LT(timeout_elapsed, timeout);
 }
 
 int main(int argc, char ** argv)
