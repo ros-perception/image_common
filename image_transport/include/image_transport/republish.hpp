@@ -41,7 +41,7 @@ namespace image_transport
 class Republisher : public rclcpp::Node
 {
 public:
-  //! Constructor
+  /// Constructor
   IMAGE_TRANSPORT_PUBLIC
   explicit Republisher(const rclcpp::NodeOptions & options);
 
