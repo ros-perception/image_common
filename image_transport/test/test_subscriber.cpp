@@ -89,7 +89,7 @@ TEST_F(TestSubscriber, callback_groups) {
   image_transport::Publisher pub = it_publisher.advertise("camera/image", 1);
 
   auto msg = sensor_msgs::msg::Image();
-  auto timer = node_publisher->create_wall_timer(100ms, [&](){ pub.publish(msg); });
+  auto timer = node_publisher->create_wall_timer(100ms, [&]() {pub.publish(msg);});
 
   // Create a subscriber to read the images.
   std::atomic<bool> flag_1 = false;
@@ -120,7 +120,7 @@ TEST_F(TestSubscriber, callback_groups) {
   executor.add_node(node_);
   executor.add_node(node_publisher);
   // Both callbacks should be executed and the flags should be set.
-  std::thread executor_thread([&](){executor.spin();});
+  std::thread executor_thread([&]() {executor.spin();});
 
   // The callbacks sleep for 5 seconds and mutually exclusive callbacks should be blocked.
   // However, because of the the multithreaded executor and renentrant callback group,
@@ -129,7 +129,7 @@ TEST_F(TestSubscriber, callback_groups) {
   auto sleep_duration = 0.1;
   auto timeout = 0.5;
 
-  while(!(flag_1 && flag_2)) {
+  while (!(flag_1 && flag_2)) {
     sleep(sleep_duration);
     timeout_elapsed += sleep_duration;
   }
