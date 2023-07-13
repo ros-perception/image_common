@@ -75,7 +75,8 @@ IMAGE_TRANSPORT_PUBLIC
 CameraPublisher create_camera_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+  rclcpp::PublisherOptions pub_options = rclcpp::PublisherOptions());
 
 /*!
  * \brief Subscribe to a camera, free function version.

@@ -74,11 +74,11 @@ struct CameraPublisher::Impl
   bool unadvertised_;
 };
 
-// TODO(ros2) Add support for SubscriberStatusCallbacks when rcl/rmw support it.
 CameraPublisher::CameraPublisher(
   rclcpp::Node * node,
   const std::string & base_topic,
-  rmw_qos_profile_t custom_qos)
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
 : impl_(std::make_shared<Impl>(node))
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
@@ -89,7 +89,7 @@ CameraPublisher::CameraPublisher(
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-  impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos);
+  impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos, pub_options);
   impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
 }
 
