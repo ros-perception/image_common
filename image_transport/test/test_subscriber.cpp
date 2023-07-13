@@ -98,13 +98,13 @@ TEST_F(TestSubscriber, callback_groups) {
     [&](const auto & msg) {
       (void)msg;
       flag_1 = true;
-      std::this_thread::sleep_for(5s);
+      std::this_thread::sleep_for(1s);
     };
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn2 =
     [&](const auto & msg) {
       (void)msg;
       flag_2 = true;
-      std::this_thread::sleep_for(5s);
+      std::this_thread::sleep_for(1s);
     };
 
   auto cb_group = node_->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
@@ -134,6 +134,7 @@ TEST_F(TestSubscriber, callback_groups) {
     timeout_elapsed += sleep_duration;
   }
   executor.cancel();
+  executor_thread.join();
 
   EXPECT_LT(timeout_elapsed, timeout);
 }
