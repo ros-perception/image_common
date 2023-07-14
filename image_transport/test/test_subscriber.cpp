@@ -125,12 +125,12 @@ TEST_F(TestSubscriber, callback_groups) {
   // The callbacks sleep for 5 seconds and mutually exclusive callbacks should be blocked.
   // However, because of the the multithreaded executor and renentrant callback group,
   // the flags should be set, as the callbacks should be in different threads.
-  auto timeout_elapsed = 0;
-  auto sleep_duration = 0.1;
-  auto timeout = 0.5;
+  auto timeout_elapsed = 0.0s;
+  auto sleep_duration = 0.1s;
+  auto timeout = 0.5s;
 
   while (!(flag_1 && flag_2)) {
-    sleep(sleep_duration);
+    std::this_thread::sleep_for(sleep_duration);
     timeout_elapsed += sleep_duration;
   }
   executor.cancel();
