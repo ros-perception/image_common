@@ -110,7 +110,7 @@ Publisher::Publisher(
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
-  uint ns_len = node->get_effective_namespace().length();
+  auto ns_len = node->get_effective_namespace().length();
   std::string param_base_name = image_topic.substr(ns_len);
   std::replace(param_base_name.begin(), param_base_name.end(), '/', '.');
   if (param_base_name.front() == '.') {
