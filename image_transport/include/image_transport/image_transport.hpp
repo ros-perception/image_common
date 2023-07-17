@@ -139,7 +139,8 @@ public:
     const std::string & base_topic, uint32_t queue_size,
     const Subscriber::Callback & callback,
     const VoidPtr & tracked_object = VoidPtr(),
-    const TransportHints * transport_hints = nullptr);
+    const TransportHints * transport_hints = nullptr,
+    const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
 
   /**
    * \brief Subscribe to an image topic, version for bare function.
@@ -148,12 +149,13 @@ public:
   Subscriber subscribe(
     const std::string & base_topic, uint32_t queue_size,
     void (* fp)(const ImageConstPtr &),
-    const TransportHints * transport_hints = nullptr)
+    const TransportHints * transport_hints = nullptr,
+    const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(
       base_topic, queue_size,
       std::function<void(const ImageConstPtr &)>(fp),
-      VoidPtr(), transport_hints);
+      VoidPtr(), transport_hints, options);
   }
 
   /**
@@ -163,11 +165,12 @@ public:
   Subscriber subscribe(
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(const ImageConstPtr &), T * obj,
-    const TransportHints * transport_hints = nullptr)
+    const TransportHints * transport_hints = nullptr,
+    const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(
       base_topic, queue_size, std::bind(fp, obj, std::placeholders::_1),
-      VoidPtr(), transport_hints);
+      VoidPtr(), transport_hints, options);
   }
 
   /**
@@ -178,11 +181,12 @@ public:
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(const ImageConstPtr &),
     const std::shared_ptr<T> & obj,
-    const TransportHints * transport_hints = nullptr)
+    const TransportHints * transport_hints = nullptr,
+    const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(
       base_topic, queue_size, std::bind(fp, obj.get(), std::placeholders::_1),
-      obj, transport_hints);
+      obj, transport_hints, options);
   }
 
   /*!
