@@ -140,16 +140,6 @@ public:
     const VoidPtr & tracked_object = VoidPtr(),
     const TransportHints * transport_hints = nullptr);
 
-  /*!
-   * \brief Advertise an image topic with subcriber status callbacks and SubscriptionOptions.
-   */
-  /* TODO(ros2) Implement when SubscriberStatusCallback is available
-   * Publisher advertise(const std::string& base_topic, uint32_t queue_size,
-   *                    const SubscriberStatusCallback& connect_cb,
-   *                    const SubscriberStatusCallback& disconnect_cb = SubscriberStatusCallback(),
-   *                    const ros::VoidPtr& tracked_object = ros::VoidPtr(), bool latch = false);
-   */
-
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
