@@ -35,7 +35,7 @@
 
 #include "image_transport/image_transport.hpp"
 
-class TestPublisher : public ::testing::Test
+class TestSubscriber : public ::testing::Test
 {
 protected:
   void SetUp()
@@ -46,7 +46,7 @@ protected:
   rclcpp::Node::SharedPtr node_;
 };
 
-TEST_F(TestPublisher, construction_and_destruction) {
+TEST_F(TestSubscriber, construction_and_destruction) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
@@ -56,7 +56,7 @@ TEST_F(TestPublisher, construction_and_destruction) {
   executor.spin_node_some(node_);
 }
 
-TEST_F(TestPublisher, shutdown) {
+TEST_F(TestSubscriber, shutdown) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
@@ -66,7 +66,7 @@ TEST_F(TestPublisher, shutdown) {
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 0u);
 }
 
-TEST_F(TestPublisher, camera_sub_shutdown) {
+TEST_F(TestSubscriber, camera_sub_shutdown) {
   std::function<void(
       const sensor_msgs::msg::Image::ConstSharedPtr &,
       const sensor_msgs::msg::CameraInfo::ConstSharedPtr &)> fcn =
