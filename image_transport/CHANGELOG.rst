@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.6 (2023-07-27)
+------------------
+* Expose callback groups - backport to humble (`#277 <https://github.com/ros-perception/image_common/issues/277>`_)
+* Contributors: Aditya Pande
+
 3.1.5 (2022-11-16)
 ------------------
 * Add alias library targets for all libraries (`#260 <https://github.com/ros-perception/image_common/issues/260>`_)
