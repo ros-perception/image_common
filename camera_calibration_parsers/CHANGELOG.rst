@@ -2,6 +2,9 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.2.1 (2023-07-27)
+------------------
+
 4.2.0 (2023-02-14)
 ------------------
 * Update image_common to C++17. (`#267 <https://github.com/ros-perception/image_common/issues/267>`_)
