@@ -16,7 +16,6 @@
   <buildtool_depend>catkin</buildtool_depend>
   
   <build_depend>boost</build_depend>
-  <build_depend>pkg-config</build_depend>
   <build_depend>rosconsole</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>yaml-cpp</build_depend>
