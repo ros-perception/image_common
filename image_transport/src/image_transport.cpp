@@ -162,22 +162,6 @@ Subscriber ImageTransport::subscribe(
     getTransportOrDefault(transport_hints), custom_qos);
 }
 
-Subscriber ImageTransport::subscribe(
-  const std::string & base_topic, uint32_t queue_size,
-  const Subscriber::Callback & callback,
-  const VoidPtr & tracked_object,
-  const TransportHints * transport_hints,
-  const rclcpp::SubscriptionOptions options)
-{
-  (void) tracked_object;
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-  custom_qos.depth = queue_size;
-  return create_subscription(
-    impl_->node_.get(), base_topic, callback,
-    getTransportOrDefault(transport_hints), custom_qos,
-    options);
-}
-
 CameraPublisher ImageTransport::advertiseCamera(
   const std::string & base_topic, uint32_t queue_size,
   bool latch)
