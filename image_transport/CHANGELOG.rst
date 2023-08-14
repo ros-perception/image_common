@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.7 (2023-08-14)
+------------------
+* Fix downstream regressions due to subscribe overloads (`#284 <https://github.com/ros-perception/image_common/issues/284>`_)
+* Contributors: Aditya Pande
+
 3.1.6 (2023-07-27)
 ------------------
 * Expose callback groups - backport to humble (`#277 <https://github.com/ros-perception/image_common/issues/277>`_)
