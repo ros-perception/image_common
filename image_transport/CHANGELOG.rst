@@ -2,6 +2,13 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* feat: enable plugin allowlist (`#264 <https://github.com/ros-perception/image_common/issues/264>`_)
+* Expose option to set callback groups (`#274 <https://github.com/ros-perception/image_common/issues/274>`_)
+* add support for lazy subscribers (`#272 <https://github.com/ros-perception/image_common/issues/272>`_)
+* Contributors: Aditya Pande, Daisuke Nishimatsu, Michael Ferguson
+
 4.3.0 (2023-04-28)
 ------------------
 
