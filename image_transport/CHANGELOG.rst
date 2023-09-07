@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Switch to using the override keyword for simple_publisher_plugin. (`#285 <https://github.com/ros-perception/image_common/issues/285>`_)
+* Contributors: Chris Lalancette
+
 4.5.0 (2023-08-21)
 ------------------
 * feat: enable plugin allowlist (`#264 <https://github.com/ros-perception/image_common/issues/264>`_)
