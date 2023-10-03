@@ -150,6 +150,13 @@ Publisher ImageTransport::advertise(const std::string & base_topic, uint32_t que
   return create_publisher(impl_->node_.get(), base_topic, custom_qos);
 }
 
+Publisher ImageTransport::advertise(const std::string & base_topic, rmw_qos_profile_t custom_qos, bool latch)
+{
+  // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
+  (void) latch;
+  return create_publisher(impl_->node_.get(), base_topic, custom_qos);
+}
+
 Subscriber ImageTransport::subscribe(
   const std::string & base_topic, uint32_t queue_size,
   const Subscriber::Callback & callback,

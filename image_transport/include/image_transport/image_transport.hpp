@@ -121,6 +121,9 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Publisher advertise(const std::string & base_topic, uint32_t queue_size, bool latch = false);
 
+  IMAGE_TRANSPORT_PUBLIC
+  Publisher advertise(const std::string & base_topic, rmw_qos_profile_t custom_qos, bool latch = false);
+
   /*!
    * \brief Advertise an image topic with subcriber status callbacks.
    */
