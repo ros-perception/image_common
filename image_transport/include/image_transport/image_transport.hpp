@@ -121,6 +121,9 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Publisher advertise(const std::string & base_topic, uint32_t queue_size, bool latch = false);
 
+  /*!
+   * \brief Advertise an image topic, simple version.
+   */
   IMAGE_TRANSPORT_PUBLIC
   Publisher advertise(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
@@ -194,6 +197,9 @@ public:
       obj, transport_hints, options);
   }
 
+  /**
+   * \brief Subscribe to an image topic, version for arbitrary std::function object and QoS.
+   */
   Subscriber subscribe(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
     const Subscriber::Callback & callback,
