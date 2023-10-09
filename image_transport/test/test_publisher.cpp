@@ -83,6 +83,11 @@ TEST_F(TestPublisher, ImageTransportCameraPublisher) {
   auto pub = it.advertiseCamera("camera/image", 1);
 }
 
+TEST_F(TestPublisher, image_transport_camera_publisher_qos) {
+  image_transport::ImageTransport it(node_);
+  auto pub = it.advertise("camera/image", rmw_qos_profile_sensor_data);
+}
+
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
