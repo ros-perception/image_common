@@ -139,6 +139,71 @@ TEST_F(TestSubscriber, callback_groups) {
   EXPECT_LT(timeout_elapsed, timeout);
 }
 
+TEST_F(TestSubscriber, callback_groups_custom_qos) {
+  using namespace std::chrono_literals;
+
+  // Create a publisher node.
+  auto node_publisher = rclcpp::Node::make_shared("image_publisher", rclcpp::NodeOptions());
+  image_transport::ImageTransport it_publisher(node_publisher);
+  image_transport::Publisher pub = it_publisher.advertise(
+    "camera/image",
+    rmw_qos_profile_sensor_data);
+
+  auto msg = sensor_msgs::msg::Image();
+  auto timer = node_publisher->create_wall_timer(100ms, [&]() {pub.publish(msg);});
+
+  // Create a subscriber to read the images.
+  std::atomic<bool> flag_1 = false;
+  std::atomic<bool> flag_2 = false;
+  std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn1 =
+    [&](const auto & msg) {
+      (void)msg;
+      flag_1 = true;
+      std::this_thread::sleep_for(1s);
+    };
+  std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn2 =
+    [&](const auto & msg) {
+      (void)msg;
+      flag_2 = true;
+      std::this_thread::sleep_for(1s);
+    };
+
+  auto cb_group = node_->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+  rclcpp::SubscriptionOptions sub_options;
+  sub_options.callback_group = cb_group;
+
+  image_transport::ImageTransport it(node_);
+
+  auto subscriber_1 = it.subscribe(
+    "camera/image", rmw_qos_profile_sensor_data, fcn1, nullptr,
+    nullptr, sub_options);
+  auto subscriber_2 = it.subscribe(
+    "camera/image", rmw_qos_profile_sensor_data, fcn2, nullptr,
+    nullptr, sub_options);
+
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(node_);
+  executor.add_node(node_publisher);
+  // Both callbacks should be executed and the flags should be set.
+  std::thread executor_thread([&]() {executor.spin();});
+
+  // The callbacks sleep for 5 seconds and mutually exclusive callbacks should be blocked.
+  // However, because of the the multithreaded executor and renentrant callback group,
+  // the flags should be set, as the callbacks should be in different threads.
+  auto timeout_elapsed = 0.0s;
+  auto sleep_duration = 0.1s;
+  auto timeout = 0.5s;
+
+  while (!(flag_1 && flag_2)) {
+    std::this_thread::sleep_for(sleep_duration);
+    timeout_elapsed += sleep_duration;
+  }
+  executor.cancel();
+  executor_thread.join();
+
+  EXPECT_LT(timeout_elapsed, timeout);
+}
+
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
