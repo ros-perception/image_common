@@ -4,6 +4,6 @@
 
 \section codeapi C++ API
 
-See: <camera_info_manager/camera_info_manager.h>.
+See: <camera_info_manager/camera_info_manager.hpp>.
 
 */
