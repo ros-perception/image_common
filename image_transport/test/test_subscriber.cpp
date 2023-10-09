@@ -145,7 +145,9 @@ TEST_F(TestSubscriber, callback_groups_custom_qos) {
   // Create a publisher node.
   auto node_publisher = rclcpp::Node::make_shared("image_publisher", rclcpp::NodeOptions());
   image_transport::ImageTransport it_publisher(node_publisher);
-  image_transport::Publisher pub = it_publisher.advertise("camera/image", rmw_qos_profile_sensor_data);
+  image_transport::Publisher pub = it_publisher.advertise(
+    "camera/image",
+    rmw_qos_profile_sensor_data);
 
   auto msg = sensor_msgs::msg::Image();
   auto timer = node_publisher->create_wall_timer(100ms, [&]() {pub.publish(msg);});
@@ -172,8 +174,12 @@ TEST_F(TestSubscriber, callback_groups_custom_qos) {
 
   image_transport::ImageTransport it(node_);
 
-  auto subscriber_1 = it.subscribe("camera/image", rmw_qos_profile_sensor_data, fcn1, nullptr, nullptr, sub_options);
-  auto subscriber_2 = it.subscribe("camera/image", rmw_qos_profile_sensor_data, fcn2, nullptr, nullptr, sub_options);
+  auto subscriber_1 = it.subscribe(
+    "camera/image", rmw_qos_profile_sensor_data, fcn1, nullptr,
+    nullptr, sub_options);
+  auto subscriber_2 = it.subscribe(
+    "camera/image", rmw_qos_profile_sensor_data, fcn2, nullptr,
+    nullptr, sub_options);
 
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(node_);
