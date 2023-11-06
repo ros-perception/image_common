@@ -2,6 +2,12 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Advertize and subscribe with custom qos (`#288 <https://github.com/ros-perception/image_common/issues/288>`_)
+* Removed C headers (`#289 <https://github.com/ros-perception/image_common/issues/289>`_)
+* Contributors: Alejandro Hernández Cordero
+
 4.5.1 (2023-09-07)
 ------------------
 * Switch to using the override keyword for simple_publisher_plugin. (`#285 <https://github.com/ros-perception/image_common/issues/285>`_)

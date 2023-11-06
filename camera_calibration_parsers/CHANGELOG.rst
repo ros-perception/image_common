@@ -2,6 +2,11 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removed C headers: camera_info_manager camera_calibration_parsers (`#290 <https://github.com/ros-perception/image_common/issues/290>`_)
+* Contributors: Alejandro Hernández Cordero
+
 4.5.1 (2023-09-07)
 ------------------
 
