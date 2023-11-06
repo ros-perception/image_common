@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+5.0.0 (2023-11-06)
+------------------
 * Advertize and subscribe with custom qos (`#288 <https://github.com/ros-perception/image_common/issues/288>`_)
 * Removed C headers (`#289 <https://github.com/ros-perception/image_common/issues/289>`_)
 * Contributors: Alejandro Hernández Cordero
