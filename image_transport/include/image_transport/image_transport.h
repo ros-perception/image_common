@@ -39,6 +39,7 @@
 #include "image_transport/subscriber.h"
 #include "image_transport/camera_publisher.h"
 #include "image_transport/camera_subscriber.h"
+#include "exports.h"
 
 namespace image_transport {
 
@@ -48,7 +49,7 @@ namespace image_transport {
  * ImageTransport is analogous to ros::NodeHandle in that it contains advertise() and
  * subscribe() functions for creating advertisements and subscriptions of image topics.
  */
-class ImageTransport
+class IMAGE_TRANSPORT_DECL ImageTransport
 {
 public:
   explicit ImageTransport(const ros::NodeHandle& nh);
@@ -96,7 +97,7 @@ public:
                        void(T::*fp)(const sensor_msgs::ImageConstPtr&), T* obj,
                        const TransportHints& transport_hints = TransportHints())
   {
-    return subscribe(base_topic, queue_size, boost::bind(fp, obj, _1), ros::VoidPtr(), transport_hints);
+    return subscribe(base_topic, queue_size, boost::bind(fp, obj, boost::placeholders::_1), ros::VoidPtr(), transport_hints);
   }
 
   /**
@@ -108,7 +109,7 @@ public:
                        const boost::shared_ptr<T>& obj,
                        const TransportHints& transport_hints = TransportHints())
   {
-    return subscribe(base_topic, queue_size, boost::bind(fp, obj.get(), _1), obj, transport_hints);
+    return subscribe(base_topic, queue_size, boost::bind(fp, obj.get(), boost::placeholders::_1), obj, transport_hints);
   }
 
   /*!
@@ -161,7 +162,7 @@ public:
                                                 const sensor_msgs::CameraInfoConstPtr&), T* obj,
                                    const TransportHints& transport_hints = TransportHints())
   {
-    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj, _1, _2), ros::VoidPtr(),
+    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj, boost::placeholders::_1, boost::placeholders::_2), ros::VoidPtr(),
                            transport_hints);
   }
 
@@ -176,7 +177,7 @@ public:
                                    const boost::shared_ptr<T>& obj,
                                    const TransportHints& transport_hints = TransportHints())
   {
-    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj.get(), _1, _2), obj,
+    return subscribeCamera(base_topic, queue_size, boost::bind(fp, obj.get(), boost::placeholders::_1, boost::placeholders::_2), obj,
                            transport_hints);
   }
 

@@ -44,7 +44,7 @@ class TestParser(unittest.TestCase):
             for dir in [ '', './']:
                 p = subprocess.Popen('rosrun camera_calibration_parsers convert $(rospack find camera_calibration_parsers)/test/%s %s%s' % (files[0], dir, files[1]), shell=True, stderr=subprocess.PIPE)
                 out, err = p.communicate()
-                self.assertEqual(err, '')
+                self.assertEqual(err, b'')
 
     def test_readCalibration(self):
         script_dir = os.path.dirname(os.path.realpath(__file__))

@@ -40,6 +40,20 @@
 #include <sensor_msgs/CameraInfo.h>
 #include "polled_camera/GetPolledImage.h"
 
+#include <ros/macros.h>
+
+// Import/export for windows dll's and visibility for gcc shared libraries.
+
+#ifdef ROS_BUILD_SHARED_LIBS // ros is being built around shared libraries
+  #ifdef polled_camera_EXPORTS // we are building a shared lib/dll
+    #define POLLED_CAMERA_DECL ROS_HELPER_EXPORT
+  #else // we are using shared lib/dll
+    #define POLLED_CAMERA_DECL ROS_HELPER_IMPORT
+  #endif
+#else // ros is being built around static libraries
+  #define POLLED_CAMERA_DECL
+#endif
+
 namespace polled_camera {
 
 /**
@@ -63,7 +77,7 @@ void callback(polled_camera::GetPolledImage::Request& req,
 }
 \endcode
  */
-class PublicationServer
+class POLLED_CAMERA_DECL PublicationServer
 {
 public:
   typedef boost::function<void (polled_camera::GetPolledImage::Request&,
@@ -115,7 +129,7 @@ PublicationServer advertise(ros::NodeHandle& nh, const std::string& service,
                                          sensor_msgs::Image&, sensor_msgs::CameraInfo&),
                             T* obj)
 {
-  return advertise(nh, service, boost::bind(fp, obj, _1, _2, _3, _4));
+  return advertise(nh, service, boost::bind(fp, obj, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4));
 }
 
 /**
@@ -128,7 +142,7 @@ PublicationServer advertise(ros::NodeHandle& nh, const std::string& service,
                                          sensor_msgs::Image&, sensor_msgs::CameraInfo&),
                             const boost::shared_ptr<T>& obj)
 {
-  return advertise(nh, service, boost::bind(fp, obj.get(), _1, _2, _3, _4), obj);
+  return advertise(nh, service, boost::bind(fp, obj.get(), boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3, boost::placeholders::_4), obj);
 }
 
 } //namespace polled_camera

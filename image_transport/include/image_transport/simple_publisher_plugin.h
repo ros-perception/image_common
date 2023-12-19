@@ -185,9 +185,9 @@ private:
   ros::SubscriberStatusCallback bindCB(const SubscriberStatusCallback& user_cb,
                                        SubscriberStatusMemFn internal_cb_fn)
   {
-    ros::SubscriberStatusCallback internal_cb = boost::bind(internal_cb_fn, this, _1);
+    ros::SubscriberStatusCallback internal_cb = boost::bind(internal_cb_fn, this, boost::placeholders::_1);
     if (user_cb)
-      return boost::bind(&SimplePublisherPlugin::subscriberCB, this, _1, user_cb, internal_cb);
+      return boost::bind(&SimplePublisherPlugin::subscriberCB, this, boost::placeholders::_1, user_cb, internal_cb);
     else
       return internal_cb;
   }
@@ -209,7 +209,7 @@ private:
     // messages of the transport-specific type.
     typedef void (SimplePublisherPlugin::*PublishMemFn)(const sensor_msgs::Image&, const PublishFn&) const;
     PublishMemFn pub_mem_fn = &SimplePublisherPlugin::publish;
-    ImagePublishFn image_publish_fn = boost::bind(pub_mem_fn, this, _1, bindInternalPublisher(ros_ssp));
+    ImagePublishFn image_publish_fn = boost::bind(pub_mem_fn, this, boost::placeholders::_1, bindInternalPublisher(ros_ssp));
     
     SingleSubscriberPublisher ssp(ros_ssp.getSubscriberName(), getTopic(),
                                   boost::bind(&SimplePublisherPlugin::getNumSubscribers, this),
@@ -231,7 +231,7 @@ private:
     // Bind PubT::publish(const Message&) as PublishFn
     typedef void (PubT::*InternalPublishMemFn)(const M&) const;
     InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
-    return boost::bind(internal_pub_mem_fn, &pub, _1);
+    return boost::bind(internal_pub_mem_fn, &pub, boost::placeholders::_1);
   }
 };
 

@@ -43,6 +43,20 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
 
+#include <ros/macros.h>
+
+// Import/export for windows dll's and visibility for gcc shared libraries.
+
+#ifdef ROS_BUILD_SHARED_LIBS // ros is being built around shared libraries
+  #ifdef camera_info_manager_EXPORTS // we are building a shared lib/dll
+    #define CAMERA_INFO_MANAGER_DECL ROS_HELPER_EXPORT
+  #else // we are using shared lib/dll
+    #define CAMERA_INFO_MANAGER_DECL ROS_HELPER_IMPORT
+  #endif
+#else // ros is being built around static libraries
+  #define CAMERA_INFO_MANAGER_DECL
+#endif
+
 /** @file
 
     @brief CameraInfo Manager interface
@@ -171,22 +185,23 @@ namespace camera_info_manager
 
 */
 
-class CameraInfoManager
+class CAMERA_INFO_MANAGER_DECL CameraInfoManager
 {
  public:
 
   CameraInfoManager(ros::NodeHandle nh,
                     const std::string &cname="camera",
                     const std::string &url="");
-
-  sensor_msgs::CameraInfo getCameraInfo(void);
-  bool isCalibrated(void);
-  bool loadCameraInfo(const std::string &url);
-  std::string resolveURL(const std::string &url,
-                         const std::string &cname);
-  bool setCameraName(const std::string &cname);
-  bool setCameraInfo(const sensor_msgs::CameraInfo &camera_info);
-  bool validateURL(const std::string &url);
+  virtual ~CameraInfoManager();
+  
+  virtual sensor_msgs::CameraInfo getCameraInfo(void);
+  virtual bool isCalibrated(void);
+  virtual bool loadCameraInfo(const std::string &url);
+  virtual std::string resolveURL(const std::string &url,
+				 const std::string &cname);
+  virtual bool setCameraName(const std::string &cname);
+  virtual bool setCameraInfo(const sensor_msgs::CameraInfo &camera_info);
+  virtual bool validateURL(const std::string &url);
 
  private:
 
@@ -204,19 +219,24 @@ class CameraInfoManager
 
   // private methods
   std::string getPackageFileName(const std::string &url);
-  bool loadCalibration(const std::string &url,
-                       const std::string &cname);
-  bool loadCalibrationFile(const std::string &filename,
-                           const std::string &cname);
+  virtual bool loadCalibration(const std::string &url,
+			       const std::string &cname);
+  virtual bool loadCalibrationFile(const std::string &filename,
+				   const std::string &cname);
+  virtual bool loadCalibrationFlash(const std::string &flashURL,
+				    const std::string &cname);  
   url_type_t parseURL(const std::string &url);
-  bool saveCalibration(const sensor_msgs::CameraInfo &new_info,
-                       const std::string &url,
-                       const std::string &cname);
-  bool saveCalibrationFile(const sensor_msgs::CameraInfo &new_info,
-                           const std::string &filename,
-                           const std::string &cname);
-  bool setCameraInfoService(sensor_msgs::SetCameraInfo::Request &req,
-                            sensor_msgs::SetCameraInfo::Response &rsp);
+  virtual bool saveCalibration(const sensor_msgs::CameraInfo &new_info,
+			       const std::string &url,
+			       const std::string &cname);
+  virtual bool saveCalibrationFile(const sensor_msgs::CameraInfo &new_info,
+				   const std::string &filename,
+				   const std::string &cname);
+  virtual bool saveCalibrationFlash(const sensor_msgs::CameraInfo &new_info,
+				    const std::string &flashURL,
+				    const std::string &cname);  
+  virtual bool setCameraInfoService(sensor_msgs::SetCameraInfo::Request &req,
+				    sensor_msgs::SetCameraInfo::Response &rsp);
 
   /** @brief mutual exclusion lock for private data
    *
@@ -238,6 +258,6 @@ class CameraInfoManager
 
 }; // class CameraInfoManager
 
-}; // namespace camera_info_manager
+} // namespace camera_info_manager
 
 #endif // _CAMERA_INFO_MANAGER_H_
