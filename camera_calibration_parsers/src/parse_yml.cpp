@@ -54,6 +54,14 @@ static const char D_YML_NAME[]      = "distortion_coefficients";
 static const char R_YML_NAME[]      = "rectification_matrix";
 static const char P_YML_NAME[]      = "projection_matrix";
 static const char DMODEL_YML_NAME[] = "distortion_model";
+static const char BINNING_X_YML_NAME[] = "binning_x";
+static const char BINNING_Y_YML_NAME[] = "binning_y";
+static const char ROI_YML_NAME[] = "roi";
+static const char ROI_WIDTH_YML_NAME[] = "width";
+static const char ROI_HEIGHT_YML_NAME[] = "height";
+static const char ROI_X_OFFSET_YML_NAME[] = "x_offset";
+static const char ROI_Y_OFFSET_YML_NAME[] = "y_offset";
+static const char ROI_DO_RECTIFY_YML_NAME[] = "do_rectify";
 
 struct SimpleMatrix
 {
@@ -131,6 +139,20 @@ bool writeCalibrationYml(std::ostream& out, const std::string& camera_name,
                                                                     const_cast<double*>(&cam_info.D[0]));
   emitter << YAML::Key << R_YML_NAME << YAML::Value << SimpleMatrix(3, 3, const_cast<double*>(&cam_info.R[0]));
   emitter << YAML::Key << P_YML_NAME << YAML::Value << SimpleMatrix(3, 4, const_cast<double*>(&cam_info.P[0]));
+
+  // Binning
+  emitter << YAML::Key << BINNING_X_YML_NAME << YAML::Value << cam_info.binning_x;
+  emitter << YAML::Key << BINNING_Y_YML_NAME << YAML::Value << cam_info.binning_y;
+
+  // ROI
+  emitter << YAML::Key << ROI_YML_NAME << YAML::Value;
+  emitter << YAML::BeginMap;
+  emitter << YAML::Key << ROI_X_OFFSET_YML_NAME << YAML::Value << cam_info.roi.x_offset;
+  emitter << YAML::Key << ROI_Y_OFFSET_YML_NAME << YAML::Value << cam_info.roi.y_offset;
+  emitter << YAML::Key << ROI_HEIGHT_YML_NAME << YAML::Value << cam_info.roi.height;
+  emitter << YAML::Key << ROI_WIDTH_YML_NAME << YAML::Value << cam_info.roi.width;
+  emitter << YAML::Key << ROI_DO_RECTIFY_YML_NAME << YAML::Value << (bool)cam_info.roi.do_rectify;
+  emitter << YAML::EndMap;
 
   emitter << YAML::EndMap;
 
@@ -214,7 +236,23 @@ bool readCalibrationYml(std::istream& in, std::string& camera_name, sensor_msgs:
     cam_info.D.resize(D_rows*D_cols);
     for (int i = 0; i < D_rows*D_cols; ++i)
       D_data[i] >> cam_info.D[i];
-  
+
+    if (doc[BINNING_X_YML_NAME])
+      doc[BINNING_X_YML_NAME] >> cam_info.binning_x;
+    if (doc[BINNING_Y_YML_NAME])
+      doc[BINNING_Y_YML_NAME] >> cam_info.binning_y;
+
+    if (doc[ROI_YML_NAME]) {
+      const YAML::Node &roi_node = doc[ROI_YML_NAME];
+      roi_node[ROI_X_OFFSET_YML_NAME] >> cam_info.roi.x_offset;
+      roi_node[ROI_Y_OFFSET_YML_NAME] >> cam_info.roi.y_offset;
+      roi_node[ROI_HEIGHT_YML_NAME] >> cam_info.roi.height;
+      roi_node[ROI_WIDTH_YML_NAME] >> cam_info.roi.width;
+      bool do_rectify;
+      roi_node[ROI_DO_RECTIFY_YML_NAME] >> do_rectify;
+      cam_info.roi.do_rectify = do_rectify;
+    }
+
     return true;
   }
   catch (YAML::Exception& e) {
