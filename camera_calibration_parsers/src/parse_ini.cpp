@@ -91,6 +91,15 @@ bool writeCalibrationIni(std::ostream& out, const std::string& camera_name,
               sensor_msgs::distortion_models::PLUMB_BOB.c_str(), (int)cam_info.D.size());
     return false;
   }
+  else if ( cam_info.distortion_model != sensor_msgs::distortion_models::EQUIDISTANT  ||
+      cam_info.D.size() != 4) {
+    ROS_ERROR("Videre INI format can only save calibrations using the equidistant distortion model. "
+              "Use the YAML format instead.\n"
+              "\tdistortion_model = '%s', expected '%s'\n"
+              "\tD.size() = %d, expected 4", cam_info.distortion_model.c_str(),
+              sensor_msgs::distortion_models::EQUIDISTANT.c_str(), (int)cam_info.D.size());
+    return false;
+  }
   
   out.precision(5);
   out << std::fixed;
@@ -213,7 +222,9 @@ bool parseCalibrationIniRange(Iterator first, Iterator last,
     cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
   else if (cam_info.D.size() == 8)
     cam_info.distortion_model = sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL;
-
+  else if (cam_info.D.size() == 4){
+    cam_info.distortion_model = sensor_msgs::distortion_models::EQUIDISTANT;
+  }
   return info.hit;
 }
 /// \endcond
