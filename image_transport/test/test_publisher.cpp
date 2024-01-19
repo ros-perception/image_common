@@ -73,6 +73,9 @@ TEST_F(TestPublisher, CameraPublisher) {
   camera_pub.publish(
     sensor_msgs::msg::Image::ConstSharedPtr(),
     sensor_msgs::msg::CameraInfo::ConstSharedPtr());
+  sensor_msgs::msg::Image image;
+  sensor_msgs::msg::CameraInfo info;
+  camera_pub.publish(image, info, rclcpp::Time());
 }
 
 TEST_F(TestPublisher, ImageTransportCameraPublisher) {

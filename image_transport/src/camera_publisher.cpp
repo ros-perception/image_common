@@ -153,6 +153,25 @@ void CameraPublisher::publish(
   impl_->info_pub_->publish(*info);
 }
 
+void CameraPublisher::publish(
+  sensor_msgs::msg::Image & image, sensor_msgs::msg::CameraInfo & info,
+  rclcpp::Time stamp) const
+{
+  if (!impl_ || !impl_->isValid()) {
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
+    RCLCPP_FATAL(
+      logger,
+      "Call to publish() on an invalid image_transport::CameraPublisher");
+    return;
+  }
+
+  image.header.stamp = stamp;
+  info.header.stamp = stamp;
+  impl_->image_pub_.publish(image);
+  impl_->info_pub_->publish(info);
+}
+
 void CameraPublisher::shutdown()
 {
   if (impl_) {
