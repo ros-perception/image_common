@@ -2,6 +2,12 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.8 (2024-01-24)
+------------------
+* implement CameraSubscriber::getNumPublishers (`#297 <https://github.com/ros-perception/image_common/issues/297>`_) (`#298 <https://github.com/ros-perception/image_common/issues/298>`_)
+* Add missing definition for CameraPublisher::publish overload (`#278 <https://github.com/ros-perception/image_common/issues/278>`_) (`#294 <https://github.com/ros-perception/image_common/issues/294>`_)
+* Contributors: Alejandro Hernández Cordero
+
 3.1.7 (2023-08-14)
 ------------------
 * Fix downstream regressions due to subscribe overloads (`#284 <https://github.com/ros-perception/image_common/issues/284>`_)
