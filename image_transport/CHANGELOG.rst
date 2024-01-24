@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+5.1.0 (2024-01-24)
+------------------
 * Add QoS option reliability to republisher qos params (`#296 <https://github.com/ros-perception/image_common/issues/296>`_)
 * implement CameraSubscriber::getNumPublishers (`#297 <https://github.com/ros-perception/image_common/issues/297>`_)
 * Add missing definition for CameraPublisher::publish overload (`#278 <https://github.com/ros-perception/image_common/issues/278>`_)
