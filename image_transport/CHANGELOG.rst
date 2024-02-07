@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.2.3 (2024-02-07)
+------------------
 * Implement CameraSubscriber::getNumPublishers (`#299 <https://github.com/ros-perception/image_common/issues/299>`_)
 * Add missing definition for CameraPublisher::publish overload (`#295 <https://github.com/ros-perception/image_common/issues/295>`_)
 * Contributors: Alejandro Hernández Cordero, Michael Ferguson, s-hall
