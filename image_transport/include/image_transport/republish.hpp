@@ -55,6 +55,7 @@ private:
   image_transport::Subscriber sub;
   image_transport::Publisher pub;
   pluginlib::UniquePtr<image_transport::PublisherPlugin> instance;
+  std::shared_ptr<pluginlib::ClassLoader<image_transport::PublisherPlugin>> loader;
 };
 
 }  // namespace image_transport

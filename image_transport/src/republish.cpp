@@ -127,10 +127,12 @@ void Republisher::initialize()
     // Use one specific transport for output
     // Load transport plugin
     typedef image_transport::PublisherPlugin Plugin;
-    pluginlib::ClassLoader<Plugin> loader("image_transport", "image_transport::PublisherPlugin");
+    loader = std::make_shared<pluginlib::ClassLoader<Plugin>>(
+      "image_transport",
+      "image_transport::PublisherPlugin");
     std::string lookup_name = Plugin::getLookupName(out_transport);
 
-    instance = loader.createUniqueInstance(lookup_name);
+    instance = loader->createUniqueInstance(lookup_name);
     instance->advertise(this, out_topic);
 
     // Use PublisherPlugin::publish as the subscriber callback
