@@ -34,6 +34,8 @@
 #include "image_transport/image_transport.hpp"
 #include "image_transport/visibility_control.hpp"
 
+#include <pluginlib/class_loader.hpp>
+
 #include <rclcpp/rclcpp.hpp>
 
 namespace image_transport
@@ -52,6 +54,7 @@ private:
   bool initialized_{false};
   image_transport::Subscriber sub;
   image_transport::Publisher pub;
+  pluginlib::UniquePtr<image_transport::PublisherPlugin> instance;
 };
 
 }  // namespace image_transport

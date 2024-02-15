@@ -130,16 +130,15 @@ void Republisher::initialize()
     pluginlib::ClassLoader<Plugin> loader("image_transport", "image_transport::PublisherPlugin");
     std::string lookup_name = Plugin::getLookupName(out_transport);
 
-    auto instance = loader.createUniqueInstance(lookup_name);
-    std::shared_ptr<Plugin> pub = std::move(instance);
-    pub->advertise(this, out_topic);
+    instance = loader.createUniqueInstance(lookup_name);
+    instance->advertise(this, out_topic);
 
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::* PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr &) const;
     PublishMemFn pub_mem_fn = &Plugin::publishPtr;
     this->sub = image_transport::create_subscription(
       this, in_topic,
-      std::bind(pub_mem_fn, pub.get(), std::placeholders::_1), in_transport);
+      std::bind(pub_mem_fn, instance.get(), std::placeholders::_1), in_transport);
   }
 }
 
