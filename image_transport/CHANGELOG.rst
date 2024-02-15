@@ -2,6 +2,31 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.0 (2024-01-24)
+------------------
+* Add QoS option reliability to republisher qos params (`#296 <https://github.com/ros-perception/image_common/issues/296>`_)
+* implement CameraSubscriber::getNumPublishers (`#297 <https://github.com/ros-perception/image_common/issues/297>`_)
+* Add missing definition for CameraPublisher::publish overload (`#278 <https://github.com/ros-perception/image_common/issues/278>`_)
+* Contributors: Carlos Andrés Álvarez Restrepo, Michael Ferguson, s-hall
+
+5.0.0 (2023-11-06)
+------------------
+* Advertize and subscribe with custom qos (`#288 <https://github.com/ros-perception/image_common/issues/288>`_)
+* Removed C headers (`#289 <https://github.com/ros-perception/image_common/issues/289>`_)
+* Contributors: Alejandro Hernández Cordero
+
+4.5.1 (2023-09-07)
+------------------
+* Switch to using the override keyword for simple_publisher_plugin. (`#285 <https://github.com/ros-perception/image_common/issues/285>`_)
+* Contributors: Chris Lalancette
+
+4.5.0 (2023-08-21)
+------------------
+* feat: enable plugin allowlist (`#264 <https://github.com/ros-perception/image_common/issues/264>`_)
+* Expose option to set callback groups (`#274 <https://github.com/ros-perception/image_common/issues/274>`_)
+* add support for lazy subscribers (`#272 <https://github.com/ros-perception/image_common/issues/272>`_)
+* Contributors: Aditya Pande, Daisuke Nishimatsu, Michael Ferguson
+
 4.3.0 (2023-04-28)
 ------------------
 

@@ -100,11 +100,12 @@ void Republisher::initialize()
     // Use all available transports for output
     rclcpp::PublisherOptions pub_options;
     auto qos_override_options = rclcpp::QosOverridingOptions(
-      {
-        rclcpp::QosPolicyKind::Depth,
-        rclcpp::QosPolicyKind::Durability,
-        rclcpp::QosPolicyKind::History,
-      });
+    {
+      rclcpp::QosPolicyKind::Depth,
+      rclcpp::QosPolicyKind::Durability,
+      rclcpp::QosPolicyKind::History,
+      rclcpp::QosPolicyKind::Reliability,
+    });
 
     pub_options.qos_overriding_options = qos_override_options;
     this->pub = image_transport::create_publisher(

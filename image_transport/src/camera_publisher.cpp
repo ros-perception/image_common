@@ -74,11 +74,11 @@ struct CameraPublisher::Impl
   bool unadvertised_;
 };
 
-// TODO(ros2) Add support for SubscriberStatusCallbacks when rcl/rmw support it.
 CameraPublisher::CameraPublisher(
   rclcpp::Node * node,
   const std::string & base_topic,
-  rmw_qos_profile_t custom_qos)
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
 : impl_(std::make_shared<Impl>(node))
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
@@ -89,7 +89,7 @@ CameraPublisher::CameraPublisher(
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-  impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos);
+  impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos, pub_options);
   impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
 }
 
@@ -151,6 +151,25 @@ void CameraPublisher::publish(
 
   impl_->image_pub_.publish(*image);
   impl_->info_pub_->publish(*info);
+}
+
+void CameraPublisher::publish(
+  sensor_msgs::msg::Image & image, sensor_msgs::msg::CameraInfo & info,
+  rclcpp::Time stamp) const
+{
+  if (!impl_ || !impl_->isValid()) {
+    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
+    auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
+    RCLCPP_FATAL(
+      logger,
+      "Call to publish() on an invalid image_transport::CameraPublisher");
+    return;
+  }
+
+  image.header.stamp = stamp;
+  info.header.stamp = stamp;
+  impl_->image_pub_.publish(image);
+  impl_->info_pub_->publish(info);
 }
 
 void CameraPublisher::shutdown()
