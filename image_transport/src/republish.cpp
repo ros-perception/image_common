@@ -109,7 +109,7 @@ void Republisher::initialize()
 
     pub_options.qos_overriding_options = qos_override_options;
     this->pub = image_transport::create_publisher(
-      this->shared_from_this().get(), out_topic,
+      this, out_topic,
       rmw_qos_profile_default, pub_options);
 
     // Use Publisher::publish as the subscriber callback
@@ -121,7 +121,7 @@ void Republisher::initialize()
     sub_options.qos_overriding_options = qos_override_options;
 
     this->sub = image_transport::create_subscription(
-      this->shared_from_this().get(), in_topic, std::bind(pub_mem_fn, &pub, std::placeholders::_1),
+      this, in_topic, std::bind(pub_mem_fn, &pub, std::placeholders::_1),
       in_transport, rmw_qos_profile_default, sub_options);
   } else {
     // Use one specific transport for output
@@ -132,13 +132,13 @@ void Republisher::initialize()
 
     auto instance = loader.createUniqueInstance(lookup_name);
     std::shared_ptr<Plugin> pub = std::move(instance);
-    pub->advertise(this->shared_from_this().get(), out_topic);
+    pub->advertise(this, out_topic);
 
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::* PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr &) const;
     PublishMemFn pub_mem_fn = &Plugin::publishPtr;
     this->sub = image_transport::create_subscription(
-      this->shared_from_this().get(), in_topic,
+      this, in_topic,
       std::bind(pub_mem_fn, pub.get(), std::placeholders::_1), in_transport);
   }
 }

@@ -71,20 +71,9 @@ ament_target_dependencies(republish_node
   rclcpp_components
   rclcpp
 )
-rclcpp_components_register_nodes(republish_node "image_transport::Republisher")
-
-add_executable(republish
-  src/republish.cpp
-  src/republish_program.cpp
-  src/utilities/utilities.cpp
-)
-target_link_libraries(republish
-  ${PROJECT_NAME}
-)
-ament_target_dependencies(republish
-  pluginlib
-  rclcpp
-  rclcpp_components
+rclcpp_components_register_node(republish_node
+  PLUGIN "image_transport::Republisher"
+  EXECUTABLE republish
 )
 
 # Install plugin descriptions
@@ -101,9 +90,15 @@ install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME})
 
 # Install executables
 install(
-  TARGETS list_transports republish
+  TARGETS list_transports
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
+
+install(TARGETS
+  republish_node
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 # Install include directories
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
