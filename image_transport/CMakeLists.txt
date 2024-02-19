@@ -76,6 +76,8 @@ rclcpp_components_register_node(republish_node
   EXECUTABLE republish
 )
 
+target_compile_definitions(republish_node PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL")
+
 # Install plugin descriptions
 pluginlib_export_plugin_description_file(image_transport default_plugins.xml)
 
