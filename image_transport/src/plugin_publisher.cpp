@@ -26,7 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "image_transport/publisher.hpp"
+#include "image_transport/plugin_publisher.hpp"
 
 #include <memory>
 #include <set>
@@ -46,7 +46,7 @@
 namespace image_transport
 {
 
-struct Publisher::Impl
+struct PluginPublisher::Impl
 {
   explicit Impl(rclcpp::Node * node)
   : logger_(node->get_logger()),
@@ -66,11 +66,6 @@ struct Publisher::Impl
       count += pub->getNumSubscribers();
     }
     return count;
-  }
-
-  std::string getTopic() const
-  {
-    return base_topic_;
   }
 
   bool isValid() const
@@ -96,18 +91,12 @@ struct Publisher::Impl
   bool unadvertised_;
 };
 
-Publisher::Publisher(
-  rclcpp::Node * node, const std::string & base_topic,
+PluginPublisher::PluginPublisher(
+  rclcpp::Node * node, const std::string & image_topic,
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 : impl_(std::make_shared<Impl>(node))
 {
-  // Resolve the name explicitly because otherwise the compressed topics don't remap
-  // properly (#3652).
-  std::string image_topic = rclcpp::expand_topic_or_service_name(
-    base_topic,
-    node->get_name(), node->get_namespace());
-  impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
   auto ns_len = node->get_effective_namespace().length();
@@ -150,27 +139,15 @@ Publisher::Publisher(
         lookup_name.c_str(), e.what());
     }
   }
-
-  if (impl_->publishers_.empty()) {
-    throw Exception(
-            "No plugins found! Does `rospack plugins --attrib=plugin "
-            "image_transport` find any packages?");
-  }
 }
 
-size_t Publisher::getNumSubscribers() const
+size_t PluginPublisher::getNumSubscribers() const
 {
   if (impl_ && impl_->isValid()) {return impl_->getNumSubscribers();}
   return 0;
 }
 
-std::string Publisher::getTopic() const
-{
-  if (impl_) {return impl_->getTopic();}
-  return std::string();
-}
-
-void Publisher::publish(const sensor_msgs::msg::Image & message) const
+void PluginPublisher::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
     // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
@@ -186,7 +163,7 @@ void Publisher::publish(const sensor_msgs::msg::Image & message) const
   }
 }
 
-void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
+void PluginPublisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
     // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
@@ -202,7 +179,7 @@ void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message)
   }
 }
 
-void Publisher::shutdown()
+void PluginPublisher::shutdown()
 {
   if (impl_) {
     impl_->shutdown();
@@ -210,7 +187,7 @@ void Publisher::shutdown()
   }
 }
 
-Publisher::operator void *() const
+PluginPublisher::operator void *() const
 {
   return (impl_ && impl_->isValid()) ? reinterpret_cast<void *>(1) : reinterpret_cast<void *>(0);
 }
