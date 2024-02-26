@@ -18,7 +18,6 @@
 #include <string>
 
 #include "camera_calibration_parsers/parse_ini.hpp"
-#include "rcpputils/filesystem_helper.hpp"
 #include "sensor_msgs/distortion_models.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
 
