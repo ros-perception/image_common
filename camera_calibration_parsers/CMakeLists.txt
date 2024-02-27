@@ -15,7 +15,6 @@ endif()
 find_package(ament_cmake_ros REQUIRED)
 
 find_package(rclcpp REQUIRED)
-find_package(rcpputils REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(yaml_cpp_vendor REQUIRED)
 
@@ -32,8 +31,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   ${sensor_msgs_TARGETS}
   ${yaml_cpp_vendor_TARGETS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  rclcpp::rclcpp
-  rcpputils::rcpputils)
+  rclcpp::rclcpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -86,7 +84,7 @@ install(
   DESTINATION include/${PROJECT_NAME}
 )
 
-ament_export_dependencies(rclcpp rcpputils sensor_msgs yaml_cpp_vendor)
+ament_export_dependencies(rclcpp sensor_msgs yaml_cpp_vendor)
 
 if(BUILD_TESTING)
   #TODO(mjcarroll) switch back to this once I can fix copyright check
@@ -106,12 +104,12 @@ if(BUILD_TESTING)
 
   ament_add_gtest(${PROJECT_NAME}-parse_ini test/test_parse_ini.cpp)
   if(TARGET ${PROJECT_NAME}-parse_ini)
-    target_link_libraries(${PROJECT_NAME}-parse_ini ${PROJECT_NAME} rcpputils::rcpputils)
+    target_link_libraries(${PROJECT_NAME}-parse_ini ${PROJECT_NAME})
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-parse_yml test/test_parse_yml.cpp)
   if(TARGET ${PROJECT_NAME}-parse_yml)
-    target_link_libraries(${PROJECT_NAME}-parse_yml ${PROJECT_NAME} rcpputils::rcpputils)
+    target_link_libraries(${PROJECT_NAME}-parse_yml ${PROJECT_NAME})
   endif()
 endif()
 
