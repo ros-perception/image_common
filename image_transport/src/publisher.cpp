@@ -109,19 +109,36 @@ Publisher::Publisher(
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
-  std::vector<std::string> blacklist_vec;
-  std::set<std::string> blacklist;
-  // nh.getParam(impl_->base_topic_ + "/disable_pub_plugins", blacklist_vec);
-  for (size_t i = 0; i < blacklist_vec.size(); ++i) {
-    blacklist.insert(blacklist_vec[i]);
+  auto ns_len = node->get_effective_namespace().length();
+  std::string param_base_name = image_topic.substr(ns_len);
+  std::replace(param_base_name.begin(), param_base_name.end(), '/', '.');
+  if (param_base_name.front() == '.') {
+    param_base_name = param_base_name.substr(1);
+  }
+  std::vector<std::string> allowlist_vec;
+  std::set<std::string> allowlist;
+  std::vector<std::string> all_transport_names;
+  for (const auto & lookup_name : loader->getDeclaredClasses()) {
+    all_transport_names.emplace_back(erase_last_copy(lookup_name, "_pub"));
+  }
+  try {
+    allowlist_vec = node->declare_parameter<std::vector<std::string>>(
+      param_base_name + ".enable_pub_plugins", all_transport_names);
+  } catch (const rclcpp::exceptions::ParameterAlreadyDeclaredException &) {
+    RCLCPP_DEBUG_STREAM(
+      node->get_logger(), param_base_name << ".enable_pub_plugins" << " was previously declared"
+    );
+    allowlist_vec =
+      node->get_parameter(
+      param_base_name +
+      ".enable_pub_plugins").get_value<std::vector<std::string>>();
+  }
+  for (size_t i = 0; i < allowlist_vec.size(); ++i) {
+    allowlist.insert(allowlist_vec[i]);
   }
 
-  for (const auto & lookup_name : loader->getDeclaredClasses()) {
-    const std::string transport_name = erase_last_copy(lookup_name, "_pub");
-    if (blacklist.count(transport_name)) {
-      continue;
-    }
-
+  for (const auto & transport_name : allowlist) {
+    const auto & lookup_name = transport_name + "_pub";
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
       pub->advertise(node, image_topic, custom_qos);
