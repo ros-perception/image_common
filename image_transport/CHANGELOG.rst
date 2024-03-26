@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.9 (2024-03-26)
+------------------
+* backport whitelist feature to humble (`#302 <https://github.com/ros-perception/image_common/issues/302>`_)
+* Contributors: Kenji Brameld
+
 3.1.8 (2024-01-24)
 ------------------
 * implement CameraSubscriber::getNumPublishers (`#297 <https://github.com/ros-perception/image_common/issues/297>`_) (`#298 <https://github.com/ros-perception/image_common/issues/298>`_)
