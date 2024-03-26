@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.1 (2024-03-26)
+------------------
+* Added rclcpp component to Republish (`#275 <https://github.com/ros-perception/image_common/issues/275>`_)
+* Contributors: Alejandro Hernández Cordero
+
 5.1.0 (2024-01-24)
 ------------------
 * Add QoS option reliability to republisher qos params (`#296 <https://github.com/ros-perception/image_common/issues/296>`_)
