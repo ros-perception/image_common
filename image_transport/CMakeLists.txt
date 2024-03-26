@@ -23,7 +23,7 @@ find_package(sensor_msgs REQUIRED)
 # Build image_transport library
 add_library(${PROJECT_NAME}
   src/camera_common.cpp
-  src/publisher.cpp
+  src/plugin_publisher.cpp
   src/subscriber.cpp
   src/single_subscriber_publisher.cpp
   src/camera_publisher.cpp

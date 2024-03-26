@@ -31,9 +31,11 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 #include <string>
 #include <vector>
 
+#include "loader_fwds.hpp"
 #include "rclcpp/node.hpp"
 
 #include "image_transport/camera_publisher.hpp"
@@ -46,6 +48,11 @@
 namespace image_transport
 {
 
+using Publisher = PublisherBase<sensor_msgs::msg::Image>;
+
+PubLoaderPtr getPubLoader();
+SubLoaderPtr getSubLoader();
+
 /*!
  * \brief Advertise an image topic, free function version.
  */
@@ -55,6 +62,21 @@ Publisher create_publisher(
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
+
+template<
+  typename MessageT,
+  typename AllocatorT = std::allocator<void>,
+  typename PublisherT = PublisherBase<MessageT, AllocatorT>>
+std::shared_ptr<PublisherT>
+IMAGE_TRANSPORT_PUBLIC
+create_type_adapted_publisher(
+  rclcpp::Node * node,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+  rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
+{
+  return std::make_shared<PublisherT>(node, base_topic, getPubLoader(), custom_qos, options);
+}
 
 /**
  * \brief Subscribe to an image topic, free function version.
@@ -67,6 +89,21 @@ Subscriber create_subscription(
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
+
+template<typename AdapterT, typename CallbackT>
+typename rclcpp::Subscription<AdapterT>::SharedPtr create_type_adapted_subscription(
+  rclcpp::Node * node,
+  const std::string & base_topic,
+  CallbackT && callback,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+  rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
+{
+  auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
+  return node->create_subscription<AdapterT>(
+    base_topic, qos,
+    std::forward<CallbackT>(callback),
+    options);
+}
 
 /*!
  * \brief Advertise a camera, free function version.

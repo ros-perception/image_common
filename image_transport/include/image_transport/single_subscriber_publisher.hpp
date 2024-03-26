@@ -81,7 +81,8 @@ private:
   GetNumSubscribersFn num_subscribers_fn_;
   PublishFn publish_fn_;
 
-  friend class Publisher;  // to get publish_fn_ directly
+  template<typename MessageT, typename AllocatorT>
+  friend class PublisherBase;  // to get publish_fn_ directly
 };
 
 typedef std::function<void (const SingleSubscriberPublisher &)> SubscriberStatusCallback;
