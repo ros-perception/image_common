@@ -49,7 +49,15 @@ namespace image_transport
 struct Publisher::Impl
 {
   explicit Impl(rclcpp::Node::SharedPtr node)
-  : logger_(node->get_logger()),
+  : node_(node),
+    logger_(node->get_logger()),
+    unadvertised_(false)
+  {
+  }
+
+  explicit Impl(rclcpp_lifecycle::LifecycleNode::SharedPtr node)
+  : lifecycle_node_(node),
+    logger_(node->get_logger()),
     unadvertised_(false)
   {
   }
@@ -89,6 +97,8 @@ struct Publisher::Impl
     }
   }
 
+  rclcpp::Node::SharedPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
   rclcpp::Logger logger_;
   std::string base_topic_;
   PubLoaderPtr loader_;
@@ -102,15 +112,43 @@ Publisher::Publisher(
   rclcpp::PublisherOptions options)
 : impl_(std::make_shared<Impl>(node))
 {
+  Publisher(base_topic, loader, custom_qos, options);
+}
+
+Publisher::Publisher(
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node, const std::string & base_topic,
+  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions options)
+: impl_(std::make_shared<Impl>(node))
+{
+  Publisher(base_topic, loader, custom_qos, options);
+}
+
+Publisher::Publisher(
+  const std::string & base_topic,
+  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions options)
+{
+  if (!impl_)
+  {
+    throw std::runtime_error("impl is not constructed!");
+  }
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
-  std::string image_topic = rclcpp::expand_topic_or_service_name(
-    base_topic,
-    node->get_name(), node->get_namespace());
+  std::string image_topic;
+  size_t ns_len;
+  if (impl_->node_) {
+    image_topic = rclcpp::expand_topic_or_service_name(
+      base_topic, impl_->node_->get_name(), impl_->node_->get_namespace());
+    ns_len = impl_->node_->get_effective_namespace().length();
+  } else {
+    image_topic = rclcpp::expand_topic_or_service_name(
+      base_topic, impl_->lifecycle_node_->get_name(), impl_->lifecycle_node_->get_namespace());
+    ns_len = strlen(impl_->lifecycle_node_->get_namespace());
+  }
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
-  auto ns_len = node->get_effective_namespace().length();
   std::string param_base_name = image_topic.substr(ns_len);
   std::replace(param_base_name.begin(), param_base_name.end(), '/', '.');
   if (param_base_name.front() == '.') {
@@ -123,16 +161,28 @@ Publisher::Publisher(
     all_transport_names.emplace_back(erase_last_copy(lookup_name, "_pub"));
   }
   try {
-    allowlist_vec = node->declare_parameter<std::vector<std::string>>(
-      param_base_name + ".enable_pub_plugins", all_transport_names);
+    if (impl_->node_) {
+      allowlist_vec = impl_->node_->declare_parameter<std::vector<std::string>>(
+        param_base_name + ".enable_pub_plugins", all_transport_names);
+    } else {
+      allowlist_vec = impl_->lifecycle_node_->declare_parameter<std::vector<std::string>>(
+        param_base_name + ".enable_pub_plugins", all_transport_names);
+    }
   } catch (const rclcpp::exceptions::ParameterAlreadyDeclaredException &) {
     RCLCPP_DEBUG_STREAM(
-      node->get_logger(), param_base_name << ".enable_pub_plugins" << " was previously declared"
+      impl_->logger_, param_base_name << ".enable_pub_plugins" << " was previously declared"
     );
-    allowlist_vec =
-      node->get_parameter(
-      param_base_name +
-      ".enable_pub_plugins").get_value<std::vector<std::string>>();
+    if (impl_->node_) {  
+      allowlist_vec =
+        impl_->node_->get_parameter(
+        param_base_name +
+        ".enable_pub_plugins").get_value<std::vector<std::string>>();
+    } else {
+      allowlist_vec =
+        impl_->lifecycle_node_->get_parameter(
+        param_base_name +
+        ".enable_pub_plugins").get_value<std::vector<std::string>>();
+    }
   }
   for (size_t i = 0; i < allowlist_vec.size(); ++i) {
     allowlist.insert(allowlist_vec[i]);
@@ -142,7 +192,11 @@ Publisher::Publisher(
     const auto & lookup_name = transport_name + "_pub";
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
-      pub->advertise(node, image_topic, custom_qos, options);
+      if (impl_->node_) {
+        pub->advertise(impl_->node_, image_topic, custom_qos, options);
+      } else {
+        pub->advertise(impl_->lifecycle_node_, image_topic, custom_qos, options);
+      }
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {
       RCLCPP_ERROR(

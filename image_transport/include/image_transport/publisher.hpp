@@ -34,6 +34,7 @@
 
 #include "rclcpp/macros.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "sensor_msgs/msg/image.hpp"
 
@@ -76,6 +77,13 @@ public:
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
 
+  IMAGE_TRANSPORT_PUBLIC
+  Publisher(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr nh,
+    const std::string & base_topic,
+    PubLoaderPtr loader,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
   /*!
    * \brief Returns the number of subscribers that are currently connected to
    * this Publisher.
@@ -122,6 +130,12 @@ public:
   bool operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
+  Publisher(
+    const std::string & base_topic,
+    PubLoaderPtr loader,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options);
+
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };

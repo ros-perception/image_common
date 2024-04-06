@@ -47,7 +47,16 @@ namespace image_transport
 struct Subscriber::Impl
 {
   Impl(rclcpp::Node::SharedPtr node, SubLoaderPtr loader)
-  : logger_(node->get_logger()),
+  : node_(node),
+    logger_(node->get_logger()),
+    loader_(loader),
+    unsubscribed_(false)
+  {
+  }
+
+  explicit Impl(rclcpp_lifecycle::LifecycleNode::SharedPtr node, SubLoaderPtr loader)
+  : lifecycle_node_(node),
+    logger_(node->get_logger()),
     loader_(loader),
     unsubscribed_(false)
   {
@@ -73,6 +82,8 @@ struct Subscriber::Impl
     }
   }
 
+  rclcpp::Node::SharedPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
   rclcpp::Logger logger_;
   std::string lookup_name_;
   SubLoaderPtr loader_;
@@ -91,10 +102,37 @@ Subscriber::Subscriber(
   rclcpp::SubscriptionOptions options)
 : impl_(std::make_shared<Impl>(node, loader))
 {
+  Subscriber(base_topic, callback, transport, custom_qos, options);
+}
+
+Subscriber::Subscriber(
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+  const std::string & base_topic,
+  const Callback & callback,
+  SubLoaderPtr loader,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::SubscriptionOptions options)
+: impl_(std::make_shared<Impl>(node, loader))
+{
+  Subscriber(base_topic, callback, transport, custom_qos, options);
+}
+
+Subscriber::Subscriber(
+  const std::string & base_topic,
+  const Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::SubscriptionOptions options)
+{
+  if (!impl_)
+  {
+    throw std::runtime_error("impl is not constructed!");
+  }
   // Load the plugin for the chosen transport.
   impl_->lookup_name_ = SubscriberPlugin::getLookupName(transport);
   try {
-    impl_->subscriber_ = loader->createSharedInstance(impl_->lookup_name_);
+    impl_->subscriber_ = impl_->loader_->createSharedInstance(impl_->lookup_name_);
   } catch (pluginlib::PluginlibException & e) {
     throw TransportLoadException(impl_->lookup_name_, e.what());
   }
@@ -108,7 +146,7 @@ Subscriber::Subscriber(
   if (found != std::string::npos) {
     std::string transport = clean_topic.substr(found + 1);
     std::string plugin_name = SubscriberPlugin::getLookupName(transport);
-    std::vector<std::string> plugins = loader->getDeclaredClasses();
+    std::vector<std::string> plugins = impl_->loader_->getDeclaredClasses();
     if (std::find(plugins.begin(), plugins.end(), plugin_name) != plugins.end()) {
       std::string real_base_topic = clean_topic.substr(0, found);
 
@@ -125,7 +163,11 @@ Subscriber::Subscriber(
 
   // Tell plugin to subscribe.
   RCLCPP_DEBUG(impl_->logger_, "Subscribing to: %s\n", base_topic.c_str());
-  impl_->subscriber_->subscribe(node, base_topic, callback, custom_qos, options);
+  if (impl_->node_) {
+    impl_->subscriber_->subscribe(impl_->node_, base_topic, callback, custom_qos, options);
+  } else {
+    impl_->subscriber_->subscribe(impl_->lifecycle_node_, base_topic, callback, custom_qos, options);
+  }
 }
 
 std::string Subscriber::getTopic() const

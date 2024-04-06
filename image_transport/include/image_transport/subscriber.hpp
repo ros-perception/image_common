@@ -34,6 +34,7 @@
 #include <string>
 
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
 #include "image_transport/exception.hpp"
@@ -69,6 +70,16 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Subscriber(
     rclcpp::Node::SharedPtr node,
+    const std::string & base_topic,
+    const Callback & callback,
+    SubLoaderPtr loader,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
+  Subscriber(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr node,
     const std::string & base_topic,
     const Callback & callback,
     SubLoaderPtr loader,
@@ -113,6 +124,13 @@ public:
   bool operator==(const Subscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
+  Subscriber(
+    const std::string & base_topic,
+    const Callback & callback,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::SubscriptionOptions options);
+
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };

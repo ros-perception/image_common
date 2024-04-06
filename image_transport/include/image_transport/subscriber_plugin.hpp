@@ -71,11 +71,34 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
-    if (impl_) {
-      throw std::runtime_error("advertise has been called previously!");
+    if (!impl_) {
+      impl_ = std::make_unique<Impl>();
     }
-    impl_ = std::make_unique<Impl>();
-    impl_->node_ = node;
+    if (impl_->lifecycle_node_) {
+      throw std::runtime_error("subscribe has been called previously with a lifecycle node!");
+    }
+    if (!impl_->node_) {
+      impl_->node_ = node;
+    }
+
+    return subscribeImpl(base_topic, callback, custom_qos, options);
+  }
+
+  void subscribe(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr node, const std::string & base_topic,
+    const Callback & callback,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
+  {
+    if (!impl_) {
+      impl_ = std::make_unique<Impl>();
+    }
+    if (impl_->node_) {
+      throw std::runtime_error("subscribe has been called previously with a standard node!");
+    }
+    if (!impl_->lifecycle_node_) {
+      impl_->lifecycle_node_ = node;
+    }
 
     return subscribeImpl(base_topic, callback, custom_qos, options);
   }
@@ -85,6 +108,18 @@ public:
    */
   void subscribe(
     rclcpp::Node::SharedPtr node, const std::string & base_topic,
+    void (* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
+  {
+    return subscribe(
+      node, base_topic,
+      std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)>(fp),
+      custom_qos, options);
+  }
+
+  void subscribe(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr node, const std::string & base_topic,
     void (* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
@@ -110,12 +145,36 @@ public:
       std::bind(fp, obj, std::placeholders::_1), custom_qos, options);
   }
 
+  template<class T>
+  void subscribe(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr node, const std::string & base_topic,
+    void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
+  {
+    return subscribe(
+      node, base_topic,
+      std::bind(fp, obj, std::placeholders::_1), custom_qos, options);
+  }
+
   /**
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
   template<class T>
   void subscribe(
     rclcpp::Node::SharedPtr node, const std::string & base_topic,
+    void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
+    std::shared_ptr<T> & obj,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  {
+    return subscribe(
+      node, base_topic,
+      std::bind(fp, obj, std::placeholders::_1), custom_qos);
+  }
+
+  template<class T>
+  void subscribe(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
     std::shared_ptr<T> & obj,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
