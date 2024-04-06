@@ -133,9 +133,19 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-publisher ${PROJECT_NAME})
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-publisher_lifecycle test/test_publisher_lifecycle.cpp)
+  if(TARGET ${PROJECT_NAME}-publisher_lifecycle)
+    target_link_libraries(${PROJECT_NAME}-publisher_lifecycle ${PROJECT_NAME})
+  endif()
+
   ament_add_gtest(${PROJECT_NAME}-subscriber test/test_subscriber.cpp)
   if(TARGET ${PROJECT_NAME}-subscriber)
     target_link_libraries(${PROJECT_NAME}-subscriber ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-subscriber_lifecycle test/test_subscriber_lifecycle.cpp)
+  if(TARGET ${PROJECT_NAME}-subscriber_lifecycle)
+    target_link_libraries(${PROJECT_NAME}-subscriber_lifecycle ${PROJECT_NAME})
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-message_passing test/test_message_passing.cpp)
@@ -143,9 +153,19 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-message_passing ${PROJECT_NAME})
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-message_passing_lifecycle test/test_message_passing_lifecycle.cpp)
+  if(TARGET ${PROJECT_NAME}-message_passing_lifecycle)
+    target_link_libraries(${PROJECT_NAME}-message_passing_lifecycle ${PROJECT_NAME})
+  endif()
+
   ament_add_gtest(${PROJECT_NAME}-remapping test/test_remapping.cpp)
   if(TARGET ${PROJECT_NAME}-remapping)
     target_link_libraries(${PROJECT_NAME}-remapping ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-remapping_lifecycle test/test_remapping_lifecycle.cpp)
+  if(TARGET ${PROJECT_NAME}-remapping_lifecycle)
+    target_link_libraries(${PROJECT_NAME}-remapping_lifecycle ${PROJECT_NAME})
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-qos_override test/test_qos_override.cpp)
@@ -153,9 +173,19 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-qos_override ${PROJECT_NAME})
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-qos_override_lifecycle test/test_qos_override_lifecycle.cpp)
+  if(TARGET ${PROJECT_NAME}-qos_override_lifecycle)
+    target_link_libraries(${PROJECT_NAME}-qos_override_lifecycle ${PROJECT_NAME})
+  endif()
+
   ament_add_gtest(${PROJECT_NAME}-single_subscriber_publisher test/test_single_subscriber_publisher.cpp)
   if(TARGET ${PROJECT_NAME}-single_subscriber_publisher)
     target_link_libraries(${PROJECT_NAME}-single_subscriber_publisher ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-single_subscriber_publisher_lifecycle test/test_single_subscriber_publisher_lifecycle.cpp)
+  if(TARGET ${PROJECT_NAME}-single_subscriber_publisher_lifecycle)
+    target_link_libraries(${PROJECT_NAME}-single_subscriber_publisher_lifecycle ${PROJECT_NAME})
   endif()
 endif()
 

@@ -32,7 +32,7 @@ namespace test_rclcpp
 // subscribers to be > 0, if false it will wait for the number of
 // subscribers to be 0
 void wait_for_subscriber(
-  std::shared_ptr<rclcpp::Node> node,
+  std::shared_ptr<rclcpp::node_interfaces::NodeGraphInterface> node,
   const std::string & topic_name,
   bool to_be_available = true,
   std::chrono::milliseconds timeout = std::chrono::milliseconds(1),
