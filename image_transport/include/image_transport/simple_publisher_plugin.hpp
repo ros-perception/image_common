@@ -99,17 +99,25 @@ public:
 
 protected:
   void advertiseImpl(
-    rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
-    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
+    auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
+
+    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>();
+    if (get_node(simple_impl_->node_)) {
+      simple_impl_->logger_ = simple_impl_->node_->get_logger();
+      simple_impl_->pub_ = simple_impl_->node_->template create_publisher<M>(transport_topic, qos, options);
+    } else if (get_node(simple_impl_->lifecycle_node_)) {
+      simple_impl_->logger_ = simple_impl_->lifecycle_node_->get_logger();
+      simple_impl_->pub_ = simple_impl_->lifecycle_node_->template create_publisher<M>(transport_topic, qos, options);
+    } else {
+      throw std::runtime_error("Not a standard node or lifecycle node!");
+    }
 
     RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
-    auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos, options);
   }
 
   //! Generic function for publishing the internal message type.
@@ -140,13 +148,13 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    explicit SimplePublisherPluginImpl(rclcpp::Node * node)
-    : node_(node),
-      logger_(node->get_logger())
+    explicit SimplePublisherPluginImpl()
+    : logger_(rclcpp::get_logger("simple_publisher_plugin_impl"))
     {
     }
 
-    rclcpp::Node * node_;
+    rclcpp::Node::SharedPtr node_;
+    rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
     rclcpp::Logger logger_;
     typename rclcpp::Publisher<M>::SharedPtr pub_;
   };

@@ -47,7 +47,7 @@ protected:
 };
 
 TEST_F(TestPublisher, publisher) {
-  auto pub = image_transport::create_publisher(node_.get(), "camera/image");
+  auto pub = image_transport::create_publisher(node_, "camera/image");
   EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 1u);
   pub.shutdown();
   EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 0u);
@@ -62,7 +62,7 @@ TEST_F(TestPublisher, image_transport_publisher) {
 }
 
 TEST_F(TestPublisher, camera_publisher) {
-  auto camera_pub = image_transport::create_camera_publisher(node_.get(), "camera/image");
+  auto camera_pub = image_transport::create_camera_publisher(node_, "camera/image");
   EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 1u);
   EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/camera_info"), 1u);
   camera_pub.shutdown();

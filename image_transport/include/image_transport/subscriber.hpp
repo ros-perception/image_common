@@ -68,7 +68,7 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   Subscriber(
-    rclcpp::Node * node,
+    rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     const Callback & callback,
     SubLoaderPtr loader,

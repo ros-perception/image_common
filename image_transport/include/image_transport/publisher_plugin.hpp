@@ -33,6 +33,7 @@
 #include <vector>
 
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
 #include "image_transport/single_subscriber_publisher.hpp"
@@ -63,14 +64,56 @@ public:
    * \brief Advertise a topic, simple version.
    */
   void advertise(
-    rclcpp::Node * nh,
+    rclcpp::Node::SharedPtr nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    advertiseImpl(nh, base_topic, custom_qos, options);
+    if (impl_) {
+      throw std::runtime_error("advertise has been called previously!");
+    }
+    impl_ = std::make_unique<Impl>();
+    impl_->node_ = nh;
+    advertise(base_topic, custom_qos, options);
   }
 
+  void advertise(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr nh,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
+  {
+    if (impl_) {
+      throw std::runtime_error("advertise has been called previously!");
+    }
+    impl_ = std::make_unique<Impl>();
+    impl_->lifecycle_node_ = nh;
+    advertise(base_topic, custom_qos, options);
+  }
+
+  void advertise(
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
+  {
+    advertiseImpl(base_topic, custom_qos, options);
+  }
+
+  bool get_node(rclcpp::Node::SharedPtr node) const {
+    if (impl_ && impl_->node_) {
+      node = impl_->node_;
+      return true;
+    }
+    return false;
+  }
+
+  bool get_node(rclcpp_lifecycle::LifecycleNode::SharedPtr node) const {
+    if (impl_ && impl_->lifecycle_node_) {
+      node = impl_->lifecycle_node_;
+      return true;
+    }
+    return false;
+  }
   /**
    * \brief Returns the number of subscribers that are currently connected to
    * this PublisherPlugin.
@@ -135,10 +178,18 @@ protected:
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
   virtual void advertiseImpl(
-    rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) = 0;
+
+private:
+  struct Impl
+  {
+    rclcpp::Node::SharedPtr node_;
+    rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
+  };
+
+  std::unique_ptr<Impl> impl_;
 };
 
 }  // namespace image_transport

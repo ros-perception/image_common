@@ -71,7 +71,7 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber(
-    rclcpp::Node * node,
+    rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     const Callback & callback,
     const std::string & transport,

@@ -46,7 +46,7 @@ namespace image_transport
 
 struct Subscriber::Impl
 {
-  Impl(rclcpp::Node * node, SubLoaderPtr loader)
+  Impl(rclcpp::Node::SharedPtr node, SubLoaderPtr loader)
   : logger_(node->get_logger()),
     loader_(loader),
     unsubscribed_(false)
@@ -82,7 +82,7 @@ struct Subscriber::Impl
 };
 
 Subscriber::Subscriber(
-  rclcpp::Node * node,
+  rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   const Callback & callback,
   SubLoaderPtr loader,

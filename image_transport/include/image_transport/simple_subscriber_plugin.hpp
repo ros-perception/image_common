@@ -109,7 +109,6 @@ protected:
   }
 
   void subscribeImpl(
-    rclcpp::Node * node,
     const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos,
@@ -120,17 +119,30 @@ protected:
     // ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
     //
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    impl_->sub_ = node->create_subscription<M>(
-      getTopicToSubscribe(base_topic), qos,
-      [this, callback](const typename std::shared_ptr<const M> msg) {
-        internalCallback(msg, callback);
-      },
-      options);
+    if (get_node(impl_->node_)) {
+      impl_->sub_ = impl_->node_->template create_subscription<M>(
+        getTopicToSubscribe(base_topic), qos,
+        [this, callback](const typename std::shared_ptr<const M> msg) {
+          internalCallback(msg, callback);
+        },
+        options);
+    } else if (get_node(impl_->lifecycle_node_)) {
+      impl_->sub_ = impl_->lifecycle_node_->template create_subscription<M>(
+        getTopicToSubscribe(base_topic), qos,
+        [this, callback](const typename std::shared_ptr<const M> msg) {
+          internalCallback(msg, callback);
+        },
+        options);
+    } else {
+      throw std::runtime_error("Not a standard node or lifecycle node!");
+    }
   }
 
 private:
   struct Impl
   {
+    rclcpp::Node::SharedPtr node_;
+    rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
     rclcpp::SubscriptionBase::SharedPtr sub_;
   };
 

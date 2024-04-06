@@ -77,7 +77,7 @@ public:
    */
   IMAGE_TRANSPORT_PUBLIC
   SubscriberFilter(
-    rclcpp::Node * node, const std::string & base_topic,
+    rclcpp::Node::SharedPtr node, const std::string & base_topic,
     const std::string & transport)
   {
     subscribe(node, base_topic, transport);
@@ -107,7 +107,7 @@ public:
    */
   IMAGE_TRANSPORT_PUBLIC
   void subscribe(
-    rclcpp::Node * node,
+    rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     const std::string & transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,

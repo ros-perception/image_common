@@ -51,7 +51,7 @@ namespace image_transport
  */
 IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
-  rclcpp::Node * node,
+  rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
@@ -61,7 +61,7 @@ Publisher create_publisher(
  */
 IMAGE_TRANSPORT_PUBLIC
 Subscriber create_subscription(
-  rclcpp::Node * node,
+  rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   const Subscriber::Callback & callback,
   const std::string & transport,
@@ -73,7 +73,7 @@ Subscriber create_subscription(
  */
 IMAGE_TRANSPORT_PUBLIC
 CameraPublisher create_camera_publisher(
-  rclcpp::Node * node,
+  rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions pub_options = rclcpp::PublisherOptions());
@@ -83,7 +83,7 @@ CameraPublisher create_camera_publisher(
  */
 IMAGE_TRANSPORT_PUBLIC
 CameraSubscriber create_camera_subscription(
-  rclcpp::Node * node,
+  rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   const CameraSubscriber::Callback & callback,
   const std::string & transport,

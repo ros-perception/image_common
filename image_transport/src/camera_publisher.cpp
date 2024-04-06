@@ -43,7 +43,7 @@ namespace image_transport
 
 struct CameraPublisher::Impl
 {
-  explicit Impl(rclcpp::Node * node)
+  explicit Impl(rclcpp::Node::SharedPtr node)
   : logger_(node->get_logger()),
     unadvertised_(false)
   {
@@ -75,7 +75,7 @@ struct CameraPublisher::Impl
 };
 
 CameraPublisher::CameraPublisher(
-  rclcpp::Node * node,
+  rclcpp::Node::SharedPtr node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)

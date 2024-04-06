@@ -69,7 +69,7 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
-    rclcpp::Node * node,
+    rclcpp::Node::SharedPtr node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions = rclcpp::PublisherOptions());
