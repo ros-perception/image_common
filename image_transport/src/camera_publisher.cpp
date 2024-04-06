@@ -109,8 +109,7 @@ void CameraPublisher::initialise(
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)
 {
-  if (!impl_)
-  {
+  if (!impl_) {
     throw std::runtime_error("impl is not constructed!");
   }
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
@@ -129,11 +128,15 @@ void CameraPublisher::initialise(
 
   auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
   if (impl_->node_) {
-    impl_->image_pub_ = image_transport::create_publisher(impl_->node_, image_topic, custom_qos, pub_options);
-    impl_->info_pub_ = impl_->node_->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
+    impl_->image_pub_ = image_transport::create_publisher(
+      impl_->node_, image_topic, custom_qos, pub_options);
+    impl_->info_pub_ =
+      impl_->node_->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
   } else {
-    impl_->image_pub_ = image_transport::create_publisher(impl_->lifecycle_node_, image_topic, custom_qos, pub_options);
-    impl_->info_pub_ = impl_->lifecycle_node_->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
+    impl_->image_pub_ = image_transport::create_publisher(
+      impl_->lifecycle_node_, image_topic, custom_qos, pub_options);
+    impl_->info_pub_ =
+      impl_->lifecycle_node_->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
   }
 }
 

@@ -125,8 +125,7 @@ void Subscriber::initialise(
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
 {
-  if (!impl_)
-  {
+  if (!impl_) {
     throw std::runtime_error("impl is not constructed!");
   }
   // Load the plugin for the chosen transport.
@@ -166,7 +165,8 @@ void Subscriber::initialise(
   if (impl_->node_) {
     impl_->subscriber_->subscribe(impl_->node_, base_topic, callback, custom_qos, options);
   } else {
-    impl_->subscriber_->subscribe(impl_->lifecycle_node_, base_topic, callback, custom_qos, options);
+    impl_->subscriber_->subscribe(
+      impl_->lifecycle_node_, base_topic, callback, custom_qos, options);
   }
 }
 

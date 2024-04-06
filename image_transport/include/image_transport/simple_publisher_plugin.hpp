@@ -108,10 +108,12 @@ protected:
     simple_impl_ = std::make_unique<SimplePublisherPluginImpl>();
     if (get_node(simple_impl_->node_)) {
       simple_impl_->logger_ = simple_impl_->node_->get_logger();
-      simple_impl_->pub_ = simple_impl_->node_->template create_publisher<M>(transport_topic, qos, options);
+      simple_impl_->pub_ = simple_impl_->node_->template create_publisher<M>(
+        transport_topic, qos, options);
     } else if (get_node(simple_impl_->lifecycle_node_)) {
       simple_impl_->logger_ = simple_impl_->lifecycle_node_->get_logger();
-      simple_impl_->pub_ = simple_impl_->lifecycle_node_->template create_publisher<M>(transport_topic, qos, options);
+      simple_impl_->pub_ = simple_impl_->lifecycle_node_->template create_publisher<M>(
+        transport_topic, qos, options);
     } else {
       throw std::runtime_error("Not a standard node or lifecycle node!");
     }
@@ -147,7 +149,7 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    explicit SimplePublisherPluginImpl()
+    SimplePublisherPluginImpl()
     : logger_(rclcpp::get_logger("simple_publisher_plugin_impl"))
     {
     }

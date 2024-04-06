@@ -129,8 +129,7 @@ void Publisher::initialise(
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 {
-  if (!impl_)
-  {
+  if (!impl_) {
     throw std::runtime_error("impl is not constructed!");
   }
   // Resolve the name explicitly because otherwise the compressed topics don't remap
@@ -172,7 +171,7 @@ void Publisher::initialise(
     RCLCPP_DEBUG_STREAM(
       impl_->logger_, param_base_name << ".enable_pub_plugins" << " was previously declared"
     );
-    if (impl_->node_) {  
+    if (impl_->node_) {
       allowlist_vec =
         impl_->node_->get_parameter(
         param_base_name +

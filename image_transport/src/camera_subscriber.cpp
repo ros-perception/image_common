@@ -157,8 +157,7 @@ void CameraSubscriber::initialise(
   const std::string & transport,
   rmw_qos_profile_t custom_qos)
 {
-  if (!impl_)
-  {
+  if (!impl_) {
     throw std::runtime_error("impl is not constructed!");
   }
   // Must explicitly remap the image topic since we then do some string manipulation on it
