@@ -105,7 +105,6 @@ protected:
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-
     simple_impl_ = std::make_unique<SimplePublisherPluginImpl>();
     if (get_node(simple_impl_->node_)) {
       simple_impl_->logger_ = simple_impl_->node_->get_logger();

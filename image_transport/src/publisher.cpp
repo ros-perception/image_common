@@ -112,7 +112,7 @@ Publisher::Publisher(
   rclcpp::PublisherOptions options)
 : impl_(std::make_shared<Impl>(node))
 {
-  Publisher(base_topic, loader, custom_qos, options);
+  initialise(base_topic, loader, custom_qos, options);
 }
 
 Publisher::Publisher(
@@ -121,10 +121,10 @@ Publisher::Publisher(
   rclcpp::PublisherOptions options)
 : impl_(std::make_shared<Impl>(node))
 {
-  Publisher(base_topic, loader, custom_qos, options);
+  initialise(base_topic, loader, custom_qos, options);
 }
 
-Publisher::Publisher(
+void Publisher::initialise(
   const std::string & base_topic,
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)

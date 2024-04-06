@@ -124,7 +124,7 @@ public:
   bool operator==(const Subscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
-  Subscriber(
+  void initialise(
     const std::string & base_topic,
     const Callback & callback,
     const std::string & transport,

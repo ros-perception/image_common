@@ -109,7 +109,7 @@ install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
 ament_export_targets(export_${PROJECT_NAME})
 
-ament_export_dependencies(message_filters rclcpp sensor_msgs pluginlib)
+ament_export_dependencies(message_filters rclcpp rclcpp_lifecycle sensor_msgs pluginlib)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

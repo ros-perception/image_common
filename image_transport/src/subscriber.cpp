@@ -102,7 +102,7 @@ Subscriber::Subscriber(
   rclcpp::SubscriptionOptions options)
 : impl_(std::make_shared<Impl>(node, loader))
 {
-  Subscriber(base_topic, callback, transport, custom_qos, options);
+  initialise(base_topic, callback, transport, custom_qos, options);
 }
 
 Subscriber::Subscriber(
@@ -115,10 +115,10 @@ Subscriber::Subscriber(
   rclcpp::SubscriptionOptions options)
 : impl_(std::make_shared<Impl>(node, loader))
 {
-  Subscriber(base_topic, callback, transport, custom_qos, options);
+  initialise(base_topic, callback, transport, custom_qos, options);
 }
 
-Subscriber::Subscriber(
+void Subscriber::initialise(
   const std::string & base_topic,
   const Callback & callback,
   const std::string & transport,

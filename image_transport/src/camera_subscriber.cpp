@@ -137,7 +137,7 @@ CameraSubscriber::CameraSubscriber(
   rmw_qos_profile_t custom_qos)
 : impl_(std::make_shared<Impl>(node))
 {
-  CameraSubscriber(base_topic, callback, transport, custom_qos);
+  initialise(base_topic, callback, transport, custom_qos);
 }
 
 CameraSubscriber::CameraSubscriber(
@@ -148,10 +148,10 @@ CameraSubscriber::CameraSubscriber(
   rmw_qos_profile_t custom_qos)
 : impl_(std::make_shared<Impl>(node))
 {
-  CameraSubscriber(base_topic, callback, transport, custom_qos);
+  initialise(base_topic, callback, transport, custom_qos);
 }
 
-CameraSubscriber::CameraSubscriber(
+void CameraSubscriber::initialise(
   const std::string & base_topic,
   const Callback & callback,
   const std::string & transport,

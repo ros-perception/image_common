@@ -91,7 +91,7 @@ CameraPublisher::CameraPublisher(
   rclcpp::PublisherOptions pub_options)
 : impl_(std::make_shared<Impl>(node))
 {
-  CameraPublisher(base_topic, custom_qos, pub_options);
+  initialise(base_topic, custom_qos, pub_options);
 }
 
 CameraPublisher::CameraPublisher(
@@ -101,10 +101,10 @@ CameraPublisher::CameraPublisher(
   rclcpp::PublisherOptions pub_options)
 : impl_(std::make_shared<Impl>(node))
 {
-  CameraPublisher(base_topic, custom_qos, pub_options);
+  initialise(base_topic, custom_qos, pub_options);
 }
 
-CameraPublisher::CameraPublisher(
+void CameraPublisher::initialise(
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)

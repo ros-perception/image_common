@@ -130,7 +130,7 @@ public:
   bool operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
-  Publisher(
+  void initialise(
     const std::string & base_topic,
     PubLoaderPtr loader,
     rmw_qos_profile_t custom_qos,

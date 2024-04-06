@@ -99,7 +99,7 @@ public:
     advertiseImpl(base_topic, custom_qos, options);
   }
 
-  bool get_node(rclcpp::Node::SharedPtr node) const {
+  bool get_node(rclcpp::Node::SharedPtr & node) const {
     if (impl_ && impl_->node_) {
       node = impl_->node_;
       return true;
@@ -107,7 +107,7 @@ public:
     return false;
   }
 
-  bool get_node(rclcpp_lifecycle::LifecycleNode::SharedPtr node) const {
+  bool get_node(rclcpp_lifecycle::LifecycleNode::SharedPtr & node) const {
     if (impl_ && impl_->lifecycle_node_) {
       node = impl_->lifecycle_node_;
       return true;

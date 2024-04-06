@@ -150,7 +150,7 @@ public:
   bool operator==(const CameraPublisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
-  CameraPublisher(
+  void initialise(
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options);

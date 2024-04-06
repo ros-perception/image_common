@@ -129,7 +129,7 @@ public:
   bool operator==(const CameraSubscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
-  CameraSubscriber(
+  void initialise(
     const std::string & base_topic,
     const Callback & callback,
     const std::string & transport,
