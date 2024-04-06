@@ -44,7 +44,15 @@ namespace image_transport
 struct CameraPublisher::Impl
 {
   explicit Impl(rclcpp::Node::SharedPtr node)
-  : logger_(node->get_logger()),
+  : node_(node),
+    logger_(node->get_logger()),
+    unadvertised_(false)
+  {
+  }
+
+  explicit Impl(rclcpp_lifecycle::LifecycleNode::SharedPtr node)
+  : lifecycle_node_(node),
+    logger_(node->get_logger()),
     unadvertised_(false)
   {
   }
@@ -68,6 +76,8 @@ struct CameraPublisher::Impl
     }
   }
 
+  rclcpp::Node::SharedPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
   rclcpp::Logger logger_;
   Publisher image_pub_;
   rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr info_pub_;
@@ -81,16 +91,50 @@ CameraPublisher::CameraPublisher(
   rclcpp::PublisherOptions pub_options)
 : impl_(std::make_shared<Impl>(node))
 {
+  CameraPublisher(base_topic, custom_qos, pub_options);
+}
+
+CameraPublisher::CameraPublisher(
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
+: impl_(std::make_shared<Impl>(node))
+{
+  CameraPublisher(base_topic, custom_qos, pub_options);
+}
+
+CameraPublisher::CameraPublisher(
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
+{
+  if (!impl_)
+  {
+    throw std::runtime_error("impl is not constructed!");
+  }
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
   // image topic is remapped (#4539).
-  std::string image_topic = rclcpp::expand_topic_or_service_name(
-    base_topic,
-    node->get_name(), node->get_namespace());
+  std::string image_topic;
+  if (impl_->node_) {
+    image_topic = rclcpp::expand_topic_or_service_name(
+      base_topic,
+      impl_->node_->get_name(), impl_->node_->get_namespace());
+  } else {
+    image_topic = rclcpp::expand_topic_or_service_name(
+      base_topic,
+      impl_->lifecycle_node_->get_name(), impl_->lifecycle_node_->get_namespace());
+  }
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-  impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos, pub_options);
-  impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
+  if (impl_->node_) {
+    impl_->image_pub_ = image_transport::create_publisher(impl_->node_, image_topic, custom_qos, pub_options);
+    impl_->info_pub_ = impl_->node_->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
+  } else {
+    impl_->image_pub_ = image_transport::create_publisher(impl_->lifecycle_node_, image_topic, custom_qos, pub_options);
+    impl_->info_pub_ = impl_->lifecycle_node_->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
+  }
 }
 
 size_t CameraPublisher::getNumSubscribers() const

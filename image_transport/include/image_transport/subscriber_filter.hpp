@@ -83,6 +83,14 @@ public:
     subscribe(node, base_topic, transport);
   }
 
+  IMAGE_TRANSPORT_PUBLIC
+  SubscriberFilter(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr node, const std::string & base_topic,
+    const std::string & transport)
+  {
+    subscribe(node, base_topic, transport);
+  }
+
   /**
    * \brief Empty constructor, use subscribe() to subscribe to a topic
    */
@@ -108,6 +116,21 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   void subscribe(
     rclcpp::Node::SharedPtr node,
+    const std::string & base_topic,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
+  {
+    unsubscribe();
+    sub_ = image_transport::create_subscription(
+      node, base_topic,
+      std::bind(&SubscriberFilter::cb, this, std::placeholders::_1), transport, custom_qos,
+      options);
+  }
+
+  IMAGE_TRANSPORT_PUBLIC
+  void subscribe(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr node,
     const std::string & base_topic,
     const std::string & transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,

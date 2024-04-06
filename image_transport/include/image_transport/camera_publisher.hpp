@@ -34,6 +34,7 @@
 
 #include "rclcpp/macros.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "sensor_msgs/msg/image.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
@@ -70,6 +71,13 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
     rclcpp::Node::SharedPtr node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions = rclcpp::PublisherOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
+  CameraPublisher(
+    rclcpp_lifecycle::LifecycleNode::SharedPtr node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions = rclcpp::PublisherOptions());
@@ -142,6 +150,11 @@ public:
   bool operator==(const CameraPublisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
+  CameraPublisher(
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options);
+
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };
