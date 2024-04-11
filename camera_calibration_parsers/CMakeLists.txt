@@ -17,6 +17,7 @@ find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(yaml_cpp_vendor REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 # define the library
 add_library(${PROJECT_NAME}
@@ -28,10 +29,10 @@ add_library(${PROJECT_NAME}
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  ${sensor_msgs_TARGETS}
-  ${yaml_cpp_vendor_TARGETS})
+  ${sensor_msgs_TARGETS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  rclcpp::rclcpp)
+  rclcpp::rclcpp
+  yaml-cpp::yaml-cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -63,7 +64,7 @@ ament_export_targets(export_${PROJECT_NAME})
 
 # define the exe to convert
 add_executable(convert src/convert.cpp)
-target_link_libraries(convert
+target_link_libraries(convert PRIVATE
   ${PROJECT_NAME}
   rclcpp::rclcpp)
 

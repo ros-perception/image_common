@@ -35,9 +35,9 @@
 #ifndef CAMERA_CALIBRATION_PARSERS__PARSE_YML_HPP_
 #define CAMERA_CALIBRATION_PARSERS__PARSE_YML_HPP_
 
-#include <string>
 #include <istream>
 #include <ostream>
+#include <string>
 
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "camera_calibration_parsers/visibility_control.hpp"
