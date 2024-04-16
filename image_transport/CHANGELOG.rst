@@ -2,6 +2,9 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 5.1.1 (2024-03-26)
 ------------------
 * Added rclcpp component to Republish (`#275 <https://github.com/ros-perception/image_common/issues/275>`_)
