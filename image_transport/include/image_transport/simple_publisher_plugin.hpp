@@ -89,7 +89,20 @@ public:
       return;
     }
 
-    publish(message, bindInternalPublisher(simple_impl_->pub_.get()));
+    publish(message, simple_impl_->pub_);
+  }
+
+  void publishUniquePtr(sensor_msgs::msg::Image::UniquePtr message) const override
+  {
+    if (!simple_impl_ || !simple_impl_->pub_) {
+      auto logger = simple_impl_ ? simple_impl_->logger_ : rclcpp::get_logger("image_transport");
+      RCLCPP_ERROR(
+        logger,
+        "Call to publish() on an invalid image_transport::SimplePublisherPlugin");
+      return;
+    }
+
+    publish(std::move(message), simple_impl_->pub_);
   }
 
   void shutdown() override
@@ -112,6 +125,8 @@ protected:
     simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos, options);
   }
 
+  typedef typename rclcpp::Publisher<M>::SharedPtr PublisherT;
+
   //! Generic function for publishing the internal message type.
   typedef std::function<void (const M &)> PublishFn;
 
@@ -125,7 +140,21 @@ protected:
    */
   virtual void publish(
     const sensor_msgs::msg::Image & message,
-    const PublishFn & publish_fn) const = 0;
+    const PublishFn & publish_fn) const {}
+
+  virtual void publish(
+    const sensor_msgs::msg::Image & message,
+    const PublisherT & publisher) const
+  {
+    publish(message, bindInternalPublisher(publisher.get()));
+  }
+
+  virtual void publish(
+    sensor_msgs::msg::Image::UniquePtr message,
+    const PublisherT & publisher) const
+  {
+    publish(*message, bindInternalPublisher(publisher.get()));
+  }
 
   /**
    * \brief Return the communication topic name for a given base topic.
@@ -148,7 +177,7 @@ private:
 
     rclcpp::Node * node_;
     rclcpp::Logger logger_;
-    typename rclcpp::Publisher<M>::SharedPtr pub_;
+    PublisherT pub_;
   };
 
   std::unique_ptr<SimplePublisherPluginImpl> simple_impl_;
