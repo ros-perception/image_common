@@ -56,10 +56,22 @@ public:
     return "raw";
   }
 
+  virtual bool supportsUniquePtrPub() const
+  {
+    return true;
+  }
+
 protected:
   virtual void publish(const sensor_msgs::msg::Image & message, const PublishFn & publish_fn) const
   {
     publish_fn(message);
+  }
+
+  virtual void publish(
+    sensor_msgs::msg::Image::UniquePtr message,
+    const PublisherT & publisher) const
+  {
+    publisher->publish(std::move(message));
   }
 
   virtual std::string getTopicToAdvertise(const std::string & base_topic) const
