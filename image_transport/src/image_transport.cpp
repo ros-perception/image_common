@@ -52,8 +52,12 @@ struct Impl
   SubLoaderPtr<rclcpp::Node> sub_loader_;
 
   Impl()
-  : pub_loader_(std::make_shared<PubLoader<rclcpp::Node>>("image_transport", "image_transport::PublisherPlugin<rclcpp::Node>")),
-    sub_loader_(std::make_shared<SubLoader<rclcpp::Node>>("image_transport", "image_transport::SubscriberPlugin<rclcpp::Node>"))
+  : pub_loader_(std::make_shared<PubLoader<rclcpp::Node>>(
+        "image_transport",
+        "image_transport::PublisherPlugin<rclcpp::Node>")),
+    sub_loader_(std::make_shared<SubLoader<rclcpp::Node>>(
+        "image_transport",
+        "image_transport::SubscriberPlugin<rclcpp::Node>"))
   {
   }
 };
@@ -64,8 +68,12 @@ struct ImplLifecycle
   SubLoaderPtr<rclcpp_lifecycle::LifecycleNode> sub_loader_;
 
   ImplLifecycle()
-  : pub_loader_(std::make_shared<PubLoader<rclcpp_lifecycle::LifecycleNode>>("image_transport", "image_transport::PublisherPlugin<rclcpp_lifecycle::LifecycleNode>")),
-    sub_loader_(std::make_shared<SubLoader<rclcpp_lifecycle::LifecycleNode>>("image_transport", "image_transport::SubscriberPlugin<rclcpp_lifecycle::LifecycleNode>"))
+  : pub_loader_(std::make_shared<PubLoader<rclcpp_lifecycle::LifecycleNode>>(
+        "image_transport",
+        "image_transport::PublisherPlugin<rclcpp_lifecycle::LifecycleNode>")),
+    sub_loader_(std::make_shared<SubLoader<rclcpp_lifecycle::LifecycleNode>>(
+        "image_transport",
+        "image_transport::SubscriberPlugin<rclcpp_lifecycle::LifecycleNode>"))
   {
   }
 };
@@ -80,12 +88,10 @@ Publisher<NodeType> create_publisher(
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 {
-  if constexpr (std::is_same_v<NodeType, rclcpp::Node>)
-  {
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
     return Publisher(node, base_topic, kImpl->pub_loader_, custom_qos, options);
   }
-  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>)
-  {
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
     return Publisher(node, base_topic, kImpl_lifecycle->pub_loader_, custom_qos, options);
   }
 }
@@ -97,12 +103,10 @@ Publisher<NodeType> create_publisher(
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 {
-  if constexpr (std::is_same_v<NodeType, rclcpp::Node>)
-  {
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
     return Publisher(node, base_topic, kImpl->pub_loader_, custom_qos, options);
   }
-  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>)
-  {
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
     return Publisher(node, base_topic, kImpl_lifecycle->pub_loader_, custom_qos, options);
   }
 }
@@ -116,13 +120,15 @@ Subscriber<NodeType> create_subscription(
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
 {
-  if constexpr (std::is_same_v<NodeType, rclcpp::Node>)
-  {
-    return Subscriber(node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos, options);
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
+    return Subscriber(
+      node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos,
+      options);
   }
-  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>)
-  {
-    return Subscriber(node, base_topic, callback, kImpl_lifecycle->sub_loader_, transport + "_lifecycle", custom_qos, options);
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
+    return Subscriber(
+      node, base_topic, callback, kImpl_lifecycle->sub_loader_,
+      transport + "_lifecycle", custom_qos, options);
   }
 }
 
@@ -135,13 +141,15 @@ Subscriber<NodeType> create_subscription(
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
 {
-  if constexpr (std::is_same_v<NodeType, rclcpp::Node>)
-  {
-    return Subscriber(node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos, options);
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
+    return Subscriber(
+      node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos,
+      options);
   }
-  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>)
-  {
-    return Subscriber(node, base_topic, callback, kImpl_lifecycle->sub_loader_, transport + "_lifecycle", custom_qos, options);
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
+    return Subscriber(
+      node, base_topic, callback, kImpl_lifecycle->sub_loader_,
+      transport + "_lifecycle", custom_qos, options);
   }
 }
 
@@ -191,12 +199,10 @@ template<class NodeType>
 std::vector<std::string> getDeclaredTransports()
 {
   std::vector<std::string> transports;
-  if constexpr (std::is_same_v<NodeType, rclcpp::Node>)
-  {
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
     transports = kImpl->sub_loader_->getDeclaredClasses();
   }
-  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>)
-  {
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
     transports = kImpl_lifecycle->sub_loader_->getDeclaredClasses();
   }
   // Remove the "_sub" at the end of each class name.
@@ -211,26 +217,22 @@ std::vector<std::string> getLoadableTransports()
 {
   std::vector<std::string> loadableTransports;
   std::vector<std::string> transports;
-  if constexpr (std::is_same_v<NodeType, rclcpp::Node>)
-  {
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
     transports = kImpl->sub_loader_->getDeclaredClasses();
   }
-  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>)
-  {
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
     transports = kImpl_lifecycle->sub_loader_->getDeclaredClasses();
   }
-  for (const std::string & transportPlugin : transports ) {
+  for (const std::string & transportPlugin : transports) {
     // If the plugin loads without throwing an exception, add its
     // transport name to the list of valid plugins, otherwise ignore
     // it.
     try {
       std::shared_ptr<image_transport::SubscriberPlugin<NodeType>> sub;
-      if constexpr (std::is_same_v<NodeType, rclcpp::Node>)
-      {
+      if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
         sub = kImpl->sub_loader_->createUniqueInstance(transportPlugin);
       }
-      if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>)
-      {
+      if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
         sub = kImpl_lifecycle->sub_loader_->createUniqueInstance(transportPlugin);
       }
       // Remove the "_sub" at the end of each class name.
@@ -277,7 +279,9 @@ template<class NodeType>
 ImageTransport<NodeType>::~ImageTransport() = default;
 
 template<class NodeType>
-Publisher<NodeType> ImageTransport<NodeType>::advertise(const std::string & base_topic, uint32_t queue_size, bool latch)
+Publisher<NodeType> ImageTransport<NodeType>::advertise(
+  const std::string & base_topic,
+  uint32_t queue_size, bool latch)
 {
   // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
   (void) latch;

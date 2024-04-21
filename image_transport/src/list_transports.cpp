@@ -56,11 +56,13 @@ int main(int /*argc*/, char ** /*argv*/)
 {
   pluginlib::ClassLoader<image_transport::PublisherPlugin<rclcpp::Node>> pub_loader(
     "image_transport", "image_transport::PublisherPlugin<rclcpp::Node>");
-  pluginlib::ClassLoader<image_transport::PublisherPlugin<rclcpp_lifecycle::LifecycleNode>> pub_loader_lifecycle(
+  pluginlib::ClassLoader<image_transport::PublisherPlugin<rclcpp_lifecycle::LifecycleNode>>
+  pub_loader_lifecycle(
     "image_transport", "image_transport::PublisherPlugin<rclcpp_lifecycle::LifecycleNode>");
   pluginlib::ClassLoader<image_transport::SubscriberPlugin<rclcpp::Node>> sub_loader(
     "image_transport", "image_transport::SubscriberPlugin<rclcpp::Node>");
-  pluginlib::ClassLoader<image_transport::SubscriberPlugin<rclcpp_lifecycle::LifecycleNode>> sub_loader_lifecycle(
+  pluginlib::ClassLoader<image_transport::SubscriberPlugin<rclcpp_lifecycle::LifecycleNode>>
+  sub_loader_lifecycle(
     "image_transport", "image_transport::SubscriberPlugin<rclcpp_lifecycle::LifecycleNode>");
   typedef std::map<std::string, TransportDesc> StatusMap;
   StatusMap transports;
@@ -83,7 +85,8 @@ int main(int /*argc*/, char ** /*argv*/)
   for (const std::string & lookup_name : pub_loader_lifecycle.getDeclaredClasses()) {
     std::string transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
     transports_lifecycle[transport_name].pub_name = lookup_name;
-    transports_lifecycle[transport_name].package_name = pub_loader_lifecycle.getClassPackage(lookup_name);
+    transports_lifecycle[transport_name].package_name = pub_loader_lifecycle.getClassPackage(
+      lookup_name);
     try {
       auto pub = pub_loader_lifecycle.createUniqueInstance(lookup_name);
       transports_lifecycle[transport_name].pub_status = SUCCESS;
@@ -112,7 +115,8 @@ int main(int /*argc*/, char ** /*argv*/)
   for (const std::string & lookup_name : sub_loader_lifecycle.getDeclaredClasses()) {
     std::string transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
     transports_lifecycle[transport_name].sub_name = lookup_name;
-    transports_lifecycle[transport_name].package_name = sub_loader_lifecycle.getClassPackage(lookup_name);
+    transports_lifecycle[transport_name].package_name = sub_loader_lifecycle.getClassPackage(
+      lookup_name);
     try {
       auto sub = sub_loader_lifecycle.createUniqueInstance(lookup_name);
       transports_lifecycle[transport_name].sub_status = SUCCESS;

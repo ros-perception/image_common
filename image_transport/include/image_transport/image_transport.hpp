@@ -164,7 +164,8 @@ public:
    * \brief Advertise an image topic, simple version.
    */
   IMAGE_TRANSPORT_PUBLIC
-  Publisher<NodeType> advertise(const std::string & base_topic, uint32_t queue_size, bool latch = false);
+  Publisher<NodeType> advertise(
+    const std::string & base_topic, uint32_t queue_size, bool latch = false);
 
   /*!
    * \brief Advertise an image topic, simple version.

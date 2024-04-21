@@ -58,7 +58,10 @@ public:
   }
 
 protected:
-  virtual void publish(const sensor_msgs::msg::Image & message, const typename SimplePublisherPlugin<sensor_msgs::msg::Image, NodeType>::PublishFn & publish_fn) const
+  virtual void publish(
+    const sensor_msgs::msg::Image & message,
+    const typename SimplePublisherPlugin<sensor_msgs::msg::Image,
+    NodeType>::PublishFn & publish_fn) const
   {
     publish_fn(message);
   }
