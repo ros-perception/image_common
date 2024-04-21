@@ -46,6 +46,7 @@ namespace image_transport
 /**
  * \brief Base class for plugins to Publisher.
  */
+template<class NodeType = rclcpp::Node>
 class PublisherPlugin
 {
 public:
@@ -65,30 +66,26 @@ public:
    * \brief Advertise a topic, simple version.
    */
   void advertise(
-    rclcpp::Node::SharedPtr nh,
+    NodeType * nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    if (impl_) {
-      throw std::runtime_error("advertise has been called previously!");
+    if (!node_) {
+      node_.reset(nh);
     }
-    impl_ = std::make_unique<Impl>();
-    impl_->node_ = nh;
     advertise(base_topic, custom_qos, options);
   }
 
   void advertise(
-    rclcpp_lifecycle::LifecycleNode::SharedPtr nh,
+    std::shared_ptr<NodeType> nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    if (impl_) {
-      throw std::runtime_error("advertise has been called previously!");
+    if (!node_) {
+      node_ = nh;
     }
-    impl_ = std::make_unique<Impl>();
-    impl_->lifecycle_node_ = nh;
     advertise(base_topic, custom_qos, options);
   }
 
@@ -98,24 +95,6 @@ public:
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
     advertiseImpl(base_topic, custom_qos, options);
-  }
-
-  bool get_node(rclcpp::Node::SharedPtr & node) const
-  {
-    if (impl_ && impl_->node_) {
-      node = impl_->node_;
-      return true;
-    }
-    return false;
-  }
-
-  bool get_node(rclcpp_lifecycle::LifecycleNode::SharedPtr & node) const
-  {
-    if (impl_ && impl_->lifecycle_node_) {
-      node = impl_->lifecycle_node_;
-      return true;
-    }
-    return false;
   }
   /**
    * \brief Returns the number of subscribers that are currently connected to
@@ -185,14 +164,7 @@ protected:
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) = 0;
 
-private:
-  struct Impl
-  {
-    rclcpp::Node::SharedPtr node_;
-    rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
-  };
-
-  std::unique_ptr<Impl> impl_;
+  std::shared_ptr<NodeType> node_;
 };
 
 }  // namespace image_transport

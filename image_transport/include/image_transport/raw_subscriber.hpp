@@ -46,7 +46,8 @@ namespace image_transport
  * RawSubscriber is a simple wrapper for ros::Subscriber which listens for Image messages
  * and passes them through to the callback.
  */
-class RawSubscriber : public SimpleSubscriberPlugin<sensor_msgs::msg::Image>
+template<class NodeType = rclcpp::Node>
+class RawSubscriber : public SimpleSubscriberPlugin<sensor_msgs::msg::Image, NodeType>
 {
 public:
   virtual ~RawSubscriber() {}
@@ -59,7 +60,7 @@ public:
 protected:
   void internalCallback(
     const std::shared_ptr<const sensor_msgs::msg::Image> & message,
-    const Callback & user_cb) override
+    const typename SubscriberPlugin<NodeType>::Callback & user_cb) override
   {
     user_cb(message);
   }

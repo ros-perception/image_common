@@ -63,6 +63,7 @@ namespace image_transport
  * associated with that handle will stop being called. Once all Publisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
+template<class NodeType = rclcpp::Node>
 class Publisher
 {
 public:
@@ -71,17 +72,17 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   Publisher(
-    rclcpp::Node::SharedPtr nh,
+    NodeType * nh,
     const std::string & base_topic,
-    PubLoaderPtr loader,
+    PubLoaderPtr<NodeType> loader,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
 
   IMAGE_TRANSPORT_PUBLIC
   Publisher(
-    rclcpp_lifecycle::LifecycleNode::SharedPtr nh,
+    std::shared_ptr<NodeType> nh,
     const std::string & base_topic,
-    PubLoaderPtr loader,
+    PubLoaderPtr<NodeType> loader,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
   /*!
@@ -132,7 +133,7 @@ public:
 private:
   void initialise(
     const std::string & base_topic,
-    PubLoaderPtr loader,
+    PubLoaderPtr<NodeType> loader,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options);
 

@@ -45,13 +45,17 @@ inline void increment(int * value)
 namespace image_transport
 {
 
-struct CameraSubscriber::Impl
+template class CameraSubscriber<rclcpp::Node>;
+template class CameraSubscriber<rclcpp_lifecycle::LifecycleNode>;
+
+template<class NodeType>
+struct CameraSubscriber<NodeType>::Impl
 {
   using Image = sensor_msgs::msg::Image;
   using CameraInfo = sensor_msgs::msg::CameraInfo;
   using TimeSync = message_filters::TimeSynchronizer<Image, CameraInfo>;
 
-  explicit Impl(rclcpp::Node::SharedPtr node)
+  explicit Impl(NodeType * node)
   : node_(node),
     logger_(node->get_logger()),
     sync_(10),
@@ -60,8 +64,8 @@ struct CameraSubscriber::Impl
   {
   }
 
-  explicit Impl(rclcpp_lifecycle::LifecycleNode::SharedPtr node)
-  : lifecycle_node_(node),
+  explicit Impl(std::shared_ptr<NodeType> node)
+  : node_(node),
     logger_(node->get_logger()),
     sync_(10),
     unsubscribed_(false),
@@ -84,11 +88,7 @@ struct CameraSubscriber::Impl
     if (!unsubscribed_) {
       unsubscribed_ = true;
       image_sub_.unsubscribe();
-      if (node_) {
-        info_sub_.unsubscribe();
-      } else {
-        lifecycle_info_sub_.unsubscribe();
-      }
+      info_sub_.unsubscribe();
     }
   }
 
@@ -97,11 +97,7 @@ struct CameraSubscriber::Impl
     int threshold = 3 * both_received_;
     if (image_received_ > threshold || info_received_ > threshold) {
       std::string info_topic;
-      if (node_) {
-        info_topic = info_sub_.getTopic();
-      } else {
-        info_topic = lifecycle_info_sub_.getTopic();
-      }
+      info_topic = info_sub_.getTopic();
       RCLCPP_WARN(
         logger_,
         "[image_transport] Topics '%s' and '%s' do not appear to be synchronized. "
@@ -115,12 +111,10 @@ struct CameraSubscriber::Impl
     image_received_ = info_received_ = both_received_ = 0;
   }
 
-  rclcpp::Node::SharedPtr node_;
-  rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
+  std::shared_ptr<NodeType> node_;
   rclcpp::Logger logger_;
-  SubscriberFilter image_sub_;
-  message_filters::Subscriber<CameraInfo> info_sub_;
-  message_filters::Subscriber<CameraInfo, rclcpp_lifecycle::LifecycleNode> lifecycle_info_sub_;
+  SubscriberFilter<NodeType> image_sub_;
+  typename message_filters::Subscriber<CameraInfo, NodeType> info_sub_;
   TimeSync sync_;
 
   bool unsubscribed_;
@@ -129,8 +123,9 @@ struct CameraSubscriber::Impl
   int image_received_, info_received_, both_received_;
 };
 
-CameraSubscriber::CameraSubscriber(
-  rclcpp::Node::SharedPtr node,
+template<class NodeType>
+CameraSubscriber<NodeType>::CameraSubscriber(
+  NodeType * node,
   const std::string & base_topic,
   const Callback & callback,
   const std::string & transport,
@@ -140,8 +135,9 @@ CameraSubscriber::CameraSubscriber(
   initialise(base_topic, callback, transport, custom_qos);
 }
 
-CameraSubscriber::CameraSubscriber(
-  rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+template<class NodeType>
+CameraSubscriber<NodeType>::CameraSubscriber(
+  std::shared_ptr<NodeType> node,
   const std::string & base_topic,
   const Callback & callback,
   const std::string & transport,
@@ -151,7 +147,8 @@ CameraSubscriber::CameraSubscriber(
   initialise(base_topic, callback, transport, custom_qos);
 }
 
-void CameraSubscriber::initialise(
+template<class NodeType>
+void CameraSubscriber<NodeType>::initialise(
   const std::string & base_topic,
   const Callback & callback,
   const std::string & transport,
@@ -163,28 +160,15 @@ void CameraSubscriber::initialise(
   // Must explicitly remap the image topic since we then do some string manipulation on it
   // to figure out the sibling camera_info topic.
   std::string image_topic;
-  if (impl_->node_) {
-    image_topic = rclcpp::expand_topic_or_service_name(
-      base_topic,
-      impl_->node_->get_name(), impl_->node_->get_namespace());
-  } else {
-    image_topic = rclcpp::expand_topic_or_service_name(
-      base_topic,
-      impl_->lifecycle_node_->get_name(), impl_->lifecycle_node_->get_namespace());
-  }
+  image_topic = rclcpp::expand_topic_or_service_name(
+    base_topic,
+    impl_->node_->get_name(), impl_->node_->get_namespace());
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  if (impl_->node_) {
-    impl_->image_sub_.subscribe(impl_->node_, image_topic, transport, custom_qos);
-    impl_->info_sub_.subscribe(impl_->node_, info_topic, custom_qos);
-    impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
-    impl_->info_sub_.registerCallback(std::bind(increment, &impl_->info_received_));
-  } else {
-    impl_->image_sub_.subscribe(impl_->lifecycle_node_, image_topic, transport, custom_qos);
-    impl_->lifecycle_info_sub_.subscribe(impl_->lifecycle_node_, info_topic, custom_qos);
-    impl_->sync_.connectInput(impl_->image_sub_, impl_->lifecycle_info_sub_);
-    impl_->lifecycle_info_sub_.registerCallback(std::bind(increment, &impl_->info_received_));
-  }
+  impl_->image_sub_.subscribe(impl_->node_, image_topic, transport, custom_qos);
+  impl_->info_sub_.subscribe(impl_->node_, info_topic, custom_qos);
+  impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
+  impl_->info_sub_.registerCallback(std::bind(increment, &impl_->info_received_));
 
   impl_->sync_.registerCallback(std::bind(callback, std::placeholders::_1, std::placeholders::_2));
 
@@ -192,44 +176,33 @@ void CameraSubscriber::initialise(
   impl_->image_sub_.registerCallback(std::bind(increment, &impl_->image_received_));
   impl_->sync_.registerCallback(std::bind(increment, &impl_->both_received_));
 
-  if (impl_->node_) {
-    impl_->check_synced_timer_ = impl_->node_->create_wall_timer(
-      std::chrono::seconds(1),
-      std::bind(&Impl::checkImagesSynchronized, impl_.get()));
-  } else {
-    impl_->check_synced_timer_ = impl_->lifecycle_node_->create_wall_timer(
-      std::chrono::seconds(1),
-      std::bind(&Impl::checkImagesSynchronized, impl_.get()));
-  }
+  impl_->check_synced_timer_ = impl_->node_->create_wall_timer(
+    std::chrono::seconds(1),
+    std::bind(&Impl::checkImagesSynchronized, impl_.get()));
 }
 
-std::string CameraSubscriber::getTopic() const
+template<class NodeType>
+std::string CameraSubscriber<NodeType>::getTopic() const
 {
   if (impl_) {return impl_->image_sub_.getTopic();}
   return std::string();
 }
 
-std::string CameraSubscriber::getInfoTopic() const
+template<class NodeType>
+std::string CameraSubscriber<NodeType>::getInfoTopic() const
 {
   if (impl_) {
-    if (impl_->node_) {
-      return impl_->info_sub_.getSubscriber()->get_topic_name();
-    } else {
-      return impl_->lifecycle_info_sub_.getSubscriber()->get_topic_name();
-    }
+    return impl_->info_sub_.getSubscriber()->get_topic_name();
   }
   return std::string();
 }
 
-size_t CameraSubscriber::getNumPublishers() const
+template<class NodeType>
+size_t CameraSubscriber<NodeType>::getNumPublishers() const
 {
   if (impl_) {
     size_t info_pub_count;
-    if (impl_->node_) {
-      info_pub_count = impl_->info_sub_.getSubscriber()->get_publisher_count();
-    } else {
-      info_pub_count = impl_->lifecycle_info_sub_.getSubscriber()->get_publisher_count();
-    }
+    info_pub_count = impl_->info_sub_.getSubscriber()->get_publisher_count();
 
     return std::max(
       impl_->image_sub_.getSubscriber().getNumPublishers(),
@@ -238,18 +211,21 @@ size_t CameraSubscriber::getNumPublishers() const
   return 0;
 }
 
-std::string CameraSubscriber::getTransport() const
+template<class NodeType>
+std::string CameraSubscriber<NodeType>::getTransport() const
 {
   if (impl_) {return impl_->image_sub_.getTransport();}
   return std::string();
 }
 
-void CameraSubscriber::shutdown()
+template<class NodeType>
+void CameraSubscriber<NodeType>::shutdown()
 {
   if (impl_) {impl_->shutdown();}
 }
 
-CameraSubscriber::operator void *() const
+template<class NodeType>
+CameraSubscriber<NodeType>::operator void *() const
 {
   return (impl_ && impl_->isValid()) ? reinterpret_cast<void *>(1) : reinterpret_cast<void *>(0);
 }

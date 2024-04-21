@@ -59,8 +59,8 @@ namespace image_transport
  * getTopicToAdvertise() controls the name of the internal communication topic.
  * It defaults to \<base topic\>/\<transport name\>.
  */
-template<class M>
-class SimplePublisherPlugin : public PublisherPlugin
+template<class M, class NodeType = rclcpp::Node>
+class SimplePublisherPlugin : public PublisherPlugin<NodeType>
 {
 public:
   virtual ~SimplePublisherPlugin() {}
@@ -105,18 +105,9 @@ protected:
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>();
-    if (get_node(simple_impl_->node_)) {
-      simple_impl_->logger_ = simple_impl_->node_->get_logger();
-      simple_impl_->pub_ = simple_impl_->node_->template create_publisher<M>(
-        transport_topic, qos, options);
-    } else if (get_node(simple_impl_->lifecycle_node_)) {
-      simple_impl_->logger_ = simple_impl_->lifecycle_node_->get_logger();
-      simple_impl_->pub_ = simple_impl_->lifecycle_node_->template create_publisher<M>(
-        transport_topic, qos, options);
-    } else {
-      throw std::runtime_error("Not a standard node or lifecycle node!");
-    }
+    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(PublisherPlugin<NodeType>::node_);
+    simple_impl_->pub_ = simple_impl_->node_->template create_publisher<M>(
+      transport_topic, qos, options);
 
     RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
   }
@@ -143,19 +134,25 @@ protected:
    */
   virtual std::string getTopicToAdvertise(const std::string & base_topic) const
   {
-    return base_topic + "/" + getTransportName();
+    return base_topic + "/" + PublisherPlugin<NodeType>::getTransportName();
   }
 
 private:
   struct SimplePublisherPluginImpl
   {
-    SimplePublisherPluginImpl()
-    : logger_(rclcpp::get_logger("simple_publisher_plugin_impl"))
+    explicit SimplePublisherPluginImpl(NodeType * node)
+    : node_(node),
+      logger_(node->get_logger())
     {
     }
 
-    rclcpp::Node::SharedPtr node_;
-    rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
+    explicit SimplePublisherPluginImpl(std::shared_ptr<NodeType> node)
+    : node_(node),
+      logger_(node->get_logger())
+    {
+    }
+
+    std::shared_ptr<NodeType> node_;
     rclcpp::Logger logger_;
     typename rclcpp::Publisher<M>::SharedPtr pub_;
   };

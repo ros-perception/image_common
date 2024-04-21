@@ -44,9 +44,6 @@
 
 namespace image_transport
 {
-
-class ImageTransport;
-
 /**
  * \brief Manages advertisements for publishing camera images.
  *
@@ -62,6 +59,7 @@ class ImageTransport;
  * associated with that handle will stop being called. Once all CameraPublisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
+template<class NodeType = rclcpp::Node>
 class CameraPublisher
 {
 public:
@@ -70,14 +68,14 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
-    rclcpp::Node::SharedPtr node,
+    NodeType * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions = rclcpp::PublisherOptions());
 
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
-    rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+    std::shared_ptr<NodeType> node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions = rclcpp::PublisherOptions());

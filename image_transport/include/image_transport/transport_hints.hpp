@@ -60,6 +60,15 @@ public:
    */
   IMAGE_TRANSPORT_PUBLIC
   TransportHints(
+    const rclcpp::Node * node,
+    const std::string & default_transport = "raw",
+    const std::string & parameter_name = "image_transport")
+  {
+    node->get_parameter_or<std::string>(parameter_name, transport_, default_transport);
+  }
+
+  IMAGE_TRANSPORT_PUBLIC
+  TransportHints(
     const rclcpp::Node::SharedPtr node,
     const std::string & default_transport = "raw",
     const std::string & parameter_name = "image_transport")

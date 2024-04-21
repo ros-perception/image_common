@@ -46,17 +46,21 @@
 namespace image_transport
 {
 
-struct Publisher::Impl
+template class Publisher<rclcpp::Node>;
+template class Publisher<rclcpp_lifecycle::LifecycleNode>;
+
+template<class NodeType>
+struct Publisher<NodeType>::Impl
 {
-  explicit Impl(rclcpp::Node::SharedPtr node)
+  explicit Impl(NodeType * node)
   : node_(node),
     logger_(node->get_logger()),
     unadvertised_(false)
   {
   }
 
-  explicit Impl(rclcpp_lifecycle::LifecycleNode::SharedPtr node)
-  : lifecycle_node_(node),
+  explicit Impl(std::shared_ptr<NodeType> node)
+  : node_(node),
     logger_(node->get_logger()),
     unadvertised_(false)
   {
@@ -97,36 +101,38 @@ struct Publisher::Impl
     }
   }
 
-  rclcpp::Node::SharedPtr node_;
-  rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
+  std::shared_ptr<NodeType> node_;
   rclcpp::Logger logger_;
   std::string base_topic_;
-  PubLoaderPtr loader_;
-  std::vector<std::shared_ptr<PublisherPlugin>> publishers_;
+  PubLoaderPtr<NodeType> loader_;
+  std::vector<std::shared_ptr<PublisherPlugin<NodeType>>> publishers_;
   bool unadvertised_;
 };
 
-Publisher::Publisher(
-  rclcpp::Node::SharedPtr node, const std::string & base_topic,
-  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+template<class NodeType>
+Publisher<NodeType>::Publisher(
+  NodeType * node, const std::string & base_topic,
+  PubLoaderPtr<NodeType> loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 : impl_(std::make_shared<Impl>(node))
 {
   initialise(base_topic, loader, custom_qos, options);
 }
 
-Publisher::Publisher(
-  rclcpp_lifecycle::LifecycleNode::SharedPtr node, const std::string & base_topic,
-  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+template<class NodeType>
+Publisher<NodeType>::Publisher(
+  std::shared_ptr<NodeType> node, const std::string & base_topic,
+  PubLoaderPtr<NodeType> loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 : impl_(std::make_shared<Impl>(node))
 {
   initialise(base_topic, loader, custom_qos, options);
 }
 
-void Publisher::initialise(
+template<class NodeType>
+void Publisher<NodeType>::initialise(
   const std::string & base_topic,
-  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+  PubLoaderPtr<NodeType> loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 {
   if (!impl_) {
@@ -136,15 +142,9 @@ void Publisher::initialise(
   // properly (#3652).
   std::string image_topic;
   size_t ns_len;
-  if (impl_->node_) {
-    image_topic = rclcpp::expand_topic_or_service_name(
-      base_topic, impl_->node_->get_name(), impl_->node_->get_namespace());
-    ns_len = impl_->node_->get_effective_namespace().length();
-  } else {
-    image_topic = rclcpp::expand_topic_or_service_name(
-      base_topic, impl_->lifecycle_node_->get_name(), impl_->lifecycle_node_->get_namespace());
-    ns_len = strlen(impl_->lifecycle_node_->get_namespace());
-  }
+  image_topic = rclcpp::expand_topic_or_service_name(
+    base_topic, impl_->node_->get_name(), impl_->node_->get_namespace());
+  ns_len = strlen(impl_->node_->get_namespace());
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
@@ -160,28 +160,16 @@ void Publisher::initialise(
     all_transport_names.emplace_back(erase_last_copy(lookup_name, "_pub"));
   }
   try {
-    if (impl_->node_) {
-      allowlist_vec = impl_->node_->declare_parameter<std::vector<std::string>>(
-        param_base_name + ".enable_pub_plugins", all_transport_names);
-    } else {
-      allowlist_vec = impl_->lifecycle_node_->declare_parameter<std::vector<std::string>>(
-        param_base_name + ".enable_pub_plugins", all_transport_names);
-    }
+    allowlist_vec = impl_->node_->template declare_parameter<std::vector<std::string>>(
+      param_base_name + ".enable_pub_plugins", all_transport_names);
   } catch (const rclcpp::exceptions::ParameterAlreadyDeclaredException &) {
     RCLCPP_DEBUG_STREAM(
       impl_->logger_, param_base_name << ".enable_pub_plugins" << " was previously declared"
     );
-    if (impl_->node_) {
-      allowlist_vec =
-        impl_->node_->get_parameter(
-        param_base_name +
-        ".enable_pub_plugins").get_value<std::vector<std::string>>();
-    } else {
-      allowlist_vec =
-        impl_->lifecycle_node_->get_parameter(
-        param_base_name +
-        ".enable_pub_plugins").get_value<std::vector<std::string>>();
-    }
+    allowlist_vec =
+      impl_->node_->get_parameter(
+      param_base_name +
+      ".enable_pub_plugins").template get_value<std::vector<std::string>>();
   }
   for (size_t i = 0; i < allowlist_vec.size(); ++i) {
     allowlist.insert(allowlist_vec[i]);
@@ -191,11 +179,7 @@ void Publisher::initialise(
     const auto & lookup_name = transport_name + "_pub";
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
-      if (impl_->node_) {
-        pub->advertise(impl_->node_, image_topic, custom_qos, options);
-      } else {
-        pub->advertise(impl_->lifecycle_node_, image_topic, custom_qos, options);
-      }
+      pub->advertise(impl_->node_, image_topic, custom_qos, options);
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {
       RCLCPP_ERROR(
@@ -211,19 +195,22 @@ void Publisher::initialise(
   }
 }
 
-size_t Publisher::getNumSubscribers() const
+template<class NodeType>
+size_t Publisher<NodeType>::getNumSubscribers() const
 {
   if (impl_ && impl_->isValid()) {return impl_->getNumSubscribers();}
   return 0;
 }
 
-std::string Publisher::getTopic() const
+template<class NodeType>
+std::string Publisher<NodeType>::getTopic() const
 {
   if (impl_) {return impl_->getTopic();}
   return std::string();
 }
 
-void Publisher::publish(const sensor_msgs::msg::Image & message) const
+template<class NodeType>
+void Publisher<NodeType>::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
     // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
@@ -239,7 +226,8 @@ void Publisher::publish(const sensor_msgs::msg::Image & message) const
   }
 }
 
-void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
+template<class NodeType>
+void Publisher<NodeType>::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
     // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
@@ -255,7 +243,8 @@ void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message)
   }
 }
 
-void Publisher::shutdown()
+template<class NodeType>
+void Publisher<NodeType>::shutdown()
 {
   if (impl_) {
     impl_->shutdown();
@@ -263,7 +252,8 @@ void Publisher::shutdown()
   }
 }
 
-Publisher::operator void *() const
+template<class NodeType>
+Publisher<NodeType>::operator void *() const
 {
   return (impl_ && impl_->isValid()) ? reinterpret_cast<void *>(1) : reinterpret_cast<void *>(0);
 }

@@ -49,16 +49,18 @@ namespace image_transport
 /*!
  * \brief Advertise an image topic, free function version.
  */
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
-Publisher create_publisher(
-  rclcpp::Node::SharedPtr node,
+Publisher<NodeType> create_publisher(
+  NodeType * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
 
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
-Publisher create_publisher(
-  rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+Publisher<NodeType> create_publisher(
+  std::shared_ptr<NodeType> node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
@@ -66,20 +68,22 @@ Publisher create_publisher(
 /**
  * \brief Subscribe to an image topic, free function version.
  */
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
-Subscriber create_subscription(
-  rclcpp::Node::SharedPtr node,
+Subscriber<NodeType> create_subscription(
+  NodeType * node,
   const std::string & base_topic,
-  const Subscriber::Callback & callback,
+  const typename Subscriber<NodeType>::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
 
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
-Subscriber create_subscription(
-  rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+Subscriber<NodeType> create_subscription(
+  std::shared_ptr<NodeType> node,
   const std::string & base_topic,
-  const Subscriber::Callback & callback,
+  const typename Subscriber<NodeType>::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
@@ -87,16 +91,18 @@ Subscriber create_subscription(
 /*!
  * \brief Advertise a camera, free function version.
  */
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
-CameraPublisher create_camera_publisher(
-  rclcpp::Node::SharedPtr node,
+CameraPublisher<NodeType> create_camera_publisher(
+  NodeType * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions pub_options = rclcpp::PublisherOptions());
 
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
-CameraPublisher create_camera_publisher(
-  rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+CameraPublisher<NodeType> create_camera_publisher(
+  std::shared_ptr<NodeType> node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions pub_options = rclcpp::PublisherOptions());
@@ -104,25 +110,29 @@ CameraPublisher create_camera_publisher(
 /*!
  * \brief Subscribe to a camera, free function version.
  */
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
-CameraSubscriber create_camera_subscription(
-  rclcpp::Node::SharedPtr node,
+CameraSubscriber<NodeType> create_camera_subscription(
+  NodeType * node,
   const std::string & base_topic,
-  const CameraSubscriber::Callback & callback,
+  const typename CameraSubscriber<NodeType>::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
-CameraSubscriber create_camera_subscription(
-  rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+CameraSubscriber<NodeType> create_camera_subscription(
+  std::shared_ptr<NodeType> node,
   const std::string & base_topic,
-  const CameraSubscriber::Callback & callback,
+  const typename CameraSubscriber<NodeType>::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
 std::vector<std::string> getDeclaredTransports();
 
+template<class NodeType = rclcpp::Node>
 IMAGE_TRANSPORT_PUBLIC
 std::vector<std::string> getLoadableTransports();
 
@@ -133,6 +143,7 @@ std::vector<std::string> getLoadableTransports();
  * subscribe() functions for creating advertisements and subscriptions of image topics.
 */
 
+template<class NodeType = rclcpp::Node>
 class ImageTransport
 {
 public:
@@ -141,10 +152,10 @@ public:
   using CameraInfoConstPtr = sensor_msgs::msg::CameraInfo::ConstSharedPtr;
 
   IMAGE_TRANSPORT_PUBLIC
-  explicit ImageTransport(rclcpp::Node::SharedPtr node);
+  explicit ImageTransport(NodeType * node);
 
   IMAGE_TRANSPORT_PUBLIC
-  explicit ImageTransport(rclcpp_lifecycle::LifecycleNode::SharedPtr node);
+  explicit ImageTransport(std::shared_ptr<NodeType> node);
 
   IMAGE_TRANSPORT_PUBLIC
   ~ImageTransport();
@@ -153,13 +164,13 @@ public:
    * \brief Advertise an image topic, simple version.
    */
   IMAGE_TRANSPORT_PUBLIC
-  Publisher advertise(const std::string & base_topic, uint32_t queue_size, bool latch = false);
+  Publisher<NodeType> advertise(const std::string & base_topic, uint32_t queue_size, bool latch = false);
 
   /*!
    * \brief Advertise an image topic, simple version.
    */
   IMAGE_TRANSPORT_PUBLIC
-  Publisher advertise(
+  Publisher<NodeType> advertise(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
     bool latch = false);
 
@@ -177,9 +188,9 @@ public:
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
   IMAGE_TRANSPORT_PUBLIC
-  Subscriber subscribe(
+  Subscriber<NodeType> subscribe(
     const std::string & base_topic, uint32_t queue_size,
-    const Subscriber::Callback & callback,
+    const typename Subscriber<NodeType>::Callback & callback,
     const VoidPtr & tracked_object = VoidPtr(),
     const TransportHints * transport_hints = nullptr,
     const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
@@ -188,7 +199,7 @@ public:
    * \brief Subscribe to an image topic, version for bare function.
    */
   IMAGE_TRANSPORT_PUBLIC
-  Subscriber subscribe(
+  Subscriber<NodeType> subscribe(
     const std::string & base_topic, uint32_t queue_size,
     void (* fp)(const ImageConstPtr &),
     const TransportHints * transport_hints = nullptr,
@@ -204,7 +215,7 @@ public:
    * \brief Subscribe to an image topic, version for class member function with bare pointer.
    */
   template<class T>
-  Subscriber subscribe(
+  Subscriber<NodeType> subscribe(
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(const ImageConstPtr &), T * obj,
     const TransportHints * transport_hints = nullptr,
@@ -219,7 +230,7 @@ public:
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
   template<class T>
-  Subscriber subscribe(
+  Subscriber<NodeType> subscribe(
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(const ImageConstPtr &),
     const std::shared_ptr<T> & obj,
@@ -235,9 +246,9 @@ public:
    * \brief Subscribe to an image topic, version for arbitrary std::function object and QoS.
    */
   IMAGE_TRANSPORT_PUBLIC
-  Subscriber subscribe(
+  Subscriber<NodeType> subscribe(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
-    const Subscriber::Callback & callback,
+    const typename Subscriber<NodeType>::Callback & callback,
     const VoidPtr & tracked_object,
     const TransportHints * transport_hints,
     const rclcpp::SubscriptionOptions options);
@@ -246,7 +257,7 @@ public:
    * \brief Subscribe to an image topic, version for bare function.
    */
   IMAGE_TRANSPORT_PUBLIC
-  Subscriber subscribe(
+  Subscriber<NodeType> subscribe(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
     void (* fp)(const ImageConstPtr &),
     const TransportHints * transport_hints = nullptr,
@@ -262,7 +273,7 @@ public:
    * \brief Subscribe to an image topic, version for class member function with bare pointer.
    */
   template<class T>
-  Subscriber subscribe(
+  Subscriber<NodeType> subscribe(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
     void (T::* fp)(const ImageConstPtr &), T * obj,
     const TransportHints * transport_hints = nullptr,
@@ -277,7 +288,7 @@ public:
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
   template<class T>
-  Subscriber subscribe(
+  Subscriber<NodeType> subscribe(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
     void (T::* fp)(const ImageConstPtr &),
     const std::shared_ptr<T> & obj,
@@ -293,7 +304,7 @@ public:
    * \brief Advertise a synchronized camera raw image + info topic pair, simple version.
    */
   IMAGE_TRANSPORT_PUBLIC
-  CameraPublisher advertiseCamera(
+  CameraPublisher<NodeType> advertiseCamera(
     const std::string & base_topic, uint32_t queue_size,
     bool latch = false);
 
@@ -318,9 +329,9 @@ public:
    * named "camera_info" in the same namespace as the base image topic.
    */
   IMAGE_TRANSPORT_PUBLIC
-  CameraSubscriber subscribeCamera(
+  CameraSubscriber<NodeType> subscribeCamera(
     const std::string & base_topic, uint32_t queue_size,
-    const CameraSubscriber::Callback & callback,
+    const typename CameraSubscriber<NodeType>::Callback & callback,
     const VoidPtr & tracked_object = VoidPtr(),
     const TransportHints * transport_hints = nullptr);
 
@@ -328,7 +339,7 @@ public:
    * \brief Subscribe to a synchronized image & camera info topic pair, version for bare function.
    */
   IMAGE_TRANSPORT_PUBLIC
-  CameraSubscriber subscribeCamera(
+  CameraSubscriber<NodeType> subscribeCamera(
     const std::string & base_topic, uint32_t queue_size,
     void (* fp)(
       const ImageConstPtr &,
@@ -336,7 +347,7 @@ public:
     const TransportHints * transport_hints = nullptr)
   {
     return subscribeCamera(
-      base_topic, queue_size, CameraSubscriber::Callback(fp), VoidPtr(),
+      base_topic, queue_size, typename CameraSubscriber<NodeType>::Callback(fp), VoidPtr(),
       transport_hints);
   }
 
@@ -345,7 +356,7 @@ public:
    * function with bare pointer.
    */
   template<class T>
-  CameraSubscriber subscribeCamera(
+  CameraSubscriber<NodeType> subscribeCamera(
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(
       const ImageConstPtr &,
@@ -363,7 +374,7 @@ public:
    * function with shared_ptr.
    */
   template<class T>
-  CameraSubscriber subscribeCamera(
+  CameraSubscriber<NodeType> subscribeCamera(
     const std::string & base_topic, uint32_t queue_size,
     void (T::* fp)(
       const ImageConstPtr &,

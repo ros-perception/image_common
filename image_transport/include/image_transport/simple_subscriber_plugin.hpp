@@ -59,8 +59,8 @@ namespace image_transport
  * getTopicToSubscribe() controls the name of the internal communication topic. It
  * defaults to \<base topic\>/\<transport name\>.
  */
-template<class M>
-class SimpleSubscriberPlugin : public SubscriberPlugin
+template<class M, class NodeType = rclcpp::Node>
+class SimpleSubscriberPlugin : public SubscriberPlugin<NodeType>
 {
 public:
   virtual ~SimpleSubscriberPlugin() {}
@@ -96,7 +96,7 @@ protected:
 
   virtual void internalCallback(
     const typename std::shared_ptr<const M> & message,
-    const Callback & user_cb) = 0;
+    const typename SubscriberPlugin<NodeType>::Callback & user_cb) = 0;
 
   /**
    * \brief Return the communication topic name for a given base topic.
@@ -105,12 +105,12 @@ protected:
    */
   virtual std::string getTopicToSubscribe(const std::string & base_topic) const
   {
-    return base_topic + "/" + getTransportName();
+    return base_topic + "/" + SubscriberPlugin<NodeType>::getTransportName();
   }
 
   void subscribeImpl(
     const std::string & base_topic,
-    const Callback & callback,
+    const typename SubscriberPlugin<NodeType>::Callback & callback,
     rmw_qos_profile_t custom_qos,
     rclcpp::SubscriptionOptions options) override
   {
@@ -119,30 +119,17 @@ protected:
     // ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
     //
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    if (get_node(impl_->node_)) {
-      impl_->sub_ = impl_->node_->template create_subscription<M>(
-        getTopicToSubscribe(base_topic), qos,
-        [this, callback](const typename std::shared_ptr<const M> msg) {
-          internalCallback(msg, callback);
-        },
-        options);
-    } else if (get_node(impl_->lifecycle_node_)) {
-      impl_->sub_ = impl_->lifecycle_node_->template create_subscription<M>(
-        getTopicToSubscribe(base_topic), qos,
-        [this, callback](const typename std::shared_ptr<const M> msg) {
-          internalCallback(msg, callback);
-        },
-        options);
-    } else {
-      throw std::runtime_error("Not a standard node or lifecycle node!");
-    }
+    impl_->sub_ = SubscriberPlugin<NodeType>::node_->template create_subscription<M>(
+      getTopicToSubscribe(base_topic), qos,
+      [this, callback](const typename std::shared_ptr<const M> msg) {
+        internalCallback(msg, callback);
+      },
+      options);
   }
 
 private:
   struct Impl
   {
-    rclcpp::Node::SharedPtr node_;
-    rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
     rclcpp::SubscriptionBase::SharedPtr sub_;
   };
 

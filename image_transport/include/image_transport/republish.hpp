@@ -52,10 +52,10 @@ private:
 
   rclcpp::TimerBase::SharedPtr timer_;
   bool initialized_{false};
-  image_transport::Subscriber sub;
-  image_transport::Publisher pub;
-  pluginlib::UniquePtr<image_transport::PublisherPlugin> instance;
-  std::shared_ptr<pluginlib::ClassLoader<image_transport::PublisherPlugin>> loader;
+  image_transport::Subscriber<rclcpp::Node> sub;
+  image_transport::Publisher<rclcpp::Node> pub;
+  pluginlib::UniquePtr<image_transport::PublisherPlugin<rclcpp::Node>> instance;
+  std::shared_ptr<pluginlib::ClassLoader<image_transport::PublisherPlugin<rclcpp::Node>>> loader;
 };
 
 }  // namespace image_transport

@@ -43,9 +43,6 @@
 
 namespace image_transport
 {
-
-class ImageTransport;
-
 /**
  * \brief Manages a subscription callback on synchronized Image and CameraInfo topics.
  *
@@ -61,6 +58,7 @@ void callback(const sensor_msgs::msg::Image::ConstSharedPtr&, const sensor_msgs:
  * associated with that handle will stop being called. Once all CameraSubscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
+template<class NodeType = rclcpp::Node>
 class CameraSubscriber
 {
 public:
@@ -72,7 +70,7 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber(
-    rclcpp::Node::SharedPtr node,
+    NodeType * node,
     const std::string & base_topic,
     const Callback & callback,
     const std::string & transport,
@@ -80,7 +78,7 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber(
-    rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+    std::shared_ptr<NodeType> node,
     const std::string & base_topic,
     const Callback & callback,
     const std::string & transport,

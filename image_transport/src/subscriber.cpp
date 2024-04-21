@@ -44,9 +44,13 @@
 namespace image_transport
 {
 
-struct Subscriber::Impl
+template class Subscriber<rclcpp::Node>;
+template class Subscriber<rclcpp_lifecycle::LifecycleNode>;
+
+template<class NodeType>
+struct Subscriber<NodeType>::Impl
 {
-  Impl(rclcpp::Node::SharedPtr node, SubLoaderPtr loader)
+  Impl(NodeType * node, SubLoaderPtr<NodeType> loader)
   : node_(node),
     logger_(node->get_logger()),
     loader_(loader),
@@ -54,8 +58,8 @@ struct Subscriber::Impl
   {
   }
 
-  explicit Impl(rclcpp_lifecycle::LifecycleNode::SharedPtr node, SubLoaderPtr loader)
-  : lifecycle_node_(node),
+  explicit Impl(std::shared_ptr<NodeType> node, SubLoaderPtr<NodeType> loader)
+  : node_(node),
     logger_(node->get_logger()),
     loader_(loader),
     unsubscribed_(false)
@@ -82,21 +86,21 @@ struct Subscriber::Impl
     }
   }
 
-  rclcpp::Node::SharedPtr node_;
-  rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
+  std::shared_ptr<NodeType> node_;
   rclcpp::Logger logger_;
   std::string lookup_name_;
-  SubLoaderPtr loader_;
-  std::shared_ptr<SubscriberPlugin> subscriber_;
+  SubLoaderPtr<NodeType> loader_;
+  std::shared_ptr<SubscriberPlugin<NodeType>> subscriber_;
   bool unsubscribed_;
   // double constructed_;
 };
 
-Subscriber::Subscriber(
-  rclcpp::Node::SharedPtr node,
+template<class NodeType>
+Subscriber<NodeType>::Subscriber(
+  NodeType * node,
   const std::string & base_topic,
   const Callback & callback,
-  SubLoaderPtr loader,
+  SubLoaderPtr<NodeType> loader,
   const std::string & transport,
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
@@ -105,11 +109,12 @@ Subscriber::Subscriber(
   initialise(base_topic, callback, transport, custom_qos, options);
 }
 
-Subscriber::Subscriber(
-  rclcpp_lifecycle::LifecycleNode::SharedPtr node,
+template<class NodeType>
+Subscriber<NodeType>::Subscriber(
+  std::shared_ptr<NodeType> node,
   const std::string & base_topic,
   const Callback & callback,
-  SubLoaderPtr loader,
+  SubLoaderPtr<NodeType> loader,
   const std::string & transport,
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
@@ -118,7 +123,8 @@ Subscriber::Subscriber(
   initialise(base_topic, callback, transport, custom_qos, options);
 }
 
-void Subscriber::initialise(
+template<class NodeType>
+void Subscriber<NodeType>::initialise(
   const std::string & base_topic,
   const Callback & callback,
   const std::string & transport,
@@ -129,7 +135,7 @@ void Subscriber::initialise(
     throw std::runtime_error("impl is not constructed!");
   }
   // Load the plugin for the chosen transport.
-  impl_->lookup_name_ = SubscriberPlugin::getLookupName(transport);
+  impl_->lookup_name_ = SubscriberPlugin<NodeType>::getLookupName(transport);
   try {
     impl_->subscriber_ = impl_->loader_->createSharedInstance(impl_->lookup_name_);
   } catch (pluginlib::PluginlibException & e) {
@@ -144,7 +150,7 @@ void Subscriber::initialise(
   size_t found = clean_topic.rfind('/');
   if (found != std::string::npos) {
     std::string transport = clean_topic.substr(found + 1);
-    std::string plugin_name = SubscriberPlugin::getLookupName(transport);
+    std::string plugin_name = SubscriberPlugin<NodeType>::getLookupName(transport);
     std::vector<std::string> plugins = impl_->loader_->getDeclaredClasses();
     if (std::find(plugins.begin(), plugins.end(), plugin_name) != plugins.end()) {
       std::string real_base_topic = clean_topic.substr(0, found);
@@ -162,38 +168,38 @@ void Subscriber::initialise(
 
   // Tell plugin to subscribe.
   RCLCPP_DEBUG(impl_->logger_, "Subscribing to: %s\n", base_topic.c_str());
-  if (impl_->node_) {
-    impl_->subscriber_->subscribe(impl_->node_, base_topic, callback, custom_qos, options);
-  } else {
-    impl_->subscriber_->subscribe(
-      impl_->lifecycle_node_, base_topic, callback, custom_qos, options);
-  }
+  impl_->subscriber_->subscribe(impl_->node_, base_topic, callback, custom_qos, options);
 }
 
-std::string Subscriber::getTopic() const
+template<class NodeType>
+std::string Subscriber<NodeType>::getTopic() const
 {
   if (impl_) {return impl_->subscriber_->getTopic();}
   return std::string();
 }
 
-size_t Subscriber::getNumPublishers() const
+template<class NodeType>
+size_t Subscriber<NodeType>::getNumPublishers() const
 {
   if (impl_) {return impl_->subscriber_->getNumPublishers();}
   return 0;
 }
 
-std::string Subscriber::getTransport() const
+template<class NodeType>
+std::string Subscriber<NodeType>::getTransport() const
 {
   if (impl_) {return impl_->subscriber_->getTransportName();}
   return std::string();
 }
 
-void Subscriber::shutdown()
+template<class NodeType>
+void Subscriber<NodeType>::shutdown()
 {
   if (impl_) {impl_->shutdown();}
 }
 
-Subscriber::operator void *() const
+template<class NodeType>
+Subscriber<NodeType>::operator void *() const
 {
   return (impl_ && impl_->isValid()) ? reinterpret_cast<void *>(1) : reinterpret_cast<void *>(0);
 }

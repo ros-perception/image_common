@@ -113,9 +113,9 @@ void Republisher::initialize()
       rmw_qos_profile_default, pub_options);
 
     // Use Publisher::publish as the subscriber callback
-    typedef void (image_transport::Publisher::* PublishMemFn)(
+    typedef void (image_transport::Publisher<rclcpp::Node>::* PublishMemFn)(
       const sensor_msgs::msg::Image::ConstSharedPtr &) const;
-    PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
+    PublishMemFn pub_mem_fn = &image_transport::Publisher<rclcpp::Node>::publish;
 
     rclcpp::SubscriptionOptions sub_options;
     sub_options.qos_overriding_options = qos_override_options;
@@ -126,10 +126,10 @@ void Republisher::initialize()
   } else {
     // Use one specific transport for output
     // Load transport plugin
-    typedef image_transport::PublisherPlugin Plugin;
+    typedef image_transport::PublisherPlugin<rclcpp::Node> Plugin;
     loader = std::make_shared<pluginlib::ClassLoader<Plugin>>(
       "image_transport",
-      "image_transport::PublisherPlugin");
+      "image_transport::PublisherPlugin<rclcpp::Node>");
     std::string lookup_name = Plugin::getLookupName(out_transport);
 
     instance = loader->createUniqueInstance(lookup_name);
