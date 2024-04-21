@@ -78,8 +78,8 @@ struct ImplLifecycle
   }
 };
 
-static std::unique_ptr<Impl> kImpl = std::make_unique<Impl>();
-static std::unique_ptr<ImplLifecycle> kImpl_lifecycle = std::make_unique<ImplLifecycle>();
+static Impl * kImpl = new Impl();
+static ImplLifecycle * kImpl_lifecycle = new ImplLifecycle();
 
 template<class NodeType>
 Publisher<NodeType> create_publisher(
