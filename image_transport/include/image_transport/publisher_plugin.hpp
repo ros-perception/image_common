@@ -105,7 +105,7 @@ public:
 
   /**
    * \brief Publish an image using the transport associated with this PublisherPlugin.
-   * This version of the function can be used to optimize cases where the Plugin can 
+   * This version of the function can be used to optimize cases where the Plugin can
    * avoid doing copies of the data when having the ownership to the image message.
    * Plugins that can take advantage of message ownership should overwrite this method
    * along with supportsUniquePtrPub().
