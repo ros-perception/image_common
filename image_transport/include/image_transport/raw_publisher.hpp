@@ -63,9 +63,9 @@ public:
   }
 
 protected:
-  virtual void publish(const sensor_msgs::msg::Image & message, const PublishFn & publish_fn) const
+  virtual void publish(const sensor_msgs::msg::Image & message, const PublisherT & publisher) const
   {
-    publish_fn(message);
+    publisher->publish(message);
   }
 
   virtual void publish(
