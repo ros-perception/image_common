@@ -29,6 +29,7 @@
 #include "image_transport/publisher.hpp"
 
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
 #include <utility>
