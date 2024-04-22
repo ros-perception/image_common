@@ -30,6 +30,7 @@
 #define IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
 
 #include <string>
+#include <utility>
 
 #include "sensor_msgs/msg/image.hpp"
 
