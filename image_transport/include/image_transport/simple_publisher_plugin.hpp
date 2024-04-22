@@ -140,8 +140,8 @@ protected:
    * single subscriber publishing (in subscription callbacks).
    */
   virtual void publish(
-    const sensor_msgs::msg::Image & message,
-    const PublishFn & publish_fn) const {}
+    const sensor_msgs::msg::Image & /*message*/,
+    const PublishFn & /*publish_fn*/) const {}
 
   virtual void publish(
     const sensor_msgs::msg::Image & message,
