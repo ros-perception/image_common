@@ -42,10 +42,6 @@
 namespace image_transport
 {
 
-template class ImageTransport<rclcpp::Node>;
-template class ImageTransport<rclcpp_lifecycle::LifecycleNode>;
-
-
 struct Impl
 {
   PubLoaderPtr<rclcpp::Node> pub_loader_;
@@ -385,3 +381,6 @@ std::string ImageTransport<NodeType>::getTransportOrDefault(const TransportHints
 }
 
 }  // namespace image_transport
+
+template class image_transport::ImageTransport<rclcpp::Node>;
+template class image_transport::ImageTransport<rclcpp_lifecycle::LifecycleNode>;

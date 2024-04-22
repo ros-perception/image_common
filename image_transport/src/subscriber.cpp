@@ -44,9 +44,6 @@
 namespace image_transport
 {
 
-template class Subscriber<rclcpp::Node>;
-template class Subscriber<rclcpp_lifecycle::LifecycleNode>;
-
 template<class NodeType>
 struct Subscriber<NodeType>::Impl
 {
@@ -205,3 +202,6 @@ Subscriber<NodeType>::operator void *() const
 }
 
 }  // namespace image_transport
+
+template class image_transport::Subscriber<rclcpp::Node>;
+template class image_transport::Subscriber<rclcpp_lifecycle::LifecycleNode>;

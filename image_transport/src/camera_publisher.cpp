@@ -41,9 +41,6 @@
 namespace image_transport
 {
 
-template class CameraPublisher<rclcpp::Node>;
-template class CameraPublisher<rclcpp_lifecycle::LifecycleNode>;
-
 template<class NodeType>
 struct CameraPublisher<NodeType>::Impl
 {
@@ -234,3 +231,6 @@ CameraPublisher<NodeType>::operator void *() const
 }
 
 }  // namespace image_transport
+
+template class image_transport::CameraPublisher<rclcpp::Node>;
+template class image_transport::CameraPublisher<rclcpp_lifecycle::LifecycleNode>;

@@ -45,9 +45,6 @@ inline void increment(int * value)
 namespace image_transport
 {
 
-template class CameraSubscriber<rclcpp::Node>;
-template class CameraSubscriber<rclcpp_lifecycle::LifecycleNode>;
-
 template<class NodeType>
 struct CameraSubscriber<NodeType>::Impl
 {
@@ -231,3 +228,6 @@ CameraSubscriber<NodeType>::operator void *() const
 }
 
 }  // namespace image_transport
+
+template class image_transport::CameraSubscriber<rclcpp::Node>;
+template class image_transport::CameraSubscriber<rclcpp_lifecycle::LifecycleNode>;

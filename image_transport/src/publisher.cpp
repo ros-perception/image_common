@@ -46,9 +46,6 @@
 namespace image_transport
 {
 
-template class Publisher<rclcpp::Node>;
-template class Publisher<rclcpp_lifecycle::LifecycleNode>;
-
 template<class NodeType>
 struct Publisher<NodeType>::Impl
 {
@@ -259,3 +256,6 @@ Publisher<NodeType>::operator void *() const
 }
 
 }  // namespace image_transport
+
+template class image_transport::Publisher<rclcpp::Node>;
+template class image_transport::Publisher<rclcpp_lifecycle::LifecycleNode>;
