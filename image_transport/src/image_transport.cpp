@@ -56,13 +56,23 @@ struct Impl
 
 static Impl * kImpl = new Impl();
 
+PubLoaderPtr getPubLoader()
+{
+  return kImpl->pub_loader_;
+}
+
+SubLoaderPtr getSubLoader()
+{
+  return kImpl->sub_loader_;
+}
+
 Publisher create_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 {
-  return Publisher(node, base_topic, kImpl->pub_loader_, custom_qos, options);
+  return {node, base_topic, kImpl->pub_loader_, custom_qos, options};
 }
 
 Subscriber create_subscription(

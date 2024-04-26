@@ -28,8 +28,6 @@
 
 #include <pluginlib/class_list_macros.hpp>
 
-#include "image_transport/raw_publisher.hpp"
 #include "image_transport/raw_subscriber.hpp"
 
-PLUGINLIB_EXPORT_CLASS(image_transport::RawPublisher, image_transport::PublisherPlugin)
 PLUGINLIB_EXPORT_CLASS(image_transport::RawSubscriber, image_transport::SubscriberPlugin)
