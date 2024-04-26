@@ -63,6 +63,12 @@ public:
   }
 
 protected:
+  [[deprecated("Use publish(const sensor_msgs::msg::Image&, const PublisherT&) instead.")]]
+  virtual void publish(const sensor_msgs::msg::Image & message, const PublishFn & publish_fn) const
+  {
+    publish_fn(message);
+  }
+
   virtual void publish(const sensor_msgs::msg::Image & message, const PublisherT & publisher) const
   {
     publisher->publish(message);
