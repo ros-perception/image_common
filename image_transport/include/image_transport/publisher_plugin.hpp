@@ -29,6 +29,7 @@
 #ifndef IMAGE_TRANSPORT__PUBLISHER_PLUGIN_HPP_
 #define IMAGE_TRANSPORT__PUBLISHER_PLUGIN_HPP_
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -110,9 +111,9 @@ public:
    * Plugins that can take advantage of message ownership should overwrite this method
    * along with supportsUniquePtrPub().
    */
-  virtual void publishUniquePtr(sensor_msgs::msg::Image::UniquePtr message) const
+  virtual void publishUniquePtr(sensor_msgs::msg::Image::UniquePtr /*message*/) const
   {
-    publish(*message);
+    throw std::logic_error("publishUniquePtr() is not implemented.");
   }
 
   /**

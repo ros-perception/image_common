@@ -30,6 +30,7 @@
 #define IMAGE_TRANSPORT__SIMPLE_PUBLISHER_PLUGIN_HPP_
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -141,7 +142,11 @@ protected:
    */
   virtual void publish(
     const sensor_msgs::msg::Image & /*message*/,
-    const PublishFn & /*publish_fn*/) const {}
+    const PublishFn & /*publish_fn*/) const
+  {
+    throw std::logic_error(
+      "publish(const sensor_msgs::msg::Image&, const PublishFn&) is not implemented.");
+  }
 
   virtual void publish(
     const sensor_msgs::msg::Image & message,
@@ -151,10 +156,11 @@ protected:
   }
 
   virtual void publish(
-    sensor_msgs::msg::Image::UniquePtr message,
-    const PublisherT & publisher) const
+    sensor_msgs::msg::Image::UniquePtr /*message*/,
+    const PublisherT & /*publisher*/) const
   {
-    publish(*message, bindInternalPublisher(publisher.get()));
+    throw std::logic_error(
+      "publish(sensor_msgs::msg::Image::UniquePtr, const PublisherT&) is not implemented.");
   }
 
   /**
