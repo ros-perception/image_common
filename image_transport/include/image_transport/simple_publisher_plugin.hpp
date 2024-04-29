@@ -133,8 +133,9 @@ protected:
   typedef std::function<void (const M &)> PublishFn;
 
   /**
-   * \brief Publish an image using the specified publish function. Must be implemented by
-   * the subclass.
+   * \brief Publish an image using the specified publish function.
+   *
+   * \deprecated Use publish(const sensor_msgs::msg::Image&, const PublisherT&) instead.
    *
    * The PublishFn publishes the transport-specific message type. This indirection allows
    * SimpleSubscriberPlugin to use this function for both normal broadcast publishing and
@@ -148,13 +149,25 @@ protected:
       "publish(const sensor_msgs::msg::Image&, const PublishFn&) is not implemented.");
   }
 
+  /**
+   * \brief Publish an image using the specified publisher.
+   */
   virtual void publish(
     const sensor_msgs::msg::Image & message,
     const PublisherT & publisher) const
   {
+    // Fallback to old, deprecated method
     publish(message, bindInternalPublisher(publisher.get()));
   }
 
+  /**
+   * \brief Publish an image using the specified publisher.
+   *
+   * This version of the function can be used to optimize cases where the Plugin can
+   * avoid doing copies of the data when having the ownership to the image message.
+   * Plugins that can take advantage of message ownership should overwrite this method
+   * along with supportsUniquePtrPub().
+   */
   virtual void publish(
     sensor_msgs::msg::Image::UniquePtr /*message*/,
     const PublisherT & /*publisher*/) const
