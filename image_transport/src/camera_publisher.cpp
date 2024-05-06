@@ -140,7 +140,6 @@ void CameraPublisher::publish(
   const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(
       logger,
@@ -157,7 +156,6 @@ void CameraPublisher::publish(
   sensor_msgs::msg::CameraInfo::UniquePtr info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(
       logger,
@@ -174,7 +172,6 @@ void CameraPublisher::publish(
   rclcpp::Time stamp) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(
       logger,
@@ -194,7 +191,6 @@ void CameraPublisher::publish(
   rclcpp::Time stamp) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(
       logger,
