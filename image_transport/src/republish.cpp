@@ -140,7 +140,9 @@ void Republisher::initialize()
     PublishMemFn pub_mem_fn = &Plugin::publishPtr;
     this->sub = image_transport::create_subscription(
       this, in_topic,
-      std::bind(pub_mem_fn, instance.get(), std::placeholders::_1), in_transport, rmw_qos_profile_default, sub_options);
+      std::bind(
+        pub_mem_fn,
+        instance.get(), std::placeholders::_1), in_transport, rmw_qos_profile_default, sub_options);
   }
 }
 
