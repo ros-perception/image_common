@@ -96,18 +96,21 @@ void Republisher::initialize()
       "The 'out_transport' parameter is set to: " << out_transport);
   }
 
+  auto qos_override_options = rclcpp::QosOverridingOptions(
+    {
+      rclcpp::QosPolicyKind::Depth,
+      rclcpp::QosPolicyKind::Durability,
+      rclcpp::QosPolicyKind::History,
+      rclcpp::QosPolicyKind::Reliability,
+    });
+  rclcpp::SubscriptionOptions sub_options;
+  rclcpp::PublisherOptions pub_options;
+  pub_options.qos_overriding_options = qos_override_options;
+  sub_options.qos_overriding_options = qos_override_options;
+
   if (out_transport.empty()) {
     // Use all available transports for output
-    rclcpp::PublisherOptions pub_options;
-    auto qos_override_options = rclcpp::QosOverridingOptions(
-      {
-        rclcpp::QosPolicyKind::Depth,
-        rclcpp::QosPolicyKind::Durability,
-        rclcpp::QosPolicyKind::History,
-        rclcpp::QosPolicyKind::Reliability,
-      });
 
-    pub_options.qos_overriding_options = qos_override_options;
     this->pub = image_transport::create_publisher(
       this, out_topic,
       rmw_qos_profile_default, pub_options);
@@ -116,9 +119,6 @@ void Republisher::initialize()
     typedef void (image_transport::Publisher::* PublishMemFn)(
       const sensor_msgs::msg::Image::ConstSharedPtr &) const;
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
-
-    rclcpp::SubscriptionOptions sub_options;
-    sub_options.qos_overriding_options = qos_override_options;
 
     this->sub = image_transport::create_subscription(
       this, in_topic, std::bind(pub_mem_fn, &pub, std::placeholders::_1),
@@ -133,14 +133,16 @@ void Republisher::initialize()
     std::string lookup_name = Plugin::getLookupName(out_transport);
 
     instance = loader->createUniqueInstance(lookup_name);
-    instance->advertise(this, out_topic);
+    instance->advertise(this, out_topic, rmw_qos_profile_default, pub_options);
 
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::* PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr &) const;
     PublishMemFn pub_mem_fn = &Plugin::publishPtr;
     this->sub = image_transport::create_subscription(
       this, in_topic,
-      std::bind(pub_mem_fn, instance.get(), std::placeholders::_1), in_transport);
+      std::bind(
+        pub_mem_fn,
+        instance.get(), std::placeholders::_1), in_transport, rmw_qos_profile_default, sub_options);
   }
 }
 
