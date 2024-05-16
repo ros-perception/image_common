@@ -104,6 +104,12 @@ public:
   void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const;
 
   /*!
+   * \brief Publish an image on the topics associated with this Publisher.
+   */
+  IMAGE_TRANSPORT_PUBLIC
+  void publish(sensor_msgs::msg::Image::UniquePtr message) const;
+
+  /*!
    * \brief Shutdown the advertisements associated with this Publisher.
    */
   IMAGE_TRANSPORT_PUBLIC

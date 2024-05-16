@@ -29,6 +29,7 @@
 #ifndef IMAGE_TRANSPORT__PUBLISHER_PLUGIN_HPP_
 #define IMAGE_TRANSPORT__PUBLISHER_PLUGIN_HPP_
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -58,6 +59,14 @@ public:
    * this plugin.
    */
   virtual std::string getTransportName() const = 0;
+
+  /**
+   * \brief Check whether this plugin supports publishing using UniquePtr.
+   */
+  virtual bool supportsUniquePtrPub() const
+  {
+    return false;
+  }
 
   /**
    * \brief Advertise a topic, simple version.
@@ -93,6 +102,18 @@ public:
   virtual void publishPtr(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
   {
     publish(*message);
+  }
+
+  /**
+   * \brief Publish an image using the transport associated with this PublisherPlugin.
+   * This version of the function can be used to optimize cases where the Plugin can
+   * avoid doing copies of the data when having the ownership to the image message.
+   * Plugins that can take advantage of message ownership should overwrite this method
+   * along with supportsUniquePtrPub().
+   */
+  virtual void publishUniquePtr(sensor_msgs::msg::Image::UniquePtr /*message*/) const
+  {
+    throw std::logic_error("publishUniquePtr() is not implemented.");
   }
 
   /**
