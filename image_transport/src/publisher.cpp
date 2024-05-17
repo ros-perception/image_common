@@ -212,7 +212,7 @@ void Publisher::publish(sensor_msgs::msg::Image::UniquePtr message) const
   }
 
   std::vector<std::shared_ptr<PublisherPlugin>> pubs_take_reference;
-  std::optional<std::shared_ptr<PublisherPlugin>> pub_takes_ownership = std::nullopt;
+  std::optional<std::shared_ptr<PublisherPlugin>> pub_takes_ownership{std::nullopt};
 
   for (const auto & pub : impl_->publishers_) {
     if (pub->getNumSubscribers() > 0) {
