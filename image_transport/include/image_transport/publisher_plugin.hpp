@@ -71,10 +71,7 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    if (!node_) {
-      node_.reset(nh);
-    }
-    advertise(base_topic, custom_qos, options);
+    advertiseImpl(std::shared_ptr<NodeType>(nh), base_topic, custom_qos, options);
   }
 
   void advertise(
@@ -83,19 +80,9 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    if (!node_) {
-      node_ = nh;
-    }
-    advertise(base_topic, custom_qos, options);
+    advertiseImpl(nh, base_topic, custom_qos, options);
   }
 
-  void advertise(
-    const std::string & base_topic,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
-  {
-    advertiseImpl(base_topic, custom_qos, options);
-  }
   /**
    * \brief Returns the number of subscribers that are currently connected to
    * this PublisherPlugin.
@@ -160,11 +147,10 @@ protected:
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
   virtual void advertiseImpl(
+    std::shared_ptr<NodeType> nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) = 0;
-
-  std::shared_ptr<NodeType> node_;
 };
 
 }  // namespace image_transport

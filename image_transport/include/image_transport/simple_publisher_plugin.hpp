@@ -99,13 +99,14 @@ public:
 
 protected:
   void advertiseImpl(
+    std::shared_ptr<NodeType> nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(PublisherPlugin<NodeType>::node_);
+    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(nh);
     simple_impl_->pub_ = simple_impl_->node_->template create_publisher<M>(
       transport_topic, qos, options);
 

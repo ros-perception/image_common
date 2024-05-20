@@ -72,10 +72,9 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
-    if (!node_) {
-      node_.reset(node);
-    }
-    return subscribeImpl(base_topic, callback, custom_qos, options);
+    return subscribeImpl(
+      std::shared_ptr<NodeType>(node), base_topic, callback, custom_qos,
+      options);
   }
 
   void subscribe(
@@ -84,10 +83,7 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
-    if (!node_) {
-      node_ = node;
-    }
-    return subscribeImpl(base_topic, callback, custom_qos, options);
+    return subscribeImpl(node, base_topic, callback, custom_qos, options);
   }
 
   /**
@@ -200,12 +196,11 @@ protected:
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
   virtual void subscribeImpl(
+    std::shared_ptr<NodeType> node,
     const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos,
     rclcpp::SubscriptionOptions options) = 0;
-
-  std::shared_ptr<NodeType> node_;
 };
 
 }  // namespace image_transport
