@@ -32,6 +32,8 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <cstddef>
+#include <thread>
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/node.hpp"

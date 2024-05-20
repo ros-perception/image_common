@@ -29,6 +29,7 @@
 #include <functional>
 #include <string>
 #include <memory>
+#include <cstddef>
 
 #include "gtest/gtest.h"
 

@@ -29,6 +29,7 @@
 #include <chrono>
 #include <memory>
 #include <cstddef>
+#include <thread>
 
 #include "gtest/gtest.h"
 
