@@ -30,6 +30,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "rclcpp/expand_topic_or_service_name.hpp"
 #include "rclcpp/logging.hpp"
@@ -165,7 +166,6 @@ void CameraPublisher<NodeType>::publish(
   const sensor_msgs::msg::CameraInfo & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(
       logger,
@@ -183,7 +183,6 @@ void CameraPublisher<NodeType>::publish(
   const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(
       logger,
@@ -197,11 +196,27 @@ void CameraPublisher<NodeType>::publish(
 
 template<class NodeType>
 void CameraPublisher<NodeType>::publish(
+  sensor_msgs::msg::Image::UniquePtr image,
+  sensor_msgs::msg::CameraInfo::UniquePtr info) const
+{
+  if (!impl_ || !impl_->isValid()) {
+    auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
+    RCLCPP_FATAL(
+      logger,
+      "Call to publish() on an invalid image_transport::CameraPublisher");
+    return;
+  }
+
+  impl_->image_pub_.publish(std::move(image));
+  impl_->info_pub_->publish(std::move(info));
+}
+
+template<class NodeType>
+void CameraPublisher<NodeType>::publish(
   sensor_msgs::msg::Image & image, sensor_msgs::msg::CameraInfo & info,
   rclcpp::Time stamp) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(
       logger,
@@ -213,6 +228,26 @@ void CameraPublisher<NodeType>::publish(
   info.header.stamp = stamp;
   impl_->image_pub_.publish(image);
   impl_->info_pub_->publish(info);
+}
+
+template<class NodeType>
+void CameraPublisher<NodeType>::publish(
+  sensor_msgs::msg::Image::UniquePtr image,
+  sensor_msgs::msg::CameraInfo::UniquePtr info,
+  rclcpp::Time stamp) const
+{
+  if (!impl_ || !impl_->isValid()) {
+    auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
+    RCLCPP_FATAL(
+      logger,
+      "Call to publish() on an invalid image_transport::CameraPublisher");
+    return;
+  }
+
+  image->header.stamp = stamp;
+  info->header.stamp = stamp;
+  impl_->image_pub_.publish(std::move(image));
+  impl_->info_pub_->publish(std::move(info));
 }
 
 template<class NodeType>

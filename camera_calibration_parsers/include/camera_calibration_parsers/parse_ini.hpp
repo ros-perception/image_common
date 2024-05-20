@@ -35,6 +35,8 @@
 #ifndef CAMERA_CALIBRATION_PARSERS__PARSE_INI_HPP_
 #define CAMERA_CALIBRATION_PARSERS__PARSE_INI_HPP_
 
+#include <istream>
+#include <ostream>
 #include <string>
 
 #include "sensor_msgs/msg/camera_info.hpp"

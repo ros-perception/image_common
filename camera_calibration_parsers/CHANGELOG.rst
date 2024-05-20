@@ -2,6 +2,14 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.2.0 (2024-04-26)
+------------------
+
+5.1.2 (2024-04-16)
+------------------
+* Update to yaml-cpp 0.8.0. (`#305 <https://github.com/ros-perception/image_common/issues/305>`_)
+* Contributors: Chris Lalancette
+
 5.1.1 (2024-03-26)
 ------------------
 * Switch from rcpputils::fs to std::filesystem (`#300 <https://github.com/ros-perception/image_common/issues/300>`_)

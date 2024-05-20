@@ -2,6 +2,12 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.2.0 (2024-04-26)
+------------------
+
+5.1.2 (2024-04-16)
+------------------
+
 5.1.1 (2024-03-26)
 ------------------
 * Switch from rcpputils::fs to std::filesystem (`#300 <https://github.com/ros-perception/image_common/issues/300>`_)
