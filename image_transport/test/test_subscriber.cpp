@@ -30,6 +30,10 @@
 
 #include <string>
 #include <memory>
+#include <functional>
+#include <chrono>
+#include <atomic>
+#include <thread>
 
 #include "rclcpp/rclcpp.hpp"
 
