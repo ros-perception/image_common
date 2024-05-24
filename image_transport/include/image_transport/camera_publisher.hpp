@@ -112,6 +112,14 @@ public:
     const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const;
 
   /*!
+   * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
+   */
+  IMAGE_TRANSPORT_PUBLIC
+  void publish(
+    sensor_msgs::msg::Image::UniquePtr image,
+    sensor_msgs::msg::CameraInfo::UniquePtr info) const;
+
+  /*!
    * \brief Publish an (image, info) pair with given timestamp on the topics associated with
    * this CameraPublisher.
    *
@@ -121,6 +129,19 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   void publish(
     sensor_msgs::msg::Image & image, sensor_msgs::msg::CameraInfo & info,
+    rclcpp::Time stamp) const;
+
+  /*!
+   * \brief Publish an (image, info) pair with given timestamp on the topics associated with
+   * this CameraPublisher.
+   *
+   * Convenience version, which sets the timestamps of both image and info to stamp before
+   * publishing.
+   */
+  IMAGE_TRANSPORT_PUBLIC
+  void publish(
+    sensor_msgs::msg::Image::UniquePtr image,
+    sensor_msgs::msg::CameraInfo::UniquePtr info,
     rclcpp::Time stamp) const;
 
   /*!
