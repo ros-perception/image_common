@@ -2,6 +2,17 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.3 (2024-05-24)
+------------------
+* Add missing sub and pub options (`#308 <https://github.com/ros-perception/image_common/issues/308>`_) (`#309 <https://github.com/ros-perception/image_common/issues/309>`_)
+  Co-authored-by: Angsa Deployment Team <team@angsa-robotics.com>
+  (cherry picked from commit 74d9e8edb02eaf13771ee4d12a558d68279cbf44)
+  Co-authored-by: Tony Najjar <tony.najjar.1997@gmail.com>
+* Support zero-copy intra-process publishing (`#306 <https://github.com/ros-perception/image_common/issues/306>`_) (`#310 <https://github.com/ros-perception/image_common/issues/310>`_)
+  (cherry picked from commit fd51363e2b8f8cd99e9a77970c1d49eb86c1480f)
+  Co-authored-by: Błażej Sowa <bsowa123@gmail.com>
+* Contributors: mergify[bot]
+
 5.1.2 (2024-04-16)
 ------------------
 
