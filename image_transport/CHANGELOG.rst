@@ -2,6 +2,14 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.2.1 (2024-05-24)
+------------------
+* Removed warning (`#312 <https://github.com/ros-perception/image_common/issues/312>`_)
+* Support zero-copy intra-process publishing (`#306 <https://github.com/ros-perception/image_common/issues/306>`_)
+* Add missing sub and pub options (`#308 <https://github.com/ros-perception/image_common/issues/308>`_)
+  Co-authored-by: Angsa Deployment Team <team@angsa-robotics.com>
+* Contributors: Alejandro Hernández Cordero, Błażej Sowa, Tony Najjar
+
 5.2.0 (2024-04-26)
 ------------------
 
