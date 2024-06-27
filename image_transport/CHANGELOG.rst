@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+5.1.4 (2024-06-27)
+------------------
 * Removed warning (`#312 <https://github.com/ros-perception/image_common/issues/312>`_) (`#313 <https://github.com/ros-perception/image_common/issues/313>`_)
   Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
 * Contributors: mergify[bot]
