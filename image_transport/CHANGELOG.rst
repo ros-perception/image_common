@@ -2,6 +2,12 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removed warning (`#312 <https://github.com/ros-perception/image_common/issues/312>`_) (`#313 <https://github.com/ros-perception/image_common/issues/313>`_)
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* Contributors: mergify[bot]
+
 5.1.3 (2024-05-24)
 ------------------
 * Add missing sub and pub options (`#308 <https://github.com/ros-perception/image_common/issues/308>`_) (`#309 <https://github.com/ros-perception/image_common/issues/309>`_)
