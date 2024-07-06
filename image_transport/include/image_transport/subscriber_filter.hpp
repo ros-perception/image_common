@@ -62,7 +62,8 @@ void callback(const std::shared_ptr<const sensor_msgs::msg::Image>&);
 \endverbatim
  */
 
-class IMAGE_TRANSPORT_PUBLIC SubscriberFilter : public message_filters::SimpleFilter<sensor_msgs::msg::Image>
+class IMAGE_TRANSPORT_PUBLIC SubscriberFilter
+  : public message_filters::SimpleFilter<sensor_msgs::msg::Image>
 {
 public:
   /**

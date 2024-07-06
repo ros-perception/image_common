@@ -63,7 +63,6 @@ class IMAGE_TRANSPORT_PUBLIC Subscriber
 public:
   typedef std::function<void (const sensor_msgs::msg::Image::ConstSharedPtr &)> Callback;
 
-  
   Subscriber() = default;
 
   Subscriber(
