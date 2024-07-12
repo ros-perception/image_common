@@ -174,7 +174,6 @@ std::string Publisher::getTopic() const
 void Publisher::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(logger, "Call to publish() on an invalid image_transport::Publisher");
     return;
@@ -190,7 +189,6 @@ void Publisher::publish(const sensor_msgs::msg::Image & message) const
 void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(logger, "Call to publish() on an invalid image_transport::Publisher");
     return;
