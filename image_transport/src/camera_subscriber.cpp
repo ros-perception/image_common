@@ -31,8 +31,8 @@
 #include <memory>
 #include <string>
 
-#include "message_filters/subscriber.h"
-#include "message_filters/time_synchronizer.h"
+#include "message_filters/subscriber.hpp"
+#include "message_filters/time_synchronizer.hpp"
 
 #include "image_transport/camera_common.hpp"
 #include "image_transport/subscriber_filter.hpp"
