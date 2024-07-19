@@ -2,6 +2,12 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.3.1 (2024-07-19)
+------------------
+* Updated deprecated message filter headers (`#320 <https://github.com/ros-perception/image_common/issues/320>`_)
+* Removed outdated comment (`#319 <https://github.com/ros-perception/image_common/issues/319>`_)
+* Contributors: Alejandro Hernández Cordero
+
 5.3.0 (2024-06-17)
 ------------------
 * Preparing for qos deprecation (`#315 <https://github.com/ros-perception/image_common/issues/315>`_)
