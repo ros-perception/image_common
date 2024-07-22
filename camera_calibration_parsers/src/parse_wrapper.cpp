@@ -1,4 +1,4 @@
-// Copyright 2024 Open Source Robotics Foundation, Inc.
+// Copyright 2024
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without

@@ -1,5 +1,5 @@
 // Copyright (c) 2009, Willow Garage, Inc.
-// Copyright (c) 2018, Open Robotics
+// Copyright (c) 2018, Open Source Robotics Foundation, Inc.
 //
 // All rights reserved.
 //
