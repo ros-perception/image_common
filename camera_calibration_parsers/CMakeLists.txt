@@ -88,19 +88,9 @@ install(
 ament_export_dependencies(rclcpp sensor_msgs yaml_cpp_vendor)
 
 if(BUILD_TESTING)
-  #TODO(mjcarroll) switch back to this once I can fix copyright check
-  #find_package(ament_lint_auto REQUIRED)
-  #ament_lint_auto_find_test_dependencies()
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
 
-  find_package(ament_cmake_cppcheck REQUIRED)
-  find_package(ament_cmake_cpplint REQUIRED)
-  find_package(ament_cmake_lint_cmake REQUIRED)
-  find_package(ament_cmake_uncrustify REQUIRED)
-  #TODO(mjcarroll) Headers need to be .hpp for this to work properly.
-  #ament_cppcheck()
-  ament_cpplint()
-  ament_lint_cmake()
-  ament_uncrustify()
   find_package(ament_cmake_gtest)
 
   ament_add_gtest(${PROJECT_NAME}-parse_ini test/test_parse_ini.cpp)
