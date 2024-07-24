@@ -66,6 +66,7 @@ boost::python::tuple readCalibrationWrapper(const std::string & file_name)
   return boost::python::make_tuple(result, camera_name, cam_info);
 }
 
+// cppcheck-suppress syntaxError
 BOOST_PYTHON_MODULE(camera_calibration_parsers_wrapper)
 {
   boost::python::def(
