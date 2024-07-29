@@ -2,6 +2,9 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 5.3.1 (2024-07-19)
 ------------------
 * Added common test to camera info manager (`#318 <https://github.com/ros-perception/image_common/issues/318>`_)

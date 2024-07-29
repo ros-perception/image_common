@@ -2,6 +2,9 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 5.3.1 (2024-07-19)
 ------------------
 * Updated deprecated message filter headers (`#320 <https://github.com/ros-perception/image_common/issues/320>`_)

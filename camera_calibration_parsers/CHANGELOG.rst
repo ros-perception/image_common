@@ -2,6 +2,11 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added common linters to camera_calibration_parsers (`#317 <https://github.com/ros-perception/image_common/issues/317>`_)
+* Contributors: Alejandro Hernández Cordero
+
 5.3.1 (2024-07-19)
 ------------------
 
