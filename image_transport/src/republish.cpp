@@ -44,7 +44,7 @@ namespace image_transport
 {
 
 Republisher::Republisher(const rclcpp::NodeOptions & options)
-: Node("point_cloud_republisher", options)
+: Node("image_republisher", options)
 {
   // Initialize Republishercomponent after construction
   // shared_from_this can't be used in the constructor
