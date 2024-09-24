@@ -128,7 +128,7 @@ std::vector<std::string> getLoadableTransports()
   return loadableTransports;
 }
 
-ImageTransport::ImageTransport(const ImageTransport& other)
+ImageTransport::ImageTransport(const ImageTransport & other)
 : impl_(std::make_unique<Impl>(*other.impl_)) {}
 
 ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
