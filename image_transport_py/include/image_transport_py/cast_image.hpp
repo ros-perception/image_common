@@ -40,7 +40,7 @@ namespace detail
 
 using ContainerAllocator = std::allocator<void>;
 
-template <>
+template<>
 struct type_caster<builtin_interfaces::msg::Time_<ContainerAllocator>>
 {
 public:
@@ -71,7 +71,7 @@ public:
   }
 };
 
-template <>
+template<>
 struct type_caster<std_msgs::msg::Header_<ContainerAllocator>>
 {
 public:
@@ -86,7 +86,7 @@ public:
     value.stamp = src.attr("stamp").cast<builtin_interfaces::msg::Time_<ContainerAllocator>>();
     value.frame_id =
       src.attr("frame_id")
-        .cast<std::basic_string<
+      .cast<std::basic_string<
           char, std::char_traits<char>,
           typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>();
     return true;
@@ -106,7 +106,7 @@ public:
   }
 };
 
-template <>
+template<>
 struct type_caster<sensor_msgs::msg::Image_<ContainerAllocator>>
 {
 public:
@@ -123,14 +123,14 @@ public:
     value.width = src.attr("width").cast<uint32_t>();
     value.encoding =
       src.attr("encoding")
-        .cast<std::basic_string<
+      .cast<std::basic_string<
           char, std::char_traits<char>,
           typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>();
     value.is_bigendian = src.attr("is_bigendian").cast<uint8_t>();
     value.step = src.attr("step").cast<uint32_t>();
     value.data =
       src.attr("data")
-        .cast<std::vector<
+      .cast<std::vector<
           uint8_t,
           typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<uint8_t>>>();
     return true;

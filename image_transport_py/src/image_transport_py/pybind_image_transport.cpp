@@ -34,24 +34,25 @@ PYBIND11_MODULE(_image_transport, m)
   m.doc() = "Python wrapper of the image_transport API";
 
   pybind11::class_<image_transport::Publisher>(m, "Publisher")
-    .def(pybind11::init())
-    .def("get_topic", &image_transport::Publisher::getTopic, "Returns the base image topic.")
-    .def(
-      "get_num_subscribers", &image_transport::Publisher::getNumSubscribers,
-      "Returns the number of subscribers this publisher is connected to.")
-    .def(
-      "shutdown", &image_transport::Publisher::shutdown,
-      "Unsubscribe the callback associated with this Publisher.")
-    .def(
-      "publish",
-      [](image_transport::Publisher & publisher, sensor_msgs::msg::Image & img) {
-        publisher.publish(img);
-      },
-      "Publish an image on the topics associated with this Publisher.");
+  .def(pybind11::init())
+  .def("get_topic", &image_transport::Publisher::getTopic, "Returns the base image topic.")
+  .def(
+    "get_num_subscribers", &image_transport::Publisher::getNumSubscribers,
+    "Returns the number of subscribers this publisher is connected to.")
+  .def(
+    "shutdown", &image_transport::Publisher::shutdown,
+    "Unsubscribe the callback associated with this Publisher.")
+  .def(
+    "publish",
+    [](image_transport::Publisher & publisher, sensor_msgs::msg::Image & img) {
+      publisher.publish(img);
+    },
+    "Publish an image on the topics associated with this Publisher.");
 
   pybind11::class_<image_transport::ImageTransport>(m, "ImageTransport")
-    .def(
-      pybind11::init([](const std::string & node_name, const std::string & launch_params_filepath) {
+  .def(
+    pybind11::init(
+      [](const std::string & node_name, const std::string & launch_params_filepath) {
         if (!rclcpp::ok()) {
           rclcpp::init(0, nullptr);
         }
@@ -59,27 +60,27 @@ PYBIND11_MODULE(_image_transport, m)
 
         if (!launch_params_filepath.empty()) {
           node_options.allow_undeclared_parameters(true)
-            .automatically_declare_parameters_from_overrides(true)
-            .arguments({"--ros-args", "--params-file", launch_params_filepath});
+          .automatically_declare_parameters_from_overrides(true)
+          .arguments({"--ros-args", "--params-file", launch_params_filepath});
         }
         rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared(node_name, "", node_options);
 
         std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor =
-          std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+        std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
 
         auto spin_node = [node, executor]() {
-          executor->add_node(node);
-          executor->spin();
-        };
+        executor->add_node(node);
+        executor->spin();
+      };
         std::thread execution_thread(spin_node);
         execution_thread.detach();
 
         return image_transport::ImageTransport(node);
       }))
-    .def(
-      "advertise",
-      pybind11::overload_cast<const std::string &, uint32_t, bool>(
-        &image_transport::ImageTransport::advertise),
-      pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("latch") = false);
+  .def(
+    "advertise",
+    pybind11::overload_cast<const std::string &, uint32_t, bool>(
+      &image_transport::ImageTransport::advertise),
+    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("latch") = false);
 }
 }  // namespace image_transport_python
