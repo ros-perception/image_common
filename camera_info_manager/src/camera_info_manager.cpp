@@ -94,8 +94,7 @@ CameraInfoManager::CameraInfoManager(
   rclcpp::node_interfaces::NodeServicesInterface::SharedPtr node_services_interface,
   rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logger_interface,
   const std::string & cname, const std::string & url, const std::string & ns,
-  rmw_qos_profile_t custom_qos
-  )
+  rmw_qos_profile_t custom_qos)
 : logger_(node_logger_interface->get_logger()),
   camera_name_(cname),
   url_(url),
