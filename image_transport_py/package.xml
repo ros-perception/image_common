@@ -21,7 +21,6 @@
 
   <depend>image_transport</depend>
   <depend>pybind11_vendor</depend>
-  <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
 
