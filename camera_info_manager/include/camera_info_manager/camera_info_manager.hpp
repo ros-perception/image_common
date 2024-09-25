@@ -155,6 +155,13 @@ using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
     will be stored there, missing parent directories being created if
     necessary and possible.
 
+    @par Namespace
+
+    The CameraInfoManager constructor takes an optional namespace
+    argument, which is used to set the ROS namespace for the
+    set_camera_info service. If not provided, the namespace defaults
+    to the private namespace of the node (i.e., "~/set_camera_info").
+
     @par Loading Calibration Data
 
     Prior to Fuerte, calibration information was loaded in the
@@ -178,13 +185,15 @@ public:
   CameraInfoManager(
     rclcpp::Node * node,
     const std::string & cname = "camera",
-    const std::string & url = "");
+    const std::string & url = "",
+    const std::string & ns = "~");
 
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfoManager(
     rclcpp_lifecycle::LifecycleNode * node,
     const std::string & cname = "camera",
-    const std::string & url = "");
+    const std::string & url = "",
+    const std::string & ns = "~");
 
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfoManager(
@@ -192,7 +201,8 @@ public:
     rclcpp::node_interfaces::NodeServicesInterface::SharedPtr node_services_interface,
     rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logger_interface,
     const std::string & cname = "camera", const std::string & url = "",
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    const std::string & ns = "~");
 
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfo getCameraInfo(void);
@@ -272,6 +282,7 @@ private:
   rclcpp::Logger logger_;               ///< logger
   std::string camera_name_;             ///< camera name
   std::string url_;                     ///< URL for calibration data
+  std::string namespace_;               ///< ROS namespace set_camera_info service
   CameraInfo cam_info_;    ///< current CameraInfo
   bool loaded_cam_info_;                ///< cam_info_ load attempted
 };  // class CameraInfoManager

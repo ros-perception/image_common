@@ -69,20 +69,25 @@ const std::string
  *           subordinate names, like "left/camera" and "right/camera".
  * @param cname default camera name
  * @param url default Uniform Resource Locator for loading and saving data.
+ * @param ns namespace for the set_camera_info service. If not specified,
+ *           the service name will be "~/set_camera_info".
  */
 CameraInfoManager::CameraInfoManager(
   rclcpp::Node * node, const std::string & cname,
-  const std::string & url)
+  const std::string & url, const std::string & ns)
 : CameraInfoManager(node->get_node_base_interface(),
-    node->get_node_services_interface(), node->get_node_logging_interface(), cname, url)
+    node->get_node_services_interface(), node->get_node_logging_interface(), cname, url,
+    rmw_qos_profile_default, ns)
 {
 }
 
 CameraInfoManager::CameraInfoManager(
   rclcpp_lifecycle::LifecycleNode * node,
-  const std::string & cname, const std::string & url)
+  const std::string & cname, const std::string & url,
+  const std::string & ns)
 : CameraInfoManager(node->get_node_base_interface(),
-    node->get_node_services_interface(), node->get_node_logging_interface(), cname, url)
+    node->get_node_services_interface(), node->get_node_logging_interface(), cname, url,
+    rmw_qos_profile_default, ns)
 {
 }
 
@@ -90,17 +95,19 @@ CameraInfoManager::CameraInfoManager(
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
   rclcpp::node_interfaces::NodeServicesInterface::SharedPtr node_services_interface,
   rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logger_interface,
-  const std::string & cname, const std::string & url, rmw_qos_profile_t custom_qos)
+  const std::string & cname, const std::string & url,
+  rmw_qos_profile_t custom_qos, const std::string & ns)
 : logger_(node_logger_interface->get_logger()),
   camera_name_(cname),
   url_(url),
+  namespace_(ns),
   loaded_cam_info_(false)
 {
   using namespace std::placeholders;
 
   // register callback for camera calibration service request
   info_service_ = rclcpp::create_service<SetCameraInfo>(
-    node_base_interface, node_services_interface, "~/set_camera_info",
+    node_base_interface, node_services_interface, namespace_ + "/set_camera_info",
     std::bind(&CameraInfoManager::setCameraInfoService, this, _1, _2), custom_qos, nullptr);
 }
 
