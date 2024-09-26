@@ -27,6 +27,7 @@
 #include "pybind11/stl.h"
 
 #include "sensor_msgs/msg/image.hpp"
+#include "sensor_msgs/msg/camera_info.hpp"
 
 static inline bool is_ros_msg_type(pybind11::handle src, const std::string & msg_type_name)
 {
@@ -153,6 +154,163 @@ public:
     msg.attr("data") = pybind11::cast(cpp_msg.data);
     msg.inc_ref();
     return msg;
+  }
+};
+
+template<>
+struct type_caster<std::shared_ptr<const sensor_msgs::msg::Image>>
+{
+public:
+  PYBIND11_TYPE_CASTER(
+    std::shared_ptr<const sensor_msgs::msg::Image>,
+    const_name("sensor_msgs::msg::Image"));
+
+  bool load(handle src, bool)
+  {
+    type_caster<sensor_msgs::msg::Image> base_caster;
+    if (!base_caster.load(src, false)) {
+      return false;
+    }
+    value =
+      std::make_shared<sensor_msgs::msg::Image>(
+      std::move(
+        base_caster.operator sensor_msgs::msg
+        ::Image & ()));
+    return true;
+  }
+
+  static handle cast(
+    const std::shared_ptr<const sensor_msgs::msg::Image> & ptr,
+    return_value_policy policy, handle parent)
+  {
+    if (!ptr) {
+      return pybind11::none().release();
+    }
+    return type_caster<sensor_msgs::msg::Image>::cast(*ptr, policy, parent);
+  }
+};
+
+template<>
+struct type_caster<sensor_msgs::msg::RegionOfInterest_<ContainerAllocator>>
+{
+public:
+  PYBIND11_TYPE_CASTER(
+    sensor_msgs::msg::RegionOfInterest_<ContainerAllocator>,
+    const_name("sensor_msgs::msg::RegionOfInterest_<ContainerAllocator>"));
+  bool load(handle src, bool)
+  {
+    if (!is_ros_msg_type(src, "sensor_msgs.msg._region_of_interest")) {
+      return false;
+    }
+    value.x_offset = src.attr("x_offset").cast<uint32_t>();
+    value.y_offset = src.attr("y_offset").cast<uint32_t>();
+    value.height = src.attr("height").cast<uint32_t>();
+    value.width = src.attr("width").cast<uint32_t>();
+    value.do_rectify = src.attr("do_rectify").cast<bool>();
+    return true;
+  }
+
+  static handle cast(
+    sensor_msgs::msg::RegionOfInterest_<ContainerAllocator> cpp_msg,
+    return_value_policy /* policy */,
+    handle /* parent */)
+  {
+    object mod = module::import("sensor_msgs.msg._region_of_interest");
+    object MsgType = mod.attr("RegionOfInterest");
+    object msg = MsgType();
+    msg.attr("x_offset") = pybind11::cast(cpp_msg.x_offset);
+    msg.attr("y_offset") = pybind11::cast(cpp_msg.y_offset);
+    msg.attr("height") = pybind11::cast(cpp_msg.height);
+    msg.attr("width") = pybind11::cast(cpp_msg.width);
+    msg.attr("do_rectify") = pybind11::cast(cpp_msg.do_rectify);
+    msg.inc_ref();
+    return msg;
+  }
+};
+
+template<>
+struct type_caster<sensor_msgs::msg::CameraInfo_<ContainerAllocator>>
+{
+public:
+  PYBIND11_TYPE_CASTER(
+    sensor_msgs::msg::CameraInfo_<ContainerAllocator>,
+    const_name("sensor_msgs::msg::CameraInfo_<ContainerAllocator>"));
+  bool load(handle src, bool)
+  {
+    if (!is_ros_msg_type(src, "sensor_msgs.msg._camera_info")) {
+      return false;
+    }
+    value.header = src.attr("header").cast<std_msgs::msg::Header_<ContainerAllocator>>();
+    value.height = src.attr("height").cast<uint32_t>();
+    value.width = src.attr("width").cast<uint32_t>();
+    value.distortion_model = src.attr("distortion_model").cast<std::basic_string<char,
+        std::char_traits<char>,
+        typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>();
+    value.d = src.attr("d").cast<std::vector<double,
+        typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<double>>>();
+    value.k = src.attr("k").cast<std::array<double, 9>>();
+    value.r = src.attr("r").cast<std::array<double, 9>>();
+    value.p = src.attr("p").cast<std::array<double, 12>>();
+    value.binning_x = src.attr("binning_x").cast<uint32_t>();
+    value.binning_y = src.attr("binning_y").cast<uint32_t>();
+    value.roi = src.attr("roi").cast<sensor_msgs::msg::RegionOfInterest_<ContainerAllocator>>();
+    return true;
+  }
+
+  static handle cast(
+    sensor_msgs::msg::CameraInfo_<ContainerAllocator> cpp_msg,
+    return_value_policy /* policy */,
+    handle /* parent */)
+  {
+    object mod = module::import("sensor_msgs.msg._camera_info");
+    object MsgType = mod.attr("CameraInfo");
+    object msg = MsgType();
+    msg.attr("header") = pybind11::cast(cpp_msg.header);
+    msg.attr("height") = pybind11::cast(cpp_msg.height);
+    msg.attr("width") = pybind11::cast(cpp_msg.width);
+    msg.attr("distortion_model") = pybind11::cast(cpp_msg.distortion_model);
+    msg.attr("d") = pybind11::cast(cpp_msg.d);
+    msg.attr("k") = pybind11::cast(cpp_msg.k);
+    msg.attr("r") = pybind11::cast(cpp_msg.r);
+    msg.attr("p") = pybind11::cast(cpp_msg.p);
+    msg.attr("binning_x") = pybind11::cast(cpp_msg.binning_x);
+    msg.attr("binning_y") = pybind11::cast(cpp_msg.binning_y);
+    msg.attr("roi") = pybind11::cast(cpp_msg.roi);
+    msg.inc_ref();
+    return msg;
+  }
+};
+
+template<>
+struct type_caster<std::shared_ptr<const sensor_msgs::msg::CameraInfo>>
+{
+public:
+  PYBIND11_TYPE_CASTER(
+    std::shared_ptr<const sensor_msgs::msg::CameraInfo>,
+    const_name("sensor_msgs::msg::CameraInfo"));
+
+  bool load(handle src, bool)
+  {
+    type_caster<sensor_msgs::msg::CameraInfo> base_caster;
+    if (!base_caster.load(src, false)) {
+      return false;
+    }
+    value =
+      std::make_shared<sensor_msgs::msg::CameraInfo>(
+      std::move(
+        base_caster.operator sensor_msgs
+        ::msg::CameraInfo & ()));
+    return true;
+  }
+
+  static handle cast(
+    const std::shared_ptr<const sensor_msgs::msg::CameraInfo> & ptr,
+    return_value_policy policy, handle parent)
+  {
+    if (!ptr) {
+      return pybind11::none().release();
+    }
+    return type_caster<sensor_msgs::msg::CameraInfo>::cast(*ptr, policy, parent);
   }
 };
 

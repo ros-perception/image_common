@@ -32,24 +32,9 @@ using namespace std::chrono_literals;
 namespace image_transport_python
 {
 
-class PyImageTransport : public image_transport::ImageTransport {
-public:
-    // Constructor that takes an rclcpp::Node::SharedPtr
-    PyImageTransport(const rclcpp::Node::SharedPtr& node)
-        : image_transport::ImageTransport(node) {}
+template<typename SubscriberType>
+using SubscriberMap = std::unordered_map<SubscriberType *, std::shared_ptr<SubscriberType>>;
 
-    // Public member variable for the subscriber
-    thread_local image_transport::Subscriber subscriber_;
-};
-
-
-void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
-{
-  RCLCPP_INFO(
-    rclcpp::get_logger(
-      "image_transport"), "message arrived yoho. %s", msg->encoding.c_str());
-
-}
 // Bindings for the image_transport classes
 PYBIND11_MODULE(_image_transport, m)
 {
@@ -90,8 +75,7 @@ PYBIND11_MODULE(_image_transport, m)
     },
     "Publish an image and camera info on the topics associated with this Publisher.");
 
-  // pybind11::class_<image_transport::ImageTransport>(m, "ImageTransport")
-  pybind11::class_<image_transport_python::PyImageTransport>(m, "ImageTransport")
+  pybind11::class_<image_transport::ImageTransport>(m, "ImageTransport")
   .def(
     pybind11::init(
       [](const std::string & node_name, const std::string & launch_params_filepath) {
@@ -107,32 +91,17 @@ PYBIND11_MODULE(_image_transport, m)
         }
         rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared(node_name, "", node_options);
 
-
-        RCLCPP_INFO(node->get_logger(), "starting thread");
         std::shared_ptr<rclcpp::executors::MultiThreadedExecutor> executor =
         std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
 
         auto spin_node = [node, executor]() {
-        // auto subscription = node->create_subscription<sensor_msgs::msg::Image>(
-        //   "camera/image", 10, image_transport_python::imageCallback);
-
-        RCLCPP_INFO(node->get_logger(), "spin on!");
         executor->add_node(node);
         executor->spin();
-        // while (rclcpp::ok()) {
-        // Spin some to process available callbacks, but do not block indefinitely
-        // executor->spin_some();  // Spin for up to 100ms at a time
-        // std::this_thread::sleep_for(1000ms);  // Simulate other tasks or waiting
-        // RCLCPP_INFO(node->get_logger(), "spinnn!");
-        // }
-
-        RCLCPP_INFO(node->get_logger(), "spin off!");
       };
         std::thread execution_thread(spin_node);
         execution_thread.detach();
 
-        // return image_transport::ImageTransport(node);
-        return image_transport_python::PyImageTransport(node);
+        return image_transport::ImageTransport(node);
       }))
   .def(
     "advertise",
@@ -146,24 +115,42 @@ PYBIND11_MODULE(_image_transport, m)
     pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("latch") = false)
   .def(
     "subscribe",
-    [](image_transport_python::PyImageTransport & image_transport,
+    [](image_transport::ImageTransport & image_transport,
     const std::string & base_topic,
     uint32_t queue_size,
-    const std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)> & callback) {
+    const image_transport::Subscriber::Callback & callback) {
 
-      RCLCPP_INFO(image_transport.impl_->node_->get_logger(), "in subscribe");
-
-      // image_transport.subscriber_ = std::make_unique<image_transport::Subscriber>(image_transport.subscribe(base_topic, queue_size, image_transport_python::imageCallback)) ;
-      // auto subscription = 
-      thread_local auto  subscription = std::make_shared<image_transport::Subscriber>(image_transport.subscribe(base_topic, queue_size, image_transport_python::imageCallback)) ;
-      // RCLCPP_INFO(image_transport.impl_->node_->get_logger(), "subscribed to %s", subscription.getTopic().c_str());
+      // Static vector to keep the subscriptions alive
+      thread_local auto vec = std::vector<std::shared_ptr<image_transport::Subscriber>>();
+      auto subscription =
+      std::make_shared<image_transport::Subscriber>(
+        image_transport.subscribe(
+          base_topic,
+          queue_size, callback));
+      vec.push_back(subscription);
 
       return subscription;
-
-  },  
+    },
     pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("callback"))
+  .def(
+    "subscribe_camera",
+    [](image_transport::ImageTransport & image_transport,
+    const std::string & base_topic,
+    uint32_t queue_size,
+    const image_transport::CameraSubscriber::Callback & callback) {
 
-  ;
+      // Static vector to keep the subscriptions alive
+      thread_local auto vec = std::vector<std::shared_ptr<image_transport::CameraSubscriber>>();
+      auto subscription =
+      std::make_shared<image_transport::CameraSubscriber>(
+        image_transport.subscribeCamera(
+          base_topic,
+          queue_size, callback));
+      vec.push_back(subscription);
+
+      return subscription;
+    },
+    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("callback"));
 
   pybind11::class_<image_transport::Subscriber, std::shared_ptr<image_transport::Subscriber>>(
     m,
@@ -186,5 +173,25 @@ PYBIND11_MODULE(_image_transport, m)
     "Unsubscribe the callback associated with this Subscriber.");
 
 
+  pybind11::class_<image_transport::CameraSubscriber,
+    std::shared_ptr<image_transport::CameraSubscriber>>(
+    m,
+    "CameraSubscriber")
+  .def(pybind11::init())
+  .def(
+    "get_topic",
+    &image_transport::CameraSubscriber::getTopic,
+    "Returns the base image topic.")
+  .def(
+    "get_num_publishers",
+    &image_transport::CameraSubscriber::getNumPublishers,
+    "Returns the number of publishers this subscriber is connected to.")
+  .def(
+    "get_transport",
+    &image_transport::CameraSubscriber::getTransport,
+    "Returns the name of the transport being used.")
+  .def(
+    "shutdown", &image_transport::CameraSubscriber::shutdown,
+    "Unsubscribe the callback associated with this CameraSubscriber.");
 }
 }  // namespace image_transport_python
