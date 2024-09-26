@@ -42,7 +42,7 @@ namespace image_transport
 /**
  * \brief Stores transport settings for an image topic subscription.
  */
-class TransportHints
+class IMAGE_TRANSPORT_PUBLIC TransportHints
 {
 public:
   /**
@@ -57,7 +57,6 @@ public:
    * @param default_transport Preferred transport to use
    * @param parameter_name The name of the transport parameter
    */
-  IMAGE_TRANSPORT_PUBLIC
   TransportHints(
     const rclcpp::Node * node,
     const std::string & default_transport = "raw",
@@ -66,7 +65,6 @@ public:
     node->get_parameter_or<std::string>(parameter_name, transport_, default_transport);
   }
 
-  IMAGE_TRANSPORT_PUBLIC
   const std::string & getTransport() const
   {
     return transport_;

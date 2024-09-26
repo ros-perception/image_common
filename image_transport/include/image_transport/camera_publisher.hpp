@@ -61,13 +61,11 @@ class ImageTransport;
  * associated with that handle will stop being called. Once all CameraPublisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
-class CameraPublisher
+class IMAGE_TRANSPORT_PUBLIC CameraPublisher
 {
 public:
-  IMAGE_TRANSPORT_PUBLIC
   CameraPublisher() = default;
 
-  IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -80,25 +78,21 @@ public:
    *
    * Returns max(image topic subscribers, info topic subscribers).
    */
-  IMAGE_TRANSPORT_PUBLIC
   size_t getNumSubscribers() const;
 
   /*!
    * \brief Returns the base (image) topic of this CameraPublisher.
    */
-  IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
 
   /**
    * \brief Returns the camera info topic of this CameraPublisher.
    */
-  IMAGE_TRANSPORT_PUBLIC
   std::string getInfoTopic() const;
 
   /*!
    * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  IMAGE_TRANSPORT_PUBLIC
   void publish(
     const sensor_msgs::msg::Image & image,
     const sensor_msgs::msg::CameraInfo & info) const;
@@ -106,7 +100,6 @@ public:
   /*!
    * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  IMAGE_TRANSPORT_PUBLIC
   void publish(
     const sensor_msgs::msg::Image::ConstSharedPtr & image,
     const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const;
@@ -114,7 +107,6 @@ public:
   /*!
    * \brief Publish an (image, info) pair on the topics associated with this CameraPublisher.
    */
-  IMAGE_TRANSPORT_PUBLIC
   void publish(
     sensor_msgs::msg::Image::UniquePtr image,
     sensor_msgs::msg::CameraInfo::UniquePtr info) const;
@@ -126,7 +118,6 @@ public:
    * Convenience version, which sets the timestamps of both image and info to stamp before
    * publishing.
    */
-  IMAGE_TRANSPORT_PUBLIC
   void publish(
     sensor_msgs::msg::Image & image, sensor_msgs::msg::CameraInfo & info,
     rclcpp::Time stamp) const;
@@ -138,7 +129,6 @@ public:
    * Convenience version, which sets the timestamps of both image and info to stamp before
    * publishing.
    */
-  IMAGE_TRANSPORT_PUBLIC
   void publish(
     sensor_msgs::msg::Image::UniquePtr image,
     sensor_msgs::msg::CameraInfo::UniquePtr info,
@@ -147,19 +137,14 @@ public:
   /*!
    * \brief Shutdown the advertisements associated with this Publisher.
    */
-  IMAGE_TRANSPORT_PUBLIC
   void shutdown();
 
-  IMAGE_TRANSPORT_PUBLIC
   operator void *() const;
 
-  IMAGE_TRANSPORT_PUBLIC
   bool operator<(const CameraPublisher & rhs) const {return impl_ < rhs.impl_;}
 
-  IMAGE_TRANSPORT_PUBLIC
   bool operator!=(const CameraPublisher & rhs) const {return impl_ != rhs.impl_;}
 
-  IMAGE_TRANSPORT_PUBLIC
   bool operator==(const CameraPublisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:

@@ -58,15 +58,13 @@ namespace image_transport
  * associated with that handle will stop being called. Once all Subscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
-class Subscriber
+class IMAGE_TRANSPORT_PUBLIC Subscriber
 {
 public:
   typedef std::function<void (const sensor_msgs::msg::Image::ConstSharedPtr &)> Callback;
 
-  IMAGE_TRANSPORT_PUBLIC
   Subscriber() = default;
 
-  IMAGE_TRANSPORT_PUBLIC
   Subscriber(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -82,34 +80,26 @@ public:
    * The Subscriber may actually be subscribed to some transport-specific topic that
    * differs from the base topic.
    */
-  IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
 
   /**
    * \brief Returns the number of publishers this subscriber is connected to.
    */
-  IMAGE_TRANSPORT_PUBLIC
   size_t getNumPublishers() const;
 
   /**
    * \brief Returns the name of the transport being used.
    */
-  IMAGE_TRANSPORT_PUBLIC
   std::string getTransport() const;
 
   /**
    * \brief Unsubscribe the callback associated with this Subscriber.
    */
-  IMAGE_TRANSPORT_PUBLIC
   void shutdown();
 
-  IMAGE_TRANSPORT_PUBLIC
   operator void *() const;
-  IMAGE_TRANSPORT_PUBLIC
   bool operator<(const Subscriber & rhs) const {return impl_ < rhs.impl_;}
-  IMAGE_TRANSPORT_PUBLIC
   bool operator!=(const Subscriber & rhs) const {return impl_ != rhs.impl_;}
-  IMAGE_TRANSPORT_PUBLIC
   bool operator==(const Subscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:

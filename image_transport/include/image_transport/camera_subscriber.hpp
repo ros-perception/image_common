@@ -60,16 +60,14 @@ void callback(const sensor_msgs::msg::Image::ConstSharedPtr&, const sensor_msgs:
  * associated with that handle will stop being called. Once all CameraSubscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
-class CameraSubscriber
+class IMAGE_TRANSPORT_PUBLIC CameraSubscriber
 {
 public:
   typedef std::function<void (const sensor_msgs::msg::Image::ConstSharedPtr &,
       const sensor_msgs::msg::CameraInfo::ConstSharedPtr &)> Callback;
 
-  IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber() = default;
 
-  IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -80,43 +78,34 @@ public:
   /**
    * \brief Get the base topic (on which the raw image is published).
    */
-  IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
 
   /**
    * \brief Get the camera info topic.
    */
-  IMAGE_TRANSPORT_PUBLIC
   std::string getInfoTopic() const;
 
   /**
    * \brief Returns the number of publishers this subscriber is connected to.
    */
-  IMAGE_TRANSPORT_PUBLIC
   size_t getNumPublishers() const;
 
   /**
    * \brief Returns the name of the transport being used.
    */
-  IMAGE_TRANSPORT_PUBLIC
   std::string getTransport() const;
 
   /**
    * \brief Unsubscribe the callback associated with this CameraSubscriber.
    */
-  IMAGE_TRANSPORT_PUBLIC
   void shutdown();
 
-  IMAGE_TRANSPORT_PUBLIC
   operator void *() const;
 
-  IMAGE_TRANSPORT_PUBLIC
   bool operator<(const CameraSubscriber & rhs) const {return impl_ < rhs.impl_;}
 
-  IMAGE_TRANSPORT_PUBLIC
   bool operator!=(const CameraSubscriber & rhs) const {return impl_ != rhs.impl_;}
 
-  IMAGE_TRANSPORT_PUBLIC
   bool operator==(const CameraSubscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
