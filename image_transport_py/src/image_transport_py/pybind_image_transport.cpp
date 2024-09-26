@@ -78,7 +78,8 @@ PYBIND11_MODULE(_image_transport, m)
   pybind11::class_<image_transport::ImageTransport>(m, "ImageTransport")
   .def(
     pybind11::init(
-      [](const std::string & node_name, const std::string & launch_params_filepath) {
+      [](const std::string & node_name, const std::string & image_transport,
+      const std::string & launch_params_filepath) {
         if (!rclcpp::ok()) {
           rclcpp::init(0, nullptr);
         }
@@ -88,31 +89,42 @@ PYBIND11_MODULE(_image_transport, m)
           node_options.allow_undeclared_parameters(true)
           .automatically_declare_parameters_from_overrides(true)
           .arguments({"--ros-args", "--params-file", launch_params_filepath});
+        } else if (!image_transport.empty()) {
+          node_options.allow_undeclared_parameters(true)
+          .automatically_declare_parameters_from_overrides(true)
+          .append_parameter_override("image_transport", image_transport);
         }
+
         rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared(node_name, "", node_options);
 
         std::shared_ptr<rclcpp::executors::MultiThreadedExecutor> executor =
         std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
 
         auto spin_node = [node, executor]() {
-          executor->add_node(node);
-          executor->spin();
-        };
+        executor->add_node(node);
+        executor->spin();
+      };
         std::thread execution_thread(spin_node);
         execution_thread.detach();
 
         return image_transport::ImageTransport(node);
-      }))
+      }),
+    pybind11::arg("node_name"), pybind11::arg("image_transport") = "",
+    pybind11::arg("launch_params_filepath") = "",
+
+    "Initialize an ImageTransport object with a node name and launch params file path.")
   .def(
     "advertise",
     pybind11::overload_cast<const std::string &, uint32_t, bool>(
       &image_transport::ImageTransport::advertise),
-    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("latch") = false)
+    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("latch") = false,
+    "Advertise an image topic.")
   .def(
     "advertise_camera",
     pybind11::overload_cast<const std::string &, uint32_t, bool>(
       &image_transport::ImageTransport::advertiseCamera),
-    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("latch") = false)
+    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("latch") = false,
+    "Advertise an image topic with camera info.")
   .def(
     "subscribe",
     [](image_transport::ImageTransport & image_transport,
@@ -131,7 +143,8 @@ PYBIND11_MODULE(_image_transport, m)
 
       return subscription;
     },
-    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("callback"))
+    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("callback"),
+    "Subscribe to an image topic.")
   .def(
     "subscribe_camera",
     [](image_transport::ImageTransport & image_transport,
@@ -150,7 +163,8 @@ PYBIND11_MODULE(_image_transport, m)
 
       return subscription;
     },
-    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("callback"));
+    pybind11::arg("base_topic"), pybind11::arg("queue_size"), pybind11::arg("callback"),
+    "Subscribe to an image topic with camera info.");
 
   pybind11::class_<image_transport::Subscriber, std::shared_ptr<image_transport::Subscriber>>(
     m,
