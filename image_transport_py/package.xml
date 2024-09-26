@@ -12,8 +12,8 @@
 
   <license>BSD</license>
 
-  <url type="repository">https://github.com/ros-perception/image_transport</url>
-  <url type="bugtracker">https://github.com/ros-perception/image_transport/issues</url>
+  <url type="repository">https://github.com/ros-perception/image_common</url>
+  <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
