@@ -95,9 +95,9 @@ PYBIND11_MODULE(_image_transport, m)
         std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
 
         auto spin_node = [node, executor]() {
-        executor->add_node(node);
-        executor->spin();
-      };
+          executor->add_node(node);
+          executor->spin();
+        };
         std::thread execution_thread(spin_node);
         execution_thread.detach();
 
