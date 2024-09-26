@@ -42,14 +42,20 @@ class ClassLoader;
 
 namespace image_transport
 {
+template<class NodeType>
 class PublisherPlugin;
+template<class NodeType>
 class SubscriberPlugin;
 
-typedef pluginlib::ClassLoader<PublisherPlugin> PubLoader;
-typedef std::shared_ptr<PubLoader> PubLoaderPtr;
+template<class NodeType>
+using PubLoader = pluginlib::ClassLoader<PublisherPlugin<NodeType>>;
+template<class NodeType>
+using PubLoaderPtr = std::shared_ptr<PubLoader<NodeType>>;
 
-typedef pluginlib::ClassLoader<SubscriberPlugin> SubLoader;
-typedef std::shared_ptr<SubLoader> SubLoaderPtr;
+template<class NodeType>
+using SubLoader = pluginlib::ClassLoader<SubscriberPlugin<NodeType>>;
+template<class NodeType>
+using SubLoaderPtr = std::shared_ptr<SubLoader<NodeType>>;
 }  // namespace image_transport
 
 #endif  // IMAGE_TRANSPORT__LOADER_FWDS_HPP_

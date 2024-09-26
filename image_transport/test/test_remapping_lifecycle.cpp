@@ -36,35 +36,35 @@
 #include <thread>
 
 #include "rclcpp/rclcpp.hpp"
-#include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "utils.hpp"
 
 #include "image_transport/image_transport.hpp"
 
-class TestPublisher : public ::testing::Test
+class TestPublisherLifecycle : public ::testing::Test
 {
 protected:
   void SetUp()
   {
-    node_ = rclcpp::Node::make_shared("node", "namespace");
+    node_ = rclcpp_lifecycle::LifecycleNode::make_shared("node", "namespace");
     std::vector<std::string> arguments{
       "--ros-args", "-r", "old_topic:=new_topic"
     };
     rclcpp::NodeOptions node_options;
     node_options.arguments(arguments);
 
-    node_remap_ = rclcpp::Node::make_shared(
+    node_remap_ = rclcpp_lifecycle::LifecycleNode::make_shared(
       "node_remap",
       "namespace",
       node_options
     );
   }
 
-  rclcpp::Node::SharedPtr node_;
-  rclcpp::Node::SharedPtr node_remap_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node_remap_;
 };
 
-TEST_F(TestPublisher, RemappedPublisher) {
+TEST_F(TestPublisherLifecycle, RemappedPublisher) {
   const size_t max_retries = 3;
   const size_t max_loops = 200;
   const std::chrono::milliseconds sleep_per_loop = std::chrono::milliseconds(10);
@@ -100,22 +100,22 @@ TEST_F(TestPublisher, RemappedPublisher) {
     std::this_thread::sleep_for(sleep_per_loop);
   }
 
-  executor.spin_node_some(node_);
-  executor.spin_node_some(node_remap_);
+  executor.spin_node_some(node_->get_node_base_interface());
+  executor.spin_node_some(node_remap_->get_node_base_interface());
 
   retry = 0;
   while (retry < max_retries && !received) {
     // generate random image and publish it
     pub.publish(image);
 
-    executor.spin_node_some(node_);
-    executor.spin_node_some(node_remap_);
+    executor.spin_node_some(node_->get_node_base_interface());
+    executor.spin_node_some(node_remap_->get_node_base_interface());
 
     size_t loop = 0;
     while ((!received) && (loop++ < max_loops)) {
       std::this_thread::sleep_for(sleep_per_loop);
-      executor.spin_node_some(node_);
-      executor.spin_node_some(node_remap_);
+      executor.spin_node_some(node_->get_node_base_interface());
+      executor.spin_node_some(node_remap_->get_node_base_interface());
     }
   }
 

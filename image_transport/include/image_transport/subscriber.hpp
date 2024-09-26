@@ -34,6 +34,7 @@
 #include <string>
 
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
 #include "image_transport/exception.hpp"
@@ -58,6 +59,7 @@ namespace image_transport
  * associated with that handle will stop being called. Once all Subscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
+template<class NodeType = rclcpp::Node>
 class Subscriber
 {
 public:
@@ -68,10 +70,20 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   Subscriber(
-    rclcpp::Node * node,
+    NodeType * node,
     const std::string & base_topic,
     const Callback & callback,
-    SubLoaderPtr loader,
+    SubLoaderPtr<NodeType> loader,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
+  Subscriber(
+    std::shared_ptr<NodeType> node,
+    const std::string & base_topic,
+    const Callback & callback,
+    SubLoaderPtr<NodeType> loader,
     const std::string & transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
@@ -113,6 +125,13 @@ public:
   bool operator==(const Subscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
+  void initialise(
+    const std::string & base_topic,
+    const Callback & callback,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::SubscriptionOptions options);
+
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };

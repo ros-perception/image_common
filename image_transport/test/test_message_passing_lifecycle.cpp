@@ -34,7 +34,7 @@
 #include "gtest/gtest.h"
 
 #include "rclcpp/rclcpp.hpp"
-#include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "image_transport/image_transport.hpp"
 #include "sensor_msgs/msg/image.hpp"
@@ -45,7 +45,7 @@ using namespace std::chrono_literals;
 
 int total_images_received = 0;
 
-class MessagePassingTesting : public ::testing::Test
+class MessagePassingTestingLifecycle : public ::testing::Test
 {
 public:
   sensor_msgs::msg::Image::UniquePtr generate_random_image()
@@ -57,11 +57,11 @@ public:
 protected:
   void SetUp()
   {
-    node_ = rclcpp::Node::make_shared("test_message_passing");
+    node_ = rclcpp_lifecycle::LifecycleNode::make_shared("test_message_passing_lifecycle");
     total_images_received = 0;
   }
 
-  rclcpp::Node::SharedPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node_;
 };
 
 
@@ -71,7 +71,7 @@ void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
   total_images_received++;
 }
 
-TEST_F(MessagePassingTesting, one_message_passing)
+TEST_F(MessagePassingTestingLifecycle, one_message_passing)
 {
   const size_t max_retries = 3;
   const size_t max_loops = 200;
@@ -89,7 +89,7 @@ TEST_F(MessagePassingTesting, one_message_passing)
   ASSERT_EQ(1u, pub.getNumSubscribers());
   ASSERT_EQ(1u, sub.getNumPublishers());
 
-  executor.spin_node_some(node_);
+  executor.spin_node_some(node_->get_node_base_interface());
   ASSERT_EQ(0, total_images_received);
 
   size_t retry = 0;
@@ -97,18 +97,18 @@ TEST_F(MessagePassingTesting, one_message_passing)
     // generate random image and publish it
     pub.publish(generate_random_image());
 
-    executor.spin_node_some(node_);
+    executor.spin_node_some(node_->get_node_base_interface());
     size_t loop = 0;
     while ((total_images_received != 1) && (loop++ < max_loops)) {
       std::this_thread::sleep_for(sleep_per_loop);
-      executor.spin_node_some(node_);
+      executor.spin_node_some(node_->get_node_base_interface());
     }
   }
 
   ASSERT_EQ(1, total_images_received);
 }
 
-TEST_F(MessagePassingTesting, one_camera_message_passing)
+TEST_F(MessagePassingTestingLifecycle, one_camera_message_passing)
 {
   const size_t max_retries = 3;
   const size_t max_loops = 200;
@@ -131,7 +131,7 @@ TEST_F(MessagePassingTesting, one_camera_message_passing)
   test_rclcpp::wait_for_subscriber(node_->get_node_graph_interface(), sub.getTopic());
 
   ASSERT_EQ(0, total_images_received);
-  executor.spin_node_some(node_);
+  executor.spin_node_some(node_->get_node_base_interface());
   ASSERT_EQ(0, total_images_received);
 
   size_t retry = 0;
@@ -139,11 +139,11 @@ TEST_F(MessagePassingTesting, one_camera_message_passing)
     // generate random image and publish it
     pub.publish(*generate_random_image().get(), sensor_msgs::msg::CameraInfo());
 
-    executor.spin_node_some(node_);
+    executor.spin_node_some(node_->get_node_base_interface());
     size_t loop = 0;
     while ((total_images_received != 1) && (loop++ < max_loops)) {
       std::this_thread::sleep_for(sleep_per_loop);
-      executor.spin_node_some(node_);
+      executor.spin_node_some(node_->get_node_base_interface());
     }
   }
 
@@ -151,7 +151,7 @@ TEST_F(MessagePassingTesting, one_camera_message_passing)
 }
 
 /*
-TEST_F(MessagePassingTesting, stress_message_passing)
+TEST_F(MessagePassingTestingLifecycle, stress_message_passing)
 {
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node_);

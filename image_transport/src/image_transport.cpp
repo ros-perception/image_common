@@ -44,40 +44,114 @@ namespace image_transport
 
 struct Impl
 {
-  PubLoaderPtr pub_loader_;
-  SubLoaderPtr sub_loader_;
+  PubLoaderPtr<rclcpp::Node> pub_loader_;
+  SubLoaderPtr<rclcpp::Node> sub_loader_;
 
   Impl()
-  : pub_loader_(std::make_shared<PubLoader>("image_transport", "image_transport::PublisherPlugin")),
-    sub_loader_(std::make_shared<SubLoader>("image_transport", "image_transport::SubscriberPlugin"))
+  : pub_loader_(std::make_shared<PubLoader<rclcpp::Node>>(
+        "image_transport",
+        "image_transport::PublisherPlugin<rclcpp::Node>")),
+    sub_loader_(std::make_shared<SubLoader<rclcpp::Node>>(
+        "image_transport",
+        "image_transport::SubscriberPlugin<rclcpp::Node>"))
+  {
+  }
+};
+
+struct ImplLifecycle
+{
+  PubLoaderPtr<rclcpp_lifecycle::LifecycleNode> pub_loader_;
+  SubLoaderPtr<rclcpp_lifecycle::LifecycleNode> sub_loader_;
+
+  ImplLifecycle()
+  : pub_loader_(std::make_shared<PubLoader<rclcpp_lifecycle::LifecycleNode>>(
+        "image_transport",
+        "image_transport::PublisherPlugin<rclcpp_lifecycle::LifecycleNode>")),
+    sub_loader_(std::make_shared<SubLoader<rclcpp_lifecycle::LifecycleNode>>(
+        "image_transport",
+        "image_transport::SubscriberPlugin<rclcpp_lifecycle::LifecycleNode>"))
   {
   }
 };
 
 static Impl * kImpl = new Impl();
+static ImplLifecycle * kImpl_lifecycle = new ImplLifecycle();
 
-Publisher create_publisher(
-  rclcpp::Node * node,
+template<class NodeType>
+Publisher<NodeType> create_publisher(
+  NodeType * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 {
-  return Publisher(node, base_topic, kImpl->pub_loader_, custom_qos, options);
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
+    return Publisher(node, base_topic, kImpl->pub_loader_, custom_qos, options);
+  }
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
+    return Publisher(node, base_topic, kImpl_lifecycle->pub_loader_, custom_qos, options);
+  }
 }
 
-Subscriber create_subscription(
-  rclcpp::Node * node,
+template<class NodeType>
+Publisher<NodeType> create_publisher(
+  std::shared_ptr<NodeType> node,
   const std::string & base_topic,
-  const Subscriber::Callback & callback,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions options)
+{
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
+    return Publisher(node, base_topic, kImpl->pub_loader_, custom_qos, options);
+  }
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
+    return Publisher(node, base_topic, kImpl_lifecycle->pub_loader_, custom_qos, options);
+  }
+}
+
+template<class NodeType>
+Subscriber<NodeType> create_subscription(
+  NodeType * node,
+  const std::string & base_topic,
+  const typename Subscriber<NodeType>::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
 {
-  return Subscriber(node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos, options);
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
+    return Subscriber(
+      node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos,
+      options);
+  }
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
+    return Subscriber(
+      node, base_topic, callback, kImpl_lifecycle->sub_loader_,
+      transport + "_lifecycle", custom_qos, options);
+  }
 }
 
-CameraPublisher create_camera_publisher(
-  rclcpp::Node * node,
+template<class NodeType>
+Subscriber<NodeType> create_subscription(
+  std::shared_ptr<NodeType> node,
+  const std::string & base_topic,
+  const typename Subscriber<NodeType>::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::SubscriptionOptions options)
+{
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
+    return Subscriber(
+      node, base_topic, callback, kImpl->sub_loader_, transport, custom_qos,
+      options);
+  }
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
+    return Subscriber(
+      node, base_topic, callback, kImpl_lifecycle->sub_loader_,
+      transport + "_lifecycle", custom_qos, options);
+  }
+}
+
+template<class NodeType>
+CameraPublisher<NodeType> create_camera_publisher(
+  NodeType * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)
@@ -85,19 +159,48 @@ CameraPublisher create_camera_publisher(
   return CameraPublisher(node, base_topic, custom_qos, pub_options);
 }
 
-CameraSubscriber create_camera_subscription(
-  rclcpp::Node * node,
+template<class NodeType>
+CameraPublisher<NodeType> create_camera_publisher(
+  std::shared_ptr<NodeType> node,
   const std::string & base_topic,
-  const CameraSubscriber::Callback & callback,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
+{
+  return CameraPublisher(node, base_topic, custom_qos, pub_options);
+}
+
+template<class NodeType>
+CameraSubscriber<NodeType> create_camera_subscription(
+  NodeType * node,
+  const std::string & base_topic,
+  const typename CameraSubscriber<NodeType>::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos)
 {
   return CameraSubscriber(node, base_topic, callback, transport, custom_qos);
 }
 
+template<class NodeType>
+CameraSubscriber<NodeType> create_camera_subscription(
+  std::shared_ptr<NodeType> node,
+  const std::string & base_topic,
+  const typename CameraSubscriber<NodeType>::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos)
+{
+  return CameraSubscriber(node, base_topic, callback, transport, custom_qos);
+}
+
+template<class NodeType>
 std::vector<std::string> getDeclaredTransports()
 {
-  std::vector<std::string> transports = kImpl->sub_loader_->getDeclaredClasses();
+  std::vector<std::string> transports;
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
+    transports = kImpl->sub_loader_->getDeclaredClasses();
+  }
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
+    transports = kImpl_lifecycle->sub_loader_->getDeclaredClasses();
+  }
   // Remove the "_sub" at the end of each class name.
   for (std::string & transport : transports) {
     transport = erase_last_copy(transport, "_sub");
@@ -105,17 +208,29 @@ std::vector<std::string> getDeclaredTransports()
   return transports;
 }
 
+template<class NodeType>
 std::vector<std::string> getLoadableTransports()
 {
   std::vector<std::string> loadableTransports;
-
-  for (const std::string & transportPlugin : kImpl->sub_loader_->getDeclaredClasses() ) {
+  std::vector<std::string> transports;
+  if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
+    transports = kImpl->sub_loader_->getDeclaredClasses();
+  }
+  if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
+    transports = kImpl_lifecycle->sub_loader_->getDeclaredClasses();
+  }
+  for (const std::string & transportPlugin : transports) {
     // If the plugin loads without throwing an exception, add its
     // transport name to the list of valid plugins, otherwise ignore
     // it.
     try {
-      std::shared_ptr<image_transport::SubscriberPlugin> sub =
-        kImpl->sub_loader_->createUniqueInstance(transportPlugin);
+      std::shared_ptr<image_transport::SubscriberPlugin<NodeType>> sub;
+      if constexpr (std::is_same_v<NodeType, rclcpp::Node>) {
+        sub = kImpl->sub_loader_->createUniqueInstance(transportPlugin);
+      }
+      if constexpr (std::is_same_v<NodeType, rclcpp_lifecycle::LifecycleNode>) {
+        sub = kImpl_lifecycle->sub_loader_->createUniqueInstance(transportPlugin);
+      }
       // Remove the "_sub" at the end of each class name.
       loadableTransports.push_back(erase_last_copy(transportPlugin, "_sub"));
     } catch (const pluginlib::LibraryLoadException & e) {
@@ -128,54 +243,78 @@ std::vector<std::string> getLoadableTransports()
   return loadableTransports;
 }
 
-struct ImageTransport::Impl
+template<class NodeType>
+struct ImageTransport<NodeType>::Impl
 {
-  rclcpp::Node::SharedPtr node_;
+  explicit Impl(NodeType * node)
+  : node_(node)
+  {
+  }
+
+  explicit Impl(std::shared_ptr<NodeType> node)
+  : node_(node)
+  {
+  }
+
+  std::shared_ptr<NodeType> node_;
 };
 
-ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
-: impl_(std::make_unique<ImageTransport::Impl>())
+template<class NodeType>
+ImageTransport<NodeType>::ImageTransport(NodeType * node)
+: impl_(std::make_unique<ImageTransport<NodeType>::Impl>(node))
 {
-  impl_->node_ = node;
 }
 
-ImageTransport::~ImageTransport() = default;
+template<class NodeType>
+ImageTransport<NodeType>::ImageTransport(std::shared_ptr<NodeType> node)
+: impl_(std::make_unique<ImageTransport<NodeType>::Impl>(node))
+{
+}
 
-Publisher ImageTransport::advertise(const std::string & base_topic, uint32_t queue_size, bool latch)
+template<class NodeType>
+ImageTransport<NodeType>::~ImageTransport() = default;
+
+template<class NodeType>
+Publisher<NodeType> ImageTransport<NodeType>::advertise(
+  const std::string & base_topic,
+  uint32_t queue_size, bool latch)
 {
   // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
   (void) latch;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_publisher(impl_->node_.get(), base_topic, custom_qos);
+  return create_publisher(impl_->node_, base_topic, custom_qos);
 }
 
-Publisher ImageTransport::advertise(
+template<class NodeType>
+Publisher<NodeType> ImageTransport<NodeType>::advertise(
   const std::string & base_topic, rmw_qos_profile_t custom_qos,
   bool latch)
 {
   // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
   (void) latch;
-  return create_publisher(impl_->node_.get(), base_topic, custom_qos);
+  return create_publisher(impl_->node_, base_topic, custom_qos);
 }
 
-Subscriber ImageTransport::subscribe(
+template<class NodeType>
+Subscriber<NodeType> ImageTransport<NodeType>::subscribe(
   const std::string & base_topic, rmw_qos_profile_t custom_qos,
-  const Subscriber::Callback & callback,
+  const typename Subscriber<NodeType>::Callback & callback,
   const VoidPtr & tracked_object,
   const TransportHints * transport_hints,
   const rclcpp::SubscriptionOptions options)
 {
   (void) tracked_object;
   return create_subscription(
-    impl_->node_.get(), base_topic, callback,
+    impl_->node_, base_topic, callback,
     getTransportOrDefault(transport_hints), custom_qos,
     options);
 }
 
-Subscriber ImageTransport::subscribe(
+template<class NodeType>
+Subscriber<NodeType> ImageTransport<NodeType>::subscribe(
   const std::string & base_topic, uint32_t queue_size,
-  const Subscriber::Callback & callback,
+  const typename Subscriber<NodeType>::Callback & callback,
   const VoidPtr & tracked_object,
   const TransportHints * transport_hints,
   const rclcpp::SubscriptionOptions options)
@@ -184,12 +323,13 @@ Subscriber ImageTransport::subscribe(
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
   return create_subscription(
-    impl_->node_.get(), base_topic, callback,
+    impl_->node_, base_topic, callback,
     getTransportOrDefault(transport_hints), custom_qos,
     options);
 }
 
-CameraPublisher ImageTransport::advertiseCamera(
+template<class NodeType>
+CameraPublisher<NodeType> ImageTransport<NodeType>::advertiseCamera(
   const std::string & base_topic, uint32_t queue_size,
   bool latch)
 {
@@ -197,12 +337,13 @@ CameraPublisher ImageTransport::advertiseCamera(
   (void) latch;
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
-  return create_camera_publisher(impl_->node_.get(), base_topic, custom_qos);
+  return create_camera_publisher(impl_->node_, base_topic, custom_qos);
 }
 
-CameraSubscriber ImageTransport::subscribeCamera(
+template<class NodeType>
+CameraSubscriber<NodeType> ImageTransport<NodeType>::subscribeCamera(
   const std::string & base_topic, uint32_t queue_size,
-  const CameraSubscriber::Callback & callback,
+  const typename CameraSubscriber<NodeType>::Callback & callback,
   const VoidPtr & tracked_object,
   const TransportHints * transport_hints)
 {
@@ -210,25 +351,28 @@ CameraSubscriber ImageTransport::subscribeCamera(
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
   custom_qos.depth = queue_size;
   return create_camera_subscription(
-    impl_->node_.get(), base_topic, callback,
+    impl_->node_, base_topic, callback,
     getTransportOrDefault(transport_hints), custom_qos);
 }
 
-std::vector<std::string> ImageTransport::getDeclaredTransports() const
+template<class NodeType>
+std::vector<std::string> ImageTransport<NodeType>::getDeclaredTransports() const
 {
   return image_transport::getDeclaredTransports();
 }
 
-std::vector<std::string> ImageTransport::getLoadableTransports() const
+template<class NodeType>
+std::vector<std::string> ImageTransport<NodeType>::getLoadableTransports() const
 {
   return image_transport::getLoadableTransports();
 }
 
-std::string ImageTransport::getTransportOrDefault(const TransportHints * transport_hints)
+template<class NodeType>
+std::string ImageTransport<NodeType>::getTransportOrDefault(const TransportHints * transport_hints)
 {
   std::string ret;
   if (nullptr == transport_hints) {
-    TransportHints th(impl_->node_.get());
+    TransportHints th(impl_->node_);
     ret = th.getTransport();
   } else {
     ret = transport_hints->getTransport();
@@ -237,3 +381,6 @@ std::string ImageTransport::getTransportOrDefault(const TransportHints * transpo
 }
 
 }  // namespace image_transport
+
+template class image_transport::ImageTransport<rclcpp::Node>;
+template class image_transport::ImageTransport<rclcpp_lifecycle::LifecycleNode>;

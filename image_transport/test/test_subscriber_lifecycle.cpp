@@ -36,31 +36,32 @@
 #include <thread>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "image_transport/image_transport.hpp"
 
-class TestSubscriber : public ::testing::Test
+class TestSubscriberLifecycle : public ::testing::Test
 {
 protected:
   void SetUp()
   {
-    node_ = rclcpp::Node::make_shared("test_subscriber");
+    node_ = rclcpp_lifecycle::LifecycleNode::make_shared("test_subscriber_lifecycle");
   }
 
-  rclcpp::Node::SharedPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node_;
 };
 
-TEST_F(TestSubscriber, construction_and_destruction) {
+TEST_F(TestSubscriberLifecycle, construction_and_destruction) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
   auto sub = image_transport::create_subscription(node_, "camera/image", fcn, "raw");
 
   rclcpp::executors::SingleThreadedExecutor executor;
-  executor.spin_node_some(node_);
+  executor.spin_node_some(node_->get_node_base_interface());
 }
 
-TEST_F(TestSubscriber, shutdown) {
+TEST_F(TestSubscriberLifecycle, shutdown) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
@@ -70,7 +71,7 @@ TEST_F(TestSubscriber, shutdown) {
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 0u);
 }
 
-TEST_F(TestSubscriber, camera_sub_shutdown) {
+TEST_F(TestSubscriberLifecycle, camera_sub_shutdown) {
   std::function<void(
       const sensor_msgs::msg::Image::ConstSharedPtr &,
       const sensor_msgs::msg::CameraInfo::ConstSharedPtr &)> fcn =
@@ -84,11 +85,13 @@ TEST_F(TestSubscriber, camera_sub_shutdown) {
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/camera_info"), 0u);
 }
 
-TEST_F(TestSubscriber, callback_groups) {
+TEST_F(TestSubscriberLifecycle, callback_groups) {
   using namespace std::chrono_literals;
 
   // Create a publisher node.
-  auto node_publisher = rclcpp::Node::make_shared("image_publisher", rclcpp::NodeOptions());
+  auto node_publisher = rclcpp_lifecycle::LifecycleNode::make_shared(
+    "image_publisher",
+    rclcpp::NodeOptions());
   image_transport::ImageTransport it_publisher(node_publisher);
   image_transport::Publisher pub = it_publisher.advertise("camera/image", 1);
 
@@ -121,8 +124,8 @@ TEST_F(TestSubscriber, callback_groups) {
   auto subscriber_2 = it.subscribe("camera/image", 1, fcn2, nullptr, nullptr, sub_options);
 
   rclcpp::executors::MultiThreadedExecutor executor;
-  executor.add_node(node_);
-  executor.add_node(node_publisher);
+  executor.add_node(node_->get_node_base_interface());
+  executor.add_node(node_publisher->get_node_base_interface());
   // Both callbacks should be executed and the flags should be set.
   std::thread executor_thread([&]() {executor.spin();});
 
@@ -143,11 +146,13 @@ TEST_F(TestSubscriber, callback_groups) {
   EXPECT_LT(timeout_elapsed, timeout);
 }
 
-TEST_F(TestSubscriber, callback_groups_custom_qos) {
+TEST_F(TestSubscriberLifecycle, callback_groups_custom_qos) {
   using namespace std::chrono_literals;
 
   // Create a publisher node.
-  auto node_publisher = rclcpp::Node::make_shared("image_publisher", rclcpp::NodeOptions());
+  auto node_publisher = rclcpp_lifecycle::LifecycleNode::make_shared(
+    "image_publisher",
+    rclcpp::NodeOptions());
   image_transport::ImageTransport it_publisher(node_publisher);
   image_transport::Publisher pub = it_publisher.advertise(
     "camera/image",
@@ -186,8 +191,8 @@ TEST_F(TestSubscriber, callback_groups_custom_qos) {
     nullptr, sub_options);
 
   rclcpp::executors::MultiThreadedExecutor executor;
-  executor.add_node(node_);
-  executor.add_node(node_publisher);
+  executor.add_node(node_->get_node_base_interface());
+  executor.add_node(node_publisher->get_node_base_interface());
   // Both callbacks should be executed and the flags should be set.
   std::thread executor_thread([&]() {executor.spin();});
 

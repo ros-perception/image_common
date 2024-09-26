@@ -34,6 +34,7 @@
 
 #include "rclcpp/macros.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
 #include "image_transport/visibility_control.hpp"
@@ -44,6 +45,7 @@ namespace image_transport
 /**
  * \brief Base class for plugins to Subscriber.
  */
+template<class NodeType = rclcpp::Node>
 class IMAGE_TRANSPORT_PUBLIC SubscriberPlugin
 {
 public:
@@ -65,7 +67,18 @@ public:
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
   void subscribe(
-    rclcpp::Node * node, const std::string & base_topic,
+    NodeType * node, const std::string & base_topic,
+    const Callback & callback,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
+  {
+    return subscribeImpl(
+      std::shared_ptr<NodeType>(node), base_topic, callback, custom_qos,
+      options);
+  }
+
+  void subscribe(
+    std::shared_ptr<NodeType> node, const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
@@ -77,7 +90,19 @@ public:
    * \brief Subscribe to an image topic, version for bare function.
    */
   void subscribe(
-    rclcpp::Node * node, const std::string & base_topic,
+    NodeType * node, const std::string & base_topic,
+    void (* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
+  {
+    return subscribe(
+      node, base_topic,
+      std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)>(fp),
+      custom_qos, options);
+  }
+
+  void subscribe(
+    std::shared_ptr<NodeType> node, const std::string & base_topic,
     void (* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
@@ -93,7 +118,19 @@ public:
    */
   template<class T>
   void subscribe(
-    rclcpp::Node * node, const std::string & base_topic,
+    NodeType * node, const std::string & base_topic,
+    void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
+  {
+    return subscribe(
+      node, base_topic,
+      std::bind(fp, obj, std::placeholders::_1), custom_qos, options);
+  }
+
+  template<class T>
+  void subscribe(
+    std::shared_ptr<NodeType> node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
@@ -108,7 +145,19 @@ public:
    */
   template<class T>
   void subscribe(
-    rclcpp::Node * node, const std::string & base_topic,
+    NodeType * node, const std::string & base_topic,
+    void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
+    std::shared_ptr<T> & obj,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
+  {
+    return subscribe(
+      node, base_topic,
+      std::bind(fp, obj, std::placeholders::_1), custom_qos);
+  }
+
+  template<class T>
+  void subscribe(
+    std::shared_ptr<NodeType> node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
     std::shared_ptr<T> & obj,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
@@ -147,7 +196,7 @@ protected:
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
   virtual void subscribeImpl(
-    rclcpp::Node * node,
+    std::shared_ptr<NodeType> node,
     const std::string & base_topic,
     const Callback & callback,
     rmw_qos_profile_t custom_qos,

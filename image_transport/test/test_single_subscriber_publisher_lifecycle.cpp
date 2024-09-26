@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Open Source Robotics Foundation, Inc.
+// Copyright (c) 2024 Open Source Robotics Foundation, Inc.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,37 +26,64 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef IMAGE_TRANSPORT__REPUBLISH_HPP_
-#define IMAGE_TRANSPORT__REPUBLISH_HPP_
-
+#include <functional>
+#include <string>
 #include <memory>
+#include <cstddef>
 
-#include "image_transport/image_transport.hpp"
-#include "image_transport/visibility_control.hpp"
+#include "gtest/gtest.h"
 
-#include <pluginlib/class_loader.hpp>
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "sensor_msgs/msg/image.hpp"
 
-#include <rclcpp/rclcpp.hpp>
+#include "image_transport/single_subscriber_publisher.hpp"
 
-namespace image_transport
+class TestPublisherLifecycle : public ::testing::Test
 {
-class Republisher : public rclcpp::Node
-{
-public:
-  /// Constructor
-  IMAGE_TRANSPORT_PUBLIC
-  explicit Republisher(const rclcpp::NodeOptions & options);
+protected:
+  static constexpr const char * caller_id = "node";
+  static constexpr const char * topic = "/topic";
 
-private:
-  void initialize();
 
-  rclcpp::TimerBase::SharedPtr timer_;
-  bool initialized_{false};
-  image_transport::Subscriber<rclcpp::Node> sub;
-  image_transport::Publisher<rclcpp::Node> pub;
-  pluginlib::UniquePtr<image_transport::PublisherPlugin<rclcpp::Node>> instance;
-  std::shared_ptr<pluginlib::ClassLoader<image_transport::PublisherPlugin<rclcpp::Node>>> loader;
+  static void SetUpTestCase()
+  {
+    rclcpp::init(0, nullptr);
+  }
+
+  void SetUp()
+  {
+    node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("image_transport", "/ns");
+  }
+
+  void TearDown()
+  {
+    node.reset();
+  }
+
+
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node;
 };
 
-}  // namespace image_transport
-#endif  // IMAGE_TRANSPORT__REPUBLISH_HPP_
+TEST_F(TestPublisherLifecycle, construction_and_destruction) {
+  auto get_num_subscribers = []() -> size_t {return 0;};
+  auto publish_fn = [](const sensor_msgs::msg::Image & /*image*/) {};
+
+  image_transport::SingleSubscriberPublisher ssp(caller_id, topic,
+    get_num_subscribers, publish_fn);
+}
+
+TEST_F(TestPublisherLifecycle, getNumSubscribers) {
+  size_t nSub = 0;
+
+  auto get_num_subscribers = [&nSub]() -> size_t {return nSub;};
+  auto publish_fn = [](const sensor_msgs::msg::Image & /*image*/) {};
+
+  image_transport::SingleSubscriberPublisher ssp(caller_id, topic,
+    get_num_subscribers, publish_fn);
+
+  nSub = 0;
+  ASSERT_EQ(ssp.getNumSubscribers(), 0u);
+  nSub = 1;
+  ASSERT_EQ(ssp.getNumSubscribers(), 1u);
+}

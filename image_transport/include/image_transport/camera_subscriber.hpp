@@ -34,6 +34,7 @@
 #include <string>
 
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "sensor_msgs/msg/image.hpp"
@@ -42,9 +43,6 @@
 
 namespace image_transport
 {
-
-class ImageTransport;
-
 /**
  * \brief Manages a subscription callback on synchronized Image and CameraInfo topics.
  *
@@ -60,6 +58,7 @@ void callback(const sensor_msgs::msg::Image::ConstSharedPtr&, const sensor_msgs:
  * associated with that handle will stop being called. Once all CameraSubscriber for a given
  * topic go out of scope the topic will be unsubscribed.
  */
+template<class NodeType = rclcpp::Node>
 class CameraSubscriber
 {
 public:
@@ -71,7 +70,15 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber(
-    rclcpp::Node * node,
+    NodeType * node,
+    const std::string & base_topic,
+    const Callback & callback,
+    const std::string & transport,
+    rmw_qos_profile_t = rmw_qos_profile_default);
+
+  IMAGE_TRANSPORT_PUBLIC
+  CameraSubscriber(
+    std::shared_ptr<NodeType> node,
     const std::string & base_topic,
     const Callback & callback,
     const std::string & transport,
@@ -120,6 +127,12 @@ public:
   bool operator==(const CameraSubscriber & rhs) const {return impl_ == rhs.impl_;}
 
 private:
+  void initialise(
+    const std::string & base_topic,
+    const Callback & callback,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos);
+
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };

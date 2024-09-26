@@ -34,6 +34,7 @@
 
 #include "rclcpp/macros.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "sensor_msgs/msg/image.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
@@ -43,9 +44,6 @@
 
 namespace image_transport
 {
-
-class ImageTransport;
-
 /**
  * \brief Manages advertisements for publishing camera images.
  *
@@ -61,6 +59,7 @@ class ImageTransport;
  * associated with that handle will stop being called. Once all CameraPublisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
+template<class NodeType = rclcpp::Node>
 class CameraPublisher
 {
 public:
@@ -69,7 +68,14 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
-    rclcpp::Node * node,
+    NodeType * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions = rclcpp::PublisherOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
+  CameraPublisher(
+    std::shared_ptr<NodeType> node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions = rclcpp::PublisherOptions());
@@ -163,6 +169,11 @@ public:
   bool operator==(const CameraPublisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
+  void initialise(
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options);
+
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };

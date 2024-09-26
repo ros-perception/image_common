@@ -47,10 +47,19 @@
 namespace image_transport
 {
 
-struct Publisher::Impl
+template<class NodeType>
+struct Publisher<NodeType>::Impl
 {
-  explicit Impl(rclcpp::Node * node)
-  : logger_(node->get_logger()),
+  explicit Impl(NodeType * node)
+  : node_(node),
+    logger_(node->get_logger()),
+    unadvertised_(false)
+  {
+  }
+
+  explicit Impl(std::shared_ptr<NodeType> node)
+  : node_(node),
+    logger_(node->get_logger()),
     unadvertised_(false)
   {
   }
@@ -90,28 +99,53 @@ struct Publisher::Impl
     }
   }
 
+  std::shared_ptr<NodeType> node_;
   rclcpp::Logger logger_;
   std::string base_topic_;
-  PubLoaderPtr loader_;
-  std::vector<std::shared_ptr<PublisherPlugin>> publishers_;
+  PubLoaderPtr<NodeType> loader_;
+  std::vector<std::shared_ptr<PublisherPlugin<NodeType>>> publishers_;
   bool unadvertised_;
 };
 
-Publisher::Publisher(
-  rclcpp::Node * node, const std::string & base_topic,
-  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+template<class NodeType>
+Publisher<NodeType>::Publisher(
+  NodeType * node, const std::string & base_topic,
+  PubLoaderPtr<NodeType> loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 : impl_(std::make_shared<Impl>(node))
 {
+  initialise(base_topic, loader, custom_qos, options);
+}
+
+template<class NodeType>
+Publisher<NodeType>::Publisher(
+  std::shared_ptr<NodeType> node, const std::string & base_topic,
+  PubLoaderPtr<NodeType> loader, rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions options)
+: impl_(std::make_shared<Impl>(node))
+{
+  initialise(base_topic, loader, custom_qos, options);
+}
+
+template<class NodeType>
+void Publisher<NodeType>::initialise(
+  const std::string & base_topic,
+  PubLoaderPtr<NodeType> loader, rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions options)
+{
+  if (!impl_) {
+    throw std::runtime_error("impl is not constructed!");
+  }
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
-  std::string image_topic = rclcpp::expand_topic_or_service_name(
-    base_topic,
-    node->get_name(), node->get_namespace());
+  std::string image_topic;
+  size_t ns_len;
+  image_topic = rclcpp::expand_topic_or_service_name(
+    base_topic, impl_->node_->get_name(), impl_->node_->get_namespace());
+  ns_len = strlen(impl_->node_->get_namespace());
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
-  auto ns_len = node->get_effective_namespace().length();
   std::string param_base_name = image_topic.substr(ns_len);
   std::replace(param_base_name.begin(), param_base_name.end(), '/', '.');
   if (param_base_name.front() == '.') {
@@ -124,16 +158,16 @@ Publisher::Publisher(
     all_transport_names.emplace_back(erase_last_copy(lookup_name, "_pub"));
   }
   try {
-    allowlist_vec = node->declare_parameter<std::vector<std::string>>(
+    allowlist_vec = impl_->node_->template declare_parameter<std::vector<std::string>>(
       param_base_name + ".enable_pub_plugins", all_transport_names);
   } catch (const rclcpp::exceptions::ParameterAlreadyDeclaredException &) {
     RCLCPP_DEBUG_STREAM(
-      node->get_logger(), param_base_name << ".enable_pub_plugins" << " was previously declared"
+      impl_->logger_, param_base_name << ".enable_pub_plugins" << " was previously declared"
     );
     allowlist_vec =
-      node->get_parameter(
+      impl_->node_->get_parameter(
       param_base_name +
-      ".enable_pub_plugins").get_value<std::vector<std::string>>();
+      ".enable_pub_plugins").template get_value<std::vector<std::string>>();
   }
   for (size_t i = 0; i < allowlist_vec.size(); ++i) {
     allowlist.insert(allowlist_vec[i]);
@@ -143,7 +177,7 @@ Publisher::Publisher(
     const auto & lookup_name = transport_name + "_pub";
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
-      pub->advertise(node, image_topic, custom_qos, options);
+      pub->advertise(impl_->node_, image_topic, custom_qos, options);
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {
       RCLCPP_ERROR(
@@ -159,19 +193,22 @@ Publisher::Publisher(
   }
 }
 
-size_t Publisher::getNumSubscribers() const
+template<class NodeType>
+size_t Publisher<NodeType>::getNumSubscribers() const
 {
   if (impl_ && impl_->isValid()) {return impl_->getNumSubscribers();}
   return 0;
 }
 
-std::string Publisher::getTopic() const
+template<class NodeType>
+std::string Publisher<NodeType>::getTopic() const
 {
   if (impl_) {return impl_->getTopic();}
   return std::string();
 }
 
-void Publisher::publish(const sensor_msgs::msg::Image & message) const
+template<class NodeType>
+void Publisher<NodeType>::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
@@ -186,7 +223,8 @@ void Publisher::publish(const sensor_msgs::msg::Image & message) const
   }
 }
 
-void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
+template<class NodeType>
+void Publisher<NodeType>::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
@@ -201,7 +239,8 @@ void Publisher::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message)
   }
 }
 
-void Publisher::publish(sensor_msgs::msg::Image::UniquePtr message) const
+template<class NodeType>
+void Publisher<NodeType>::publish(sensor_msgs::msg::Image::UniquePtr message) const
 {
   if (!impl_ || !impl_->isValid()) {
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
@@ -209,8 +248,8 @@ void Publisher::publish(sensor_msgs::msg::Image::UniquePtr message) const
     return;
   }
 
-  std::vector<std::shared_ptr<PublisherPlugin>> pubs_take_reference;
-  std::optional<std::shared_ptr<PublisherPlugin>> pub_takes_ownership{std::nullopt};
+  std::vector<std::shared_ptr<PublisherPlugin<NodeType>>> pubs_take_reference;
+  std::optional<std::shared_ptr<PublisherPlugin<NodeType>>> pub_takes_ownership{std::nullopt};
 
   for (const auto & pub : impl_->publishers_) {
     if (pub->getNumSubscribers() > 0) {
@@ -231,7 +270,8 @@ void Publisher::publish(sensor_msgs::msg::Image::UniquePtr message) const
   }
 }
 
-void Publisher::shutdown()
+template<class NodeType>
+void Publisher<NodeType>::shutdown()
 {
   if (impl_) {
     impl_->shutdown();
@@ -239,9 +279,13 @@ void Publisher::shutdown()
   }
 }
 
-Publisher::operator void *() const
+template<class NodeType>
+Publisher<NodeType>::operator void *() const
 {
   return (impl_ && impl_->isValid()) ? reinterpret_cast<void *>(1) : reinterpret_cast<void *>(0);
 }
 
 }  // namespace image_transport
+
+template class image_transport::Publisher<rclcpp::Node>;
+template class image_transport::Publisher<rclcpp_lifecycle::LifecycleNode>;

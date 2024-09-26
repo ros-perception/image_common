@@ -32,37 +32,38 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "image_transport/image_transport.hpp"
 
-class TestQosOverride : public ::testing::Test
+class TestQosOverrideLifecycle : public ::testing::Test
 {
 protected:
   void SetUp()
   {
-    pub_node_ = rclcpp::Node::make_shared("test_publisher");
-    qos_override_pub_node_ = rclcpp::Node::make_shared(
-      "test_qos_override_publisher", rclcpp::NodeOptions().parameter_overrides(
+    pub_node_ = rclcpp_lifecycle::LifecycleNode::make_shared("test_publisher_lifecycle");
+    qos_override_pub_node_ = rclcpp_lifecycle::LifecycleNode::make_shared(
+      "test_qos_override_publisher_lifecycle", rclcpp::NodeOptions().parameter_overrides(
     {
       rclcpp::Parameter(
         "qos_overrides./camera/image.publisher.reliability", "best_effort"),
     }));
-    sub_node_ = rclcpp::Node::make_shared("test_subscriber");
-    qos_override_sub_node_ = rclcpp::Node::make_shared(
-      "test_qos_override_subscriber", rclcpp::NodeOptions().parameter_overrides(
+    sub_node_ = rclcpp_lifecycle::LifecycleNode::make_shared("test_subscriber_lifecycle");
+    qos_override_sub_node_ = rclcpp_lifecycle::LifecycleNode::make_shared(
+      "test_qos_override_subscriber_lifecycle", rclcpp::NodeOptions().parameter_overrides(
     {
       rclcpp::Parameter(
         "qos_overrides./camera/image.subscription.reliability", "best_effort"),
     }));
   }
 
-  rclcpp::Node::SharedPtr pub_node_;
-  rclcpp::Node::SharedPtr qos_override_pub_node_;
-  rclcpp::Node::SharedPtr sub_node_;
-  rclcpp::Node::SharedPtr qos_override_sub_node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr pub_node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr qos_override_pub_node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr sub_node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr qos_override_sub_node_;
 };
 
-TEST_F(TestQosOverride, qos_override_publisher_without_options) {
+TEST_F(TestQosOverrideLifecycle, qos_override_publisher_without_options) {
   auto pub =
     image_transport::create_publisher(pub_node_, "camera/image", rmw_qos_profile_default);
   auto endpoint_info_vec = pub_node_->get_publishers_info_by_topic("camera/image");
@@ -79,7 +80,7 @@ TEST_F(TestQosOverride, qos_override_publisher_without_options) {
   pub.shutdown();
 }
 
-TEST_F(TestQosOverride, qos_override_publisher_with_options) {
+TEST_F(TestQosOverrideLifecycle, qos_override_publisher_with_options) {
   rclcpp::PublisherOptions options;
   options.qos_overriding_options = rclcpp::QosOverridingOptions(
   {
@@ -105,7 +106,7 @@ TEST_F(TestQosOverride, qos_override_publisher_with_options) {
   pub.shutdown();
 }
 
-TEST_F(TestQosOverride, qos_override_subscriber_without_options) {
+TEST_F(TestQosOverrideLifecycle, qos_override_subscriber_without_options) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
@@ -124,7 +125,7 @@ TEST_F(TestQosOverride, qos_override_subscriber_without_options) {
     rclcpp::ReliabilityPolicy::Reliable);
 }
 
-TEST_F(TestQosOverride, qos_override_subscriber_with_options) {
+TEST_F(TestQosOverrideLifecycle, qos_override_subscriber_with_options) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 

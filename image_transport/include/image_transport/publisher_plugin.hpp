@@ -32,8 +32,10 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
 #include "image_transport/single_subscriber_publisher.hpp"
@@ -45,6 +47,7 @@ namespace image_transport
 /**
  * \brief Base class for plugins to Publisher.
  */
+template<class NodeType = rclcpp::Node>
 class PublisherPlugin
 {
 public:
@@ -72,7 +75,16 @@ public:
    * \brief Advertise a topic, simple version.
    */
   void advertise(
-    rclcpp::Node * nh,
+    NodeType * nh,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
+  {
+    advertiseImpl(std::shared_ptr<NodeType>(nh), base_topic, custom_qos, options);
+  }
+
+  void advertise(
+    std::shared_ptr<NodeType> nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
@@ -156,7 +168,7 @@ protected:
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
   virtual void advertiseImpl(
-    rclcpp::Node * node,
+    std::shared_ptr<NodeType> nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) = 0;

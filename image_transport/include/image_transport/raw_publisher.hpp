@@ -47,7 +47,8 @@ namespace image_transport
  * messages on the base topic.
  */
 
-class RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
+template<class NodeType = rclcpp::Node>
+class RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image, NodeType>
 {
 public:
   virtual ~RawPublisher() {}
@@ -64,19 +65,26 @@ public:
 
 protected:
   [[deprecated("Use publish(const sensor_msgs::msg::Image&, const PublisherT&) instead.")]]
-  virtual void publish(const sensor_msgs::msg::Image & message, const PublishFn & publish_fn) const
+  virtual void publish(
+    const sensor_msgs::msg::Image & message,
+    const typename SimplePublisherPlugin<sensor_msgs::msg::Image,
+    NodeType>::PublishFn & publish_fn) const
   {
     publish_fn(message);
   }
 
-  virtual void publish(const sensor_msgs::msg::Image & message, const PublisherT & publisher) const
+  virtual void publish(
+    const sensor_msgs::msg::Image & message,
+    const typename SimplePublisherPlugin<sensor_msgs::msg::Image,
+    NodeType>::PublisherT & publisher) const
   {
     publisher->publish(message);
   }
 
   virtual void publish(
     sensor_msgs::msg::Image::UniquePtr message,
-    const PublisherT & publisher) const
+    const typename SimplePublisherPlugin<sensor_msgs::msg::Image,
+    NodeType>::PublisherT & publisher) const
   {
     publisher->publish(std::move(message));
   }

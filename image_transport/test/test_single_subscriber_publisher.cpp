@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Open Source Robotics Foundation, Inc.
+// Copyright (c) 2024 Open Source Robotics Foundation, Inc.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@
 #include <functional>
 #include <string>
 #include <memory>
+#include <cstddef>
 
 #include "gtest/gtest.h"
 

@@ -42,10 +42,19 @@
 namespace image_transport
 {
 
-struct CameraPublisher::Impl
+template<class NodeType>
+struct CameraPublisher<NodeType>::Impl
 {
-  explicit Impl(rclcpp::Node * node)
-  : logger_(node->get_logger()),
+  explicit Impl(NodeType * node)
+  : node_(node),
+    logger_(node->get_logger()),
+    unadvertised_(false)
+  {
+  }
+
+  explicit Impl(std::shared_ptr<NodeType> node)
+  : node_(node),
+    logger_(node->get_logger()),
     unadvertised_(false)
   {
   }
@@ -69,32 +78,61 @@ struct CameraPublisher::Impl
     }
   }
 
+  std::shared_ptr<NodeType> node_;
   rclcpp::Logger logger_;
-  Publisher image_pub_;
+  Publisher<NodeType> image_pub_;
   rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr info_pub_;
   bool unadvertised_;
 };
 
-CameraPublisher::CameraPublisher(
-  rclcpp::Node * node,
+template<class NodeType>
+CameraPublisher<NodeType>::CameraPublisher(
+  NodeType * node,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)
 : impl_(std::make_shared<Impl>(node))
 {
+  initialise(base_topic, custom_qos, pub_options);
+}
+
+template<class NodeType>
+CameraPublisher<NodeType>::CameraPublisher(
+  std::shared_ptr<NodeType> node,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
+: impl_(std::make_shared<Impl>(node))
+{
+  initialise(base_topic, custom_qos, pub_options);
+}
+
+template<class NodeType>
+void CameraPublisher<NodeType>::initialise(
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
+{
+  if (!impl_) {
+    throw std::runtime_error("impl is not constructed!");
+  }
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
   // image topic is remapped (#4539).
-  std::string image_topic = rclcpp::expand_topic_or_service_name(
+  std::string image_topic;
+  image_topic = rclcpp::expand_topic_or_service_name(
     base_topic,
-    node->get_name(), node->get_namespace());
+    impl_->node_->get_name(), impl_->node_->get_namespace());
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-  impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos, pub_options);
-  impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
+  impl_->image_pub_ = image_transport::create_publisher(
+    impl_->node_, image_topic, custom_qos, pub_options);
+  impl_->info_pub_ =
+    impl_->node_->template create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
 }
 
-size_t CameraPublisher::getNumSubscribers() const
+template<class NodeType>
+size_t CameraPublisher<NodeType>::getNumSubscribers() const
 {
   if (impl_ && impl_->isValid()) {
     return std::max(
@@ -104,7 +142,8 @@ size_t CameraPublisher::getNumSubscribers() const
   return 0;
 }
 
-std::string CameraPublisher::getTopic() const
+template<class NodeType>
+std::string CameraPublisher<NodeType>::getTopic() const
 {
   if (impl_) {
     return impl_->image_pub_.getTopic();
@@ -112,7 +151,8 @@ std::string CameraPublisher::getTopic() const
   return std::string();
 }
 
-std::string CameraPublisher::getInfoTopic() const
+template<class NodeType>
+std::string CameraPublisher<NodeType>::getInfoTopic() const
 {
   if (impl_) {
     return impl_->info_pub_->get_topic_name();
@@ -120,7 +160,8 @@ std::string CameraPublisher::getInfoTopic() const
   return std::string();
 }
 
-void CameraPublisher::publish(
+template<class NodeType>
+void CameraPublisher<NodeType>::publish(
   const sensor_msgs::msg::Image & image,
   const sensor_msgs::msg::CameraInfo & info) const
 {
@@ -136,7 +177,8 @@ void CameraPublisher::publish(
   impl_->info_pub_->publish(info);
 }
 
-void CameraPublisher::publish(
+template<class NodeType>
+void CameraPublisher<NodeType>::publish(
   const sensor_msgs::msg::Image::ConstSharedPtr & image,
   const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) const
 {
@@ -152,7 +194,8 @@ void CameraPublisher::publish(
   impl_->info_pub_->publish(*info);
 }
 
-void CameraPublisher::publish(
+template<class NodeType>
+void CameraPublisher<NodeType>::publish(
   sensor_msgs::msg::Image::UniquePtr image,
   sensor_msgs::msg::CameraInfo::UniquePtr info) const
 {
@@ -168,7 +211,8 @@ void CameraPublisher::publish(
   impl_->info_pub_->publish(std::move(info));
 }
 
-void CameraPublisher::publish(
+template<class NodeType>
+void CameraPublisher<NodeType>::publish(
   sensor_msgs::msg::Image & image, sensor_msgs::msg::CameraInfo & info,
   rclcpp::Time stamp) const
 {
@@ -186,7 +230,8 @@ void CameraPublisher::publish(
   impl_->info_pub_->publish(info);
 }
 
-void CameraPublisher::publish(
+template<class NodeType>
+void CameraPublisher<NodeType>::publish(
   sensor_msgs::msg::Image::UniquePtr image,
   sensor_msgs::msg::CameraInfo::UniquePtr info,
   rclcpp::Time stamp) const
@@ -205,7 +250,8 @@ void CameraPublisher::publish(
   impl_->info_pub_->publish(std::move(info));
 }
 
-void CameraPublisher::shutdown()
+template<class NodeType>
+void CameraPublisher<NodeType>::shutdown()
 {
   if (impl_) {
     impl_->shutdown();
@@ -213,9 +259,13 @@ void CameraPublisher::shutdown()
   }
 }
 
-CameraPublisher::operator void *() const
+template<class NodeType>
+CameraPublisher<NodeType>::operator void *() const
 {
   return (impl_ && impl_->isValid()) ? reinterpret_cast<void *>(1) : reinterpret_cast<void *>(0);
 }
 
 }  // namespace image_transport
+
+template class image_transport::CameraPublisher<rclcpp::Node>;
+template class image_transport::CameraPublisher<rclcpp_lifecycle::LifecycleNode>;

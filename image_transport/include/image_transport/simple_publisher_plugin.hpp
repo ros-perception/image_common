@@ -61,8 +61,8 @@ namespace image_transport
  * getTopicToAdvertise() controls the name of the internal communication topic.
  * It defaults to \<base topic\>/\<transport name\>.
  */
-template<class M>
-class SimplePublisherPlugin : public PublisherPlugin
+template<class M, class NodeType = rclcpp::Node>
+class SimplePublisherPlugin : public PublisherPlugin<NodeType>
 {
 public:
   virtual ~SimplePublisherPlugin() {}
@@ -114,17 +114,18 @@ public:
 
 protected:
   void advertiseImpl(
-    rclcpp::Node * node,
+    std::shared_ptr<NodeType> nh,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
-    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
+    auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
+    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(nh);
+    simple_impl_->pub_ = simple_impl_->node_->template create_publisher<M>(
+      transport_topic, qos, options);
 
     RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
-    auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos, options);
   }
 
   typedef typename rclcpp::Publisher<M>::SharedPtr PublisherT;
@@ -146,7 +147,7 @@ protected:
     const PublishFn & /*publish_fn*/) const
   {
     throw std::logic_error(
-      "publish(const sensor_msgs::msg::Image&, const PublishFn&) is not implemented.");
+            "publish(const sensor_msgs::msg::Image&, const PublishFn&) is not implemented.");
   }
 
   /**
@@ -173,7 +174,7 @@ protected:
     const PublisherT & /*publisher*/) const
   {
     throw std::logic_error(
-      "publish(sensor_msgs::msg::Image::UniquePtr, const PublisherT&) is not implemented.");
+            "publish(sensor_msgs::msg::Image::UniquePtr, const PublisherT&) is not implemented.");
   }
 
   /**
@@ -183,19 +184,25 @@ protected:
    */
   virtual std::string getTopicToAdvertise(const std::string & base_topic) const
   {
-    return base_topic + "/" + getTransportName();
+    return base_topic + "/" + PublisherPlugin<NodeType>::getTransportName();
   }
 
 private:
   struct SimplePublisherPluginImpl
   {
-    explicit SimplePublisherPluginImpl(rclcpp::Node * node)
+    explicit SimplePublisherPluginImpl(NodeType * node)
     : node_(node),
       logger_(node->get_logger())
     {
     }
 
-    rclcpp::Node * node_;
+    explicit SimplePublisherPluginImpl(std::shared_ptr<NodeType> node)
+    : node_(node),
+      logger_(node->get_logger())
+    {
+    }
+
+    std::shared_ptr<NodeType> node_;
     rclcpp::Logger logger_;
     PublisherT pub_;
   };

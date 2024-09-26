@@ -112,34 +112,34 @@ void Republisher::initialize()
     // Use all available transports for output
 
     this->pub = image_transport::create_publisher(
-      this, out_topic,
+      shared_from_this(), out_topic,
       rmw_qos_profile_default, pub_options);
 
     // Use Publisher::publish as the subscriber callback
-    typedef void (image_transport::Publisher::* PublishMemFn)(
+    typedef void (image_transport::Publisher<rclcpp::Node>::* PublishMemFn)(
       const sensor_msgs::msg::Image::ConstSharedPtr &) const;
-    PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
+    PublishMemFn pub_mem_fn = &image_transport::Publisher<rclcpp::Node>::publish;
 
     this->sub = image_transport::create_subscription(
-      this, in_topic, std::bind(pub_mem_fn, &pub, std::placeholders::_1),
+      shared_from_this(), in_topic, std::bind(pub_mem_fn, &pub, std::placeholders::_1),
       in_transport, rmw_qos_profile_default, sub_options);
   } else {
     // Use one specific transport for output
     // Load transport plugin
-    typedef image_transport::PublisherPlugin Plugin;
+    typedef image_transport::PublisherPlugin<rclcpp::Node> Plugin;
     loader = std::make_shared<pluginlib::ClassLoader<Plugin>>(
       "image_transport",
-      "image_transport::PublisherPlugin");
+      "image_transport::PublisherPlugin<rclcpp::Node>");
     std::string lookup_name = Plugin::getLookupName(out_transport);
 
     instance = loader->createUniqueInstance(lookup_name);
-    instance->advertise(this, out_topic, rmw_qos_profile_default, pub_options);
+    instance->advertise(shared_from_this(), out_topic, rmw_qos_profile_default, pub_options);
 
     // Use PublisherPlugin::publish as the subscriber callback
     typedef void (Plugin::* PublishMemFn)(const sensor_msgs::msg::Image::ConstSharedPtr &) const;
     PublishMemFn pub_mem_fn = &Plugin::publishPtr;
     this->sub = image_transport::create_subscription(
-      this, in_topic,
+      shared_from_this(), in_topic,
       std::bind(
         pub_mem_fn,
         instance.get(), std::placeholders::_1), in_transport, rmw_qos_profile_default, sub_options);

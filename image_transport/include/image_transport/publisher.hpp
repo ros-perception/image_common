@@ -34,6 +34,7 @@
 
 #include "rclcpp/macros.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "sensor_msgs/msg/image.hpp"
 
@@ -62,6 +63,7 @@ namespace image_transport
  * associated with that handle will stop being called. Once all Publisher for a
  * given base topic go out of scope the topic (and all subtopics) will be unadvertised.
  */
+template<class NodeType = rclcpp::Node>
 class Publisher
 {
 public:
@@ -70,12 +72,19 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   Publisher(
-    rclcpp::Node * nh,
+    NodeType * nh,
     const std::string & base_topic,
-    PubLoaderPtr loader,
+    PubLoaderPtr<NodeType> loader,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
 
+  IMAGE_TRANSPORT_PUBLIC
+  Publisher(
+    std::shared_ptr<NodeType> nh,
+    const std::string & base_topic,
+    PubLoaderPtr<NodeType> loader,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
   /*!
    * \brief Returns the number of subscribers that are currently connected to
    * this Publisher.
@@ -128,6 +137,12 @@ public:
   bool operator==(const Publisher & rhs) const {return impl_ == rhs.impl_;}
 
 private:
+  void initialise(
+    const std::string & base_topic,
+    PubLoaderPtr<NodeType> loader,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options);
+
   struct Impl;
   std::shared_ptr<Impl> impl_;
 };

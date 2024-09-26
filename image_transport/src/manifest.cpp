@@ -31,5 +31,15 @@
 #include "image_transport/raw_publisher.hpp"
 #include "image_transport/raw_subscriber.hpp"
 
-PLUGINLIB_EXPORT_CLASS(image_transport::RawPublisher, image_transport::PublisherPlugin)
-PLUGINLIB_EXPORT_CLASS(image_transport::RawSubscriber, image_transport::SubscriberPlugin)
+PLUGINLIB_EXPORT_CLASS(
+  image_transport::RawPublisher<rclcpp::Node>,
+  image_transport::PublisherPlugin<rclcpp::Node>)
+PLUGINLIB_EXPORT_CLASS(
+  image_transport::RawPublisher<rclcpp_lifecycle::LifecycleNode>,
+  image_transport::PublisherPlugin<rclcpp_lifecycle::LifecycleNode>)
+PLUGINLIB_EXPORT_CLASS(
+  image_transport::RawSubscriber<rclcpp::Node>,
+  image_transport::SubscriberPlugin<rclcpp::Node>)
+PLUGINLIB_EXPORT_CLASS(
+  image_transport::RawSubscriber<rclcpp_lifecycle::LifecycleNode>,
+  image_transport::SubscriberPlugin<rclcpp_lifecycle::LifecycleNode>)

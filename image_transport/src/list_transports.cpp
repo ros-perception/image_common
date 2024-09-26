@@ -54,10 +54,16 @@ struct TransportDesc
 
 int main(int /*argc*/, char ** /*argv*/)
 {
-  pluginlib::ClassLoader<image_transport::PublisherPlugin> pub_loader(
-    "image_transport", "image_transport::PublisherPlugin");
-  pluginlib::ClassLoader<image_transport::SubscriberPlugin> sub_loader(
-    "image_transport", "image_transport::SubscriberPlugin");
+  pluginlib::ClassLoader<image_transport::PublisherPlugin<rclcpp::Node>> pub_loader(
+    "image_transport", "image_transport::PublisherPlugin<rclcpp::Node>");
+  pluginlib::ClassLoader<image_transport::PublisherPlugin<rclcpp_lifecycle::LifecycleNode>>
+  pub_loader_lifecycle(
+    "image_transport", "image_transport::PublisherPlugin<rclcpp_lifecycle::LifecycleNode>");
+  pluginlib::ClassLoader<image_transport::SubscriberPlugin<rclcpp::Node>> sub_loader(
+    "image_transport", "image_transport::SubscriberPlugin<rclcpp::Node>");
+  pluginlib::ClassLoader<image_transport::SubscriberPlugin<rclcpp_lifecycle::LifecycleNode>>
+  sub_loader_lifecycle(
+    "image_transport", "image_transport::SubscriberPlugin<rclcpp_lifecycle::LifecycleNode>");
   typedef std::map<std::string, TransportDesc> StatusMap;
   StatusMap transports;
 
@@ -75,6 +81,22 @@ int main(int /*argc*/, char ** /*argv*/)
     }
   }
 
+  StatusMap transports_lifecycle;
+  for (const std::string & lookup_name : pub_loader_lifecycle.getDeclaredClasses()) {
+    std::string transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
+    transports_lifecycle[transport_name].pub_name = lookup_name;
+    transports_lifecycle[transport_name].package_name = pub_loader_lifecycle.getClassPackage(
+      lookup_name);
+    try {
+      auto pub = pub_loader_lifecycle.createUniqueInstance(lookup_name);
+      transports_lifecycle[transport_name].pub_status = SUCCESS;
+    } catch (const pluginlib::LibraryLoadException &) {
+      transports_lifecycle[transport_name].pub_status = LIB_LOAD_FAILURE;
+    } catch (const pluginlib::CreateClassException &) {
+      transports_lifecycle[transport_name].pub_status = CREATE_FAILURE;
+    }
+  }
+
   for (const std::string & lookup_name : sub_loader.getDeclaredClasses()) {
     std::string transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
     transports[transport_name].sub_name = lookup_name;
@@ -86,6 +108,22 @@ int main(int /*argc*/, char ** /*argv*/)
       transports[transport_name].sub_status = LIB_LOAD_FAILURE;
     } catch (const pluginlib::CreateClassException &) {
       transports[transport_name].sub_status = CREATE_FAILURE;
+    }
+  }
+
+
+  for (const std::string & lookup_name : sub_loader_lifecycle.getDeclaredClasses()) {
+    std::string transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
+    transports_lifecycle[transport_name].sub_name = lookup_name;
+    transports_lifecycle[transport_name].package_name = sub_loader_lifecycle.getClassPackage(
+      lookup_name);
+    try {
+      auto sub = sub_loader_lifecycle.createUniqueInstance(lookup_name);
+      transports_lifecycle[transport_name].sub_status = SUCCESS;
+    } catch (const pluginlib::LibraryLoadException &) {
+      transports_lifecycle[transport_name].sub_status = LIB_LOAD_FAILURE;
+    } catch (const pluginlib::CreateClassException &) {
+      transports_lifecycle[transport_name].sub_status = CREATE_FAILURE;
     }
   }
 
@@ -123,6 +161,31 @@ int main(int /*argc*/, char ** /*argv*/)
       printf(" - No subscriber provided\n");
     } else {
       printf(" - Subscriber: %s\n", sub_loader.getClassDescription(td.sub_name).c_str());
+    }
+  }
+
+  printf("\nDetails Lifecycle:\n");
+  for (const auto & value : transports_lifecycle) {
+    const TransportDesc & td = value.second;
+    printf("----------\n");
+    printf("\"%s\"\n", value.first.c_str());
+    if (td.pub_status == CREATE_FAILURE || td.sub_status == CREATE_FAILURE) {
+      printf(
+        "*** Plugins are built, but could not be loaded. The package may need to be rebuilt or may "
+        "not be compatible with this release of image_common. ***\n");
+    } else if (td.pub_status == LIB_LOAD_FAILURE || td.sub_status == LIB_LOAD_FAILURE) {
+      printf("*** Plugins are not built. ***\n");
+    }
+    printf(" - Provided by package: %s\n", td.package_name.c_str());
+    if (td.pub_status == DOES_NOT_EXIST) {
+      printf(" - No publisher provided\n");
+    } else {
+      printf(" - Publisher: %s\n", pub_loader_lifecycle.getClassDescription(td.pub_name).c_str());
+    }
+    if (td.sub_status == DOES_NOT_EXIST) {
+      printf(" - No subscriber provided\n");
+    } else {
+      printf(" - Subscriber: %s\n", sub_loader_lifecycle.getClassDescription(td.sub_name).c_str());
     }
   }
 
