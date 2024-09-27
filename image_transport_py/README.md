@@ -1,9 +1,9 @@
-# image_transport_py: Python Bindings for ROS2 Image Transport
+# image_transport_py: Python Bindings for ROS 2 Image Transport
 
 ## Introduction
 
 `image_transport_py` is a Python package that provides bindings for `image_transport`. It enables efficient publishing and subscribing of images in Python, leveraging various transport plugins (e.g., `raw`, `compressed`). 
-The package allows developers to handle image topics more efficiently and with less overhead than using standard ROS2 topics.
+The package allows developers to handle image topics more efficiently and with less overhead than using standard ROS 2 topics.
 
 ## Usage
 
@@ -47,7 +47,6 @@ class ImagePublisher(Node):
 
 `advertise_camera` can publish `CameraInfo` along with `Image` message.
 
-
 ### Subscribing to Images
 
 To subscribe to images, use `ImageTransport` to create a subscription to the image topic.
@@ -69,7 +68,7 @@ class ImageSubscriber(Node):
     def __init__(self):
         super().__init__('image_subscriber')
         self.image_transport = ImageTransport("imagetransport_sub", image_transport="raw")
-        self.subscription = self.image_transport.subscribe('camera/image', self.image_callback, 10)
+        self.subscription = self.image_transport.subscribe('camera/image', 10, self.image_callback)
 ```
 
 3. Handle Incoming Images:
@@ -80,12 +79,10 @@ class ImageSubscriber(Node):
 
 `subscribe_camera` will add `CameraInfo` along with `Image` message for the callback.
 
-
 ### Transport Selection
 
 By default, `image_transport` uses the `raw` transport. You can specify a different transport by passing `image_transport` parameter to `ImageTransport`. Alternatively,
 you can use your own ROS2 parameter file for the imagetransport node via `launch_params_filepath` parameter.
-
 
 ## Classes
 
@@ -141,7 +138,7 @@ An object for image transport operations.
 
 - `__init__(node_name, image_transport="", launch_params_filepath="")`
 
-  Initialize an ImageTransport object with its node name, image_transport and launch params file path. If no `image_transport` specified, the default `raw` plugin will be initialized.
+  Initialize an ImageTransport object with its node name, `image_transport` and launch params file path. If no `image_transport` specified, the default `raw` plugin will be initialized.
 
 #### Methods
 

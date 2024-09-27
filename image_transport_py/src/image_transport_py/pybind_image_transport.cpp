@@ -187,11 +187,10 @@ PYBIND11_MODULE(_image_transport, m)
     "shutdown", &image_transport::Subscriber::shutdown,
     "Unsubscribe the callback associated with this Subscriber.");
 
-
   pybind11::class_<image_transport::CameraSubscriber,
     std::shared_ptr<image_transport::CameraSubscriber>>(
     m,
-    "CameraSubscriber")
+    "Camera subscriber constructor")
   .def(pybind11::init())
   .def(
     "get_topic",
