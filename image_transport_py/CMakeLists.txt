@@ -25,7 +25,6 @@ if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(Python3_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
 endif()
 
-
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
