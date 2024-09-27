@@ -101,9 +101,9 @@ PYBIND11_MODULE(_image_transport, m)
         std::make_shared<rclcpp::executors::MultiThreadedExecutor>();
 
         auto spin_node = [node, executor]() {
-        executor->add_node(node);
-        executor->spin();
-      };
+          executor->add_node(node);
+          executor->spin();
+        };
         std::thread execution_thread(spin_node);
         execution_thread.detach();
 
@@ -112,7 +112,7 @@ PYBIND11_MODULE(_image_transport, m)
     pybind11::arg("node_name"), pybind11::arg("image_transport") = "",
     pybind11::arg("launch_params_filepath") = "",
 
-    "Initialize an ImageTransport object with a node name and launch params file path.")
+    "Initialize an ImageTransport object with a node name, image_transport and launch params file path.")
   .def(
     "advertise",
     pybind11::overload_cast<const std::string &, uint32_t, bool>(

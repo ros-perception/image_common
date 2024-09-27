@@ -21,10 +21,16 @@ with add_dll_directories_from_env('PATH'):
     from image_transport_py._image_transport import (
         ImageTransport,
         Publisher,
+        Subscriber,
+        CameraPublisher,
+        CameraSubscriber,
     )
 
 
 __all__ = [
     'ImageTransport',
     'Publisher',
+    'Subscriber',
+    'CameraPublisher',
+    'CameraSubscriber',
 ]
