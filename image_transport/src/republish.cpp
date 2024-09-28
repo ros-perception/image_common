@@ -111,18 +111,29 @@ void Republisher::initialize()
   if (out_transport.empty()) {
     // Use all available transports for output
 
-    this->pub = image_transport::create_publisher(
-      this, out_topic,
-      rmw_qos_profile_default, pub_options);
-
     // Use Publisher::publish as the subscriber callback
     typedef void (image_transport::Publisher::* PublishMemFn)(
       const sensor_msgs::msg::Image::ConstSharedPtr &) const;
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
 
-    this->sub = image_transport::create_subscription(
-      this, in_topic, std::bind(pub_mem_fn, &pub, std::placeholders::_1),
-      in_transport, rmw_qos_profile_default, sub_options);
+    pub_options.event_callbacks.matched_callback =
+      [this, in_topic, in_transport, pub_mem_fn, sub_options](rclcpp::MatchedInfo & matched_info)
+      {
+        if (this->pub.getNumSubscribers() == 0) {
+          this->sub.shutdown();
+        } else if (!this->sub) {
+          this->sub = image_transport::create_subscription(
+            this, in_topic,
+            std::bind(pub_mem_fn, &this->pub, std::placeholders::_1),
+            in_transport,
+            rmw_qos_profile_default,
+            sub_options);
+        }
+      };
+
+    this->pub = image_transport::create_publisher(
+      this, out_topic,
+      rmw_qos_profile_default, pub_options);
   } else {
     // Use one specific transport for output
     // Load transport plugin
