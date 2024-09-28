@@ -117,8 +117,9 @@ void Republisher::initialize()
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
 
     pub_options.event_callbacks.matched_callback =
-      [this, in_topic, in_transport, pub_mem_fn, sub_options](rclcpp::MatchedInfo & matched_info)
+      [this, in_topic, in_transport, pub_mem_fn, sub_options](rclcpp::MatchedInfo &)
       {
+        std::scoped_lock<std::mutex> lock(this->pub_matched_mutex);
         if (this->pub.getNumSubscribers() == 0) {
           this->sub.shutdown();
         } else if (!this->sub) {
