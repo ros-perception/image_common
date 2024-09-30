@@ -61,12 +61,8 @@ Republisher::Republisher(const rclcpp::NodeOptions & options)
 
 void Republisher::initialize()
 {
-  std::string in_topic = rclcpp::expand_topic_or_service_name(
-    "in",
-    this->get_name(), this->get_namespace());
-  std::string out_topic = rclcpp::expand_topic_or_service_name(
-    "out",
-    this->get_name(), this->get_namespace());
+  std::string in_topic = this->get_node_topics_interface()->resolve_topic_name("in");
+  std::string out_topic = this->get_node_topics_interface()->resolve_topic_name("out");
 
   std::string in_transport = "raw";
   this->declare_parameter<std::string>("in_transport", in_transport);
