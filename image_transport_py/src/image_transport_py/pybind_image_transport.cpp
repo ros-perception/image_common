@@ -190,7 +190,7 @@ PYBIND11_MODULE(_image_transport, m)
   pybind11::class_<image_transport::CameraSubscriber,
     std::shared_ptr<image_transport::CameraSubscriber>>(
     m,
-    "Camera subscriber constructor")
+    "CameraSubscriber")
   .def(pybind11::init())
   .def(
     "get_topic",
