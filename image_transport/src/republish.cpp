@@ -61,13 +61,6 @@ Republisher::Republisher(const rclcpp::NodeOptions & options)
 
 void Republisher::initialize()
 {
-  std::string in_topic = rclcpp::expand_topic_or_service_name(
-    "in",
-    this->get_name(), this->get_namespace());
-  std::string out_topic = rclcpp::expand_topic_or_service_name(
-    "out",
-    this->get_name(), this->get_namespace());
-
   std::string in_transport = "raw";
   this->declare_parameter<std::string>("in_transport", in_transport);
   if (!this->get_parameter(
@@ -117,14 +110,14 @@ void Republisher::initialize()
     PublishMemFn pub_mem_fn = &image_transport::Publisher::publish;
 
     pub_options.event_callbacks.matched_callback =
-      [this, in_topic, in_transport, pub_mem_fn, sub_options](rclcpp::MatchedInfo &)
+      [this, in_transport, pub_mem_fn, sub_options](rclcpp::MatchedInfo &)
       {
         std::scoped_lock<std::mutex> lock(this->pub_matched_mutex);
         if (this->pub.getNumSubscribers() == 0) {
           this->sub.shutdown();
         } else if (!this->sub) {
           this->sub = image_transport::create_subscription(
-            this, in_topic,
+            this, "in",
             std::bind(pub_mem_fn, &this->pub, std::placeholders::_1),
             in_transport,
             rmw_qos_profile_default,
@@ -133,7 +126,7 @@ void Republisher::initialize()
       };
 
     this->pub = image_transport::create_publisher(
-      this, out_topic,
+      this, "out",
       rmw_qos_profile_default, pub_options);
   } else {
     // Use one specific transport for output
@@ -151,13 +144,13 @@ void Republisher::initialize()
     this->instance = loader->createUniqueInstance(lookup_name);
 
     pub_options.event_callbacks.matched_callback =
-      [this, in_topic, in_transport, pub_mem_fn, sub_options](rclcpp::MatchedInfo & matched_info)
+      [this, in_transport, pub_mem_fn, sub_options](rclcpp::MatchedInfo & matched_info)
       {
         if (matched_info.current_count == 0) {
           this->sub.shutdown();
         } else if (!this->sub) {
           this->sub = image_transport::create_subscription(
-            this, in_topic,
+            this, "in",
             std::bind(
               pub_mem_fn,
               this->instance.get(), std::placeholders::_1), in_transport, rmw_qos_profile_default,
@@ -165,7 +158,7 @@ void Republisher::initialize()
         }
       };
 
-    this->instance->advertise(this, out_topic, rmw_qos_profile_default, pub_options);
+    this->instance->advertise(this, "out", rmw_qos_profile_default, pub_options);
   }
 }
 

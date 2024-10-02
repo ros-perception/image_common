@@ -35,7 +35,6 @@
 #include <utility>
 #include <vector>
 
-#include "rclcpp/expand_topic_or_service_name.hpp"
 #include "rclcpp/logging.hpp"
 #include "rclcpp/node.hpp"
 
@@ -105,9 +104,7 @@ Publisher::Publisher(
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
-  std::string image_topic = rclcpp::expand_topic_or_service_name(
-    base_topic,
-    node->get_name(), node->get_namespace());
+  std::string image_topic = node->get_node_topics_interface()->resolve_topic_name(base_topic);
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
