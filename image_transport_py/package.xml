@@ -19,8 +19,9 @@
   <buildtool_depend>ament_cmake_python</buildtool_depend>
   <buildtool_depend>python_cmake_module</buildtool_depend>
 
+  <build_depend>pybind11_vendor</build_depend>
+
   <depend>image_transport</depend>
-  <depend>pybind11_vendor</depend>
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
 
