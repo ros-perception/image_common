@@ -30,6 +30,7 @@
 #define IMAGE_TRANSPORT__REPUBLISH_HPP_
 
 #include <memory>
+#include <mutex>
 
 #include "image_transport/image_transport.hpp"
 #include "image_transport/visibility_control.hpp"
@@ -54,6 +55,7 @@ private:
   bool initialized_{false};
   image_transport::Subscriber sub;
   image_transport::Publisher pub;
+  std::mutex pub_matched_mutex;
   pluginlib::UniquePtr<image_transport::PublisherPlugin> instance;
   std::shared_ptr<pluginlib::ClassLoader<image_transport::PublisherPlugin>> loader;
 };
