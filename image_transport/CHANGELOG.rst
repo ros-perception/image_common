@@ -2,8 +2,8 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+6.0.0 (2024-10-03)
+------------------
 * Apply remappings to base topic before creating transport-specific topics (`#326 <https://github.com/ros-perception/image_common/issues/326>`_)
 * Add lazy subscription to republisher (`#325 <https://github.com/ros-perception/image_common/issues/325>`_)
 * Fix node name (`#321 <https://github.com/ros-perception/image_common/issues/321>`_)
