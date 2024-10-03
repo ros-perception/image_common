@@ -2,6 +2,11 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add optional namespace to /set_camera_info service in CameraInfoManager (`#324 <https://github.com/ros-perception/image_common/issues/324>`_)
+* Contributors: Jan Hernas
+
 5.3.2 (2024-07-29)
 ------------------
 
