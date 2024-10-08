@@ -74,7 +74,6 @@ if(BUILD_TESTING)
     ament_cmake_cppcheck
   )
   ament_lint_auto_find_test_dependencies()
-ament_cppcheck(LANGUAGE c++)
   ament_cppcheck(LANGUAGE "c++")
 endif()
 
