@@ -74,7 +74,12 @@ if(BUILD_TESTING)
     ament_cmake_cppcheck
   )
   ament_lint_auto_find_test_dependencies()
-  ament_cppcheck(LANGUAGE "c++")
+
+  if(NOT WIN32)
+    ament_cppcheck(LANGUAGE "c++")
+  else()
+    message(STATUS "Skipping ament_cppcheck on Windows")
+  endif()
 endif()
 
 ament_package()
