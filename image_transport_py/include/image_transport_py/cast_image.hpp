@@ -29,6 +29,10 @@
 #include "sensor_msgs/msg/image.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
 
+#if PYBIND11_VERSION_MAJOR > 2 || (PYBIND11_VERSION_MAJOR == 2 && PYBIND11_VERSION_MINOR >= 9)
+    #define const_name _
+#endif
+
 static inline bool is_ros_msg_type(pybind11::handle src, const std::string & msg_type_name)
 {
   return pybind11::hasattr(src, "__module__") &&
