@@ -29,7 +29,7 @@
 #include "sensor_msgs/msg/image.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
 
-#if PYBIND11_VERSION_MAJOR > 2 || (PYBIND11_VERSION_MAJOR == 2 && PYBIND11_VERSION_MINOR < 9)
+#if PYBIND11_VERSION_MAJOR < 2 || (PYBIND11_VERSION_MAJOR == 2 && PYBIND11_VERSION_MINOR < 9)
     #define const_name _
 #endif
 
