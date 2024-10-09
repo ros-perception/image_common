@@ -128,10 +128,8 @@ std::vector<std::string> getLoadableTransports()
   return loadableTransports;
 }
 
-struct ImageTransport::Impl
-{
-  rclcpp::Node::SharedPtr node_;
-};
+ImageTransport::ImageTransport(const ImageTransport & other)
+: impl_(std::make_unique<Impl>(*other.impl_)) {}
 
 ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
 : impl_(std::make_unique<ImageTransport::Impl>())
