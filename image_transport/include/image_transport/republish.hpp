@@ -30,7 +30,6 @@
 #define IMAGE_TRANSPORT__REPUBLISH_HPP_
 
 #include <memory>
-#include <mutex>
 
 #include "image_transport/image_transport.hpp"
 #include "image_transport/visibility_control.hpp"
