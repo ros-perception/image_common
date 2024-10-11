@@ -43,6 +43,8 @@ using namespace std::chrono_literals;
 namespace image_transport
 {
 
+std::mutex pub_matched_mutex;
+
 Republisher::Republisher(const rclcpp::NodeOptions & options)
 : Node("image_republisher", options)
 {
@@ -119,7 +121,7 @@ void Republisher::initialize()
     pub_options.event_callbacks.matched_callback =
       [this, in_topic, in_transport, pub_mem_fn, sub_options](rclcpp::MatchedInfo &)
       {
-        std::scoped_lock<std::mutex> lock(this->pub_matched_mutex);
+        std::scoped_lock<std::mutex> lock(pub_matched_mutex);
         if (this->pub.getNumSubscribers() == 0) {
           this->sub.shutdown();
         } else if (!this->sub) {

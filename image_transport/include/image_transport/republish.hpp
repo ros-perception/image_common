@@ -55,7 +55,6 @@ private:
   bool initialized_{false};
   image_transport::Subscriber sub;
   image_transport::Publisher pub;
-  std::mutex pub_matched_mutex;
   pluginlib::UniquePtr<image_transport::PublisherPlugin> instance;
   std::shared_ptr<pluginlib::ClassLoader<image_transport::PublisherPlugin>> loader;
 };
