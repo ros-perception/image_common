@@ -20,8 +20,9 @@
 
   <author>Jack O'Quin</author>
 
-  <depend>rclpy</depend>
+  <exec_depend>ament_index_python</exec_depend>
 
+  <depend>rclpy</depend>
   <depend>sensor_msgs</depend>
   <depend>python3-rospkg</depend>
   <depend>python3-yaml</depend>

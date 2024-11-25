@@ -18,7 +18,7 @@ setup(
     zip_safe=True,
     maintainer='Jose Mastrangelo',
     maintainer_email='jmastrangelo@clearpathrobotics.com',
-    author='Jack O\'Quin',
+    author="Jack O'Quin",
     author_email='jack.oquin@gmail.com',
     description='Python interface for camera calibration information.',
     long_description='Python interface for camera calibration information. \n\n'

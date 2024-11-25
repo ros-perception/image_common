@@ -2,38 +2,37 @@
 # Copyright 2012, Jack O'Quin
 # All rights reserved.
 #
-# Software License Agreement (BSD License 2.0)
-#
 # Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
+# modification, are permitted provided that the following conditions are met:
 #
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above
-#    copyright notice, this list of conditions and the following
-#    disclaimer in the documentation and/or other materials provided
-#    with the distribution.
-#  * Neither the name of Jack O'Quin nor the names of its
-#    contributors may be used to endorse or promote products derived
-#    from this software without specific prior written permission.
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in the
+#      documentation and/or other materials provided with the distribution.
+#
+#    * Neither the name of the the copyright holder nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""
-Python camera_info_manager interface, providing `CameraInfo` support
-for drivers written in Python. This is very similar to the
+"""Python camera_info_manager interface.
+
+Providing `CameraInfo` support for drivers written in Python.
+This is very similar to the
+
 `C++ camera_info_manager`_ package, but not identical.
 
 .. _`C++ camera_info_manager`: http://ros.org/wiki/camera_info_manager
@@ -47,9 +46,10 @@ import locale
 import os
 from pathlib import Path
 
+from ament_index_python import get_package_share_directory
+from ament_index_python import PackageNotFoundError
 import rclpy
 from rclpy.node import Node
-import rospkg
 from sensor_msgs.msg import CameraInfo
 from sensor_msgs.srv import SetCameraInfo
 import yaml
@@ -63,23 +63,22 @@ URL_invalid = 3  # anything >= is invalid
 
 
 class CameraInfoError(Exception):
-    """
-    ..exception: CameraInfoError
+    """Base class for exceptions in this module.
 
-    Base class for exceptions in this module.
+    ..exception: CameraInfoError
     """
 
 
 class CameraInfoMissingError(CameraInfoError):
-    """
-    ..exception: CameraInfoMissingError
+    """Exception raised when CameraInfo has not been loaded.
 
-    Exception raised when CameraInfo has not been loaded.
+    ..exception: CameraInfoMissingError
     """
 
 
 class CameraInfoManager:
-    """
+    """CameraInfoManager class.
+
     :class:`CameraInfoManager` provides ROS CameraInfo support for
     Python camera drivers. It handles the `sensor_msgs/SetCameraInfo`_
     service requests, saving and restoring `sensor_msgs/CameraInfo`_
@@ -200,7 +199,7 @@ class CameraInfoManager:
     """
 
     def __init__(self, node: Node, cname='camera', url='', namespace=''):
-        """Constructor."""
+        """Call the Constructor."""
         self.node = node
         self.cname = cname
         self.url = url
@@ -214,7 +213,10 @@ class CameraInfoManager:
         self.svc = self.node.create_service(SetCameraInfo, service_name, self.setCameraInfo)
 
     def __str__(self):
-        """:returns: String representation of :class:`CameraInfoManager`"""
+        """Return string representation of CameraInfoManager.
+
+        :returns: Return string representation of :class:CameraInfoManager.
+        """
         return '[' + self.cname + ']' + str(self.utm)
 
     def getCameraInfo(self):
@@ -248,7 +250,7 @@ class CameraInfoManager:
         return self.url
 
     def isCalibrated(self):
-        """Is the current CameraInfo calibrated?
+        """Is the current CameraInfo calibrated?.
 
         The :py:meth:`loadCameraInfo` must have been called since the
         last time the camera name or URL changed.
@@ -315,7 +317,7 @@ class CameraInfoManager:
         self._loadCalibration(self.url, self.cname)
 
     def setCameraInfo(self, req):
-        """Callback for SetCameraInfo request.
+        """Set camera info request callback.
 
         :param req: SetCameraInfo request message.
         :returns: SetCameraInfo response message, success is True if
@@ -422,12 +424,11 @@ def getPackageFileName(url):
 
     # Look up the ROS package path name.
     pkgPath = ''
-    rp = rospkg.RosPack()
     try:
-        pkgPath = rp.get_path(package)
+        pkgPath = get_package_share_directory(package)
         pkgPath += url[rest:]
 
-    except rospkg.ResourceNotFound:
+    except PackageNotFoundError:
         rclpy.get_logger('camera_info_manager').warning(
             'unknown package: ' + package + ' (ignored)'
         )
@@ -622,7 +623,6 @@ def saveCalibrationFile(ci, filename, cname):
     :param cname: Camera name.
     :returns: True if able to save the data.
     """
-
     # make calibration dictionary from CameraInfo fields and camera name
     calib = {
         'image_width': ci.width,

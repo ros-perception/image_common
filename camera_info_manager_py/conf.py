@@ -83,7 +83,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'camera_info_manager_py'
-copyright = "2012, Jack O'Quin"
+# copyright = "2012, Jack O'Quin"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
