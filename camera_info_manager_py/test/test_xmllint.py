@@ -27,12 +27,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from ament_copyright.main import main
+from ament_xmllint.main import main
 import pytest
 
 
-@pytest.mark.copyright
 @pytest.mark.linter
-def test_copyright():
-    rc = main(argv=['.'])
+@pytest.mark.xmllint
+def test_xmllint() -> None:
+    rc = main(argv=[])
     assert rc == 0, 'Found errors'

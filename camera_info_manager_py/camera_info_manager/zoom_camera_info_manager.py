@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright 2016, Martin Pecka
 # All rights reserved.
 #

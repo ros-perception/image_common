@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright 2012, Jack O'Quin
 # All rights reserved.
 #
@@ -28,7 +27,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Python camera_info_manager interface.
+"""
+Python camera_info_manager interface.
 
 Providing `CameraInfo` support for drivers written in Python.
 This is very similar to the
@@ -63,21 +63,24 @@ URL_invalid = 3  # anything >= is invalid
 
 
 class CameraInfoError(Exception):
-    """Base class for exceptions in this module.
+    """
+    Base class for exceptions in this module.
 
     ..exception: CameraInfoError
     """
 
 
 class CameraInfoMissingError(CameraInfoError):
-    """Exception raised when CameraInfo has not been loaded.
+    """
+    Exception raised when CameraInfo has not been loaded.
 
     ..exception: CameraInfoMissingError
     """
 
 
 class CameraInfoManager:
-    """CameraInfoManager class.
+    """
+    CameraInfoManager class.
 
     :class:`CameraInfoManager` provides ROS CameraInfo support for
     Python camera drivers. It handles the `sensor_msgs/SetCameraInfo`_
@@ -213,14 +216,16 @@ class CameraInfoManager:
         self.svc = self.node.create_service(SetCameraInfo, service_name, self.setCameraInfo)
 
     def __str__(self):
-        """Return string representation of CameraInfoManager.
+        """
+        Return string representation of CameraInfoManager.
 
         :returns: Return string representation of :class:CameraInfoManager.
         """
         return '[' + self.cname + ']' + str(self.utm)
 
     def getCameraInfo(self):
-        """Get the current camera calibration.
+        """
+        Get the current camera calibration.
 
         The :py:meth:`loadCameraInfo` must have been called since the
         last time the camera name or URL changed.
@@ -236,21 +241,24 @@ class CameraInfoManager:
         return self.camera_info
 
     def getCameraName(self):
-        """Get the current camera name.
+        """
+        Get the current camera name.
 
         :returns: camera name string
         """
         return self.cname
 
     def getURL(self):
-        """Get the current calibration URL.
+        """
+        Get the current calibration URL.
 
         :returns: URL string without variable expansion.
         """
         return self.url
 
     def isCalibrated(self):
-        """Is the current CameraInfo calibrated?.
+        """
+        Determine whether the current CameraInfo is calibrated.
 
         The :py:meth:`loadCameraInfo` must have been called since the
         last time the camera name or URL changed.
@@ -267,7 +275,8 @@ class CameraInfoManager:
         return self.camera_info.K[0] != 0.0
 
     def _loadCalibration(self, url, cname):
-        """Load calibration data (if any available).
+        """
+        Load calibration data (if any available).
 
         This method updates self.camera_info, if possible, based on
         the url and cname parameters.  An empty or non-existent
@@ -304,7 +313,8 @@ class CameraInfoManager:
             self.camera_info = CameraInfo()
 
     def loadCameraInfo(self):
-        """Load currently configured calibration data (if any).
+        """
+        Load currently configured calibration data (if any).
 
         This method updates camera_info, if possible, based on the
         currently-configured URL and camera name.  An empty or
@@ -317,7 +327,8 @@ class CameraInfoManager:
         self._loadCalibration(self.url, self.cname)
 
     def setCameraInfo(self, req):
-        """Set camera info request callback.
+        """
+        Set camera info request callback.
 
         :param req: SetCameraInfo request message.
         :returns: SetCameraInfo response message, success is True if
@@ -335,7 +346,8 @@ class CameraInfoManager:
         return rsp
 
     def setCameraName(self, cname):
-        """Set a new camera name.
+        """
+        Set a new camera name.
 
         :param cname: camera name to use for saving calibration data
 
@@ -361,7 +373,8 @@ class CameraInfoManager:
         return True
 
     def setURL(self, url):
-        """Set the calibration URL.
+        """
+        Set the calibration URL.
 
         :param cname: camera name to use for saving calibration data
 
@@ -386,7 +399,8 @@ class CameraInfoManager:
 
 
 def genCameraName(from_string):
-    """Generate a valid camera name.
+    """
+    Generate a valid camera name.
 
     Valid names contain only alphabetic, numeric, or '_'
     characters. All invalid characters in from_string are replaced
@@ -410,7 +424,8 @@ def genCameraName(from_string):
 
 
 def getPackageFileName(url):
-    """Get file name corresponding to a `package:` URL.
+    """
+    Get file name corresponding to a `package:` URL.
 
     `param url` fully-resolved Uniform Resource Locator
     `returns` file name if package found, "" otherwise
@@ -437,7 +452,8 @@ def getPackageFileName(url):
 
 
 def loadCalibrationFile(filename, cname):
-    """Load calibration data from a file.
+    """
+    Load calibration data from a file.
 
     This function returns a `sensor_msgs/CameraInfo`_ message, based
     on the filename parameter.  An empty or non-existent file is *not*
@@ -482,7 +498,8 @@ def loadCalibrationFile(filename, cname):
 
 
 def parseURL(url):
-    """Parse calibration Uniform Resource Locator.
+    """
+    Parse calibration Uniform Resource Locator.
 
     `param url`: string to parse
     `returns` URL type code
@@ -508,7 +525,8 @@ def parseURL(url):
 
 
 def resolveURL(url, cname):
-    """Resolve substitution strings in Uniform Resource Locator.
+    """
+    Resolve substitution strings in Uniform Resource Locator.
 
     :param url: URL to resolve, which may include `${...}`
                 substitution variables.
@@ -567,7 +585,8 @@ def resolveURL(url, cname):
 
 
 def saveCalibration(new_info, url, cname):
-    """Save calibration data.
+    """
+    Save calibration data.
 
     This function writes new calibration information to the
     location defined by the url and cname parameters, if possible.
@@ -613,7 +632,8 @@ def saveCalibration(new_info, url, cname):
 
 
 def saveCalibrationFile(ci, filename, cname):
-    """Save calibration data to a YAML file.
+    """
+    Save calibration data to a YAML file.
 
     This function writes the new calibration information to a YAML
     file, if possible.
