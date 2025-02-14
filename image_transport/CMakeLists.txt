@@ -65,11 +65,9 @@ add_library(republish_node SHARED
 )
 target_link_libraries(republish_node
   ${PROJECT_NAME}
-)
-ament_target_dependencies(republish_node
-  pluginlib
-  rclcpp_components
-  rclcpp
+  pluginlib::pluginlib
+  rclcpp_components::component
+  rclcpp::rclcpp
 )
 rclcpp_components_register_node(republish_node
   PLUGIN "image_transport::Republisher"

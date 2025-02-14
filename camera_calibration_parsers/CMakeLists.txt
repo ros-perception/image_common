@@ -55,9 +55,9 @@ ament_export_targets(export_${PROJECT_NAME})
 #endif()
 #add_library(${PROJECT_NAME}_wrapper
 #  src/parse_wrapper.cpp)
-#ament_target_dependencies(${PROJECT_NAME}_wrapper
-#  "rclcpp"
-#  "sensor_msgs"
+#target_link_libraries(${PROJECT_NAME}_wrapper
+#  rclcpp::rclcpp
+#  ${sensor_msgs_TARGETS}
 #)
 #target_include_directories(${PROJECT_NAME}_wrapper PUBLIC ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 #target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${YAML_CPP_LIBRARIES})
