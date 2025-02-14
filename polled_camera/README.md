@@ -32,10 +32,10 @@ $ poller 5 camera:=my_camera output:=my_polled_output
 ```
 
 Published Topics
-* <output>/image_raw (sensor_msgs/Image)
+* `<output>/image_raw` ([sensor_msgs/Image](https://github.com/ros2/common_interfaces/blob/rolling/sensor_msgs/msg/Image.msg))
   Image topic, actually published by the camera driver. output should be remapped by the user.
-* <output>/camera_info (sensor_msgs/CameraInfo)
+* `<output>/camera_info` ([sensor_msgs/CameraInfo](https://github.com/ros2/common_interfaces/blob/rolling/sensor_msgs/msg/CameraInfo.msg))
   Info topic, actually published by the camera driver. output should be remapped by the user.
 Services Called
-* <camera>/request_image (polled_camera/GetPolledImage)
+* `<camera>/request_image` ([polled_camera/GetPolledImage](https://github.com/ros-perception/image_common/blob/rolling/polled_camera/srv/GetPolledImage.srv))
 The camera driver's polled image service. camera should be remapped by the user to the camera namespace.
