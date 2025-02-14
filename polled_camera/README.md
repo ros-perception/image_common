@@ -2,7 +2,7 @@
 
 `polled_camera` defines the ROS interface that client nodes use to request images from a polling camera driver node (e.g. [prosilica_camera](https://index.ros.org/p/prosilica_camera/)). The protocol is:
 
-* The camera driver advertises a service call `<camera>/request_image` of type [polled_camera/GetPolledImage](http://www.ros.org/doc/api/polled_camera/html/srv/GetPolledImage.html).
+* The camera driver advertises a service call `<camera>/request_image` of type [polled_camera/GetPolledImage](https://github.com/ros-perception/image_common/blob/rolling/polled_camera/srv/GetPolledImage.srv).
 * The client calls the service, specifying an output namespace.
 * On receiving a request, the driver captures an image and returns its time stamp in the service response.
 * The driver publishes (latching) the [sensor_msgs/Image](http://www.ros.org/doc/api/sensor_msgs/html/msg/Image.html) and [sensor_msgs/CameraInfo](http://www.ros.org/doc/api/sensor_msgs/html/msg/CameraInfo.html) to `<response_namespace>/image_raw` and `<response_namespace>/camera_info`.
