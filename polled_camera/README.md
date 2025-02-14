@@ -15,7 +15,7 @@ There are several reasons for publishing images to topics instead of returning t
 
 * **Consistency:** Client-side processing is always performed in an image callback, regardless of what type of camera is used.
 * **Visibility:** Topics can be monitored in [image_view](https://index.ros.org/p/image_view/) or [rviz](https://index.ros.org/p/rviz/).
-* **Reproducibility:** Topics can be [bagged](https://index.ros.org/p/rosbag/) and played back later.
+* **Reproducibility:** Topics can be [bagged](https://index.ros.org/p/rosbag2/) and played back later.
 * **Compression:** Can take advantage of [image_transport](https://index.ros.org/p/image_transport/) to compress images, if desired.
 
 ## Nodes
