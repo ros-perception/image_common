@@ -59,7 +59,8 @@ protected:
     node.reset();
   }
 
-  static void TearDownTestSuite() {
+  static void TearDownTestSuite()
+  {
     rclcpp::shutdown();
   }
 
