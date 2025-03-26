@@ -38,6 +38,7 @@
 #include "rclcpp/logger.hpp"
 #include "rclcpp/logging.hpp"
 
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/publisher_plugin.hpp"
 #include "image_transport/visibility_control.hpp"
 
@@ -114,17 +115,24 @@ public:
 
 protected:
   void advertiseImpl(
-    rclcpp::Node * node,
+    RequiredInterfaces node_interfaces,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
     std::string transport_topic = getTopicToAdvertise(base_topic);
-    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
+    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node_interfaces);
 
     RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos, options);
+
+    // temporary variables are unfortunately necessary due to different passing conventions for shared pointers
+    // between rclcpp core modules for publishers and the node interfaces class
+    auto node_params_interface = node_interfaces.get_node_parameters_interface();
+    auto node_topics_interface = node_interfaces.get_node_topics_interface();
+    simple_impl_->pub_ = rclcpp::create_publisher<M>(node_params_interface,
+                                                     node_topics_interface,
+                                                     transport_topic, qos, options);
   }
 
   typedef typename rclcpp::Publisher<M>::SharedPtr PublisherT;
@@ -189,13 +197,13 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    explicit SimplePublisherPluginImpl(rclcpp::Node * node)
-    : node_(node),
-      logger_(node->get_logger())
+    explicit SimplePublisherPluginImpl(RequiredInterfaces node_interfaces)
+    : node_interfaces_(node_interfaces),
+      logger_(node_interfaces_.get_node_logging_interface()->get_logger())
     {
     }
 
-    rclcpp::Node * node_;
+    RequiredInterfaces node_interfaces_;
     rclcpp::Logger logger_;
     PublisherT pub_;
   };

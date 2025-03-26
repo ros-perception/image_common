@@ -38,6 +38,7 @@
 
 #include "image_transport/exception.hpp"
 #include "image_transport/loader_fwds.hpp"
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
@@ -68,7 +69,7 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   Subscriber(
-    rclcpp::Node * node,
+    RequiredInterfaces node_interfaces,
     const std::string & base_topic,
     const Callback & callback,
     SubLoaderPtr loader,

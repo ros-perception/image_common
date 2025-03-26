@@ -38,6 +38,7 @@
 
 #include "image_transport/camera_publisher.hpp"
 #include "image_transport/camera_subscriber.hpp"
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/publisher.hpp"
 #include "image_transport/subscriber.hpp"
 #include "image_transport/transport_hints.hpp"
@@ -51,43 +52,86 @@ namespace image_transport
  */
 IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
-  rclcpp::Node * node,
+  RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
+
+template<typename NodeT>
+IMAGE_TRANSPORT_PUBLIC
+Publisher create_publisher(
+        NodeT * node,
+        const std::string & base_topic,
+        rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+        rclcpp::PublisherOptions options = rclcpp::PublisherOptions()) {
+    return create_publisher(*node, base_topic, custom_qos, options);
+}
 
 /**
  * \brief Subscribe to an image topic, free function version.
  */
 IMAGE_TRANSPORT_PUBLIC
 Subscriber create_subscription(
-  rclcpp::Node * node,
+  RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   const Subscriber::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
 
+template<typename NodeT>
+IMAGE_TRANSPORT_PUBLIC
+Subscriber create_subscription(
+  NodeT * node,
+  const std::string & base_topic,
+  const Subscriber::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+  rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions()) {
+  return create_subscription(*node, base_topic, callback, transport, custom_qos, options);
+}
+
 /*!
  * \brief Advertise a camera, free function version.
  */
 IMAGE_TRANSPORT_PUBLIC
 CameraPublisher create_camera_publisher(
-  rclcpp::Node * node,
+  RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
   rclcpp::PublisherOptions pub_options = rclcpp::PublisherOptions());
+
+template<typename NodeT>
+IMAGE_TRANSPORT_PUBLIC
+CameraPublisher create_camera_publisher(
+  NodeT * node,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+  rclcpp::PublisherOptions pub_options = rclcpp::PublisherOptions()) {
+  return create_camera_publisher(*node, base_topic, custom_qos, pub_options);
+}
 
 /*!
  * \brief Subscribe to a camera, free function version.
  */
 IMAGE_TRANSPORT_PUBLIC
 CameraSubscriber create_camera_subscription(
-  rclcpp::Node * node,
+  RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   const CameraSubscriber::Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
+
+template<typename NodeT>
+IMAGE_TRANSPORT_PUBLIC
+CameraSubscriber create_camera_subscription(
+  NodeT * node,
+  const std::string & base_topic,
+  const CameraSubscriber::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos = rmw_qos_profile_default) {
+  return create_camera_subscription(*node, base_topic, callback, transport, custom_qos);
+}
 
 IMAGE_TRANSPORT_PUBLIC
 std::vector<std::string> getDeclaredTransports();
@@ -110,7 +154,11 @@ public:
   using CameraInfoConstPtr = sensor_msgs::msg::CameraInfo::ConstSharedPtr;
 
   IMAGE_TRANSPORT_PUBLIC
-  explicit ImageTransport(rclcpp::Node::SharedPtr node);
+  explicit ImageTransport(RequiredInterfaces node_interfaces);
+
+  template<typename NodeT>
+  IMAGE_TRANSPORT_PUBLIC
+  explicit ImageTransport(std::shared_ptr<NodeT> node) : ImageTransport(*node) {}
 
   IMAGE_TRANSPORT_PUBLIC
   ImageTransport(const ImageTransport & other);
@@ -372,7 +420,7 @@ private:
 
 struct ImageTransport::Impl
 {
-  rclcpp::Node::SharedPtr node_;
+  RequiredInterfaces node_interfaces_;
 };
 
 }  // namespace image_transport

@@ -35,6 +35,7 @@
 #include "message_filters/time_synchronizer.hpp"
 
 #include "image_transport/camera_common.hpp"
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/subscriber_filter.hpp"
 
 inline void increment(int * value)
@@ -51,8 +52,8 @@ struct CameraSubscriber::Impl
   using CameraInfo = sensor_msgs::msg::CameraInfo;
   using TimeSync = message_filters::TimeSynchronizer<Image, CameraInfo>;
 
-  explicit Impl(rclcpp::Node * node)
-  : logger_(node->get_logger()),
+  explicit Impl(RequiredInterfaces node_interfaces) // TODO: could be limited to logging interface?
+  : logger_(node_interfaces.get_node_logging_interface()->get_logger()),
     sync_(10),
     unsubscribed_(false),
     image_received_(0), info_received_(0), both_received_(0)
@@ -107,20 +108,20 @@ struct CameraSubscriber::Impl
 };
 
 CameraSubscriber::CameraSubscriber(
-  rclcpp::Node * node,
+  RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   const Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos)
-: impl_(std::make_shared<Impl>(node))
+: impl_(std::make_shared<Impl>(node_interfaces))
 {
   // Must explicitly remap the image topic since we then do some string manipulation on it
   // to figure out the sibling camera_info topic.
-  std::string image_topic = node->get_node_topics_interface()->resolve_topic_name(base_topic);
+  std::string image_topic = node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  impl_->image_sub_.subscribe(node, image_topic, transport, custom_qos);
-  impl_->info_sub_.subscribe(node, info_topic,
+  impl_->image_sub_.subscribe(node_interfaces, image_topic, transport, custom_qos);
+  impl_->info_sub_.subscribe(node_interfaces, info_topic,
     rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos)));
 
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
@@ -131,9 +132,11 @@ CameraSubscriber::CameraSubscriber(
   impl_->info_sub_.registerCallback(std::bind(increment, &impl_->info_received_));
   impl_->sync_.registerCallback(std::bind(increment, &impl_->both_received_));
 
-  impl_->check_synced_timer_ = node->create_wall_timer(
-    std::chrono::seconds(1),
-    std::bind(&Impl::checkImagesSynchronized, impl_.get()));
+  impl_->check_synced_timer_ = rclcpp::create_wall_timer(std::chrono::seconds(1),
+                                                         std::bind(&Impl::checkImagesSynchronized, impl_.get()),
+                                                         nullptr,
+                                                         node_interfaces.get_node_base_interface().get(),
+                                                         node_interfaces.get_node_timers_interface().get());
 }
 
 std::string CameraSubscriber::getTopic() const

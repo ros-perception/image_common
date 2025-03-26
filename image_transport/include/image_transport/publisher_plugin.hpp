@@ -36,6 +36,7 @@
 #include "rclcpp/node.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/single_subscriber_publisher.hpp"
 #include "image_transport/visibility_control.hpp"
 
@@ -72,12 +73,22 @@ public:
    * \brief Advertise a topic, simple version.
    */
   void advertise(
-    rclcpp::Node * nh,
+    RequiredInterfaces node_interfaces, // TODO: single interface might be enough?
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    advertiseImpl(nh, base_topic, custom_qos, options);
+    advertiseImpl(node_interfaces, base_topic, custom_qos, options);
+  }
+
+  template<typename NodeT>
+  void advertise(
+    NodeT * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
+  {
+    advertiseImpl(*node, base_topic, custom_qos, options);
   }
 
   /**
@@ -156,7 +167,7 @@ protected:
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
   virtual void advertiseImpl(
-    rclcpp::Node * node,
+    RequiredInterfaces node_interfaces, // TODO: could be limited to less interfaces? topic + logger?
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) = 0;

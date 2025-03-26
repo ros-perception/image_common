@@ -32,6 +32,7 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
+#include <rclcpp_lifecycle/lifecycle_node.hpp>
 
 #include "image_transport/image_transport.hpp"
 
@@ -41,9 +42,11 @@ protected:
   void SetUp()
   {
     node_ = rclcpp::Node::make_shared("test_publisher");
+    lifecycle_node_ = rclcpp_lifecycle::LifecycleNode::make_shared("test_publisher_lifecycle");
   }
 
   rclcpp::Node::SharedPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr lifecycle_node_;
 };
 
 TEST_F(TestPublisher, publisher) {
@@ -58,6 +61,11 @@ TEST_F(TestPublisher, publisher) {
 
 TEST_F(TestPublisher, image_transport_publisher) {
   image_transport::ImageTransport it(node_);
+  auto pub = it.advertise("camera/image", 1);
+}
+
+TEST_F(TestPublisher, image_transport_publisher_lifecycle) {
+  image_transport::ImageTransport it(lifecycle_node_);
   auto pub = it.advertise("camera/image", 1);
 }
 

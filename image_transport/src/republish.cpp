@@ -46,7 +46,7 @@ namespace image_transport
 Republisher::Republisher(const rclcpp::NodeOptions & options)
 : Node("image_republisher", options)
 {
-  // Initialize Republishercomponent after construction
+  // Initialize Republisher component after construction
   // shared_from_this can't be used in the constructor
   this->timer_ = create_wall_timer(
     1ms, [this]() {

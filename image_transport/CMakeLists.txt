@@ -118,6 +118,7 @@ if(BUILD_TESTING)
   ament_cppcheck(LANGUAGE "c++")
 
   find_package(ament_cmake_gtest)
+  find_package(rclcpp_lifecycle REQUIRED)
 
   ament_add_gtest(${PROJECT_NAME}-camera_common test/test_camera_common.cpp)
   if(TARGET ${PROJECT_NAME}-camera_common)
@@ -126,7 +127,7 @@ if(BUILD_TESTING)
 
   ament_add_gtest(${PROJECT_NAME}-publisher test/test_publisher.cpp)
   if(TARGET ${PROJECT_NAME}-publisher)
-    target_link_libraries(${PROJECT_NAME}-publisher ${PROJECT_NAME})
+    target_link_libraries(${PROJECT_NAME}-publisher ${PROJECT_NAME} rclcpp_lifecycle::rclcpp_lifecycle)
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-subscriber test/test_subscriber.cpp)

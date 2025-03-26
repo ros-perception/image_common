@@ -38,6 +38,7 @@
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
@@ -71,7 +72,7 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber(
-    rclcpp::Node * node,
+    RequiredInterfaces node_interfaces,
     const std::string & base_topic,
     const Callback & callback,
     const std::string & transport,

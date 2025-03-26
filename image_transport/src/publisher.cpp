@@ -48,8 +48,8 @@ namespace image_transport
 
 struct Publisher::Impl
 {
-  explicit Impl(rclcpp::Node * node)
-  : logger_(node->get_logger()),
+  explicit Impl(RequiredInterfaces node_interfaces)
+  : logger_(node_interfaces.get_node_logging_interface()->get_logger()),
     unadvertised_(false)
   {
   }
@@ -97,41 +97,45 @@ struct Publisher::Impl
 };
 
 Publisher::Publisher(
-  rclcpp::Node * node, const std::string & base_topic,
+  RequiredInterfaces node_interfaces, const std::string & base_topic,
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
-: impl_(std::make_shared<Impl>(node))
+: impl_(std::make_shared<Impl>(node_interfaces))
 {
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
-  std::string image_topic = node->get_node_topics_interface()->resolve_topic_name(base_topic);
+  std::string image_topic = node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
-  auto ns_len = node->get_effective_namespace().length();
+  auto ns_len = strlen(node_interfaces.get_node_base_interface()->get_namespace());
   std::string param_base_name = image_topic.substr(ns_len);
   std::replace(param_base_name.begin(), param_base_name.end(), '/', '.');
   if (param_base_name.front() == '.') {
     param_base_name = param_base_name.substr(1);
   }
+  rclcpp::ParameterValue allowlist_param;
   std::vector<std::string> allowlist_vec;
   std::set<std::string> allowlist;
   std::vector<std::string> all_transport_names;
   for (const auto & lookup_name : loader->getDeclaredClasses()) {
     all_transport_names.emplace_back(erase_last_copy(lookup_name, "_pub"));
   }
+
+  auto node_parameters_interface = node_interfaces.get_node_parameters_interface();
   try {
-    allowlist_vec = node->declare_parameter<std::vector<std::string>>(
-      param_base_name + ".enable_pub_plugins", all_transport_names);
+    allowlist_param = node_parameters_interface->declare_parameter(
+      param_base_name + ".enable_pub_plugins", rclcpp::ParameterValue(all_transport_names));
   } catch (const rclcpp::exceptions::ParameterAlreadyDeclaredException &) {
     RCLCPP_DEBUG_STREAM(
-      node->get_logger(), param_base_name << ".enable_pub_plugins" << " was previously declared"
+      node_interfaces.get_node_logging_interface()->get_logger(), param_base_name << ".enable_pub_plugins" << " was previously declared"
     );
-    allowlist_vec =
-      node->get_parameter(
-      param_base_name +
-      ".enable_pub_plugins").get_value<std::vector<std::string>>();
+    allowlist_param =
+      node_interfaces.get_node_parameters_interface()->get_parameter(
+              param_base_name +
+              ".enable_pub_plugins").get_parameter_value();
   }
+  allowlist_vec = allowlist_param.get<std::vector<std::string>>();
   for (size_t i = 0; i < allowlist_vec.size(); ++i) {
     allowlist.insert(allowlist_vec[i]);
   }
@@ -140,7 +144,7 @@ Publisher::Publisher(
     const auto & lookup_name = transport_name + "_pub";
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
-      pub->advertise(node, image_topic, custom_qos, options);
+      pub->advertise(node_interfaces, image_topic, custom_qos, options);
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {
       RCLCPP_ERROR(

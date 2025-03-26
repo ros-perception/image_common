@@ -43,8 +43,8 @@ namespace image_transport
 
 struct CameraPublisher::Impl
 {
-  explicit Impl(rclcpp::Node * node)
-  : logger_(node->get_logger()),
+  explicit Impl(RequiredInterfaces node_interfaces)
+  : logger_(node_interfaces.get_node_logging_interface()->get_logger()),
     unadvertised_(false)
   {
   }
@@ -75,20 +75,21 @@ struct CameraPublisher::Impl
 };
 
 CameraPublisher::CameraPublisher(
-  rclcpp::Node * node,
+  RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)
-: impl_(std::make_shared<Impl>(node))
+: impl_(std::make_shared<Impl>(node_interfaces))
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
   // image topic is remapped (#4539).
-  std::string image_topic = node->get_node_topics_interface()->resolve_topic_name(base_topic);
+  std::string image_topic = node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-  impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos, pub_options);
-  impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
+  impl_->image_pub_ = image_transport::create_publisher(node_interfaces, image_topic, custom_qos, pub_options);
+  impl_->info_pub_ = rclcpp::create_publisher<sensor_msgs::msg::CameraInfo>(node_interfaces.get_node_topics_interface(),
+    info_topic, qos);
 }
 
 size_t CameraPublisher::getNumSubscribers() const

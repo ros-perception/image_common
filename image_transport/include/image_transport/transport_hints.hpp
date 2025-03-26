@@ -59,11 +59,14 @@ public:
    */
   IMAGE_TRANSPORT_PUBLIC
   TransportHints(
-    const rclcpp::Node * node,
+    RequiredInterfaces node_interfaces, // TODO: limit to parameters interface?
     const std::string & default_transport = "raw",
     const std::string & parameter_name = "image_transport")
   {
-    node->get_parameter_or<std::string>(parameter_name, transport_, default_transport);
+    rclcpp::Parameter parameter(parameter_name, default_transport);
+
+    parameter = node_interfaces.get_node_parameters_interface()->get_parameter(parameter_name);
+    transport_ = parameter.as_string();
   }
 
   IMAGE_TRANSPORT_PUBLIC
