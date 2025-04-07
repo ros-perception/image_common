@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<?xml-model
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>camera_info_manager_py</name>
+  <version>6.1.0</version>
+  <description>
+    Python interface for camera calibration information.
+
+    This ROS package provides a CameraInfo interface for Python camera
+    drivers similar to the C++ camera_info_manager package.
+  </description>
+  <maintainer email="jmastrangelo@clearpathrobotics.com">Jose Mastrangelo</maintainer>
+  <maintainer email="mhosmar@clearpathrobotics.com">Mike Hosmar</maintainer>
+  <license>BSD</license>
+  <url type="website">http://ros.org/wiki/camera_info_manager_py</url>
+  <url type="repository">https://github.com/ros-perception/image_common.git</url>
+  <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>
+
+  <author>Jack O'Quin</author>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>ament_xmllint</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+
+</package>

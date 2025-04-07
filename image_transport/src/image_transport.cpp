@@ -266,6 +266,10 @@ ImageTransport<NodeType>::ImageTransport(NodeType * node)
 }
 
 template<class NodeType>
+ImageTransport<NodeType>::ImageTransport(const ImageTransport & other)
+: impl_(std::make_unique<ImageTransport<NodeType>::Impl>(*other.impl_)) {}
+
+template<class NodeType>
 ImageTransport<NodeType>::ImageTransport(std::shared_ptr<NodeType> node)
 : impl_(std::make_unique<ImageTransport<NodeType>::Impl>(node))
 {

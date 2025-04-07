@@ -35,7 +35,6 @@
 #include <utility>
 #include <vector>
 
-#include "rclcpp/expand_topic_or_service_name.hpp"
 #include "rclcpp/logging.hpp"
 #include "rclcpp/node.hpp"
 
@@ -138,14 +137,11 @@ void Publisher<NodeType>::initialise(
   }
   // Resolve the name explicitly because otherwise the compressed topics don't remap
   // properly (#3652).
-  std::string image_topic;
-  size_t ns_len;
-  image_topic = rclcpp::expand_topic_or_service_name(
-    base_topic, impl_->node_->get_name(), impl_->node_->get_namespace());
-  ns_len = strlen(impl_->node_->get_namespace());
+  std::string image_topic = impl_->node_->get_node_topics_interface()->resolve_topic_name(base_topic);
   impl_->base_topic_ = image_topic;
   impl_->loader_ = loader;
 
+  auto ns_len = std::string(impl_->node_->get_namespace()).length();
   std::string param_base_name = image_topic.substr(ns_len);
   std::replace(param_base_name.begin(), param_base_name.end(), '/', '.');
   if (param_base_name.front() == '.') {
@@ -211,7 +207,6 @@ template<class NodeType>
 void Publisher<NodeType>::publish(const sensor_msgs::msg::Image & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(logger, "Call to publish() on an invalid image_transport::Publisher");
     return;
@@ -228,7 +223,6 @@ template<class NodeType>
 void Publisher<NodeType>::publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const
 {
   if (!impl_ || !impl_->isValid()) {
-    // TODO(ros2) Switch to RCUTILS_ASSERT when ros2/rcutils#112 is merged
     auto logger = impl_ ? impl_->logger_ : rclcpp::get_logger("image_transport");
     RCLCPP_FATAL(logger, "Call to publish() on an invalid image_transport::Publisher");
     return;

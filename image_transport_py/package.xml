@@ -1,0 +1,37 @@
+<package format="3">
+  <name>image_transport_py</name>
+
+  <version>6.1.0</version>
+
+  <description>Python API for image_transport</description>
+
+  <author>Tamas Foldi</author>
+
+  <maintainer email="alejandro@openrobotics.org">Alejandro Hernández</maintainer>
+  <maintainer email="john.dangelo@tailos.com">John D'Angelo</maintainer>
+
+  <license>BSD</license>
+
+  <url type="repository">https://github.com/ros-perception/image_common</url>
+  <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>
+
+  <buildtool_depend>ament_cmake_ros</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <build_depend>pybind11_vendor</build_depend>
+  <build_depend>python3-dev</build_depend>
+
+  <depend>image_transport</depend>
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <exec_depend>rpyutils</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>

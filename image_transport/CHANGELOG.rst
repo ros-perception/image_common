@@ -2,6 +2,42 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.1.0 (2024-12-20)
+------------------
+
+6.0.3 (2024-11-25)
+------------------
+
+6.0.2 (2024-11-25)
+------------------
+
+6.0.1 (2024-10-10)
+------------------
+* feat: python bindings for image_transport and publish (`#323 <https://github.com/ros-perception/image_common/issues/323>`_)
+  Co-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>
+* Contributors: Földi Tamás
+
+6.0.0 (2024-10-03)
+------------------
+* Apply remappings to base topic before creating transport-specific topics (`#326 <https://github.com/ros-perception/image_common/issues/326>`_)
+* Add lazy subscription to republisher (`#325 <https://github.com/ros-perception/image_common/issues/325>`_)
+* Fix node name (`#321 <https://github.com/ros-perception/image_common/issues/321>`_)
+* Contributors: Błażej Sowa, Michal Sojka
+
+5.3.2 (2024-07-29)
+------------------
+
+5.3.1 (2024-07-19)
+------------------
+* Updated deprecated message filter headers (`#320 <https://github.com/ros-perception/image_common/issues/320>`_)
+* Removed outdated comment (`#319 <https://github.com/ros-perception/image_common/issues/319>`_)
+* Contributors: Alejandro Hernández Cordero
+
+5.3.0 (2024-06-17)
+------------------
+* Preparing for qos deprecation (`#315 <https://github.com/ros-perception/image_common/issues/315>`_)
+* Contributors: Lucas Wendland
+
 5.2.1 (2024-05-24)
 ------------------
 * Removed warning (`#312 <https://github.com/ros-perception/image_common/issues/312>`_)

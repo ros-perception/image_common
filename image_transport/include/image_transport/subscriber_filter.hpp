@@ -34,7 +34,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
-#include "message_filters/simple_filter.h"
+#include "message_filters/simple_filter.hpp"
 
 #include "image_transport/image_transport.hpp"
 #include "image_transport/visibility_control.hpp"

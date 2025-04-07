@@ -31,7 +31,17 @@
 #include <memory>
 #include <string>
 
+// TODO(ahcorde): Remove this #ifdef when message_filters remove the
+// deprecations
+#ifdef _WIN32
+# pragma warning(push)
+# pragma warning(disable : 4996)
+#endif
 #include "message_filters/subscriber.h"
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
+
 #include "message_filters/time_synchronizer.h"
 
 #include "image_transport/camera_common.hpp"
@@ -111,7 +121,14 @@ struct CameraSubscriber<NodeType>::Impl
   std::shared_ptr<NodeType> node_;
   rclcpp::Logger logger_;
   SubscriberFilter<NodeType> image_sub_;
+#ifdef _WIN32
+# pragma warning(push)
+# pragma warning(disable : 4996)
+#endif
   typename message_filters::Subscriber<CameraInfo, NodeType> info_sub_;
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
   TimeSync sync_;
 
   bool unsubscribed_;
@@ -156,10 +173,7 @@ void CameraSubscriber<NodeType>::initialise(
   }
   // Must explicitly remap the image topic since we then do some string manipulation on it
   // to figure out the sibling camera_info topic.
-  std::string image_topic;
-  image_topic = rclcpp::expand_topic_or_service_name(
-    base_topic,
-    impl_->node_->get_name(), impl_->node_->get_namespace());
+  std::string image_topic = impl_->node_->get_node_topics_interface()->resolve_topic_name(base_topic);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   impl_->image_sub_.subscribe(impl_->node_, image_topic, transport, custom_qos);

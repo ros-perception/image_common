@@ -158,6 +158,12 @@ public:
   explicit ImageTransport(std::shared_ptr<NodeType> node);
 
   IMAGE_TRANSPORT_PUBLIC
+  ImageTransport(const ImageTransport & other);
+
+  IMAGE_TRANSPORT_PUBLIC
+  ImageTransport & operator=(const ImageTransport & other);
+
+  IMAGE_TRANSPORT_PUBLIC
   ~ImageTransport();
 
   /*!

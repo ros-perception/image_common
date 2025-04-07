@@ -32,7 +32,6 @@
 #include <string>
 #include <utility>
 
-#include "rclcpp/expand_topic_or_service_name.hpp"
 #include "rclcpp/logging.hpp"
 #include "rclcpp/node.hpp"
 
@@ -118,10 +117,7 @@ void CameraPublisher<NodeType>::initialise(
   }
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
   // image topic is remapped (#4539).
-  std::string image_topic;
-  image_topic = rclcpp::expand_topic_or_service_name(
-    base_topic,
-    impl_->node_->get_name(), impl_->node_->get_namespace());
+  std::string image_topic = impl_->node_->get_node_topics_interface()->resolve_topic_name(base_topic);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
   auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);

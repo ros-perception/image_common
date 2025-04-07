@@ -55,9 +55,9 @@ ament_export_targets(export_${PROJECT_NAME})
 #endif()
 #add_library(${PROJECT_NAME}_wrapper
 #  src/parse_wrapper.cpp)
-#ament_target_dependencies(${PROJECT_NAME}_wrapper
-#  "rclcpp"
-#  "sensor_msgs"
+#target_link_libraries(${PROJECT_NAME}_wrapper
+#  rclcpp::rclcpp
+#  ${sensor_msgs_TARGETS}
 #)
 #target_include_directories(${PROJECT_NAME}_wrapper PUBLIC ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 #target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${YAML_CPP_LIBRARIES})
@@ -88,19 +88,9 @@ install(
 ament_export_dependencies(rclcpp sensor_msgs yaml_cpp_vendor)
 
 if(BUILD_TESTING)
-  #TODO(mjcarroll) switch back to this once I can fix copyright check
-  #find_package(ament_lint_auto REQUIRED)
-  #ament_lint_auto_find_test_dependencies()
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
 
-  find_package(ament_cmake_cppcheck REQUIRED)
-  find_package(ament_cmake_cpplint REQUIRED)
-  find_package(ament_cmake_lint_cmake REQUIRED)
-  find_package(ament_cmake_uncrustify REQUIRED)
-  #TODO(mjcarroll) Headers need to be .hpp for this to work properly.
-  #ament_cppcheck()
-  ament_cpplint()
-  ament_lint_cmake()
-  ament_uncrustify()
   find_package(ament_cmake_gtest)
 
   ament_add_gtest(${PROJECT_NAME}-parse_ini test/test_parse_ini.cpp)

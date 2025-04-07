@@ -1,38 +1,31 @@
-/* $Id$ */
-
-/*********************************************************************
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2010-2012 Jack O'Quin
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the author nor other contributors may be
-*     used to endorse or promote products derived from this software
-*     without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
+// Copyright (c) 2010-2012 Jack O'Quin
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the copyright holder nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 #include "camera_info_manager/camera_info_manager.hpp"
 
@@ -76,20 +69,25 @@ const std::string
  *           subordinate names, like "left/camera" and "right/camera".
  * @param cname default camera name
  * @param url default Uniform Resource Locator for loading and saving data.
+ * @param ns namespace for the set_camera_info service. If not specified,
+ *           the service name will be "~/set_camera_info".
  */
 CameraInfoManager::CameraInfoManager(
   rclcpp::Node * node, const std::string & cname,
-  const std::string & url)
+  const std::string & url, const std::string & ns)
 : CameraInfoManager(node->get_node_base_interface(),
-    node->get_node_services_interface(), node->get_node_logging_interface(), cname, url)
+    node->get_node_services_interface(), node->get_node_logging_interface(), cname, url,
+    rmw_qos_profile_default, ns)
 {
 }
 
 CameraInfoManager::CameraInfoManager(
   rclcpp_lifecycle::LifecycleNode * node,
-  const std::string & cname, const std::string & url)
+  const std::string & cname, const std::string & url,
+  const std::string & ns)
 : CameraInfoManager(node->get_node_base_interface(),
-    node->get_node_services_interface(), node->get_node_logging_interface(), cname, url)
+    node->get_node_services_interface(), node->get_node_logging_interface(), cname, url,
+    rmw_qos_profile_default, ns)
 {
 }
 
@@ -97,17 +95,19 @@ CameraInfoManager::CameraInfoManager(
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
   rclcpp::node_interfaces::NodeServicesInterface::SharedPtr node_services_interface,
   rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logger_interface,
-  const std::string & cname, const std::string & url, rmw_qos_profile_t custom_qos)
+  const std::string & cname, const std::string & url,
+  rmw_qos_profile_t custom_qos, const std::string & ns)
 : logger_(node_logger_interface->get_logger()),
   camera_name_(cname),
   url_(url),
+  namespace_(ns),
   loaded_cam_info_(false)
 {
   using namespace std::placeholders;
 
   // register callback for camera calibration service request
   info_service_ = rclcpp::create_service<SetCameraInfo>(
-    node_base_interface, node_services_interface, "~/set_camera_info",
+    node_base_interface, node_services_interface, namespace_ + "/set_camera_info",
     std::bind(&CameraInfoManager::setCameraInfoService, this, _1, _2), custom_qos, nullptr);
 }
 
