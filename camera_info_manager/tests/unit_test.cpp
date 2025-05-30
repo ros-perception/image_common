@@ -317,7 +317,7 @@ TEST_F(CameraInfoManagerTesting, calibrated)
   camera_info_manager::CameraInfoManager cinfo(node.get());
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  std::string current_path = std::filesystem::current_path();
+  std::string current_path = std::filesystem::current_path().string();
   std::string url("file://" + current_path + "/tests/test_calibration.yaml");
   EXPECT_TRUE(cinfo.loadCameraInfo(url));
   EXPECT_TRUE(cinfo.isCalibrated());
