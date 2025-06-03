@@ -107,6 +107,10 @@ public:
   using ImageConstPtr = sensor_msgs::msg::Image::ConstSharedPtr;
   using CameraInfoConstPtr = sensor_msgs::msg::CameraInfo::ConstSharedPtr;
 
+  [[deprecated("Use ImageTransport(image_transport::RequiredInterfaces node_interfaces) instead")]]
+  IMAGE_TRANSPORT_PUBLIC
+  explicit ImageTransport(rclcpp::Node::SharedPtr node);
+
   IMAGE_TRANSPORT_PUBLIC
   explicit ImageTransport(RequiredInterfaces node_interfaces);
 

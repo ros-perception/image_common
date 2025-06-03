@@ -132,6 +132,12 @@ std::vector<std::string> getLoadableTransports()
 ImageTransport::ImageTransport(const ImageTransport & other)
 : impl_(std::make_unique<Impl>(*other.impl_)) {}
 
+ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
+: impl_(std::make_unique<ImageTransport::Impl>())
+{
+  impl_->required_interfaces_ = RequiredInterfaces(*node);
+}
+
 ImageTransport::ImageTransport(RequiredInterfaces node_interfaces)
 : impl_(std::make_unique<ImageTransport::Impl>())
 {
