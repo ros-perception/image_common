@@ -447,9 +447,15 @@ TEST_F(CameraInfoManagerTesting, setCalibration)
     compare_calibration(exp, ci);
   }
 
+#ifdef _WIN32
+  std::string localdata;
+  localdata = rcpputils::get_env_var("localdata");
+  delete_file(localdata + "/ros/camera_info/camera.yaml");
+#else
   std::string home;
   home = rcpputils::get_env_var("HOME");
   delete_file(home + "/.ros/camera_info/camera.yaml");
+#endif
 }
 
 // Test ability to save calibrated CameraInfo in default URL
@@ -496,9 +502,15 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationCameraName)
   // set ${ROS_HOME} to /tmp, delete the calibration file
   rcpputils::set_env_var("ROS_HOME", "/tmp");
 
-  std::string tmpFile("/tmp/camera_info/" + g_camera_name + ".yaml");
+  std::string tmpFile;
+#ifdef _WIN32
+  std::string localdata;
+  localdata = rcpputils::get_env_var("localdata");
+  tmpFile = std::string(localdata + "/camera_info/" + g_camera_name + ".yaml");
+#else
+  tmpFile = std::string("/tmp/camera_info/" + g_camera_name + ".yaml");
+#endif
   delete_file(tmpFile);
-
   {
     // create instance to save calibrated data
     camera_info_manager::CameraInfoManager cinfo(node.get(), g_camera_name);
@@ -628,14 +640,20 @@ TEST_F(CameraInfoManagerTesting, rosHome)
 {
   std::string name_url;
   std::string exp_url;
-  std::string home = rcpputils::get_env_var("HOME");
 
   // resolve ${ROS_HOME} with environment variable undefined
   rcpputils::set_env_var("ROS_HOME", "");
   name_url = "file://${ROS_HOME}/camera_info/test_camera.yaml";
+#ifdef _WIN32
+  std::string localdata;
+  localdata = rcpputils::get_env_var("localdata");
+  exp_url = "file://" + localdata + "/ros/camera_info/test_camera.yaml";
+  check_url_substitution(node, name_url, exp_url, g_camera_name);
+#else
+  std::string home = rcpputils::get_env_var("HOME");
   exp_url = "file://" + home + "/.ros/camera_info/test_camera.yaml";
   check_url_substitution(node, name_url, exp_url, g_camera_name);
-
+#endif
   // resolve ${ROS_HOME} with environment variable defined
   rcpputils::set_env_var("ROS_HOME", "/my/ros/home");
   name_url = "file://${ROS_HOME}/camera_info/test_camera.yaml";
