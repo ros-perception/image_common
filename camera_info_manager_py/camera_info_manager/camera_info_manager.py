@@ -272,7 +272,7 @@ class CameraInfoManager:
         """
         if self.camera_info is None:
             raise CameraInfoMissingError('Calibration missing, ' + 'loadCameraInfo() needed.')
-        return self.camera_info.K[0] != 0.0
+        return self.camera_info.k[0] != 0.0
 
     def _loadCalibration(self, url, cname):
         """
@@ -486,10 +486,10 @@ def loadCalibrationFile(filename, cname):
                 ci.width = calib['image_width']
                 ci.height = calib['image_height']
                 ci.distortion_model = calib['distortion_model']
-                ci.D = calib['distortion_coefficients']['data']
-                ci.K = calib['camera_matrix']['data']
-                ci.R = calib['rectification_matrix']['data']
-                ci.P = calib['projection_matrix']['data']
+                ci.d = calib['distortion_coefficients']['data']
+                ci.k = calib['camera_matrix']['data']
+                ci.r = calib['rectification_matrix']['data']
+                ci.p = calib['projection_matrix']['data']
 
     except OSError:  # OK if file did not exist
         pass
@@ -649,10 +649,10 @@ def saveCalibrationFile(ci, filename, cname):
         'image_height': ci.height,
         'camera_name': cname,
         'distortion_model': ci.distortion_model,
-        'distortion_coefficients': {'data': ci.D, 'rows': 1, 'cols': len(ci.D)},
-        'camera_matrix': {'data': ci.K, 'rows': 3, 'cols': 3},
-        'rectification_matrix': {'data': ci.R, 'rows': 3, 'cols': 3},
-        'projection_matrix': {'data': ci.P, 'rows': 3, 'cols': 4},
+        'distortion_coefficients': {'data': ci.d, 'rows': 1, 'cols': len(ci.d)},
+        'camera_matrix': {'data': ci.k, 'rows': 3, 'cols': 3},
+        'rectification_matrix': {'data': ci.r, 'rows': 3, 'cols': 3},
+        'projection_matrix': {'data': ci.p, 'rows': 3, 'cols': 4},
     }
 
     # make sure the directory exists and the file is writable
