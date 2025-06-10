@@ -665,7 +665,9 @@ def saveCalibrationFile(ci, filename, cname):
                 return False  # fail if unable to write file
     except OSError as e:
         if e.errno in {errno.EACCES, errno.EPERM}:
-            rclpy.logging.get_logger('camera_info_manager').error('file [' + filename + '] not accessible')
+            rclpy.logging.get_logger('camera_info_manager').error(
+                'file [' + filename + '] not accessible'
+            )
             return False  # unable to write this file
         if e.errno in {errno.ENOENT}:
             # Find last slash in the name.  The URL parser ensures
