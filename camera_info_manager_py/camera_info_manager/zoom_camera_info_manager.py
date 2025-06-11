@@ -207,7 +207,7 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
             return
 
         self.camera_info = deepcopy(self._loaded_camera_info)
-        self.camera_info.K[8] = 1.0
+        self.camera_info.k[8] = 1.0
 
         aspect_ratio = float(self._image_height) / self._image_width
         zoom_percentage = float(self._zoom - self._min_zoom) / float(
@@ -218,33 +218,33 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
             (self._max_fov - self._min_fov) * (1 - zoom_percentage) + self._min_fov
         )
         horizontal_focal_length_in_px = self._image_width / (2 * tan(horizontal_fov / 2))
-        self.camera_info.K[0] = horizontal_focal_length_in_px
+        self.camera_info.k[0] = horizontal_focal_length_in_px
 
         vertical_fov = horizontal_fov * aspect_ratio
         vertical_focal_length_in_px = self._image_height / (2 * tan(vertical_fov / 2))
-        self.camera_info.K[4] = vertical_focal_length_in_px
+        self.camera_info.k[4] = vertical_focal_length_in_px
 
         self.camera_info.width = self._image_width
         self.camera_info.height = self._image_height
 
-        if self._loaded_camera_info.K[2] != 0.0:
+        if self._loaded_camera_info.k[2] != 0.0:
             # if a standard calibration is available, just scale the principal point
             # offset with the resolution
-            self.camera_info.K[2] = (
+            self.camera_info.k[2] = (
                 float(self._image_width)
                 / self._loaded_camera_info.width
-                * self._loaded_camera_info.K[2]
+                * self._loaded_camera_info.k[2]
             )
-            self.camera_info.K[5] = (
+            self.camera_info.k[5] = (
                 float(self._image_height)
                 / self._loaded_camera_info.height
-                * self._loaded_camera_info.K[5]
+                * self._loaded_camera_info.k[5]
             )
         else:
             # if no calibration is available, just set the principal point to lie in
             # the middle of the image
-            self.camera_info.K[2] = self._image_width / 2.0
-            self.camera_info.K[5] = self._image_height / 2.0
+            self.camera_info.k[2] = self._image_width / 2.0
+            self.camera_info.k[5] = self._image_height / 2.0
 
 
 class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
@@ -317,28 +317,28 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
 
         # linearly interpolate all the matrices
         self.camera_info = deepcopy(self._camera_infos[closest_lower_zoom])
-        self.camera_info.K = [
+        self.camera_info.k = [
             (ratio * low + (1 - ratio) * high)
             for (low, high) in zip(
-                self._camera_infos[closest_lower_zoom].K, self._camera_infos[closest_higher_zoom].K
+                self._camera_infos[closest_lower_zoom].k, self._camera_infos[closest_higher_zoom].k
             )
         ]
-        self.camera_info.P = [
+        self.camera_info.p = [
             (ratio * low + (1 - ratio) * high)
             for (low, high) in zip(
-                self._camera_infos[closest_lower_zoom].P, self._camera_infos[closest_higher_zoom].P
+                self._camera_infos[closest_lower_zoom].p, self._camera_infos[closest_higher_zoom].p
             )
         ]
-        self.camera_info.R = [
+        self.camera_info.r = [
             (ratio * low + (1 - ratio) * high)
             for (low, high) in zip(
-                self._camera_infos[closest_lower_zoom].R, self._camera_infos[closest_higher_zoom].R
+                self._camera_infos[closest_lower_zoom].r, self._camera_infos[closest_higher_zoom].r
             )
         ]
-        self.camera_info.D = [
+        self.camera_info.d = [
             (ratio * low + (1 - ratio) * high)
             for (low, high) in zip(
-                self._camera_infos[closest_lower_zoom].D, self._camera_infos[closest_higher_zoom].D
+                self._camera_infos[closest_lower_zoom].d, self._camera_infos[closest_higher_zoom].d
             )
         ]
 
