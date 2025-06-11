@@ -263,7 +263,7 @@ class CameraInfoManager:
         """
         if self.camera_info is None:
             raise CameraInfoMissingError('Calibration missing, ' + 'loadCameraInfo() needed.')
-        return self.camera_info.K[0] != 0.0
+        return self.camera_info.k[0] != 0.0
 
     def _loadCalibration(self, url, cname):
         """Load calibration data (if any available).
@@ -428,7 +428,7 @@ def getPackageFileName(url):
         pkgPath += url[rest:]
 
     except PackageNotFoundError:
-        rclpy.get_logger('camera_info_manager').warning(
+        rclpy.logging.get_logger('camera_info_manager').warning(
             'unknown package: ' + package + ' (ignored)'
         )
 
@@ -456,7 +456,7 @@ def loadCalibrationFile(filename, cname):
             calib = yaml.safe_load(f)
             if calib is not None:
                 if calib['camera_name'] != cname:
-                    rclpy.get_logger('camera_info_manager').warn(
+                    rclpy.logging.get_logger('camera_info_manager').warn(
                         '['
                         + cname
                         + '] does not match name '
@@ -469,10 +469,10 @@ def loadCalibrationFile(filename, cname):
                 ci.width = calib['image_width']
                 ci.height = calib['image_height']
                 ci.distortion_model = calib['distortion_model']
-                ci.D = calib['distortion_coefficients']['data']
-                ci.K = calib['camera_matrix']['data']
-                ci.R = calib['rectification_matrix']['data']
-                ci.P = calib['projection_matrix']['data']
+                ci.d = calib['distortion_coefficients']['data']
+                ci.k = calib['camera_matrix']['data']
+                ci.r = calib['rectification_matrix']['data']
+                ci.p = calib['projection_matrix']['data']
 
     except OSError:  # OK if file did not exist
         pass
@@ -545,7 +545,7 @@ def resolveURL(url, cname):
             if ros_home is None:
                 ros_home = os.environ.get('HOME')
                 if ros_home is None:
-                    rclpy.get_logger('camera_info_manager').warn(
+                    rclpy.logging.get_logger('camera_info_manager').warn(
                         '[CameraInfoManager]' + ' unable to resolve ${ROS_HOME}'
                     )
                     ros_home = '${ROS_HOME}'  # retain it unresolved
@@ -556,7 +556,7 @@ def resolveURL(url, cname):
 
         else:
             # not a valid substitution variable
-            rclpy.get_logger('camera_info_manager').warn(
+            rclpy.logging.get_logger('camera_info_manager').warn(
                 '[CameraInfoManager] invalid URL substitution (not resolved): ' + url
             )
             resolved += '$'  # keep the bogus '$'
@@ -584,7 +584,7 @@ def saveCalibration(new_info, url, cname):
     if url_type == URL_empty:
         return saveCalibration(new_info, default_camera_info_url, cname)
 
-    rclpy.get_logger('camera_info_manager').info(
+    rclpy.logging.get_logger('camera_info_manager').info(
         'writing calibration data to URL: ' + resolved_url
     )
 
@@ -594,7 +594,7 @@ def saveCalibration(new_info, url, cname):
     elif url_type == URL_package:
         filename = getPackageFileName(resolved_url)
         if not filename:  # package not resolved
-            rclpy.get_logger('camera_info_manager').error(
+            rclpy.logging.get_logger('camera_info_manager').error(
                 'Calibration package missing: ' + resolved_url + ' (ignored)'
             )
             # treat it like an empty URL
@@ -603,7 +603,7 @@ def saveCalibration(new_info, url, cname):
             success = saveCalibrationFile(new_info, filename, cname)
 
     else:
-        rclpy.get_logger('camera_info_manager').error(
+        rclpy.logging.get_logger('camera_info_manager').error(
             'Invalid camera calibration URL: ' + resolved_url
         )
         # treat it like an empty URL
@@ -628,10 +628,10 @@ def saveCalibrationFile(ci, filename, cname):
         'image_height': ci.height,
         'camera_name': cname,
         'distortion_model': ci.distortion_model,
-        'distortion_coefficients': {'data': ci.D, 'rows': 1, 'cols': len(ci.D)},
-        'camera_matrix': {'data': ci.K, 'rows': 3, 'cols': 3},
-        'rectification_matrix': {'data': ci.R, 'rows': 3, 'cols': 3},
-        'projection_matrix': {'data': ci.P, 'rows': 3, 'cols': 4},
+        'distortion_coefficients': {'data': ci.d, 'rows': 1, 'cols': len(ci.d)},
+        'camera_matrix': {'data': ci.k, 'rows': 3, 'cols': 3},
+        'rectification_matrix': {'data': ci.r, 'rows': 3, 'cols': 3},
+        'projection_matrix': {'data': ci.p, 'rows': 3, 'cols': 4},
     }
 
     # make sure the directory exists and the file is writable
@@ -644,14 +644,16 @@ def saveCalibrationFile(ci, filename, cname):
                 return False  # fail if unable to write file
     except OSError as e:
         if e.errno in {errno.EACCES, errno.EPERM}:
-            rclpy.get_logger('camera_info_manager').error('file [' + filename + '] not accessible')
+            rclpy.logging.get_logger('camera_info_manager').error(
+                'file [' + filename + '] not accessible'
+            )
             return False  # unable to write this file
         if e.errno in {errno.ENOENT}:
             # Find last slash in the name.  The URL parser ensures
             # there is at least one '/', at the beginning.
             last_slash = filename.rfind('/')
             if last_slash < 0:
-                rclpy.get_logger('camera_info_manager').error(
+                rclpy.logging.get_logger('camera_info_manager').error(
                     'filename [' + filename + "] has no '/'"
                 )
                 return False  # not a valid URL
@@ -661,7 +663,7 @@ def saveCalibrationFile(ci, filename, cname):
             try:
                 Path(dirname).mkdir(parents=True)
             except OSError:
-                rclpy.get_logger('camera_info_manager').error(
+                rclpy.logging.get_logger('camera_info_manager').error(
                     'unable to create path to directory [' + dirname + ']'
                 )
                 return False
@@ -673,7 +675,7 @@ def saveCalibrationFile(ci, filename, cname):
                     return True
 
                 except OSError:
-                    rclpy.get_logger('camera_info_manager').error(
+                    rclpy.logging.get_logger('camera_info_manager').error(
                         'file [' + filename + '] not accessible'
                     )
                     return False  # fail if unable to write file
