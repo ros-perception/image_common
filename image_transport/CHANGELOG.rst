@@ -2,6 +2,9 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.7 (2025-06-12)
+------------------
+
 5.1.6 (2025-04-02)
 ------------------
 * fix: add `rclcpp::shutdown` (`#347 <https://github.com/ros-perception/image_common/issues/347>`_) (`#348 <https://github.com/ros-perception/image_common/issues/348>`_)
