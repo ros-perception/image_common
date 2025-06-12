@@ -2,6 +2,9 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.1.2 (2025-06-12)
+------------------
+
 6.1.1 (2025-04-28)
 ------------------
 * Use target_link_libraries instead of ament_target_dependencies (`#345 <https://github.com/ros-perception/image_common/issues/345>`_)
