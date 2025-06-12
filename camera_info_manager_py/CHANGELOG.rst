@@ -2,6 +2,11 @@
 Changelog for package camera_info_manager_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.12 (2025-06-12)
+-------------------
+* Fix CameraInfo distortion coefficients and logger (`#360 <https://github.com/ros-perception/image_common/issues/360>`_) (`#363 <https://github.com/ros-perception/image_common/issues/363>`_)
+* Contributors: mergify[bot]
+
 3.1.11 (2025-02-12)
 -------------------
 

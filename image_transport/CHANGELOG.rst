@@ -2,6 +2,9 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.12 (2025-06-12)
+-------------------
+
 3.1.11 (2025-02-12)
 -------------------
 * Advertize and subscribe with custom qos (`#288 <https://github.com/ros-perception/image_common/issues/288>`_) (`#344 <https://github.com/ros-perception/image_common/issues/344>`_)
