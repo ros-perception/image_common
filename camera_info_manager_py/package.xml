@@ -4,7 +4,7 @@
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>camera_info_manager_py</name>
-  <version>5.1.6</version>
+  <version>5.1.7</version>
   <description>
     Python interface for camera calibration information.
 
