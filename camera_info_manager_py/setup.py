@@ -5,7 +5,7 @@ package_name = 'camera_info_manager_py'
 
 setup(
     name=package_name,
-    version='6.1.1',
+    version='6.1.2',
     packages=find_packages(exclude=['test']),
     data_files=[
         # Install marker file in the package index
