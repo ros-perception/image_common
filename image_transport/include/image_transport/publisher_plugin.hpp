@@ -77,7 +77,8 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    advertiseImpl(nh, base_topic, custom_qos, options);
+    std::string image_topic = nh->get_node_topics_interface()->resolve_topic_name(base_topic);
+    advertiseImpl(nh, image_topic, custom_qos, options);
   }
 
   /**
