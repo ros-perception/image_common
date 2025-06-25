@@ -114,6 +114,15 @@ public:
 
 protected:
   void advertiseImpl(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options) override
+  {
+    advertiseImpl(RequiredInterfaces(*node), base_topic, custom_qos, options);
+  }
+
+  void advertiseImpl(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,

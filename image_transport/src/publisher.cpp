@@ -98,6 +98,14 @@ struct Publisher::Impl
 };
 
 Publisher::Publisher(
+  rclcpp::Node * node, const std::string & base_topic,
+  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions options)
+: Publisher(RequiredInterfaces(*node), base_topic, loader, custom_qos, options)
+{
+}
+
+Publisher::Publisher(
   RequiredInterfaces node_interfaces, const std::string & base_topic,
   PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)

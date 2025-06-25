@@ -69,6 +69,14 @@ public:
   CameraPublisher() = default;
 
   IMAGE_TRANSPORT_PUBLIC
+  [[deprecated("Use CameraPublisher(RequiredInterfaces node_interfaces, ...) instead.")]]
+  CameraPublisher(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions = rclcpp::PublisherOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,
@@ -134,7 +142,7 @@ public:
 
   /*!
    * \brief Publish an (image, info) pair with given timestamp on the topics associated with
-   * this CameraPublisher.
+   * this CameraPublish:er.
    *
    * Convenience version, which sets the timestamps of both image and info to stamp before
    * publishing.

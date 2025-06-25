@@ -69,6 +69,16 @@ public:
 
   IMAGE_TRANSPORT_PUBLIC
   Subscriber(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    const Callback & callback,
+    SubLoaderPtr loader,
+    const std::string & transport,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
+  Subscriber(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,
     const Callback & callback,

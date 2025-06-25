@@ -70,6 +70,15 @@ public:
   Publisher() = default;
 
   IMAGE_TRANSPORT_PUBLIC
+  [[deprecated("Use CameraSubscriber(RequiredInterfaces node_interfaces, ...) instead.")]]
+  Publisher(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    PubLoaderPtr loader,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
   Publisher(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,

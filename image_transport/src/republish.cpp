@@ -158,7 +158,8 @@ void Republisher::initialize()
         }
       };
 
-    this->instance->advertise(RequiredInterfaces(*this), "out", rmw_qos_profile_default, pub_options);
+    this->instance->advertise(RequiredInterfaces(*this), "out", rmw_qos_profile_default,
+        pub_options);
   }
 }
 

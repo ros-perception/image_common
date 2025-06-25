@@ -78,6 +78,15 @@ struct CameraPublisher::Impl
 };
 
 CameraPublisher::CameraPublisher(
+  rclcpp::Node * node,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
+: CameraPublisher(RequiredInterfaces(*node), base_topic, custom_qos, pub_options)
+{
+}
+
+CameraPublisher::CameraPublisher(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,

@@ -73,6 +73,18 @@ public:
    * \brief Advertise a topic, simple version.
    */
   void advertise(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
+  {
+    advertiseImpl(RequiredInterfaces(*node), base_topic, custom_qos, options);
+  }
+
+  /**
+   * \brief Advertise a topic, simple version.
+   */
+  void advertise(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
@@ -153,6 +165,18 @@ public:
   }
 
 protected:
+  /**
+   * \brief Advertise a topic. Must be implemented by the subclass.
+   */
+  virtual void advertiseImpl(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options)
+  {
+    advertiseImpl(RequiredInterfaces(*node), base_topic, custom_qos, options);
+  }
+
   /**
    * \brief Advertise a topic. Must be implemented by the subclass.
    */

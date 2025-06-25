@@ -57,12 +57,33 @@ struct Impl
 static Impl * kImpl = new Impl();
 
 Publisher create_publisher(
+  rclcpp::Node * node,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions options)
+{
+  return Publisher(RequiredInterfaces(*node), base_topic, kImpl->pub_loader_, custom_qos, options);
+}
+
+Publisher create_publisher(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 {
   return Publisher(node_interfaces, base_topic, kImpl->pub_loader_, custom_qos, options);
+}
+
+Subscriber create_subscription(
+  rclcpp::Node * node,
+  const std::string & base_topic,
+  const Subscriber::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::SubscriptionOptions options)
+{
+  return Subscriber(RequiredInterfaces(*node), base_topic, callback, kImpl->sub_loader_, transport,
+      custom_qos, options);
 }
 
 Subscriber create_subscription(
@@ -78,12 +99,32 @@ Subscriber create_subscription(
 }
 
 CameraPublisher create_camera_publisher(
+  rclcpp::Node * node,
+  const std::string & base_topic,
+  rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions pub_options)
+{
+  return CameraPublisher(RequiredInterfaces(*node), base_topic, custom_qos, pub_options);
+}
+
+
+CameraPublisher create_camera_publisher(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)
 {
   return CameraPublisher(node_interfaces, base_topic, custom_qos, pub_options);
+}
+
+CameraSubscriber create_camera_subscription(
+  rclcpp::Node * node,
+  const std::string & base_topic,
+  const CameraSubscriber::Callback & callback,
+  const std::string & transport,
+  rmw_qos_profile_t custom_qos)
+{
+  return CameraSubscriber(RequiredInterfaces(*node), base_topic, callback, transport, custom_qos);
 }
 
 CameraSubscriber create_camera_subscription(
