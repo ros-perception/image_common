@@ -98,7 +98,7 @@ struct Publisher::Impl
 
 Publisher::Publisher(
   rclcpp::Node * node, const std::string & base_topic,
-  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+  PubLoaderPtr loader, rclcpp::QoS custom_qos,
   rclcpp::PublisherOptions options)
 : impl_(std::make_shared<Impl>(node))
 {
@@ -154,6 +154,16 @@ Publisher::Publisher(
             "No plugins found! Does `rospack plugins --attrib=plugin "
             "image_transport` find any packages?");
   }
+}
+
+Publisher::Publisher(
+  rclcpp::Node * node, const std::string & base_topic,
+  PubLoaderPtr loader, rmw_qos_profile_t custom_qos,
+  rclcpp::PublisherOptions options)
+: Publisher(node, base_topic, loader,
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
+    options)
+{
 }
 
 size_t Publisher::getNumSubscribers() const

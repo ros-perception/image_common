@@ -119,12 +119,20 @@ protected:
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
+    advertiseImpl(node, base_topic, custom_qos, options);
+  }
+
+  void advertiseImpl(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rclcpp::QoS custom_qos,
+    rclcpp::PublisherOptions options) override
+  {
     std::string transport_topic = getTopicToAdvertise(base_topic);
     simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
 
     RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
-    auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos, options);
+    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, custom_qos, options);
   }
 
   typedef typename rclcpp::Publisher<M>::SharedPtr PublisherT;

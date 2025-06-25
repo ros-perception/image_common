@@ -66,6 +66,7 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Subscriber() = default;
 
+  [[deprecated("Use Subscriber(rclcpp::node_interfaces...) instead")]]
   IMAGE_TRANSPORT_PUBLIC
   Subscriber(
     rclcpp::Node * node,
@@ -74,6 +75,16 @@ public:
     SubLoaderPtr loader,
     const std::string & transport,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
+  Subscriber(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    const Callback & callback,
+    SubLoaderPtr loader,
+    const std::string & transport,
+    rclcpp::QoS custom_qos,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
 
   /**

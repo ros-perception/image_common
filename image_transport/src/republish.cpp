@@ -120,14 +120,14 @@ void Republisher::initialize()
             this, "in",
             std::bind(pub_mem_fn, &this->pub, std::placeholders::_1),
             in_transport,
-            rmw_qos_profile_default,
+            rclcpp::SystemDefaultsQoS(),
             sub_options);
         }
       };
 
     this->pub = image_transport::create_publisher(
       this, "out",
-      rmw_qos_profile_default, pub_options);
+      rclcpp::SystemDefaultsQoS(), pub_options);
   } else {
     // Use one specific transport for output
     // Load transport plugin
@@ -153,12 +153,13 @@ void Republisher::initialize()
             this, "in",
             std::bind(
               pub_mem_fn,
-              this->instance.get(), std::placeholders::_1), in_transport, rmw_qos_profile_default,
+              this->instance.get(), std::placeholders::_1), in_transport,
+            rclcpp::SystemDefaultsQoS(),
             sub_options);
         }
       };
 
-    this->instance->advertise(this, "out", rmw_qos_profile_default, pub_options);
+    this->instance->advertise(this, "out", rclcpp::SystemDefaultsQoS(), pub_options);
   }
 }
 

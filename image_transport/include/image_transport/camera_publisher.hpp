@@ -67,11 +67,19 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher() = default;
 
+  [[deprecated("Use CameraPublisher(..., rclcpp::QoS, ...) instead")]]
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
     rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::PublisherOptions = rclcpp::PublisherOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
+  CameraPublisher(
+    rclcpp::Node * node,
+    const std::string & base_topic,
+    rclcpp::QoS custom_qos,
     rclcpp::PublisherOptions = rclcpp::PublisherOptions());
 
   /*!

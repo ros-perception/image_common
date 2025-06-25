@@ -68,12 +68,21 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Publisher() = default;
 
+  [[deprecated("Use Publisher(..., rclcpp::QoS, ...) instead")]]
   IMAGE_TRANSPORT_PUBLIC
   Publisher(
     rclcpp::Node * nh,
     const std::string & base_topic,
     PubLoaderPtr loader,
     rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
+
+  IMAGE_TRANSPORT_PUBLIC
+  Publisher(
+    rclcpp::Node * nh,
+    const std::string & base_topic,
+    PubLoaderPtr loader,
+    rclcpp::QoS custom_qos,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
 
   /*!

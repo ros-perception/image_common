@@ -77,10 +77,11 @@ TEST_F(TestPublisher, RemappedPublisher) {
     [&received](const sensor_msgs::msg::Image::ConstSharedPtr & msg) {
       (void)msg;
       received = true;
-    }, "raw");
+    }, "raw", rclcpp::SystemDefaultsQoS());
 
   // Publish
-  auto pub = image_transport::create_publisher(node_.get(), "new_topic");
+  auto pub = image_transport::create_publisher(node_.get(), "new_topic",
+    rclcpp::SystemDefaultsQoS());
 
   ASSERT_EQ("/namespace/new_topic", sub.getTopic());
   ASSERT_EQ("/namespace/new_topic", pub.getTopic());

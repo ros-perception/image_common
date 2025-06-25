@@ -79,6 +79,16 @@ CameraPublisher::CameraPublisher(
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)
+: CameraPublisher(node, base_topic,
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), pub_options)
+{
+}
+
+CameraPublisher::CameraPublisher(
+  rclcpp::Node * node,
+  const std::string & base_topic,
+  rclcpp::QoS custom_qos,
+  rclcpp::PublisherOptions pub_options)
 : impl_(std::make_shared<Impl>(node))
 {
   // Explicitly resolve name here so we compute the correct CameraInfo topic when the
@@ -86,9 +96,8 @@ CameraPublisher::CameraPublisher(
   std::string image_topic = node->get_node_topics_interface()->resolve_topic_name(base_topic);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
   impl_->image_pub_ = image_transport::create_publisher(node, image_topic, custom_qos, pub_options);
-  impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, qos);
+  impl_->info_pub_ = node->create_publisher<sensor_msgs::msg::CameraInfo>(info_topic, custom_qos);
 }
 
 size_t CameraPublisher::getNumSubscribers() const
