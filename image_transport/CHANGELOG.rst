@@ -2,6 +2,19 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.2.1 (2025-06-12)
+------------------
+
+6.2.0 (2025-04-28)
+------------------
+
+6.1.1 (2025-04-28)
+------------------
+* Remove windows warnings (`#350 <https://github.com/ros-perception/image_common/issues/350>`_)
+* Add `rclcpp::shutdown` (`#347 <https://github.com/ros-perception/image_common/issues/347>`_)
+* Use target_link_libraries instead of ament_target_dependencies (`#345 <https://github.com/ros-perception/image_common/issues/345>`_)
+* Contributors: Alejandro Hernández Cordero, Shane Loretz, Yuyuan Yuan
+
 6.1.0 (2024-12-20)
 ------------------
 
