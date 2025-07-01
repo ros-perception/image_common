@@ -142,7 +142,7 @@ public:
 
   /*!
    * \brief Publish an (image, info) pair with given timestamp on the topics associated with
-   * this CameraPublish:er.
+   * this CameraPublisher.
    *
    * Convenience version, which sets the timestamps of both image and info to stamp before
    * publishing.
