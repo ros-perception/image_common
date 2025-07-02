@@ -29,17 +29,18 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <string>
-#include <memory>
-#include <vector>
 #include <cstddef>
+#include <memory>
+#include <string>
 #include <thread>
+#include <vector>
 
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include <image_transport/image_transport.hpp>
+
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp_lifecycle/lifecycle_node.hpp>
+
 #include "utils.hpp"
-
-#include "image_transport/image_transport.hpp"
 
 class TestPublisherLifecycle : public ::testing::Test
 {

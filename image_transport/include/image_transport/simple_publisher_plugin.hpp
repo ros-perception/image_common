@@ -203,7 +203,7 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    explicit  SimplePublisherPluginImpl(RequiredInterfaces required_interfaces)
+    explicit SimplePublisherPluginImpl(RequiredInterfaces required_interfaces)
     : required_interfaces_(required_interfaces),
       logger_(required_interfaces.get_node_logging_interface()->get_logger())
     {

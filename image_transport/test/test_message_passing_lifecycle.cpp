@@ -27,8 +27,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <chrono>
-#include <memory>
 #include <cstddef>
+#include <memory>
 #include <thread>
 
 #include "gtest/gtest.h"

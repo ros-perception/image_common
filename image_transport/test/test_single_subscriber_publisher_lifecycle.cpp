@@ -26,10 +26,10 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <functional>
-#include <string>
-#include <memory>
 #include <cstddef>
+#include <functional>
+#include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 

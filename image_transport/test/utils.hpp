@@ -27,12 +27,12 @@
 
 namespace test_rclcpp
 {
+using NodeBaseInterface = rclcpp::node_interfaces::NodeBaseInterface;
 using NodeGraphInterface = rclcpp::node_interfaces::NodeGraphInterface;
 using NodeLoggingInterface = rclcpp::node_interfaces::NodeLoggingInterface;
-using NodeBaseInterface = rclcpp::node_interfaces::NodeBaseInterface;
 using NodeParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
-using NodeTopicsInterface = rclcpp::node_interfaces::NodeTopicsInterface;
 using NodeTimersInterface = rclcpp::node_interfaces::NodeTimersInterface;
+using NodeTopicsInterface = rclcpp::node_interfaces::NodeTopicsInterface;
 
 using RequiredInterfacesTest = rclcpp::node_interfaces::NodeInterfaces<
   NodeBaseInterface,

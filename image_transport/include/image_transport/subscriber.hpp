@@ -37,8 +37,8 @@
 #include "sensor_msgs/msg/image.hpp"
 
 #include "image_transport/exception.hpp"
-#include "image_transport/node_interfaces.hpp"
 #include "image_transport/loader_fwds.hpp"
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
