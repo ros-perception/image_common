@@ -31,7 +31,7 @@ setup(
                      'drivers similar to the C++ camera_info_manager package.',
     license='BSD',
     extras_require={
-        'test' : [
+        'test': [
             'pytest'
         ]
     },
