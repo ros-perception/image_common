@@ -107,7 +107,6 @@ CameraPublisher create_camera_publisher(
   return CameraPublisher(*node, base_topic, custom_qos, pub_options);
 }
 
-
 CameraPublisher create_camera_publisher(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
