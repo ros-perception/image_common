@@ -78,7 +78,7 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    advertiseImpl(RequiredInterfaces(*node), base_topic, custom_qos, options);
+    advertiseImpl(*node, base_topic, custom_qos, options);
   }
 
   /**
@@ -174,7 +174,7 @@ protected:
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options)
   {
-    advertiseImpl(RequiredInterfaces(*node), base_topic, custom_qos, options);
+    advertiseImpl(*node, base_topic, custom_qos, options);
   }
 
   /**

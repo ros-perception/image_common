@@ -88,7 +88,7 @@ Subscriber::Subscriber(
   const std::string & transport,
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
-: Subscriber(RequiredInterfaces(*node), base_topic, callback, loader, transport, custom_qos,
+: Subscriber(*node, base_topic, callback, loader, transport, custom_qos,
     options)
 {
 }

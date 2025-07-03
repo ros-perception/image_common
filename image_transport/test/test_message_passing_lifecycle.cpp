@@ -79,16 +79,15 @@ TEST_F(MessagePassingTestingLifecycle, one_message_passing)
 
   rclcpp::executors::SingleThreadedExecutor executor;
 
-  test_rclcpp::RequiredInterfacesTest required_test_interfaces(*node_);
-  auto pub = image_transport::create_publisher(required_test_interfaces, "camera/image");
+  auto pub = image_transport::create_publisher(*node_, "camera/image");
   auto sub =
-    image_transport::create_subscription(required_test_interfaces, "camera/image", imageCallback,
+    image_transport::create_subscription(*node_, "camera/image", imageCallback,
     "raw");
 
-  auto graph_interface = required_test_interfaces.get_node_graph_interface();
-  auto base_node_interface = required_test_interfaces.get_node_base_interface();
+  auto graph_interface = node_->get_node_graph_interface();
+  auto base_node_interface = node_->get_node_base_interface();
 
-  test_rclcpp::wait_for_subscriber(required_test_interfaces, sub.getTopic());
+  test_rclcpp::wait_for_subscriber(*node_, sub.getTopic());
 
   ASSERT_EQ(0, total_images_received);
   ASSERT_EQ(1u, pub.getNumSubscribers());
@@ -121,11 +120,9 @@ TEST_F(MessagePassingTestingLifecycle, one_camera_message_passing)
 
   rclcpp::executors::SingleThreadedExecutor executor;
 
-  test_rclcpp::RequiredInterfacesTest required_test_interfaces(*node_);
-
-  auto pub = image_transport::create_camera_publisher(required_test_interfaces, "camera/image");
+  auto pub = image_transport::create_camera_publisher(*node_, "camera/image");
   auto sub = image_transport::create_camera_subscription(
-    required_test_interfaces, "camera/image",
+    *node_, "camera/image",
     [](const sensor_msgs::msg::Image::ConstSharedPtr & image,
     const sensor_msgs::msg::CameraInfo::ConstSharedPtr & info) {
       (void) image;
@@ -135,10 +132,10 @@ TEST_F(MessagePassingTestingLifecycle, one_camera_message_passing)
     "raw"
   );
 
-  test_rclcpp::wait_for_subscriber(required_test_interfaces, sub.getTopic());
+  test_rclcpp::wait_for_subscriber(*node_, sub.getTopic());
 
   ASSERT_EQ(0, total_images_received);
-  executor.spin_node_some(required_test_interfaces.get_node_base_interface());
+  executor.spin_node_some(node_->get_node_base_interface());
   ASSERT_EQ(0, total_images_received);
 
   size_t retry = 0;
@@ -146,11 +143,11 @@ TEST_F(MessagePassingTestingLifecycle, one_camera_message_passing)
     // generate random image and publish it
     pub.publish(*generate_random_image().get(), sensor_msgs::msg::CameraInfo());
 
-    executor.spin_node_some(required_test_interfaces.get_node_base_interface());
+    executor.spin_node_some(node_->get_node_base_interface());
     size_t loop = 0;
     while ((total_images_received != 1) && (loop++ < max_loops)) {
       std::this_thread::sleep_for(sleep_per_loop);
-      executor.spin_node_some(required_test_interfaces.get_node_base_interface());
+      executor.spin_node_some(node_->get_node_base_interface());
     }
   }
 

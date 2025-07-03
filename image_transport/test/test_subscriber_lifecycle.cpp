@@ -57,26 +57,23 @@ TEST_F(TestSubscriberLifecycle, construction_and_destruction) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
-  test_rclcpp::RequiredInterfacesTest required_test_interfaces(*node_);
-
-  auto sub = image_transport::create_subscription(required_test_interfaces, "camera/image", fcn,
+  auto sub = image_transport::create_subscription(*node_, "camera/image", fcn,
     "raw");
 
   rclcpp::executors::SingleThreadedExecutor executor;
-  executor.spin_node_some(required_test_interfaces.get_node_base_interface());
+  executor.spin_node_some(node_->get_node_base_interface());
 }
 
 TEST_F(TestSubscriberLifecycle, shutdown) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
-test_rclcpp::RequiredInterfacesTest required_test_interfaces(*node_);
-auto sub = image_transport::create_subscription(required_test_interfaces, "camera/image", fcn,
+auto sub = image_transport::create_subscription(*node_, "camera/image", fcn,
     "raw");
-  EXPECT_EQ(required_test_interfaces.get_node_graph_interface()->count_subscribers("camera/image"),
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
     1u);
   sub.shutdown();
-  EXPECT_EQ(required_test_interfaces.get_node_graph_interface()->count_subscribers("camera/image"),
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
     0u);
 }
 
@@ -86,17 +83,16 @@ TEST_F(TestSubscriberLifecycle, camera_sub_shutdown) {
       const sensor_msgs::msg::CameraInfo::ConstSharedPtr &)> fcn =
     [](const auto & msg, const auto &) {(void)msg;};
 
-  test_rclcpp::RequiredInterfacesTest required_test_interfaces(*node_);
-  auto sub = image_transport::create_camera_subscription(required_test_interfaces, "camera/image",
+  auto sub = image_transport::create_camera_subscription(*node_, "camera/image",
     fcn, "raw");
-  EXPECT_EQ(required_test_interfaces.get_node_graph_interface()->count_subscribers("camera/image"),
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
     1u);
-  EXPECT_EQ(required_test_interfaces.get_node_graph_interface()->count_subscribers(
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers(
     "camera/camera_info"), 1u);
   sub.shutdown();
-  EXPECT_EQ(required_test_interfaces.get_node_graph_interface()->count_subscribers("camera/image"),
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
     0u);
-  EXPECT_EQ(required_test_interfaces.get_node_graph_interface()->count_subscribers(
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers(
     "camera/camera_info"), 0u);
 }
 
@@ -107,14 +103,12 @@ TEST_F(TestSubscriberLifecycle, callback_groups) {
   auto node_publisher = rclcpp_lifecycle::LifecycleNode::make_shared(
     "image_publisher",
     rclcpp::NodeOptions());
-  test_rclcpp::RequiredInterfacesTest required_test_interfaces(*node_);
-  test_rclcpp::RequiredInterfacesTest required_test_interfaces_pub(*node_publisher);
-    image_transport::ImageTransport it_publisher(required_test_interfaces_pub);
+  image_transport::ImageTransport it_publisher(*node_publisher);
   image_transport::Publisher pub = it_publisher.advertise("camera/image", 1);
 
   auto msg = sensor_msgs::msg::Image();
-  auto base_node_interface = required_test_interfaces_pub.get_node_base_interface();
-  auto base_timers_interface = required_test_interfaces_pub.get_node_timers_interface();
+  auto base_node_interface = node_publisher->get_node_base_interface();
+  auto base_timers_interface = node_publisher->get_node_timers_interface();
   auto timer = rclcpp::create_wall_timer(
     100ms,
     [&]() {pub.publish(msg);},
@@ -139,19 +133,19 @@ TEST_F(TestSubscriberLifecycle, callback_groups) {
     };
 
     auto cb_group =
-    required_test_interfaces.get_node_base_interface()->create_callback_group(
+    node_->get_node_base_interface()->create_callback_group(
     rclcpp::CallbackGroupType::Reentrant);
     rclcpp::SubscriptionOptions sub_options;
     sub_options.callback_group = cb_group;
 
-    image_transport::ImageTransport it(required_test_interfaces);
+    image_transport::ImageTransport it(*node_);
 
     auto subscriber_1 = it.subscribe("camera/image", 1, fcn1, nullptr, nullptr, sub_options);
     auto subscriber_2 = it.subscribe("camera/image", 1, fcn2, nullptr, nullptr, sub_options);
 
     rclcpp::executors::MultiThreadedExecutor executor;
-    executor.add_node(required_test_interfaces.get_node_base_interface());
-    executor.add_node(required_test_interfaces_pub.get_node_base_interface());
+    executor.add_node(node_->get_node_base_interface());
+    executor.add_node(node_publisher->get_node_base_interface());
     // Both callbacks should be executed and the flags should be set.
     std::thread executor_thread([&]() {executor.spin();});
 
@@ -180,17 +174,14 @@ TEST_F(TestSubscriberLifecycle, callback_groups_custom_qos) {
       "image_publisher",
       rclcpp::NodeOptions());
 
-    test_rclcpp::RequiredInterfacesTest required_test_interfaces(*node_);
-    test_rclcpp::RequiredInterfacesTest required_test_interfaces_pub(*node_publisher);
-
-    image_transport::ImageTransport it_publisher(required_test_interfaces_pub);
+    image_transport::ImageTransport it_publisher(*node_publisher);
     image_transport::Publisher pub = it_publisher.advertise(
       "camera/image",
       rmw_qos_profile_sensor_data);
 
     auto msg = sensor_msgs::msg::Image();
-    auto base_node_interface = required_test_interfaces_pub.get_node_base_interface();
-    auto base_timers_interface = required_test_interfaces_pub.get_node_timers_interface();
+    auto base_node_interface = node_publisher->get_node_base_interface();
+    auto base_timers_interface = node_publisher->get_node_timers_interface();
     auto timer = rclcpp::create_wall_timer(
       100ms,
     [&]() {pub.publish(msg);},
@@ -215,12 +206,12 @@ TEST_F(TestSubscriberLifecycle, callback_groups_custom_qos) {
     };
 
     auto cb_group =
-    required_test_interfaces.get_node_base_interface()->create_callback_group(
+    node_->get_node_base_interface()->create_callback_group(
     rclcpp::CallbackGroupType::Reentrant);
     rclcpp::SubscriptionOptions sub_options;
     sub_options.callback_group = cb_group;
 
-    image_transport::ImageTransport it(required_test_interfaces);
+    image_transport::ImageTransport it(*node_);
 
     auto subscriber_1 = it.subscribe(
       "camera/image", rmw_qos_profile_sensor_data, fcn1, nullptr,
@@ -230,8 +221,8 @@ TEST_F(TestSubscriberLifecycle, callback_groups_custom_qos) {
       nullptr, sub_options);
 
     rclcpp::executors::MultiThreadedExecutor executor;
-    executor.add_node(required_test_interfaces.get_node_base_interface());
-    executor.add_node(required_test_interfaces_pub.get_node_base_interface());
+    executor.add_node(node_->get_node_base_interface());
+    executor.add_node(node_publisher->get_node_base_interface());
     // Both callbacks should be executed and the flags should be set.
     std::thread executor_thread([&]() {executor.spin();});
 

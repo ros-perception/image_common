@@ -72,7 +72,7 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
-    return subscribeImpl(RequiredInterfaces(*node), base_topic, callback, custom_qos, options);
+    return subscribeImpl(*node, base_topic, callback, custom_qos, options);
   }
 
   /**
@@ -99,7 +99,7 @@ public:
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(
-      RequiredInterfaces(*node), base_topic,
+      *node, base_topic,
       std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr &)>(fp),
       custom_qos, options);
   }
@@ -132,7 +132,7 @@ public:
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(
-      RequiredInterfaces(*node), base_topic,
+      *node, base_topic,
       std::bind(fp, obj, std::placeholders::_1), custom_qos, options);
   }
 
@@ -164,7 +164,7 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default)
   {
     return subscribe(
-       RequiredInterfaces(*node), base_topic,
+       *node, base_topic,
       std::bind(fp, obj, std::placeholders::_1), custom_qos);
   }
 
@@ -219,7 +219,7 @@ protected:
     rmw_qos_profile_t custom_qos,
     rclcpp::SubscriptionOptions options)
   {
-    subscribeImpl(RequiredInterfaces(*node), base_topic, callback, custom_qos, options);
+    subscribeImpl(*node, base_topic, callback, custom_qos, options);
   }
 
   virtual void subscribeImpl(

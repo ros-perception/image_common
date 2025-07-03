@@ -129,7 +129,7 @@ CameraSubscriber::CameraSubscriber(
   const Callback & callback,
   const std::string & transport,
   rmw_qos_profile_t custom_qos)
-: CameraSubscriber(RequiredInterfaces(*node), base_topic, callback, transport, custom_qos)
+: CameraSubscriber(*node, base_topic, callback, transport, custom_qos)
 {
 }
 

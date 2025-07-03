@@ -62,7 +62,7 @@ Publisher create_publisher(
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions options)
 {
-  return Publisher(RequiredInterfaces(*node), base_topic, kImpl->pub_loader_, custom_qos, options);
+  return Publisher(*node, base_topic, kImpl->pub_loader_, custom_qos, options);
 }
 
 Publisher create_publisher(
@@ -82,7 +82,7 @@ Subscriber create_subscription(
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
 {
-  return Subscriber(RequiredInterfaces(*node), base_topic, callback, kImpl->sub_loader_, transport,
+  return Subscriber(*node, base_topic, callback, kImpl->sub_loader_, transport,
       custom_qos, options);
 }
 
@@ -104,7 +104,7 @@ CameraPublisher create_camera_publisher(
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)
 {
-  return CameraPublisher(RequiredInterfaces(*node), base_topic, custom_qos, pub_options);
+  return CameraPublisher(*node, base_topic, custom_qos, pub_options);
 }
 
 
@@ -124,7 +124,7 @@ CameraSubscriber create_camera_subscription(
   const std::string & transport,
   rmw_qos_profile_t custom_qos)
 {
-  return CameraSubscriber(RequiredInterfaces(*node), base_topic, callback, transport, custom_qos);
+  return CameraSubscriber(*node, base_topic, callback, transport, custom_qos);
 }
 
 CameraSubscriber create_camera_subscription(

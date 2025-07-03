@@ -115,7 +115,7 @@ protected:
     rmw_qos_profile_t custom_qos,
     rclcpp::SubscriptionOptions options) override
   {
-    subscribeImpl(RequiredInterfaces(*node), base_topic, callback, custom_qos, options);
+    subscribeImpl(*node, base_topic, callback, custom_qos, options);
   }
 
   void subscribeImpl(

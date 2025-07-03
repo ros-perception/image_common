@@ -119,7 +119,7 @@ protected:
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
-    advertiseImpl(RequiredInterfaces(*node), base_topic, custom_qos, options);
+    advertiseImpl(*node, base_topic, custom_qos, options);
   }
 
   void advertiseImpl(

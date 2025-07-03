@@ -81,7 +81,7 @@ public:
     const std::string & base_topic,
     const std::string & transport)
   {
-    subscribe(RequiredInterfaces(*node), base_topic, transport);
+    subscribe(*node, base_topic, transport);
   }
 
   IMAGE_TRANSPORT_PUBLIC
@@ -123,7 +123,7 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
-    subscribe(RequiredInterfaces(*node), base_topic, transport, custom_qos, options);
+    subscribe(*node, base_topic, transport, custom_qos, options);
   }
 
   /**

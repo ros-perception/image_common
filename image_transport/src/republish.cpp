@@ -117,7 +117,7 @@ void Republisher::initialize()
           this->sub.shutdown();
         } else if (!this->sub) {
           this->sub = image_transport::create_subscription(
-            RequiredInterfaces(*this), "in",
+            *this, "in",
             std::bind(pub_mem_fn, &this->pub, std::placeholders::_1),
             in_transport,
             rmw_qos_profile_default,
@@ -126,7 +126,7 @@ void Republisher::initialize()
       };
 
     this->pub = image_transport::create_publisher(
-      RequiredInterfaces(*this), "out",
+      *this, "out",
       rmw_qos_profile_default, pub_options);
   } else {
     // Use one specific transport for output
@@ -150,7 +150,7 @@ void Republisher::initialize()
           this->sub.shutdown();
         } else if (!this->sub) {
           this->sub = image_transport::create_subscription(
-            RequiredInterfaces(*this), "in",
+            *this, "in",
             std::bind(
               pub_mem_fn,
               this->instance.get(), std::placeholders::_1), in_transport, rmw_qos_profile_default,
@@ -158,7 +158,7 @@ void Republisher::initialize()
         }
       };
 
-    this->instance->advertise(RequiredInterfaces(*this), "out", rmw_qos_profile_default,
+    this->instance->advertise(*this, "out", rmw_qos_profile_default,
         pub_options);
   }
 }

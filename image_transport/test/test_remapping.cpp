@@ -70,25 +70,22 @@ TEST_F(TestPublisher, RemappedPublisher) {
   rclcpp::executors::SingleThreadedExecutor executor;
   auto image = std::make_shared<sensor_msgs::msg::Image>();
 
-  test_rclcpp::RequiredInterfacesTest required_test_interfaces_remap(*node_remap_);
-  test_rclcpp::RequiredInterfacesTest required_test_interfaces_(*node_);
-
   // Subscribe
   bool received{false};
   auto sub = image_transport::create_subscription(
-    required_test_interfaces_remap, "old_topic",
+    *node_remap_, "old_topic",
     [&received](const sensor_msgs::msg::Image::ConstSharedPtr & msg) {
       (void)msg;
       received = true;
     }, "raw");
 
   // Publish
-  auto pub = image_transport::create_publisher(required_test_interfaces_, "new_topic");
+  auto pub = image_transport::create_publisher(*node_, "new_topic");
 
   ASSERT_EQ("/namespace/new_topic", sub.getTopic());
   ASSERT_EQ("/namespace/new_topic", pub.getTopic());
 
-  test_rclcpp::wait_for_subscriber(required_test_interfaces_, sub.getTopic());
+  test_rclcpp::wait_for_subscriber(*node_, sub.getTopic());
 
   ASSERT_FALSE(received);
 
@@ -101,22 +98,22 @@ TEST_F(TestPublisher, RemappedPublisher) {
     std::this_thread::sleep_for(sleep_per_loop);
   }
 
-  executor.spin_node_some(required_test_interfaces_.get_node_base_interface());
-  executor.spin_node_some(required_test_interfaces_remap.get_node_base_interface());
+  executor.spin_node_some(node_->get_node_base_interface());
+  executor.spin_node_some(node_remap_->get_node_base_interface());
 
   retry = 0;
   while (retry < max_retries && !received) {
     // generate random image and publish it
     pub.publish(image);
 
-    executor.spin_node_some(required_test_interfaces_.get_node_base_interface());
-    executor.spin_node_some(required_test_interfaces_remap.get_node_base_interface());
+    executor.spin_node_some(node_->get_node_base_interface());
+    executor.spin_node_some(node_remap_->get_node_base_interface());
 
     size_t loop = 0;
     while ((!received) && (loop++ < max_loops)) {
       std::this_thread::sleep_for(sleep_per_loop);
-      executor.spin_node_some(required_test_interfaces_.get_node_base_interface());
-      executor.spin_node_some(required_test_interfaces_remap.get_node_base_interface());
+      executor.spin_node_some(node_->get_node_base_interface());
+      executor.spin_node_some(node_remap_->get_node_base_interface());
     }
   }
 
