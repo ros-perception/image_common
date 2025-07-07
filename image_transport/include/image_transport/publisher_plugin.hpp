@@ -91,7 +91,8 @@ public:
     rclcpp::QoS custom_qos,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    advertiseImpl(nh, base_topic, custom_qos, options);
+    std::string image_topic = nh->get_node_topics_interface()->resolve_topic_name(base_topic);
+    advertiseImpl(nh, image_topic, custom_qos, options);
   }
 
   /**
