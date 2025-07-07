@@ -70,7 +70,7 @@ Publisher create_publisher(
 /**
  * \brief Subscribe to an image topic, free function version.
  */
-[[deprecated("Use create_publisher(..., rclcpp::QoS, ...) instead")]]
+[[deprecated("Use create_subscription(..., rclcpp::QoS, ...) instead")]]
 IMAGE_TRANSPORT_PUBLIC
 Subscriber create_subscription(
   rclcpp::Node * node,
@@ -95,7 +95,7 @@ Subscriber create_subscription(
 /*!
  * \brief Advertise a camera, free function version.
  */
-[[deprecated("Use create_publisher(..., rclcpp::QoS, ...) instead")]]
+[[deprecated("Use create_camera_publisher(..., rclcpp::QoS, ...) instead")]]
 IMAGE_TRANSPORT_PUBLIC
 CameraPublisher create_camera_publisher(
   rclcpp::Node * node,
@@ -116,7 +116,7 @@ CameraPublisher create_camera_publisher(
 /*!
  * \brief Subscribe to a camera, free function version.
  */
-[[deprecated("Use create_publisher(..., rclcpp::QoS, ...) instead")]]
+[[deprecated("Use create_camera_subscription(..., rclcpp::QoS, ...) instead")]]
 IMAGE_TRANSPORT_PUBLIC
 CameraSubscriber create_camera_subscription(
   rclcpp::Node * node,
@@ -263,6 +263,7 @@ public:
    * \brief Subscribe to an image topic, version for arbitrary std::function object and QoS.
    */
   IMAGE_TRANSPORT_PUBLIC
+  [[deprecated("Use subscribe(..., rclcpp::QoS, ...) instead")]]
   Subscriber subscribe(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
     const Subscriber::Callback & callback,
@@ -350,6 +351,7 @@ public:
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
   template<class T>
+  [[deprecated("Use subscribe(..., rclcpp::QoS, ...) instead")]]
   Subscriber subscribe(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
     void (T::* fp)(const ImageConstPtr &),
@@ -366,7 +368,6 @@ public:
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
   template<class T>
-  [[deprecated("Use subscribe(..., rclcpp::QoS, ...) instead")]]
   Subscriber subscribe(
     const std::string & base_topic, rclcpp::QoS custom_qos,
     void (T::* fp)(const ImageConstPtr &),
