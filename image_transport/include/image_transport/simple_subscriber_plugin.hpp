@@ -108,7 +108,7 @@ protected:
     return base_topic + "/" + getTransportName();
   }
 
-  [[deprecated("Use subscribeImpl(rclcpp::node_interfaces...) instead")]]
+  [[deprecated("Use subscribeImpl(..., rclcpp::QoS, ...) instead")]]
   void subscribeImpl(
     rclcpp::Node * node,
     const std::string & base_topic,

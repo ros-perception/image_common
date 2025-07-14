@@ -64,7 +64,7 @@ public:
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
-  [[deprecated("Use subscribe(rclcpp::node_interfaces...) instead")]]
+  [[deprecated("Use subscribe(.., rclcpp::QoS, ...) instead")]]
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     const Callback & callback,
@@ -90,7 +90,7 @@ public:
   /**
    * \brief Subscribe to an image topic, version for bare function.
    */
-  [[deprecated("Use subscribe(rclcpp::node_interfaces...) instead")]]
+  [[deprecated("Use subscribe(.., rclcpp::QoS, ...) instead")]]
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
@@ -123,7 +123,7 @@ public:
    * \brief Subscribe to an image topic, version for class member function with bare pointer.
    */
   template<class T>
-  [[deprecated("Use subscribe(rclcpp::node_interfaces...) instead")]]
+  [[deprecated("Use subscribe(.., rclcpp::QoS, ...) instead")]]
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &), T * obj,
@@ -132,7 +132,9 @@ public:
   {
     return subscribe(
       node, base_topic,
-      std::bind(fp, obj, std::placeholders::_1), custom_qos, options);
+      std::bind(fp, obj, std::placeholders::_1),
+      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
+      options);
   }
 
   /**
@@ -154,7 +156,7 @@ public:
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
   template<class T>
-  [[deprecated("Use subscribe(rclcpp::node_interfaces...) instead")]]
+  [[deprecated("Use subscribe(.., rclcpp::QoS, ...) instead")]]
   void subscribe(
     rclcpp::Node * node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
@@ -163,7 +165,8 @@ public:
   {
     return subscribe(
       node, base_topic,
-      std::bind(fp, obj, std::placeholders::_1), custom_qos);
+      std::bind(fp, obj, std::placeholders::_1),
+      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos));
   }
 
   /**
@@ -209,7 +212,7 @@ protected:
   /**
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
-  [[deprecated("Use subscribeImpl(rclcpp::node_interfaces...) instead")]]
+  [[deprecated("Use subscribeImpl(.., rclcpp::QoS, ...) instead")]]
   virtual void subscribeImpl(
     rclcpp::Node * node,
     const std::string & base_topic,

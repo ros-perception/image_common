@@ -360,7 +360,9 @@ public:
     const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     return subscribe(
-      base_topic, custom_qos, std::bind(fp, obj.get(), std::placeholders::_1),
+      base_topic,
+      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
+      std::bind(fp, obj.get(), std::placeholders::_1),
       obj, transport_hints, options);
   }
 

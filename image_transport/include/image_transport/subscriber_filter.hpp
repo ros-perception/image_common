@@ -105,7 +105,7 @@ public:
    * \param nh The ros::NodeHandle to use to subscribe.
    * \param base_topic The topic to subscribe to.
    */
-  [[deprecated("Use subscribe(rclcpp::node_interfaces...) instead")]]
+  [[deprecated("Use subscribe(..., rclcpp::QoS, ...) instead")]]
   IMAGE_TRANSPORT_PUBLIC
   void subscribe(
     rclcpp::Node * node,

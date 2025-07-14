@@ -66,7 +66,7 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Subscriber() = default;
 
-  [[deprecated("Use Subscriber(rclcpp::node_interfaces...) instead")]]
+  [[deprecated("Use Subscriber(..., rclcpp::QoS, ...) instead")]]
   IMAGE_TRANSPORT_PUBLIC
   Subscriber(
     rclcpp::Node * node,
