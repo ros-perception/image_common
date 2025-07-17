@@ -48,6 +48,7 @@ namespace image_transport
 {
 
 IMAGE_TRANSPORT_PUBLIC
+[[deprecated("Use create_publisher(RequiredInterfaces node_interfaces, ...) instead.")]]
 Publisher create_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
@@ -65,6 +66,7 @@ Publisher create_publisher(
  * \brief Subscribe to an image topic, free function version.
  */
 IMAGE_TRANSPORT_PUBLIC
+[[deprecated("Use create_subscription(RequiredInterfaces node_interfaces, ...) instead.")]]
 Subscriber create_subscription(
   rclcpp::Node * node,
   const std::string & base_topic,
@@ -89,6 +91,7 @@ Subscriber create_subscription(
  * \brief Advertise a camera, free function version.
  */
 IMAGE_TRANSPORT_PUBLIC
+[[deprecated("Use create_camera_publisher(RequiredInterfaces node_interfaces, ...) instead.")]]
 CameraPublisher create_camera_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
@@ -109,6 +112,7 @@ CameraPublisher create_camera_publisher(
  * \brief Subscribe to a camera, free function version.
  */
 IMAGE_TRANSPORT_PUBLIC
+[[deprecated("Use create_camera_subscription(RequiredInterfaces node_interfaces, ...) instead.")]]
 CameraSubscriber create_camera_subscription(
   rclcpp::Node * node,
   const std::string & base_topic,
@@ -148,6 +152,7 @@ public:
   using CameraInfoConstPtr = sensor_msgs::msg::CameraInfo::ConstSharedPtr;
 
   IMAGE_TRANSPORT_PUBLIC
+  [[deprecated("Use ImageTransport(RequiredInterfaces node_interfaces, ...) instead.")]]
   explicit ImageTransport(rclcpp::Node::SharedPtr node);
 
   IMAGE_TRANSPORT_PUBLIC

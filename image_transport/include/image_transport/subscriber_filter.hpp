@@ -76,6 +76,7 @@ public:
    * \param transport The transport hint to pass along
    */
   IMAGE_TRANSPORT_PUBLIC
+  [[deprecated("Use SubscriberFilter(RequiredInterfaces node_interfaces, ...) instead.")]]
   SubscriberFilter(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -116,6 +117,7 @@ public:
    * \param base_topic The topic to subscribe to.
    */
   IMAGE_TRANSPORT_PUBLIC
+  [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, ...) instead.")]]
   void subscribe(
     rclcpp::Node * node,
     const std::string & base_topic,

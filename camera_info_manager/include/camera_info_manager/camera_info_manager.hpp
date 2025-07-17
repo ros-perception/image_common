@@ -182,6 +182,8 @@ class CameraInfoManager
 {
 public:
   CAMERA_INFO_MANAGER_PUBLIC
+  [[deprecated("Use CameraInfoManager(rclcpp::node_interfaces::NodeBaseInterface::SharedPtr, ...)"
+    " instead.")]]
   CameraInfoManager(
     rclcpp::Node * node,
     const std::string & cname = "camera",
@@ -189,6 +191,8 @@ public:
     const std::string & ns = "~");
 
   CAMERA_INFO_MANAGER_PUBLIC
+  [[deprecated("Use CameraInfoManager(rclcpp::node_interfaces::NodeBaseInterface::SharedPtr, ...)"
+    " instead.")]]
   CameraInfoManager(
     rclcpp_lifecycle::LifecycleNode * node,
     const std::string & cname = "camera",

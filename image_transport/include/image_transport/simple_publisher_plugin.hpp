@@ -113,6 +113,7 @@ public:
   }
 
 protected:
+  [[deprecated("Use advertiseImpl(RequiredInterfaces node_interfaces, ...) instead.")]]
   void advertiseImpl(
     rclcpp::Node * node,
     const std::string & base_topic,

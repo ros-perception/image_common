@@ -68,6 +68,7 @@ public:
   Subscriber() = default;
 
   IMAGE_TRANSPORT_PUBLIC
+  [[deprecated("Use Subscriber(RequiredInterfaces node_interfaces, ...) instead.")]]
   Subscriber(
     rclcpp::Node * node,
     const std::string & base_topic,

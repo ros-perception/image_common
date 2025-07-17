@@ -65,6 +65,7 @@ public:
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
+  [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, ...) instead.")]]
   void subscribe(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -91,6 +92,7 @@ public:
   /**
    * \brief Subscribe to an image topic, version for bare function.
    */
+  [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, ...) instead.")]]
   void subscribe(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -124,6 +126,7 @@ public:
    * \brief Subscribe to an image topic, version for class member function with bare pointer.
    */
   template<class T>
+  [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, ...) instead.")]]
   void subscribe(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -156,6 +159,7 @@ public:
    * \brief Subscribe to an image topic, version for class member function with shared_ptr.
    */
   template<class T>
+  [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, ...) instead.")]]
   void subscribe(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -212,6 +216,7 @@ protected:
   /*
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
+  [[deprecated("Use subscribeImpl(RequiredInterfaces node_interfaces, ...) instead.")]]
   virtual void subscribeImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
