@@ -71,7 +71,8 @@ public:
   CameraSubscriber() = default;
 
   IMAGE_TRANSPORT_PUBLIC
-  [[deprecated("Use CameraSubscriber(RequiredInterfaces node_interfaces, ...) instead.")]]
+  [[deprecated("Use CameraSubscriber(RequiredInterfaces node_interfaces, ..., rclcpp::QoS instead) "
+    "instead.")]]
   CameraSubscriber(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -85,7 +86,7 @@ public:
     const std::string & base_topic,
     const Callback & callback,
     const std::string & transport,
-    rmw_qos_profile_t = rmw_qos_profile_default);
+    rclcpp::QoS);
 
   /**
    * \brief Get the base topic (on which the raw image is published).

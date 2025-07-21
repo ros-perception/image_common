@@ -58,7 +58,7 @@ TEST_F(TestSubscriberLifecycle, construction_and_destruction) {
     [](const auto & msg) {(void)msg;};
 
   auto sub = image_transport::create_subscription(*node_, "camera/image", fcn,
-    "raw");
+    "raw", rclcpp::SystemDefaultsQoS());
 
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.spin_node_some(node_->get_node_base_interface());
@@ -69,7 +69,7 @@ TEST_F(TestSubscriberLifecycle, shutdown) {
     [](const auto & msg) {(void)msg;};
 
 auto sub = image_transport::create_subscription(*node_, "camera/image", fcn,
-    "raw");
+    "raw", rclcpp::SystemDefaultsQoS());
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
     1u);
   sub.shutdown();
@@ -84,7 +84,7 @@ TEST_F(TestSubscriberLifecycle, camera_sub_shutdown) {
     [](const auto & msg, const auto &) {(void)msg;};
 
   auto sub = image_transport::create_camera_subscription(*node_, "camera/image",
-    fcn, "raw");
+    fcn, "raw", rclcpp::SystemDefaultsQoS());
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
     1u);
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers(
@@ -177,7 +177,7 @@ TEST_F(TestSubscriberLifecycle, callback_groups_custom_qos) {
     image_transport::ImageTransport it_publisher(*node_publisher);
     image_transport::Publisher pub = it_publisher.advertise(
       "camera/image",
-      rmw_qos_profile_sensor_data);
+      rclcpp::SensorDataQoS());
 
     auto msg = sensor_msgs::msg::Image();
     auto base_node_interface = node_publisher->get_node_base_interface();
@@ -214,10 +214,10 @@ TEST_F(TestSubscriberLifecycle, callback_groups_custom_qos) {
     image_transport::ImageTransport it(*node_);
 
     auto subscriber_1 = it.subscribe(
-      "camera/image", rmw_qos_profile_sensor_data, fcn1, nullptr,
+      "camera/image", rclcpp::SensorDataQoS(), fcn1, nullptr,
       nullptr, sub_options);
     auto subscriber_2 = it.subscribe(
-      "camera/image", rmw_qos_profile_sensor_data, fcn2, nullptr,
+      "camera/image", rclcpp::SensorDataQoS(), fcn2, nullptr,
       nullptr, sub_options);
 
     rclcpp::executors::MultiThreadedExecutor executor;

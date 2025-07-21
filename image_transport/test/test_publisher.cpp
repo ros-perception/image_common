@@ -49,9 +49,9 @@ protected:
 };
 
 TEST_F(TestPublisher, publisher) {
-  auto pub = image_transport::create_publisher(*node_, "camera/image");
-  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"),
-    1u);
+  auto pub = image_transport::create_publisher(*node_, "camera/image",
+    rclcpp::SystemDefaultsQoS());
+  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 1u);
   pub.shutdown();
   EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"),
     0u);
@@ -66,12 +66,10 @@ TEST_F(TestPublisher, image_transport_publisher) {
 }
 
 TEST_F(TestPublisher, camera_publisher) {
-  auto camera_pub = image_transport::create_camera_publisher(*node_,
-    "camera/image");
-  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"),
-    1u);
-  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers(
-    "camera/camera_info"), 1u);
+  auto camera_pub = image_transport::create_camera_publisher(*node_, "camera/image",
+    rclcpp::SystemDefaultsQoS());
+  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"), 1u);
+  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/camera_info"), 1u);
   camera_pub.shutdown();
   EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"),
     0u);
@@ -94,7 +92,7 @@ TEST_F(TestPublisher, image_transport_camera_publisher) {
 
 TEST_F(TestPublisher, image_transport_camera_publisher_qos) {
   image_transport::ImageTransport it(*node_);
-  auto pub = it.advertise("camera/image", rmw_qos_profile_sensor_data);
+  auto pub = it.advertise("camera/image", rclcpp::SensorDataQoS());
 }
 
 

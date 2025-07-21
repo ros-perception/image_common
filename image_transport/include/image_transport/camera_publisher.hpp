@@ -69,7 +69,8 @@ public:
   CameraPublisher() = default;
 
   IMAGE_TRANSPORT_PUBLIC
-  [[deprecated("Use CameraPublisher(RequiredInterfaces node_interfaces, ...) instead.")]]
+  [[deprecated("Use CameraPublisher(RequiredInterfaces node_interfaces, ..., rclcpp::QoS) "
+    "instead.")]]
   CameraPublisher(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -80,7 +81,7 @@ public:
   CameraPublisher(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::QoS custom_qos,
     rclcpp::PublisherOptions = rclcpp::PublisherOptions());
 
   /*!

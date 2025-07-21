@@ -79,10 +79,10 @@ TEST_F(MessagePassingTestingLifecycle, one_message_passing)
 
   rclcpp::executors::SingleThreadedExecutor executor;
 
-  auto pub = image_transport::create_publisher(*node_, "camera/image");
+  auto pub = image_transport::create_publisher(*node_, "camera/image", rclcpp::SystemDefaultsQoS());
   auto sub =
     image_transport::create_subscription(*node_, "camera/image", imageCallback,
-    "raw");
+    "raw", rclcpp::SystemDefaultsQoS());
 
   auto graph_interface = node_->get_node_graph_interface();
   auto base_node_interface = node_->get_node_base_interface();
@@ -120,7 +120,8 @@ TEST_F(MessagePassingTestingLifecycle, one_camera_message_passing)
 
   rclcpp::executors::SingleThreadedExecutor executor;
 
-  auto pub = image_transport::create_camera_publisher(*node_, "camera/image");
+  auto pub = image_transport::create_camera_publisher(*node_, "camera/image",
+    rclcpp::SystemDefaultsQoS());
   auto sub = image_transport::create_camera_subscription(
     *node_, "camera/image",
     [](const sensor_msgs::msg::Image::ConstSharedPtr & image,
@@ -129,7 +130,8 @@ TEST_F(MessagePassingTestingLifecycle, one_camera_message_passing)
       (void) info;
       total_images_received++;
     },
-    "raw"
+    "raw",
+    rclcpp::SystemDefaultsQoS()
   );
 
   test_rclcpp::wait_for_subscriber(*node_, sub.getTopic());

@@ -82,14 +82,15 @@ CameraPublisher::CameraPublisher(
   const std::string & base_topic,
   rmw_qos_profile_t custom_qos,
   rclcpp::PublisherOptions pub_options)
-: CameraPublisher(RequiredInterfaces(*node), base_topic, custom_qos, pub_options)
+: CameraPublisher(*node, base_topic,
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), pub_options)
 {
 }
 
 CameraPublisher::CameraPublisher(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
-  rmw_qos_profile_t custom_qos,
+  rclcpp::QoS custom_qos,
   rclcpp::PublisherOptions pub_options)
 : impl_(std::make_shared<Impl>(node_interfaces))
 {
@@ -99,7 +100,6 @@ CameraPublisher::CameraPublisher(
     node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
   impl_->image_pub_ = image_transport::create_publisher(node_interfaces, image_topic, custom_qos,
       pub_options);
 
@@ -109,7 +109,7 @@ CameraPublisher::CameraPublisher(
   impl_->info_pub_ = rclcpp::create_publisher<sensor_msgs::msg::CameraInfo>(
     parameters_interface,
     topics_interface,
-    info_topic, qos);
+    info_topic, custom_qos);
 }
 
 size_t CameraPublisher::getNumSubscribers() const

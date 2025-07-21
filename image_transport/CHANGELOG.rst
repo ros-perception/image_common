@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.2.2 (2025-07-01)
+------------------
+* Fix topic resolution for plugins (`#365 <https://github.com/ros-perception/image_common/issues/365>`_)
+* Contributors: Alex Tyshka
+
 6.2.1 (2025-06-12)
 ------------------
 

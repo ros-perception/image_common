@@ -81,8 +81,8 @@ public:
     rclcpp::Node * node,
     const std::string & base_topic,
     const std::string & transport)
+  : SubscriberFilter(*node, base_topic, transport)
   {
-    subscribe(*node, base_topic, transport);
   }
 
   IMAGE_TRANSPORT_PUBLIC
@@ -91,7 +91,7 @@ public:
     const std::string & base_topic,
     const std::string & transport)
   {
-    subscribe(required_interfaces, base_topic, transport);
+    subscribe(required_interfaces, base_topic, transport, rclcpp::SystemDefaultsQoS());
   }
 
   /**
@@ -117,7 +117,8 @@ public:
    * \param base_topic The topic to subscribe to.
    */
   IMAGE_TRANSPORT_PUBLIC
-  [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, ...) instead.")]]
+  [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
+    "instead.")]]
   void subscribe(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -125,7 +126,8 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
-    subscribe(*node, base_topic, transport, custom_qos, options);
+    subscribe(*node, base_topic, transport,
+      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), options);
   }
 
   /**
@@ -141,7 +143,7 @@ public:
     RequiredInterfaces required_interfaces,
     const std::string & base_topic,
     const std::string & transport,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::QoS custom_qos,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
     unsubscribe();

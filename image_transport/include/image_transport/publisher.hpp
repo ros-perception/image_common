@@ -70,7 +70,8 @@ public:
   Publisher() = default;
 
   IMAGE_TRANSPORT_PUBLIC
-  [[deprecated("Use Publisher(RequiredInterfaces node_interfaces, ...) instead.")]]
+  [[deprecated("Use Publisher(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
+    "instead.")]]
   Publisher(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -83,7 +84,7 @@ public:
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,
     PubLoaderPtr loader,
-    rmw_qos_profile_t custom_qos,
+    rclcpp::QoS custom_qos,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
 
   /*!

@@ -51,8 +51,8 @@ TEST_F(TestSubscriber, construction_and_destruction) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
-  auto sub = image_transport::create_subscription(*node_, "camera/image", fcn,
-    "raw");
+  auto sub = image_transport::create_subscription(*node_, "camera/image", fcn, "raw",
+    rclcpp::SystemDefaultsQoS());
 
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.spin_node_some(node_->get_node_base_interface());
@@ -62,10 +62,9 @@ TEST_F(TestSubscriber, shutdown) {
   std::function<void(const sensor_msgs::msg::Image::ConstSharedPtr & msg)> fcn =
     [](const auto & msg) {(void)msg;};
 
-auto sub = image_transport::create_subscription(*node_, "camera/image", fcn,
-    "raw");
-  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
-    1u);
+  auto sub = image_transport::create_subscription(*node_, "camera/image", fcn, "raw",
+    rclcpp::SystemDefaultsQoS());
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 1u);
   sub.shutdown();
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
     0u);
@@ -77,12 +76,10 @@ TEST_F(TestSubscriber, camera_sub_shutdown) {
       const sensor_msgs::msg::CameraInfo::ConstSharedPtr &)> fcn =
     [](const auto & msg, const auto &) {(void)msg;};
 
-  auto sub = image_transport::create_camera_subscription(*node_, "camera/image",
-    fcn, "raw");
-  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
-    1u);
-  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers(
-    "camera/camera_info"), 1u);
+  auto sub = image_transport::create_camera_subscription(*node_, "camera/image", fcn, "raw",
+    rclcpp::SystemDefaultsQoS());
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 1u);
+  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/camera_info"), 1u);
   sub.shutdown();
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
     0u);
@@ -172,7 +169,7 @@ TEST_F(TestSubscriber, callback_groups_custom_qos) {
     image_transport::ImageTransport it_publisher(*node_publisher);
     image_transport::Publisher pub = it_publisher.advertise(
       "camera/image",
-      rmw_qos_profile_sensor_data);
+      rclcpp::SensorDataQoS());
 
     auto msg = sensor_msgs::msg::Image();
     auto base_node_interface = node_publisher->get_node_base_interface();
@@ -208,12 +205,12 @@ TEST_F(TestSubscriber, callback_groups_custom_qos) {
 
     image_transport::ImageTransport it(*node_);
 
-    auto subscriber_1 = it.subscribe(
-      "camera/image", rmw_qos_profile_sensor_data, fcn1, nullptr,
-      nullptr, sub_options);
-    auto subscriber_2 = it.subscribe(
-      "camera/image", rmw_qos_profile_sensor_data, fcn2, nullptr,
-      nullptr, sub_options);
+  auto subscriber_1 = it.subscribe(
+    "camera/image", rclcpp::SensorDataQoS(), fcn1, nullptr,
+    nullptr, sub_options);
+  auto subscriber_2 = it.subscribe(
+    "camera/image", rclcpp::SensorDataQoS(), fcn2, nullptr,
+    nullptr, sub_options);
 
     rclcpp::executors::MultiThreadedExecutor executor;
     executor.add_node(node_->get_node_base_interface());

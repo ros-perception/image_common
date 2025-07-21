@@ -88,7 +88,8 @@ Subscriber::Subscriber(
   const std::string & transport,
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
-: Subscriber(*node, base_topic, callback, loader, transport, custom_qos,
+: Subscriber(*node, base_topic, callback, loader, transport,
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
     options)
 {
 }
@@ -99,7 +100,7 @@ Subscriber::Subscriber(
   const Callback & callback,
   SubLoaderPtr loader,
   const std::string & transport,
-  rmw_qos_profile_t custom_qos,
+  rclcpp::QoS custom_qos,
   rclcpp::SubscriptionOptions options)
 : impl_(std::make_shared<Impl>(node_interfaces, loader))
 {

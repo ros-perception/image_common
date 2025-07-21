@@ -68,7 +68,7 @@ public:
   Subscriber() = default;
 
   IMAGE_TRANSPORT_PUBLIC
-  [[deprecated("Use Subscriber(RequiredInterfaces node_interfaces, ...) instead.")]]
+  [[deprecated("Use Subscriber(RequiredInterfaces node_interfaces, ..., rclcpp::QoS) instead.")]]
   Subscriber(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -85,7 +85,7 @@ public:
     const Callback & callback,
     SubLoaderPtr loader,
     const std::string & transport,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
+    rclcpp::QoS custom_qos,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
 
   /**
