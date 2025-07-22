@@ -177,7 +177,7 @@ public:
     rclcpp::Node * node, const std::string & base_topic,
     void (T::* fp)(const sensor_msgs::msg::Image::ConstSharedPtr &),
     std::shared_ptr<T> & obj,
-    rclcpp::QoS custom_qos = rmw_qos_profile_default)
+    rclcpp::QoS custom_qos)
   {
     return subscribe(
       node, base_topic,
