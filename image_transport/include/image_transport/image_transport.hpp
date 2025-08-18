@@ -262,8 +262,8 @@ public:
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object and QoS.
    */
-  IMAGE_TRANSPORT_PUBLIC
   [[deprecated("Use subscribe(..., rclcpp::QoS, ...) instead")]]
+  IMAGE_TRANSPORT_PUBLIC
   Subscriber subscribe(
     const std::string & base_topic, rmw_qos_profile_t custom_qos,
     const Subscriber::Callback & callback,
