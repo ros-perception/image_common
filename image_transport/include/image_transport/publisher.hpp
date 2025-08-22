@@ -69,9 +69,9 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Publisher() = default;
 
-  IMAGE_TRANSPORT_PUBLIC
   [[deprecated("Use Publisher(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
     "instead.")]]
+  IMAGE_TRANSPORT_PUBLIC
   Publisher(
     rclcpp::Node * node,
     const std::string & base_topic,

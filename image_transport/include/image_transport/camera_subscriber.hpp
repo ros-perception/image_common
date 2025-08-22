@@ -70,9 +70,9 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber() = default;
 
-  IMAGE_TRANSPORT_PUBLIC
   [[deprecated("Use CameraSubscriber(RequiredInterfaces node_interfaces, ..., rclcpp::QoS instead) "
     "instead.")]]
+  IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber(
     rclcpp::Node * node,
     const std::string & base_topic,

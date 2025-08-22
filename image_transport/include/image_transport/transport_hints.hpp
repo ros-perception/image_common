@@ -72,8 +72,8 @@ public:
     }
   }
 
-  IMAGE_TRANSPORT_PUBLIC
   [[deprecated("Use TransportHints(RequiredInterfaces node_interfaces, ...) instead.")]]
+  IMAGE_TRANSPORT_PUBLIC
   TransportHints(
     const rclcpp::Node * node,
     const std::string & default_transport = "raw",

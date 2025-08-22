@@ -68,9 +68,9 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher() = default;
 
-  IMAGE_TRANSPORT_PUBLIC
   [[deprecated("Use CameraPublisher(RequiredInterfaces node_interfaces, ..., rclcpp::QoS) "
     "instead.")]]
+  IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
     rclcpp::Node * node,
     const std::string & base_topic,

@@ -75,8 +75,8 @@ public:
    * \param queue_size The subscription queue size
    * \param transport The transport hint to pass along
    */
-  IMAGE_TRANSPORT_PUBLIC
   [[deprecated("Use SubscriberFilter(RequiredInterfaces node_interfaces, ...) instead.")]]
+  IMAGE_TRANSPORT_PUBLIC
   SubscriberFilter(
     rclcpp::Node * node,
     const std::string & base_topic,
@@ -116,9 +116,9 @@ public:
    * \param nh The ros::NodeHandle to use to subscribe.
    * \param base_topic The topic to subscribe to.
    */
-  IMAGE_TRANSPORT_PUBLIC
   [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
     "instead.")]]
+  IMAGE_TRANSPORT_PUBLIC
   void subscribe(
     rclcpp::Node * node,
     const std::string & base_topic,

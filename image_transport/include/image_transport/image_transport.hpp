@@ -50,9 +50,9 @@ namespace image_transport
 /*!
  * \brief Advertise an image topic, free function version.
  */
-IMAGE_TRANSPORT_PUBLIC
 [[deprecated("Use create_publisher(RequiredInterfaces node_interfaces, ..., rclcpp::QoS) "
   "instead.")]]
+IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
   rclcpp::Node * node,
   const std::string & base_topic,
@@ -158,8 +158,8 @@ public:
   using ImageConstPtr = sensor_msgs::msg::Image::ConstSharedPtr;
   using CameraInfoConstPtr = sensor_msgs::msg::CameraInfo::ConstSharedPtr;
 
-  IMAGE_TRANSPORT_PUBLIC
   [[deprecated("Use ImageTransport(RequiredInterfaces node_interfaces, ...) instead.")]]
+  IMAGE_TRANSPORT_PUBLIC
   explicit ImageTransport(rclcpp::Node::SharedPtr node);
 
   IMAGE_TRANSPORT_PUBLIC
