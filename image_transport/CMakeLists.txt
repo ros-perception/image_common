@@ -18,7 +18,6 @@ find_package(message_filters REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
-find_package(rclcpp_lifecycle REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
 # Build image_transport library
@@ -119,6 +118,7 @@ if(BUILD_TESTING)
   ament_cppcheck(LANGUAGE "c++")
 
   find_package(ament_cmake_gtest)
+  find_package(rclcpp_lifecycle REQUIRED)
 
   ament_add_gtest(test_${PROJECT_NAME}-camera_common test/test_camera_common.cpp)
   if(TARGET test_${PROJECT_NAME}-camera_common)
