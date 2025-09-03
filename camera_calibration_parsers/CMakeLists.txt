@@ -16,7 +16,6 @@ find_package(ament_cmake_ros REQUIRED)
 
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(yaml_cpp_vendor REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 # define the library
@@ -85,7 +84,7 @@ install(
   DESTINATION include/${PROJECT_NAME}
 )
 
-ament_export_dependencies(rclcpp sensor_msgs yaml_cpp_vendor)
+ament_export_dependencies(rclcpp sensor_msgs yaml-cpp)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
