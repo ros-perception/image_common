@@ -53,6 +53,17 @@ from rclpy.node import Node
 from sensor_msgs.msg import CameraInfo
 from sensor_msgs.srv import SetCameraInfo
 import yaml
+import array
+import numpy as np
+
+# tell yaml to serialise array.arrays and np.arrays as simple lists
+# (these hold the matrices and distortion coefficients in CameraInfo)
+
+def ndarray_representer(dumper: yaml.Dumper, array: np.ndarray) -> yaml.Node:
+    return dumper.represent_list(array.tolist())
+
+yaml.SafeDumper.add_representer(np.ndarray, ndarray_representer)    
+yaml.SafeDumper.add_representer(array.array, yaml.representer.Representer.represent_list)
 
 default_camera_info_url = 'file://${ROS_HOME}/camera_info/${NAME}.yaml'
 # parseURL() type codes:
@@ -326,7 +337,7 @@ class CameraInfoManager:
         """
         self._loadCalibration(self.url, self.cname)
 
-    def setCameraInfo(self, req):
+    def setCameraInfo(self, req, rsp):
         """
         Set camera info request callback.
 
@@ -339,7 +350,6 @@ class CameraInfoManager:
         """
         self.node.get_logger().debug('SetCameraInfo received for ' + self.cname)
         self.camera_info = req.camera_info
-        rsp = SetCameraInfo.Response()
         rsp.success = saveCalibration(req.camera_info, self.url, self.cname)
         if not rsp.success:
             rsp.status_message = 'Error storing camera calibration.'
