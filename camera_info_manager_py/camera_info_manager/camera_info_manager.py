@@ -45,6 +45,7 @@ import errno
 import locale
 import os
 from pathlib import Path
+import array
 
 from ament_index_python import get_package_share_directory
 from ament_index_python import PackageNotFoundError
@@ -53,14 +54,15 @@ from rclpy.node import Node
 from sensor_msgs.msg import CameraInfo
 from sensor_msgs.srv import SetCameraInfo
 import yaml
-import array
 import numpy as np
 
-# tell yaml to serialise array.arrays and np.arrays as simple lists
-# (these hold the matrices and distortion coefficients in CameraInfo)
 
 def ndarray_representer(dumper: yaml.Dumper, array: np.ndarray) -> yaml.Node:
+    """
+    This makes yaml output a numpy array as though it were a simple list
+    """
     return dumper.represent_list(array.tolist())
+
 
 yaml.SafeDumper.add_representer(np.ndarray, ndarray_representer)    
 yaml.SafeDumper.add_representer(array.array, yaml.representer.Representer.represent_list)
