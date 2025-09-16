@@ -57,14 +57,12 @@ import yaml
 import numpy as np
 
 
-def ndarray_representer(dumper: yaml.Dumper, array: np.ndarray) -> yaml.Node:
-    """
-    This makes yaml output a numpy array as though it were a simple list
-    """
+def _ndarray_representer(dumper: yaml.Dumper, array: np.ndarray) -> yaml.Node:
+    """Make yaml output a numpy array as though it were a simple list."""
     return dumper.represent_list(array.tolist())
 
 
-yaml.SafeDumper.add_representer(np.ndarray, ndarray_representer)    
+yaml.SafeDumper.add_representer(np.ndarray, _ndarray_representer)
 yaml.SafeDumper.add_representer(array.array, yaml.representer.Representer.represent_list)
 
 default_camera_info_url = 'file://${ROS_HOME}/camera_info/${NAME}.yaml'
