@@ -47,9 +47,9 @@ import locale
 import os
 from pathlib import Path
 
-import numpy as np
 from ament_index_python import get_package_share_directory
 from ament_index_python import PackageNotFoundError
+import numpy as np
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import CameraInfo
