@@ -41,12 +41,13 @@ This is very similar to the
 
 """
 
+import array
 import errno
 import locale
 import os
 from pathlib import Path
-import array
 
+import numpy as np
 from ament_index_python import get_package_share_directory
 from ament_index_python import PackageNotFoundError
 import rclpy
@@ -54,7 +55,6 @@ from rclpy.node import Node
 from sensor_msgs.msg import CameraInfo
 from sensor_msgs.srv import SetCameraInfo
 import yaml
-import numpy as np
 
 
 def _ndarray_representer(dumper: yaml.Dumper, array: np.ndarray) -> yaml.Node:
