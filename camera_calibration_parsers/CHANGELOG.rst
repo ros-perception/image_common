@@ -2,6 +2,11 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.1.3 (2025-10-16)
+------------------
+* Fix cmake deprecation (`#367 <https://github.com/ros-perception/image_common/issues/367>`_) (`#368 <https://github.com/ros-perception/image_common/issues/368>`_)
+* Contributors: mergify[bot]
+
 6.1.2 (2025-06-12)
 ------------------
 
