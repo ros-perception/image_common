@@ -168,7 +168,7 @@ CameraInfo CameraInfoManager::getCameraInfo(void)
  * @param url a copy of the Uniform Resource Locator
  * @return file name if package found, "" otherwise
  */
-std::string CameraInfoManager::getPackageFileName(const std::string & url)
+std::filesystem::path CameraInfoManager::getPackageFileName(const std::string & url)
 {
   RCLCPP_DEBUG(logger_, "camera calibration url: %s", url.c_str());
 
@@ -179,13 +179,14 @@ std::string CameraInfoManager::getPackageFileName(const std::string & url)
   std::string package(url.substr(prefix_len, rest - prefix_len));
 
   // Look up the ROS package path name.
-  std::string pkgPath = ament_index_cpp::get_package_share_directory(package);
+  std::filesystem::path pkgPath;
+  ament_index_cpp::get_package_share_directory(package, pkgPath);
   if (pkgPath.empty()) {                // package not found?
     RCLCPP_WARN(logger_, "unknown package: %s (ignored)", package.c_str());
     return pkgPath;
   } else {
     // Construct file name from package location and remainder of URL.
-    return pkgPath + url.substr(rest);
+    return std::filesystem::path(pkgPath.string() + url.substr(rest));
   }
 }
 
@@ -264,7 +265,7 @@ bool CameraInfoManager::loadCalibration(
       }
     case URL_package:
       {
-        std::string filename(getPackageFileName(resURL));
+        std::filesystem::path filename(getPackageFileName(resURL));
         if (!filename.empty()) {
           success = loadCalibrationFile(filename, cname);
         }
@@ -291,7 +292,7 @@ bool CameraInfoManager::loadCalibration(
  * Sets cam_info_, if successful
  */
 bool CameraInfoManager::loadCalibrationFile(
-  const std::string & filename,
+  const std::filesystem::path & filename,
   const std::string & cname)
 {
   bool success = false;
@@ -300,7 +301,7 @@ bool CameraInfoManager::loadCalibrationFile(
   std::string cam_name;
   CameraInfo cam_info;
 
-  if (readCalibration(filename, cam_name, cam_info)) {
+  if (readCalibration(filename.string(), cam_name, cam_info)) {
     if (cname != cam_name) {
       RCLCPP_WARN(
         logger_,
@@ -484,7 +485,7 @@ CameraInfoManager::saveCalibration(
       }
     case URL_package:
       {
-        std::string filename(getPackageFileName(resURL));
+        std::filesystem::path filename(getPackageFileName(resURL));
         if (!filename.empty()) {
           success = saveCalibrationFile(new_info, filename, cname);
         }
@@ -514,13 +515,12 @@ CameraInfoManager::saveCalibration(
 bool
 CameraInfoManager::saveCalibrationFile(
   const CameraInfo & new_info,
-  const std::string & filename,
+  const std::filesystem::path & filename,
   const std::string & cname)
 {
   RCLCPP_INFO(logger_, "writing calibration data to %s", filename.c_str());
 
-  std::filesystem::path filepath(filename);
-  std::filesystem::path parent = filepath.parent_path();
+  std::filesystem::path parent = filename.parent_path();
 
   if (!std::filesystem::exists(parent)) {
     if (!std::filesystem::create_directories(parent)) {
@@ -532,7 +532,7 @@ CameraInfoManager::saveCalibrationFile(
   // Directory exists. Permissions might still be bad.
   // Currently, writeCalibration() always returns true no matter what
   // (ros-pkg ticket #5010).
-  return writeCalibration(filename, cname, new_info);
+  return writeCalibration(filename.string(), cname, new_info);
 }
 
 /** Callback for SetCameraInfo request.

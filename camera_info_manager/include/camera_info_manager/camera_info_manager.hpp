@@ -30,6 +30,7 @@
 #ifndef CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_HPP_
 #define CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_HPP_
 
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -255,14 +256,14 @@ private:
   } url_type_t;
 
   // private methods
-  std::string getPackageFileName(const std::string & url);
+  std::filesystem::path getPackageFileName(const std::string & url);
 
   bool loadCalibration(
     const std::string & url,
     const std::string & cname);
 
   bool loadCalibrationFile(
-    const std::string & filename,
+    const std::filesystem::path & filename,
     const std::string & cname);
 
   url_type_t parseURL(const std::string & url);
@@ -274,7 +275,7 @@ private:
 
   bool saveCalibrationFile(
     const CameraInfo & new_info,
-    const std::string & filename,
+    const std::filesystem::path & filename,
     const std::string & cname);
 
   void setCameraInfoService(
