@@ -10,7 +10,7 @@
   <maintainer email="alejandro@openrobotics.org">Alejandro Hernández</maintainer>
   <maintainer email="john.dangelo@tailos.com">John D'Angelo</maintainer>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <url type="repository">https://github.com/ros-perception/image_common</url>
   <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>
