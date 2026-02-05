@@ -61,25 +61,25 @@ An object for image transport operations.
 
 #### Constructor
 
-- `__init__(node_name, image_transport="", launch_params_filepath="")`
+- `__init__(node, node_name, image_transport="", launch_params_filepath="")`
 
   Initialize an ImageTransport object with its node name, `image_transport` and launch params file path. If no `image_transport` specified, the default `raw` plugin will be initialized.
 
 #### Methods
 
-- `advertise(base_topic, queue_size, latch=False)`
+- `advertise(node, base_topic, queue_size, latch=False)`
 
   Advertise an image topic.
 
-- `advertise_camera(base_topic, queue_size, latch=False)`
+- `advertise_camera(node, base_topic, queue_size, latch=False)`
 
   Advertise an image topic with camera info.
 
-- `subscribe(base_topic, queue_size, callback)`
+- `subscribe(node, base_topic, queue_size, callback)`
 
   Subscribe to an image topic.
 
-- `subscribe_camera(base_topic, queue_size, callback)`
+- `subscribe_camera(node, base_topic, queue_size, callback)`
 
   Subscribe to an image topic with camera info.
 
