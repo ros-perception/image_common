@@ -22,17 +22,32 @@
 
 #include "gtest/gtest.h"
 
-#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/node_interfaces/node_interfaces.hpp>
 
 namespace test_rclcpp
 {
+using NodeBaseInterface = rclcpp::node_interfaces::NodeBaseInterface;
+using NodeGraphInterface = rclcpp::node_interfaces::NodeGraphInterface;
+using NodeLoggingInterface = rclcpp::node_interfaces::NodeLoggingInterface;
+using NodeParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
+using NodeTimersInterface = rclcpp::node_interfaces::NodeTimersInterface;
+using NodeTopicsInterface = rclcpp::node_interfaces::NodeTopicsInterface;
+
+using RequiredInterfacesTest = rclcpp::node_interfaces::NodeInterfaces<
+  NodeBaseInterface,
+  NodeGraphInterface,
+  NodeLoggingInterface,
+  NodeParametersInterface,
+  NodeTimersInterface,
+  NodeTopicsInterface>;
 
 // Sleep for timeout ms or until a subscriber has registered for the topic
 // if to_be_available is true, then it will wait for the number of
 // subscribers to be > 0, if false it will wait for the number of
 // subscribers to be 0
 void wait_for_subscriber(
-  std::shared_ptr<rclcpp::Node> node,
+  RequiredInterfacesTest node_interfaces,
   const std::string & topic_name,
   bool to_be_available = true,
   std::chrono::milliseconds timeout = std::chrono::milliseconds(1),
@@ -43,18 +58,19 @@ void wait_for_subscriber(
   using std::chrono::steady_clock;
   auto start = steady_clock::now();
   microseconds time_slept(0);
-  auto predicate = [&node, &topic_name, &to_be_available]() -> bool {
+  auto predicate = [&node_interfaces, &topic_name, &to_be_available]() -> bool {
       if (to_be_available) {
         // the subscriber is available if the count is gt 0
-        return node->count_subscribers(topic_name) > 0;
+        return node_interfaces.get_node_graph_interface()->count_subscribers(topic_name) > 0;
       } else {
-        // the subscriber is no longer available when the count is 0
-        return node->count_subscribers(topic_name) == 0;
+        // the node_interfaces is no longer available when the count is 0
+        return node_interfaces.get_node_graph_interface()->count_subscribers(topic_name) == 0;
       }
     };
   while (!predicate() && time_slept < duration_cast<microseconds>(timeout)) {
-    rclcpp::Event::SharedPtr graph_event = node->get_graph_event();
-    node->wait_for_graph_change(graph_event, sleep_period);
+    rclcpp::Event::SharedPtr graph_event =
+      node_interfaces.get_node_graph_interface()->get_graph_event();
+    node_interfaces.get_node_graph_interface()->wait_for_graph_change(graph_event, sleep_period);
     time_slept = duration_cast<std::chrono::microseconds>(steady_clock::now() - start);
   }
   int64_t time_slept_count =

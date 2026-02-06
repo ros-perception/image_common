@@ -2,6 +2,44 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.4.4 (2025-12-23)
+------------------
+* Updated deprecated ament_index_cpp API (`#388 <https://github.com/ros-perception/image_common/issues/388>`_)
+* Contributors: Alejandro Hernández Cordero
+
+6.4.3 (2025-11-24)
+------------------
+
+6.4.2 (2025-10-16)
+------------------
+
+6.4.1 (2025-08-25)
+------------------
+
+6.4.0 (2025-08-22)
+------------------
+* Fix compilation error with clang (`#372 <https://github.com/ros-perception/image_common/issues/372>`_)
+* Support lifecycle node - NodeInterfaces (`#352 <https://github.com/ros-perception/image_common/issues/352>`_)
+* Contributors: Alejandro Hernández Cordero
+
+6.3.0 (2025-07-25)
+------------------
+* Deprecated rmw_qos_profile_t in favour of rclcpp::QoS (`#364 <https://github.com/ros-perception/image_common/issues/364>`_)
+* Fix cmake deprecation (`#367 <https://github.com/ros-perception/image_common/issues/367>`_)
+* Contributors: Alejandro Hernández Cordero, mosfet80
+
+6.2.2 (2025-07-01)
+------------------
+
+6.2.1 (2025-06-12)
+------------------
+
+6.2.0 (2025-04-28)
+------------------
+
+6.1.1 (2025-04-28)
+------------------
+
 6.1.0 (2024-12-20)
 ------------------
 

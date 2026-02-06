@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Open Source Robotics Foundation, Inc.
+// Copyright (c) 2024 Open Source Robotics Foundation, Inc.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,40 +29,43 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <string>
+#include <cstddef>
 #include <memory>
+#include <string>
+#include <thread>
 #include <vector>
 
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp/node.hpp"
+#include <image_transport/image_transport.hpp>
+
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp_lifecycle/lifecycle_node.hpp>
+
 #include "utils.hpp"
 
-#include "image_transport/image_transport.hpp"
-
-class TestPublisher : public ::testing::Test
+class TestPublisherLifecycle : public ::testing::Test
 {
 protected:
   void SetUp()
   {
-    node_ = rclcpp::Node::make_shared("node", "namespace");
+    node_ = rclcpp_lifecycle::LifecycleNode::make_shared("node", "namespace");
     std::vector<std::string> arguments{
       "--ros-args", "-r", "old_topic:=new_topic"
     };
     rclcpp::NodeOptions node_options;
     node_options.arguments(arguments);
 
-    node_remap_ = rclcpp::Node::make_shared(
+    node_remap_ = rclcpp_lifecycle::LifecycleNode::make_shared(
       "node_remap",
       "namespace",
       node_options
     );
   }
 
-  rclcpp::Node::SharedPtr node_;
-  rclcpp::Node::SharedPtr node_remap_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node_remap_;
 };
 
-TEST_F(TestPublisher, RemappedPublisher) {
+TEST_F(TestPublisherLifecycle, RemappedPublisher) {
   const size_t max_retries = 3;
   const size_t max_loops = 200;
   const std::chrono::milliseconds sleep_per_loop = std::chrono::milliseconds(10);
@@ -80,8 +83,7 @@ TEST_F(TestPublisher, RemappedPublisher) {
     }, "raw", rclcpp::SystemDefaultsQoS());
 
   // Publish
-  auto pub = image_transport::create_publisher(*node_, "new_topic",
-    rclcpp::SystemDefaultsQoS());
+  auto pub = image_transport::create_publisher(*node_, "new_topic", rclcpp::SystemDefaultsQoS());
 
   ASSERT_EQ("/namespace/new_topic", sub.getTopic());
   ASSERT_EQ("/namespace/new_topic", pub.getTopic());

@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Open Source Robotics Foundation, Inc.
+// Copyright (c) 2025 Open Source Robotics Foundation, Inc.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,12 +27,14 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <chrono>
+#include <cstddef>
 #include <memory>
+#include <thread>
 
 #include "gtest/gtest.h"
 
 #include "rclcpp/rclcpp.hpp"
-#include "rclcpp/node.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 
 #include "image_transport/image_transport.hpp"
 #include "sensor_msgs/msg/image.hpp"
@@ -43,7 +45,7 @@ using namespace std::chrono_literals;
 
 int total_images_received = 0;
 
-class MessagePassingTesting : public ::testing::Test
+class MessagePassingTestingLifecycle : public ::testing::Test
 {
 public:
   sensor_msgs::msg::Image::UniquePtr generate_random_image()
@@ -55,11 +57,11 @@ public:
 protected:
   void SetUp()
   {
-    node_ = rclcpp::Node::make_shared("test_message_passing");
+    node_ = rclcpp_lifecycle::LifecycleNode::make_shared("test_message_passing_lifecycle");
     total_images_received = 0;
   }
 
-  rclcpp::Node::SharedPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node_;
 };
 
 
@@ -69,7 +71,7 @@ void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
   total_images_received++;
 }
 
-TEST_F(MessagePassingTesting, one_message_passing)
+TEST_F(MessagePassingTestingLifecycle, one_message_passing)
 {
   const size_t max_retries = 3;
   const size_t max_loops = 200;
@@ -77,11 +79,10 @@ TEST_F(MessagePassingTesting, one_message_passing)
 
   rclcpp::executors::SingleThreadedExecutor executor;
 
-  auto pub = image_transport::create_publisher(*node_, "camera/image",
-    rclcpp::SystemDefaultsQoS());
+  auto pub = image_transport::create_publisher(*node_, "camera/image", rclcpp::SystemDefaultsQoS());
   auto sub =
-    image_transport::create_subscription(*node_, "camera/image", imageCallback, "raw",
-    rclcpp::SystemDefaultsQoS());
+    image_transport::create_subscription(*node_, "camera/image", imageCallback,
+    "raw", rclcpp::SystemDefaultsQoS());
 
   auto graph_interface = node_->get_node_graph_interface();
   auto base_node_interface = node_->get_node_base_interface();
@@ -111,7 +112,7 @@ TEST_F(MessagePassingTesting, one_message_passing)
   ASSERT_EQ(1, total_images_received);
 }
 
-TEST_F(MessagePassingTesting, one_camera_message_passing)
+TEST_F(MessagePassingTestingLifecycle, one_camera_message_passing)
 {
   const size_t max_retries = 3;
   const size_t max_loops = 200;

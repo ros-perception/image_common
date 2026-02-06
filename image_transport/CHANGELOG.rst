@@ -2,6 +2,57 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.4.4 (2025-12-23)
+------------------
+* properly shut down rclcpp after all tests complete. (`#384 <https://github.com/ros-perception/image_common/issues/384>`_)
+* Contributors: Tomoya Fujita
+
+6.4.3 (2025-11-24)
+------------------
+
+6.4.2 (2025-10-16)
+------------------
+* Fix QoS override tests (`#376 <https://github.com/ros-perception/image_common/issues/376>`_)
+* Contributors: Alejandro Hernández Cordero
+
+6.4.1 (2025-08-25)
+------------------
+* Fix rclcpp_lifecycle dependency (`#373 <https://github.com/ros-perception/image_common/issues/373>`_)
+* Contributors: Alejandro Hernández Cordero
+
+6.4.0 (2025-08-22)
+------------------
+* Fix compilation error with clang (`#372 <https://github.com/ros-perception/image_common/issues/372>`_)
+* Support lifecycle node - NodeInterfaces (`#352 <https://github.com/ros-perception/image_common/issues/352>`_)
+* Fixed clang build (`#371 <https://github.com/ros-perception/image_common/issues/371>`_)
+* Contributors: Alejandro Hernández Cordero
+
+6.3.0 (2025-07-25)
+------------------
+* fixed build (`#369 <https://github.com/ros-perception/image_common/issues/369>`_)
+* Deprecated rmw_qos_profile_t in favour of rclcpp::QoS (`#364 <https://github.com/ros-perception/image_common/issues/364>`_)
+* Removed deprecated code (`#356 <https://github.com/ros-perception/image_common/issues/356>`_)
+* Fix cmake deprecation (`#367 <https://github.com/ros-perception/image_common/issues/367>`_)
+* Contributors: Alejandro Hernández Cordero, mosfet80
+
+6.2.2 (2025-07-01)
+------------------
+* Fix topic resolution for plugins (`#365 <https://github.com/ros-perception/image_common/issues/365>`_)
+* Contributors: Alex Tyshka
+
+6.2.1 (2025-06-12)
+------------------
+
+6.2.0 (2025-04-28)
+------------------
+
+6.1.1 (2025-04-28)
+------------------
+* Remove windows warnings (`#350 <https://github.com/ros-perception/image_common/issues/350>`_)
+* Add `rclcpp::shutdown` (`#347 <https://github.com/ros-perception/image_common/issues/347>`_)
+* Use target_link_libraries instead of ament_target_dependencies (`#345 <https://github.com/ros-perception/image_common/issues/345>`_)
+* Contributors: Alejandro Hernández Cordero, Shane Loretz, Yuyuan Yuan
+
 6.1.0 (2024-12-20)
 ------------------
 

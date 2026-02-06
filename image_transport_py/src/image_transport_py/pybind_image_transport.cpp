@@ -107,7 +107,7 @@ PYBIND11_MODULE(_image_transport, m)
         std::thread execution_thread(spin_node);
         execution_thread.detach();
 
-        return image_transport::ImageTransport(node);
+        return image_transport::ImageTransport(*node);
       }),
     pybind11::arg("node_name"), pybind11::arg("image_transport") = "",
     pybind11::arg("launch_params_filepath") = "",

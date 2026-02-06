@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Willow Garage, Inc.
+// Copyright (c) 2025, Open Source Robotics Foundation, Inc.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,61 +26,31 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
-#define IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
+#ifndef IMAGE_TRANSPORT__NODE_INTERFACES_HPP_
+#define IMAGE_TRANSPORT__NODE_INTERFACES_HPP_
 
-#include <string>
-#include <utility>
+#include <rclcpp/node_interfaces/node_interfaces.hpp>
 
-#include "sensor_msgs/msg/image.hpp"
-
-#include "image_transport/simple_publisher_plugin.hpp"
-#include "image_transport/visibility_control.hpp"
+#include <rclcpp/node_interfaces/node_base_interface.hpp>
+#include <rclcpp/node_interfaces/node_logging_interface.hpp>
+#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
+#include <rclcpp/node_interfaces/node_timers_interface.hpp>
+#include <rclcpp/node_interfaces/node_topics_interface.hpp>
 
 namespace image_transport
 {
+using NodeBaseInterface = rclcpp::node_interfaces::NodeBaseInterface;
+using NodeParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
+using NodeLoggingInterface = rclcpp::node_interfaces::NodeLoggingInterface;
+using NodeTimersInterface = rclcpp::node_interfaces::NodeTimersInterface;
+using NodeTopicsInterface = rclcpp::node_interfaces::NodeTopicsInterface;
 
-/**
- * \brief The default PublisherPlugin.
- *
- * RawPublisher is a simple wrapper for ros::Publisher, publishing unaltered Image
- * messages on the base topic.
- */
-
-class RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
-{
-public:
-  virtual ~RawPublisher() {}
-
-  virtual std::string getTransportName() const
-  {
-    return "raw";
-  }
-
-  virtual bool supportsUniquePtrPub() const
-  {
-    return true;
-  }
-
-protected:
-  virtual void publish(const sensor_msgs::msg::Image & message, const PublisherT & publisher) const
-  {
-    publisher->publish(message);
-  }
-
-  virtual void publish(
-    sensor_msgs::msg::Image::UniquePtr message,
-    const PublisherT & publisher) const
-  {
-    publisher->publish(std::move(message));
-  }
-
-  virtual std::string getTopicToAdvertise(const std::string & base_topic) const
-  {
-    return base_topic;
-  }
-};
-
+using RequiredInterfaces = rclcpp::node_interfaces::NodeInterfaces<
+  NodeBaseInterface,
+  NodeParametersInterface,
+  NodeLoggingInterface,
+  NodeTimersInterface,
+  NodeTopicsInterface>;
 }  // namespace image_transport
 
-#endif  // IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
+#endif  // IMAGE_TRANSPORT__NODE_INTERFACES_HPP_

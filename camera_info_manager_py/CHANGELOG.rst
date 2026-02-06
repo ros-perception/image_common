@@ -2,6 +2,42 @@
 Changelog for package camera_info_manager_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.4.4 (2025-12-23)
+------------------
+
+6.4.3 (2025-11-24)
+------------------
+* Cleanup mislabeled BSD license (`#382 <https://github.com/ros-perception/image_common/issues/382>`_)
+* Contributors: Alejandro Hernández Cordero
+
+6.4.2 (2025-10-16)
+------------------
+
+6.4.1 (2025-08-25)
+------------------
+
+6.4.0 (2025-08-22)
+------------------
+
+6.3.0 (2025-07-25)
+------------------
+* fix setuptools deprecation (`#366 <https://github.com/ros-perception/image_common/issues/366>`_)
+* Contributors: mosfet80
+
+6.2.2 (2025-07-01)
+------------------
+
+6.2.1 (2025-06-12)
+------------------
+* Fix CameraInfo distortion coefficients and logger (`#360 <https://github.com/ros-perception/image_common/issues/360>`_)
+* Contributors: Rick-v-E
+
+6.2.0 (2025-04-28)
+------------------
+
+6.1.1 (2025-04-28)
+------------------
+
 6.1.0 (2024-12-20)
 ------------------
 * Cleanup of camera_info_manager_py. (`#340 <https://github.com/ros-perception/image_common/issues/340>`_)
