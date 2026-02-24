@@ -179,8 +179,7 @@ std::filesystem::path CameraInfoManager::getPackageFileName(const std::string & 
   std::string package(url.substr(prefix_len, rest - prefix_len));
 
   // Look up the ROS package path name.
-  std::filesystem::path pkgPath;
-  ament_index_cpp::get_package_share_path(package);
+  std::filesystem::path pkgPath = ament_index_cpp::get_package_share_path(package);
   if (pkgPath.empty()) {                // package not found?
     RCLCPP_WARN(logger_, "unknown package: %s (ignored)", package.c_str());
     return pkgPath;
