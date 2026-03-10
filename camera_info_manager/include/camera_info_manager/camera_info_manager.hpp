@@ -217,7 +217,7 @@ public:
     rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logger_interface,
     const std::string & cname = "camera", const std::string & url = "",
     rclcpp::QoS custom_qos = rclcpp::SystemDefaultsQoS(),
-    const std::string & ns = "~");
+    const std::string & ns = "");
 
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfo getCameraInfo(void);

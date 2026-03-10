@@ -65,6 +65,7 @@ if(BUILD_TESTING)
   target_link_libraries(${PROJECT_NAME}-unit_test
     ${PROJECT_NAME}
     ${sensor_msgs_TARGETS}
+    ament_index_cpp::ament_index_cpp
     rclcpp::rclcpp
   )
 

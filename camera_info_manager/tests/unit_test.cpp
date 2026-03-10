@@ -40,6 +40,7 @@
 #include <cstdlib>
 #include <string>
 
+#include "ament_index_cpp/get_package_share_path.hpp"
 #include "camera_info_manager/camera_info_manager.hpp"
 #include "rcpputils/env.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
@@ -57,6 +58,30 @@ protected:
   void SetUp()
   {
     node = rclcpp::Node::make_shared("camera_info_manager_test");
+    executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+    executor->add_node(node);
+    executor_thread = std::thread([this]() {executor->spin();});
+  }
+
+  void TearDown()
+  {
+    executor->cancel();
+    if (executor_thread.joinable()) {
+      executor_thread.join();
+    }
+  }
+
+  // Helper to construct CameraInfoManager without deprecated rclcpp::Node* API
+  camera_info_manager::CameraInfoManager make_cinfo(
+    const std::string & cname = "camera",
+    const std::string & url = "",
+    const std::string & ns = "")
+  {
+    return camera_info_manager::CameraInfoManager(
+      node->get_node_base_interface(),
+      node->get_node_services_interface(),
+      node->get_node_logging_interface(),
+      cname, url, rclcpp::SystemDefaultsQoS(), ns);
   }
 
   rclcpp::Node::SharedPtr node;
@@ -67,6 +92,8 @@ protected:
   std::string g_package_name_url = "package://" + g_package_name + "/tests/${NAME}.yaml";
   std::string g_default_url = "file://${ROS_HOME}/camera_info/${NAME}.yaml";
   std::string g_camera_name = "08144361026320a0";
+  std::thread executor_thread;
+  rclcpp::executors::SingleThreadedExecutor::SharedPtr executor;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -113,28 +140,21 @@ void delete_file(std::string filename)
 
 void delete_default_file(void)
 {
-  std::string ros_home("/tmp");
+  std::string ros_home = std::filesystem::temp_directory_path().string();
   std::string tmpFile(ros_home + "/camera_info/camera.yaml");
   std::filesystem::remove(tmpFile);
 }
 
-// void do_system(const std::string & command)
-// {
-//   int rc = system(command.c_str());
-//   if (rc) {
-//     std::cout << command << " returns " << rc;
-//   }
-// }
-
 void delete_tmp_camera_info_directory(void)
 {
-  std::filesystem::remove("/tmp/camera_info");
+  std::filesystem::remove_all(std::filesystem::temp_directory_path() / "camera_info");
 }
 
-// void make_tmp_camera_info_directory(void)
-// {
-//   do_system(std::string("mkdir -p /tmp/camera_info"));
-// }
+void make_tmp_camera_info_directory(void)
+{
+  std::filesystem::create_directories(
+    std::filesystem::temp_directory_path() / "camera_info");
+}
 
 // These data must match the contents of test_calibration.yaml.
 sensor_msgs::msg::CameraInfo expected_calibration(void)
@@ -197,28 +217,28 @@ bool set_calibration(
   std::shared_ptr<rclcpp::Node> node,
   const sensor_msgs::msg::CameraInfo & calib)
 {
-  auto client = node->create_client<sensor_msgs::srv::SetCameraInfo>("/set_camera_info");
+  auto client = node->create_client<sensor_msgs::srv::SetCameraInfo>("set_camera_info");
   while (!client->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
       RCLCPP_ERROR(node->get_logger(), "client interrupted while waiting for service to appear.");
       return 1;
     }
-    RCLCPP_INFO(node->get_logger(), "waiting for service to appear...");
+    RCLCPP_INFO(
+      node->get_logger(), "waiting for service to appear... %s",
+      client->get_service_name());
   }
 
   auto request = std::make_shared<sensor_msgs::srv::SetCameraInfo::Request>();
   request->camera_info = calib;
   auto result_future = client->async_send_request(request);
-  if (rclcpp::spin_until_future_complete(node, result_future) !=
-    rclcpp::FutureReturnCode::SUCCESS)
-  {
-    RCLCPP_ERROR(node->get_logger(), "service call failed :(");
+  // Wait for result; the node is already being spun by executor_thread
+  auto status = result_future.wait_for(std::chrono::seconds(5));
+  if (status != std::future_status::ready) {
+    RCLCPP_ERROR(node->get_logger(), "service call timed out");
     client->remove_pending_request(result_future);
     return false;
   }
-  result_future.get();
-
-  return true;
+  return result_future.get()->success;
 }
 
 // resolve URL string, result should be as expected
@@ -228,7 +248,11 @@ void check_url_substitution(
   const std::string & exp_url,
   const std::string & camera_name)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get(), camera_name, url);
+  camera_info_manager::CameraInfoManager cinfo(
+    node->get_node_base_interface(),
+    node->get_node_services_interface(),
+    node->get_node_logging_interface(),
+    camera_name, url, rclcpp::SystemDefaultsQoS());
   std::string sub_url = cinfo.resolveURL(url, camera_name);
   EXPECT_EQ(sub_url, exp_url);
 }
@@ -240,7 +264,7 @@ void check_url_substitution(
 // Test that valid camera names are accepted
 TEST_F(CameraInfoManagerTesting, validNames)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
 
   EXPECT_TRUE(cinfo.setCameraName(std::string("a")));
   EXPECT_TRUE(cinfo.setCameraName(std::string("1")));
@@ -257,7 +281,7 @@ TEST_F(CameraInfoManagerTesting, validNames)
 // Test that invalid camera names are rejected
 TEST_F(CameraInfoManagerTesting, invalidNames)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
 
   EXPECT_FALSE(cinfo.setCameraName(std::string("")));
   EXPECT_FALSE(cinfo.setCameraName(std::string("-21")));
@@ -269,7 +293,7 @@ TEST_F(CameraInfoManagerTesting, invalidNames)
 // Test that valid URLs are accepted
 TEST_F(CameraInfoManagerTesting, validURLs)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
 
   EXPECT_TRUE(cinfo.validateURL(std::string("")));
   EXPECT_TRUE(cinfo.validateURL(std::string("file:///")));
@@ -285,7 +309,7 @@ TEST_F(CameraInfoManagerTesting, validURLs)
 // Test that invalid URLs are rejected
 TEST_F(CameraInfoManagerTesting, invalidURLs)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
 
   EXPECT_FALSE(cinfo.validateURL(std::string("file://")));
   EXPECT_FALSE(cinfo.validateURL(std::string("flash:///")));
@@ -301,7 +325,7 @@ TEST_F(CameraInfoManagerTesting, uncalibrated)
 {
   delete_default_file();
 
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
   EXPECT_FALSE(cinfo.isCalibrated());
 
   sensor_msgs::msg::CameraInfo ci(cinfo.getCameraInfo());
@@ -314,11 +338,11 @@ TEST_F(CameraInfoManagerTesting, calibrated)
 {
   delete_default_file();
 
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  std::string current_path = std::filesystem::current_path().string();
-  std::string url("file://" + current_path + "/tests/test_calibration.yaml");
+  std::string pkgPath = ament_index_cpp::get_package_share_path("camera_info_manager").string();
+  std::string url("file://" + pkgPath + "/tests/test_calibration.yaml");
   EXPECT_TRUE(cinfo.loadCameraInfo(url));
   EXPECT_TRUE(cinfo.isCalibrated());
 
@@ -330,7 +354,7 @@ TEST_F(CameraInfoManagerTesting, calibrated)
 // Test ability to load calibrated CameraInfo from package
 TEST_F(CameraInfoManagerTesting, fromPackage)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
 
   std::cout << "g_package_url " << g_package_url << std::endl;
 
@@ -345,8 +369,7 @@ TEST_F(CameraInfoManagerTesting, fromPackage)
 // Test ability to access named calibrated CameraInfo from package
 TEST_F(CameraInfoManagerTesting, fromPackageWithName)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get(), g_test_name,
-    g_package_name_url);
+  auto cinfo = make_cinfo(g_test_name, g_package_name_url);
   EXPECT_TRUE(cinfo.isCalibrated());
 
   sensor_msgs::msg::CameraInfo ci(cinfo.getCameraInfo());
@@ -357,7 +380,7 @@ TEST_F(CameraInfoManagerTesting, fromPackageWithName)
 // Test load of unresolved "package:" URL files
 TEST_F(CameraInfoManagerTesting, unresolvedLoads)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
 
   EXPECT_FALSE(cinfo.loadCameraInfo(std::string("package://")));
   EXPECT_FALSE(cinfo.isCalibrated());
@@ -381,8 +404,7 @@ TEST_F(CameraInfoManagerTesting, nameChange)
   const std::string missing_file("no_such_file");
 
   // first declare using non-existent camera name
-  camera_info_manager::CameraInfoManager cinfo(node.get(), missing_file,
-    g_package_name_url);
+  auto cinfo = make_cinfo(missing_file, g_package_name_url);
   EXPECT_FALSE(cinfo.isCalibrated());
 
   // set name so it resolves to a test file that does exist
@@ -396,7 +418,7 @@ TEST_F(CameraInfoManagerTesting, nameChange)
 // Test load of invalid CameraInfo URLs
 TEST_F(CameraInfoManagerTesting, invalidLoads)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
 
   EXPECT_FALSE(cinfo.loadCameraInfo(std::string("flash:///")));
   EXPECT_FALSE(cinfo.isCalibrated());
@@ -412,7 +434,7 @@ TEST_F(CameraInfoManagerTesting, invalidLoads)
 // Test ability to set CameraInfo directly
 TEST_F(CameraInfoManagerTesting, setCameraInfo)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
 
   // issue calibration service request
   sensor_msgs::msg::CameraInfo exp(expected_calibration());
@@ -432,7 +454,7 @@ TEST_F(CameraInfoManagerTesting, setCameraInfo)
 // Test ability to set calibrated CameraInfo
 TEST_F(CameraInfoManagerTesting, setCalibration)
 {
-  camera_info_manager::CameraInfoManager cinfo(node.get());
+  auto cinfo = make_cinfo();
 
   // issue calibration service request
   sensor_msgs::msg::CameraInfo exp(expected_calibration());
@@ -448,12 +470,10 @@ TEST_F(CameraInfoManagerTesting, setCalibration)
   }
 
 #ifdef _WIN32
-  std::string localdata;
-  localdata = rcpputils::get_env_var("localdata");
-  delete_file(localdata + "/ros/camera_info/camera.yaml");
+  std::string userprofile = rcpputils::get_env_var("USERPROFILE");
+  delete_file(userprofile + "\\.ros\\camera_info\\camera.yaml");
 #else
-  std::string home;
-  home = rcpputils::get_env_var("HOME");
+  std::string home = rcpputils::get_env_var("HOME");
   delete_file(home + "/.ros/camera_info/camera.yaml");
 #endif
 }
@@ -464,14 +484,16 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationDefault)
   sensor_msgs::msg::CameraInfo exp(expected_calibration());
   bool success;
 
-  // Set ${ROS_HOME} to /tmp, then delete the /tmp/camera_info
+  // Set ${ROS_HOME} to temp dir, then delete the camera_info
   // directory and everything in it.
-  rcpputils::set_env_var("ROS_HOME", "/tmp");
+  std::string tmp_dir = std::filesystem::temp_directory_path().string();
+  rcpputils::set_env_var("ROS_HOME", tmp_dir.c_str());
   delete_tmp_camera_info_directory();
+  make_tmp_camera_info_directory();
 
   {
     // create instance to save calibrated data
-    camera_info_manager::CameraInfoManager cinfo(node.get());
+    auto cinfo = make_cinfo();
     EXPECT_FALSE(cinfo.isCalibrated());
 
     // issue calibration service request
@@ -483,7 +505,7 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationDefault)
   // and redundant failure messages
   if (success) {
     // create a new instance to load saved calibration
-    camera_info_manager::CameraInfoManager cinfo2(node.get());
+    auto cinfo2 = make_cinfo();
     EXPECT_TRUE(cinfo2.isCalibrated());
     if (cinfo2.isCalibrated()) {
       sensor_msgs::msg::CameraInfo ci(cinfo2.getCameraInfo());
@@ -499,21 +521,17 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationCameraName)
   sensor_msgs::msg::CameraInfo exp(expected_calibration());
   bool success;
 
-  // set ${ROS_HOME} to /tmp, delete the calibration file
-  rcpputils::set_env_var("ROS_HOME", "/tmp");
+  // set ${ROS_HOME} to temp dir, delete the calibration file
+  std::string tmp_dir = std::filesystem::temp_directory_path().string();
+  rcpputils::set_env_var("ROS_HOME", tmp_dir.c_str());
 
-  std::string tmpFile;
-#ifdef _WIN32
-  std::string localdata;
-  localdata = rcpputils::get_env_var("localdata");
-  tmpFile = std::string(localdata + "/camera_info/" + g_camera_name + ".yaml");
-#else
-  tmpFile = std::string("/tmp/camera_info/" + g_camera_name + ".yaml");
-#endif
+  std::string tmpFile = (std::filesystem::temp_directory_path() / "camera_info" /
+    (g_camera_name + ".yaml")).string();
   delete_file(tmpFile);
+  make_tmp_camera_info_directory();
   {
     // create instance to save calibrated data
-    camera_info_manager::CameraInfoManager cinfo(node.get(), g_camera_name);
+    auto cinfo = make_cinfo(g_camera_name);
     success = set_calibration(node, exp);
     EXPECT_TRUE(cinfo.isCalibrated());
   }
@@ -522,7 +540,7 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationCameraName)
   // and redundant failure messages
   if (success) {
     // create a new instance to load saved calibration
-    camera_info_manager::CameraInfoManager cinfo2(node.get());
+    auto cinfo2 = make_cinfo();
     std::string url = "file://" + tmpFile;
     cinfo2.loadCameraInfo(std::string(url));
     EXPECT_TRUE(cinfo2.isCalibrated());
@@ -582,8 +600,7 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationPackage)
 
   {
     // create instance to save calibrated data
-    camera_info_manager::CameraInfoManager cinfo(node.get(), g_camera_name,
-      g_package_url);
+    auto cinfo = make_cinfo(g_camera_name, g_package_url);
     success = set_calibration(node, exp);
     EXPECT_TRUE(cinfo.isCalibrated());
   }
@@ -592,8 +609,7 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationPackage)
   // and redundant failure messages
   if (success) {
     // create a new instance to load saved calibration
-    camera_info_manager::CameraInfoManager cinfo2(node.get(), g_camera_name,
-      g_package_url);
+    auto cinfo2 = make_cinfo(g_camera_name, g_package_url);
     EXPECT_TRUE(cinfo2.isCalibrated());
     if (cinfo2.isCalibrated()) {
       sensor_msgs::msg::CameraInfo ci(cinfo2.getCameraInfo());
@@ -608,28 +624,25 @@ TEST_F(CameraInfoManagerTesting, cameraName)
   std::string exp_url;
 
   // resolve a GUID camera name
-  name_url = +"/tests/${NAME}.yaml";
-  exp_url = +"/tests/" + g_camera_name + ".yaml";
+  name_url = "package://" + g_package_name + "/tests/${NAME}.yaml";
+  exp_url = "package://" + g_package_name + "/tests/" + g_camera_name + ".yaml";
   check_url_substitution(node, name_url, exp_url, g_camera_name);
 
   // substitute camera name "test"
-  name_url = +"/tests/${NAME}_calibration.yaml";
+  name_url = "package://" + g_package_name + "/tests/${NAME}_calibration.yaml";
   std::string test_name("test");
-  exp_url = +"/tests/" + test_name +
-    "_calibration.yaml";
+  exp_url = "package://" + g_package_name + "/tests/" + test_name + "_calibration.yaml";
   check_url_substitution(node, name_url, exp_url, test_name);
 
   // with an '_' in the name
   test_name = "camera_1024x768";
-  exp_url = +"/tests/" + test_name +
-    "_calibration.yaml";
+  exp_url = "package://" + g_package_name + "/tests/" + test_name + "_calibration.yaml";
   check_url_substitution(node, name_url, exp_url, test_name);
 
   // substitute empty camera name
-  name_url = +"/tests/${NAME}_calibration.yaml";
+  name_url = "package://" + g_package_name + "/tests/${NAME}_calibration.yaml";
   std::string empty_name("");
-  exp_url = +"/tests/" + empty_name +
-    "_calibration.yaml";
+  exp_url = "package://" + g_package_name + "/tests/" + empty_name + "_calibration.yaml";
   check_url_substitution(node, name_url, exp_url, empty_name);
 
   // substitute test camera calibration from this package
@@ -642,18 +655,17 @@ TEST_F(CameraInfoManagerTesting, rosHome)
   std::string exp_url;
 
   // resolve ${ROS_HOME} with environment variable undefined
-  rcpputils::set_env_var("ROS_HOME", "");
+  rcpputils::set_env_var("ROS_HOME", nullptr);
   name_url = "file://${ROS_HOME}/camera_info/test_camera.yaml";
 #ifdef _WIN32
-  std::string localdata;
-  localdata = rcpputils::get_env_var("localdata");
-  exp_url = "file://" + localdata + "/ros/camera_info/test_camera.yaml";
-  check_url_substitution(node, name_url, exp_url, g_camera_name);
+  std::string userprofile = rcpputils::get_env_var("USERPROFILE");
+  exp_url = "file://" + userprofile + "/.ros/camera_info/test_camera.yaml";
 #else
   std::string home = rcpputils::get_env_var("HOME");
   exp_url = "file://" + home + "/.ros/camera_info/test_camera.yaml";
-  check_url_substitution(node, name_url, exp_url, g_camera_name);
 #endif
+  check_url_substitution(node, name_url, exp_url, g_camera_name);
+
   // resolve ${ROS_HOME} with environment variable defined
   rcpputils::set_env_var("ROS_HOME", "/my/ros/home");
   name_url = "file://${ROS_HOME}/camera_info/test_camera.yaml";
@@ -663,9 +675,12 @@ TEST_F(CameraInfoManagerTesting, rosHome)
 
 TEST_F(CameraInfoManagerTesting, unmatchedDollarSigns)
 {
+  std::string tmp_dir =
+    (std::filesystem::temp_directory_path() / "").generic_string();
+
   // test for "$$" in the URL (NAME should be resolved)
-  std::string name_url("file:///tmp/$${NAME}.yaml");
-  std::string exp_url("file:///tmp/$" + g_camera_name + ".yaml");
+  std::string name_url("file://" + tmp_dir + "$${NAME}.yaml");
+  std::string exp_url("file://" + tmp_dir + "$" + g_camera_name + ".yaml");
   check_url_substitution(node, name_url, exp_url, g_camera_name);
 
   // test for "$" in middle of string
@@ -694,19 +709,19 @@ TEST_F(CameraInfoManagerTesting, invalidVariables)
   std::string name_url;
 
   // missing "{...}"
-  name_url = "file:///tmp/$NAME.yaml";
+  name_url = "file:///$NAME.yaml";
   check_url_substitution(node, name_url, name_url, g_camera_name);
 
   // invalid substitution variable name
-  name_url = "file:///tmp/${INVALID}/calibration.yaml";
+  name_url = "file:///${INVALID}/calibration.yaml";
   check_url_substitution(node, name_url, name_url, g_camera_name);
 
   // truncated substitution variable
-  name_url = "file:///tmp/${NAME";
+  name_url = "file:///${NAME";
   check_url_substitution(node, name_url, name_url, g_camera_name);
 
   // missing substitution variable
-  name_url = "file:///tmp/${}";
+  name_url = "file:///${}";
   check_url_substitution(node, name_url, name_url, g_camera_name);
 
   // no exception thrown for single "$" at end of string

@@ -384,14 +384,20 @@ std::string CameraInfoManager::resolveURL(
       // substitute $ROS_HOME
       std::string ros_home;
       std::string ros_home_env = rcpputils::get_env_var("ROS_HOME");
-      std::string home_env = rcpputils::get_env_var("HOME");
       if (!ros_home_env.empty()) {
         // use environment variable
         ros_home = ros_home_env;
-      } else if (!home_env.empty()) {
-        // use "$HOME/.ros"
-        ros_home = home_env;
-        ros_home += "/.ros";
+      } else {
+        // use "$HOME/.ros" on Linux/macOS, "%USERPROFILE%/.ros" on Windows
+#ifdef _WIN32
+        std::string home_env = rcpputils::get_env_var("USERPROFILE");
+#else
+        std::string home_env = rcpputils::get_env_var("HOME");
+#endif
+        if (!home_env.empty()) {
+          ros_home = home_env;
+          ros_home += "/.ros";
+        }
       }
       resolved += ros_home;
       dollar += 10;
