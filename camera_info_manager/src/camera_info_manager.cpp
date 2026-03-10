@@ -185,7 +185,8 @@ std::filesystem::path CameraInfoManager::getPackageFileName(const std::string & 
     return pkgPath;
   } else {
     // Construct file name from package location and remainder of URL.
-    return std::filesystem::path(pkgPath.string() + url.substr(rest));
+    // url.substr(rest) starts with '/', use relative() to compose safely.
+    return pkgPath / std::filesystem::path(url.substr(rest + 1));
   }
 }
 
@@ -254,7 +255,8 @@ bool CameraInfoManager::loadCalibration(
       }
     case URL_file:
       {
-        success = loadCalibrationFile(resURL.substr(7), cname);
+        success = loadCalibrationFile(
+          std::filesystem::path(resURL.substr(7)), cname);
         break;
       }
     case URL_flash:
@@ -385,8 +387,8 @@ std::string CameraInfoManager::resolveURL(
       std::string ros_home;
       std::string ros_home_env = rcpputils::get_env_var("ROS_HOME");
       if (!ros_home_env.empty()) {
-        // use environment variable
-        ros_home = ros_home_env;
+        // use environment variable (already a path, forward-slashes preferred)
+        ros_home = std::filesystem::path(ros_home_env).generic_string();
       } else {
         // use "$HOME/.ros" on Linux/macOS, "%USERPROFILE%/.ros" on Windows
 #ifdef _WIN32
@@ -395,8 +397,7 @@ std::string CameraInfoManager::resolveURL(
         std::string home_env = rcpputils::get_env_var("HOME");
 #endif
         if (!home_env.empty()) {
-          ros_home = home_env;
-          ros_home += "/.ros";
+          ros_home = (std::filesystem::path(home_env) / ".ros").generic_string();
         }
       }
       resolved += ros_home;
@@ -485,7 +486,8 @@ CameraInfoManager::saveCalibration(
       }
     case URL_file:
       {
-        success = saveCalibrationFile(new_info, resURL.substr(7), cname);
+        success = saveCalibrationFile(
+          new_info, std::filesystem::path(resURL.substr(7)), cname);
         break;
       }
     case URL_package:

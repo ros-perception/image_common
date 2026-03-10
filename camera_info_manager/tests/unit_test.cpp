@@ -357,7 +357,8 @@ TEST_F(CameraInfoManagerTesting, calibrated)
   auto cinfo = make_cinfo();
   EXPECT_FALSE(cinfo.isCalibrated());
 
-  std::string pkgPath = ament_index_cpp::get_package_share_path("camera_info_manager").string();
+  std::string pkgPath =
+    ament_index_cpp::get_package_share_path("camera_info_manager").generic_string();
   std::string url("file://" + pkgPath + "/tests/test_calibration.yaml");
   EXPECT_TRUE(cinfo.loadCameraInfo(url));
   EXPECT_TRUE(cinfo.isCalibrated());
@@ -486,12 +487,11 @@ TEST_F(CameraInfoManagerTesting, setCalibration)
   }
 
 #ifdef _WIN32
-  std::string userprofile = rcpputils::get_env_var("USERPROFILE");
-  delete_file(userprofile + "\\.ros\\camera_info\\camera.yaml");
+  std::filesystem::path home_path(rcpputils::get_env_var("USERPROFILE"));
 #else
-  std::string home = rcpputils::get_env_var("HOME");
-  delete_file(home + "/.ros/camera_info/camera.yaml");
+  std::filesystem::path home_path(rcpputils::get_env_var("HOME"));
 #endif
+  delete_file((home_path / ".ros" / "camera_info" / "camera.yaml").string());
 }
 
 // Test ability to save calibrated CameraInfo in default URL
