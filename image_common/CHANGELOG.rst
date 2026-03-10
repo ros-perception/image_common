@@ -2,6 +2,38 @@
 Changelog for package image_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.4.5 (2026-02-25)
+------------------
+* Update BSD licenses to SPDX identifier (`#389 <https://github.com/ros-perception/image_common/issues/389>`_)
+  Co-authored-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>
+* Contributors: Garrett Brown
+
+6.4.4 (2025-12-23)
+------------------
+
+6.4.3 (2025-11-24)
+------------------
+
+6.4.2 (2025-10-16)
+------------------
+
+6.4.1 (2025-08-25)
+------------------
+
+6.4.0 (2025-08-22)
+------------------
+
+6.3.0 (2025-07-25)
+------------------
+* Fix cmake deprecation (`#367 <https://github.com/ros-perception/image_common/issues/367>`_)
+* Contributors: mosfet80
+
+6.2.2 (2025-07-01)
+------------------
+
+6.2.1 (2025-06-12)
+------------------
+
 6.2.0 (2025-04-28)
 ------------------
 

@@ -16,7 +16,7 @@
   <maintainer email="alejandro@openrobotics.org">Alejandro Hernandez Cordero</maintainer>
   <maintainer email="geoff@openrobotics.org">Geoffrey Biggs</maintainer>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <url type="website">http://ros.org/wiki/polled_camera</url>
   <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>

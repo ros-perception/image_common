@@ -36,6 +36,7 @@
 #include "rclcpp/node.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/single_subscriber_publisher.hpp"
 #include "image_transport/visibility_control.hpp"
 
@@ -71,13 +72,30 @@ public:
   /**
    * \brief Advertise a topic, simple version.
    */
+  [[deprecated("Use advertise(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) instead")]]
   void advertise(
-    rclcpp::Node * nh,
+    rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    advertiseImpl(nh, base_topic, custom_qos, options);
+    std::string image_topic = node->get_node_topics_interface()->resolve_topic_name(base_topic);
+    advertiseImpl(*node, image_topic,
+        rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), options);
+  }
+
+  /**
+   * \brief Advertise a topic, simple version.
+   */
+  void advertise(
+    RequiredInterfaces node_interfaces,
+    const std::string & base_topic,
+    rclcpp::QoS custom_qos,
+    rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
+  {
+    std::string image_topic =
+      node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
+    advertiseImpl(node_interfaces, image_topic, custom_qos, options);
   }
 
   /**
@@ -155,10 +173,25 @@ protected:
   /**
    * \brief Advertise a topic. Must be implemented by the subclass.
    */
+  [[deprecated("Use advertiseImpl(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
+    "instead")]]
   virtual void advertiseImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
+    rclcpp::PublisherOptions options)
+  {
+    advertiseImpl(*node, base_topic,
+      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), options);
+  }
+
+  /**
+   * \brief Advertise a topic. Must be implemented by the subclass.
+   */
+  virtual void advertiseImpl(
+    RequiredInterfaces node_interfaces,
+    const std::string & base_topic,
+    rclcpp::QoS custom_qos,
     rclcpp::PublisherOptions options) = 0;
 };
 

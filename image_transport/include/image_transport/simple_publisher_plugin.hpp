@@ -113,18 +113,36 @@ public:
   }
 
 protected:
+  [[deprecated("Use advertiseImpl(RequiredInterfaces node_interfaces, ...) instead.")]]
   void advertiseImpl(
     rclcpp::Node * node,
     const std::string & base_topic,
     rmw_qos_profile_t custom_qos,
     rclcpp::PublisherOptions options) override
   {
+    advertiseImpl(
+      *node,
+      base_topic,
+      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
+      options);
+  }
+
+  void advertiseImpl(
+    RequiredInterfaces node_interfaces,
+    const std::string & base_topic,
+    rclcpp::QoS custom_qos,
+    rclcpp::PublisherOptions options) override
+  {
     std::string transport_topic = getTopicToAdvertise(base_topic);
-    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node);
+    simple_impl_ = std::make_unique<SimplePublisherPluginImpl>(node_interfaces);
 
     RCLCPP_DEBUG(simple_impl_->logger_, "getTopicToAdvertise: %s", transport_topic.c_str());
-    auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos);
-    simple_impl_->pub_ = node->create_publisher<M>(transport_topic, qos, options);
+    auto parameters_interface = node_interfaces.get_node_parameters_interface();
+    auto topics_interface = node_interfaces.get_node_topics_interface();
+    simple_impl_->pub_ = rclcpp::create_publisher<M>(
+      parameters_interface,
+      topics_interface,
+      transport_topic, custom_qos, options);
   }
 
   typedef typename rclcpp::Publisher<M>::SharedPtr PublisherT;
@@ -133,31 +151,13 @@ protected:
   typedef std::function<void (const M &)> PublishFn;
 
   /**
-   * \brief Publish an image using the specified publish function.
-   *
-   * \deprecated Use publish(const sensor_msgs::msg::Image&, const PublisherT&) instead.
-   *
-   * The PublishFn publishes the transport-specific message type. This indirection allows
-   * SimpleSubscriberPlugin to use this function for both normal broadcast publishing and
-   * single subscriber publishing (in subscription callbacks).
-   */
-  virtual void publish(
-    const sensor_msgs::msg::Image & /*message*/,
-    const PublishFn & /*publish_fn*/) const
-  {
-    throw std::logic_error(
-      "publish(const sensor_msgs::msg::Image&, const PublishFn&) is not implemented.");
-  }
-
-  /**
    * \brief Publish an image using the specified publisher.
    */
   virtual void publish(
     const sensor_msgs::msg::Image & message,
     const PublisherT & publisher) const
   {
-    // Fallback to old, deprecated method
-    publish(message, bindInternalPublisher(publisher.get()));
+    publish(message, publisher);
   }
 
   /**
@@ -189,13 +189,13 @@ protected:
 private:
   struct SimplePublisherPluginImpl
   {
-    explicit SimplePublisherPluginImpl(rclcpp::Node * node)
-    : node_(node),
-      logger_(node->get_logger())
+    explicit SimplePublisherPluginImpl(RequiredInterfaces required_interfaces)
+    : required_interfaces_(required_interfaces),
+      logger_(required_interfaces.get_node_logging_interface()->get_logger())
     {
     }
 
-    rclcpp::Node * node_;
+    RequiredInterfaces required_interfaces_;
     rclcpp::Logger logger_;
     PublisherT pub_;
   };

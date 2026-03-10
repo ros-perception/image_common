@@ -34,6 +34,7 @@
 
 #include "rclcpp/node.hpp"
 
+#include "image_transport/node_interfaces.hpp"
 #include "image_transport/visibility_control.hpp"
 
 namespace image_transport
@@ -57,6 +58,21 @@ public:
    * @param default_transport Preferred transport to use
    * @param parameter_name The name of the transport parameter
    */
+  IMAGE_TRANSPORT_PUBLIC
+  TransportHints(
+    RequiredInterfaces node_interfaces,
+    const std::string & default_transport = "raw",
+    const std::string & parameter_name = "image_transport")
+  {
+    if (node_interfaces.get_node_parameters_interface()->has_parameter(parameter_name)) {
+      transport_ =
+        node_interfaces.get_node_parameters_interface()->get_parameter(parameter_name).as_string();
+    } else {
+      transport_ = default_transport;
+    }
+  }
+
+  [[deprecated("Use TransportHints(RequiredInterfaces node_interfaces, ...) instead.")]]
   IMAGE_TRANSPORT_PUBLIC
   TransportHints(
     const rclcpp::Node * node,

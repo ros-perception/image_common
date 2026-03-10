@@ -2,13 +2,13 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>image_common</name>
-  <version>6.2.0</version>
+  <version>6.4.5</version>
   <description>Common code for working with images in ROS.</description>
 
   <maintainer email="alejandro@openrobotics.org">Alejandro Hernandez Cordero</maintainer>
   <maintainer email="geoff@openrobotics.org">Geoffrey Biggs</maintainer>
 
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <url type="website">http://www.ros.org/wiki/image_common</url>
   <url type="bugtracker">https://github.com/ros-perception/image_common/issues</url>

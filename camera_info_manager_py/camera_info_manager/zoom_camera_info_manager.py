@@ -1,33 +1,30 @@
 # Copyright 2016, Martin Pecka
 # All rights reserved.
 #
-# Software License Agreement (BSD License 2.0)
-#
 # Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
+# modification, are permitted provided that the following conditions are met:
 #
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above
-#    copyright notice, this list of conditions and the following
-#    disclaimer in the documentation and/or other materials provided
-#    with the distribution.
-#  * Neither the name of Martin Pecka nor the names of its
-#    contributors may be used to endorse or promote products derived
-#    from this software without specific prior written permission.
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in the
+#      documentation and/or other materials provided with the distribution.
+#
+#    * Neither the name of the copyright holder nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
 """
@@ -206,7 +203,7 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
             return
 
         self.camera_info = deepcopy(self._loaded_camera_info)
-        self.camera_info.K[8] = 1.0
+        self.camera_info.k[8] = 1.0
 
         aspect_ratio = float(self._image_height) / self._image_width
         zoom_percentage = float(self._zoom - self._min_zoom) / float(
@@ -217,33 +214,33 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
             (self._max_fov - self._min_fov) * (1 - zoom_percentage) + self._min_fov
         )
         horizontal_focal_length_in_px = self._image_width / (2 * tan(horizontal_fov / 2))
-        self.camera_info.K[0] = horizontal_focal_length_in_px
+        self.camera_info.k[0] = horizontal_focal_length_in_px
 
         vertical_fov = horizontal_fov * aspect_ratio
         vertical_focal_length_in_px = self._image_height / (2 * tan(vertical_fov / 2))
-        self.camera_info.K[4] = vertical_focal_length_in_px
+        self.camera_info.k[4] = vertical_focal_length_in_px
 
         self.camera_info.width = self._image_width
         self.camera_info.height = self._image_height
 
-        if self._loaded_camera_info.K[2] != 0.0:
+        if self._loaded_camera_info.k[2] != 0.0:
             # if a standard calibration is available, just scale the principal point
             # offset with the resolution
-            self.camera_info.K[2] = (
+            self.camera_info.k[2] = (
                 float(self._image_width)
                 / self._loaded_camera_info.width
-                * self._loaded_camera_info.K[2]
+                * self._loaded_camera_info.k[2]
             )
-            self.camera_info.K[5] = (
+            self.camera_info.k[5] = (
                 float(self._image_height)
                 / self._loaded_camera_info.height
-                * self._loaded_camera_info.K[5]
+                * self._loaded_camera_info.k[5]
             )
         else:
             # if no calibration is available, just set the principal point to lie in
             # the middle of the image
-            self.camera_info.K[2] = self._image_width / 2.0
-            self.camera_info.K[5] = self._image_height / 2.0
+            self.camera_info.k[2] = self._image_width / 2.0
+            self.camera_info.k[5] = self._image_height / 2.0
 
 
 class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
@@ -316,28 +313,28 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
 
         # linearly interpolate all the matrices
         self.camera_info = deepcopy(self._camera_infos[closest_lower_zoom])
-        self.camera_info.K = [
+        self.camera_info.k = [
             (ratio * low + (1 - ratio) * high)
             for (low, high) in zip(
-                self._camera_infos[closest_lower_zoom].K, self._camera_infos[closest_higher_zoom].K
+                self._camera_infos[closest_lower_zoom].k, self._camera_infos[closest_higher_zoom].k
             )
         ]
-        self.camera_info.P = [
+        self.camera_info.p = [
             (ratio * low + (1 - ratio) * high)
             for (low, high) in zip(
-                self._camera_infos[closest_lower_zoom].P, self._camera_infos[closest_higher_zoom].P
+                self._camera_infos[closest_lower_zoom].p, self._camera_infos[closest_higher_zoom].p
             )
         ]
-        self.camera_info.R = [
+        self.camera_info.r = [
             (ratio * low + (1 - ratio) * high)
             for (low, high) in zip(
-                self._camera_infos[closest_lower_zoom].R, self._camera_infos[closest_higher_zoom].R
+                self._camera_infos[closest_lower_zoom].r, self._camera_infos[closest_higher_zoom].r
             )
         ]
-        self.camera_info.D = [
+        self.camera_info.d = [
             (ratio * low + (1 - ratio) * high)
             for (low, high) in zip(
-                self._camera_infos[closest_lower_zoom].D, self._camera_infos[closest_higher_zoom].D
+                self._camera_infos[closest_lower_zoom].d, self._camera_infos[closest_higher_zoom].d
             )
         ]
 

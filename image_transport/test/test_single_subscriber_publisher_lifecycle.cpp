@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Willow Garage, Inc.
+// Copyright (c) 2024 Open Source Robotics Foundation, Inc.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,61 +26,70 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
-#define IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
-
+#include <cstddef>
+#include <functional>
+#include <memory>
 #include <string>
-#include <utility>
 
+#include "gtest/gtest.h"
+
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
-#include "image_transport/simple_publisher_plugin.hpp"
-#include "image_transport/visibility_control.hpp"
+#include "image_transport/single_subscriber_publisher.hpp"
 
-namespace image_transport
+#include "utils.hpp"
+
+class TestPublisherLifecycle : public ::testing::Test
 {
-
-/**
- * \brief The default PublisherPlugin.
- *
- * RawPublisher is a simple wrapper for ros::Publisher, publishing unaltered Image
- * messages on the base topic.
- */
-
-class RawPublisher : public SimplePublisherPlugin<sensor_msgs::msg::Image>
-{
-public:
-  virtual ~RawPublisher() {}
-
-  virtual std::string getTransportName() const
-  {
-    return "raw";
-  }
-
-  virtual bool supportsUniquePtrPub() const
-  {
-    return true;
-  }
-
 protected:
-  virtual void publish(const sensor_msgs::msg::Image & message, const PublisherT & publisher) const
+  static constexpr const char * caller_id = "node";
+  static constexpr const char * topic = "/topic";
+
+
+  static void SetUpTestCase()
   {
-    publisher->publish(message);
+    rclcpp::init(0, nullptr);
   }
 
-  virtual void publish(
-    sensor_msgs::msg::Image::UniquePtr message,
-    const PublisherT & publisher) const
+  void SetUp()
   {
-    publisher->publish(std::move(message));
+    node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("image_transport", "/ns");
   }
 
-  virtual std::string getTopicToAdvertise(const std::string & base_topic) const
+  void TearDown()
   {
-    return base_topic;
+    node.reset();
   }
+
+  static void TearDownTestSuite()
+  {
+    rclcpp::shutdown();
+  }
+
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node;
 };
 
-}  // namespace image_transport
+TEST_F(TestPublisherLifecycle, construction_and_destruction) {
+  auto get_num_subscribers = []() -> size_t {return 0;};
+  auto publish_fn = [](const sensor_msgs::msg::Image & /*image*/) {};
 
-#endif  // IMAGE_TRANSPORT__RAW_PUBLISHER_HPP_
+  image_transport::SingleSubscriberPublisher ssp(caller_id, topic,
+    get_num_subscribers, publish_fn);
+}
+
+TEST_F(TestPublisherLifecycle, getNumSubscribers) {
+  size_t nSub = 0;
+
+  auto get_num_subscribers = [&nSub]() -> size_t {return nSub;};
+  auto publish_fn = [](const sensor_msgs::msg::Image & /*image*/) {};
+
+  image_transport::SingleSubscriberPublisher ssp(caller_id, topic,
+    get_num_subscribers, publish_fn);
+
+  nSub = 0;
+  ASSERT_EQ(ssp.getNumSubscribers(), 0u);
+  nSub = 1;
+  ASSERT_EQ(ssp.getNumSubscribers(), 1u);
+}

@@ -30,6 +30,7 @@
 #ifndef CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_HPP_
 #define CAMERA_INFO_MANAGER__CAMERA_INFO_MANAGER_HPP_
 
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -181,6 +182,8 @@ using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
 class CameraInfoManager
 {
 public:
+  [[deprecated("Use CameraInfoManager(rclcpp::node_interfaces::NodeBaseInterface::SharedPtr, ...)"
+    " instead.")]]
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfoManager(
     rclcpp::Node * node,
@@ -188,6 +191,8 @@ public:
     const std::string & url = "",
     const std::string & ns = "");
 
+  [[deprecated("Use CameraInfoManager(rclcpp::node_interfaces::NodeBaseInterface::SharedPtr, ...)"
+    " instead.")]]
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfoManager(
     rclcpp_lifecycle::LifecycleNode * node,
@@ -195,6 +200,7 @@ public:
     const std::string & url = "",
     const std::string & ns = "");
 
+  [[deprecated("Use CameraInfoManager(..., rclcpp::QoS, ...) instead")]]
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfoManager(
     rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
@@ -203,6 +209,15 @@ public:
     const std::string & cname = "camera", const std::string & url = "",
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     const std::string & ns = "");
+
+  CAMERA_INFO_MANAGER_PUBLIC
+  CameraInfoManager(
+    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
+    rclcpp::node_interfaces::NodeServicesInterface::SharedPtr node_services_interface,
+    rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logger_interface,
+    const std::string & cname = "camera", const std::string & url = "",
+    rclcpp::QoS custom_qos = rclcpp::SystemDefaultsQoS(),
+    const std::string & ns = "~");
 
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfo getCameraInfo(void);
@@ -241,14 +256,14 @@ private:
   } url_type_t;
 
   // private methods
-  std::string getPackageFileName(const std::string & url);
+  std::filesystem::path getPackageFileName(const std::string & url);
 
   bool loadCalibration(
     const std::string & url,
     const std::string & cname);
 
   bool loadCalibrationFile(
-    const std::string & filename,
+    const std::filesystem::path & filename,
     const std::string & cname);
 
   url_type_t parseURL(const std::string & url);
@@ -260,7 +275,7 @@ private:
 
   bool saveCalibrationFile(
     const CameraInfo & new_info,
-    const std::string & filename,
+    const std::filesystem::path & filename,
     const std::string & cname);
 
   void setCameraInfoService(

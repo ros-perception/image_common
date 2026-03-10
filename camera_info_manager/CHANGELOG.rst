@@ -2,6 +2,45 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.4.5 (2026-02-25)
+------------------
+* Use get_package_share_path (`#391 <https://github.com/ros-perception/image_common/issues/391>`_)
+* Update BSD licenses to SPDX identifier (`#389 <https://github.com/ros-perception/image_common/issues/389>`_)
+  Co-authored-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>
+* Contributors: Alejandro Hernández Cordero, Garrett Brown
+
+6.4.4 (2025-12-23)
+------------------
+* Updated deprecated ament_index_cpp API (`#388 <https://github.com/ros-perception/image_common/issues/388>`_)
+* Contributors: Alejandro Hernández Cordero
+
+6.4.3 (2025-11-24)
+------------------
+
+6.4.2 (2025-10-16)
+------------------
+
+6.4.1 (2025-08-25)
+------------------
+
+6.4.0 (2025-08-22)
+------------------
+* Fix compilation error with clang (`#372 <https://github.com/ros-perception/image_common/issues/372>`_)
+* Support lifecycle node - NodeInterfaces (`#352 <https://github.com/ros-perception/image_common/issues/352>`_)
+* Contributors: Alejandro Hernández Cordero
+
+6.3.0 (2025-07-25)
+------------------
+* Deprecated rmw_qos_profile_t in favour of rclcpp::QoS (`#364 <https://github.com/ros-perception/image_common/issues/364>`_)
+* Fix cmake deprecation (`#367 <https://github.com/ros-perception/image_common/issues/367>`_)
+* Contributors: Alejandro Hernández Cordero, mosfet80
+
+6.2.2 (2025-07-01)
+------------------
+
+6.2.1 (2025-06-12)
+------------------
+
 6.2.0 (2025-04-28)
 ------------------
 

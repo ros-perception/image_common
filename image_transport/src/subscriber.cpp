@@ -45,8 +45,8 @@ namespace image_transport
 
 struct Subscriber::Impl
 {
-  Impl(rclcpp::Node * node, SubLoaderPtr loader)
-  : logger_(node->get_logger()),
+  Impl(RequiredInterfaces required_interfaces, SubLoaderPtr loader)
+  : logger_(required_interfaces.get_node_logging_interface()->get_logger()),
     loader_(loader),
     unsubscribed_(false)
   {
@@ -88,7 +88,21 @@ Subscriber::Subscriber(
   const std::string & transport,
   rmw_qos_profile_t custom_qos,
   rclcpp::SubscriptionOptions options)
-: impl_(std::make_shared<Impl>(node, loader))
+: Subscriber(*node, base_topic, callback, loader, transport,
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
+    options)
+{
+}
+
+Subscriber::Subscriber(
+  RequiredInterfaces node_interfaces,
+  const std::string & base_topic,
+  const Callback & callback,
+  SubLoaderPtr loader,
+  const std::string & transport,
+  rclcpp::QoS custom_qos,
+  rclcpp::SubscriptionOptions options)
+: impl_(std::make_shared<Impl>(node_interfaces, loader))
 {
   // Load the plugin for the chosen transport.
   impl_->lookup_name_ = SubscriberPlugin::getLookupName(transport);
@@ -98,7 +112,8 @@ Subscriber::Subscriber(
     throw TransportLoadException(impl_->lookup_name_, e.what());
   }
 
-  std::string image_topic = node->get_node_topics_interface()->resolve_topic_name(base_topic);
+  std::string image_topic =
+    node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
 
   // Try to catch if user passed in a transport-specific topic as base_topic.
 
@@ -123,7 +138,7 @@ Subscriber::Subscriber(
 
   // Tell plugin to subscribe.
   RCLCPP_DEBUG(impl_->logger_, "Subscribing to: %s\n", image_topic.c_str());
-  impl_->subscriber_->subscribe(node, image_topic, callback, custom_qos, options);
+  impl_->subscriber_->subscribe(node_interfaces, image_topic, callback, custom_qos, options);
 }
 
 std::string Subscriber::getTopic() const
