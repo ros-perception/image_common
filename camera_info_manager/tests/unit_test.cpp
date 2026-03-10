@@ -140,9 +140,25 @@ void delete_file(std::string filename)
 
 void delete_default_file(void)
 {
-  std::string ros_home = std::filesystem::temp_directory_path().string();
-  std::string tmpFile(ros_home + "/camera_info/camera.yaml");
-  std::filesystem::remove(tmpFile);
+  std::filesystem::path ros_home;
+  std::string ros_home_env = rcpputils::get_env_var("ROS_HOME");
+  if (!ros_home_env.empty()) {
+    ros_home = ros_home_env;
+  } else {
+#ifdef _WIN32
+    std::string home_env = rcpputils::get_env_var("USERPROFILE");
+#else
+    std::string home_env = rcpputils::get_env_var("HOME");
+#endif
+    if (!home_env.empty()) {
+      ros_home = std::filesystem::path(home_env) / ".ros";
+    }
+  }
+
+  if (ros_home.empty()) {
+    return;
+  }
+  std::filesystem::remove(ros_home / "camera_info" / "camera.yaml");
 }
 
 void delete_tmp_camera_info_directory(void)
@@ -486,7 +502,8 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationDefault)
 
   // Set ${ROS_HOME} to temp dir, then delete the camera_info
   // directory and everything in it.
-  std::string tmp_dir = std::filesystem::temp_directory_path().string();
+  std::string tmp_dir =
+    std::filesystem::temp_directory_path().generic_string();
   rcpputils::set_env_var("ROS_HOME", tmp_dir.c_str());
   delete_tmp_camera_info_directory();
   make_tmp_camera_info_directory();
@@ -522,11 +539,12 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationCameraName)
   bool success;
 
   // set ${ROS_HOME} to temp dir, delete the calibration file
-  std::string tmp_dir = std::filesystem::temp_directory_path().string();
+  std::string tmp_dir =
+    std::filesystem::temp_directory_path().generic_string();
   rcpputils::set_env_var("ROS_HOME", tmp_dir.c_str());
 
   std::string tmpFile = (std::filesystem::temp_directory_path() / "camera_info" /
-    (g_camera_name + ".yaml")).string();
+    (g_camera_name + ".yaml")).generic_string();
   delete_file(tmpFile);
   make_tmp_camera_info_directory();
   {
