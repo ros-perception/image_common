@@ -676,12 +676,13 @@ TEST_F(CameraInfoManagerTesting, rosHome)
   rcpputils::set_env_var("ROS_HOME", nullptr);
   name_url = "file://${ROS_HOME}/camera_info/test_camera.yaml";
 #ifdef _WIN32
-  std::string userprofile = rcpputils::get_env_var("USERPROFILE");
-  exp_url = "file://" + userprofile + "/.ros/camera_info/test_camera.yaml";
+  std::string home = rcpputils::get_env_var("USERPROFILE");
 #else
   std::string home = rcpputils::get_env_var("HOME");
-  exp_url = "file://" + home + "/.ros/camera_info/test_camera.yaml";
 #endif
+  // resolveURL uses generic_string() so forward slashes are always used in URLs
+  exp_url = "file://" +
+    (std::filesystem::path(home) / ".ros" / "camera_info" / "test_camera.yaml").generic_string();
   check_url_substitution(node, name_url, exp_url, g_camera_name);
 
   // resolve ${ROS_HOME} with environment variable defined
