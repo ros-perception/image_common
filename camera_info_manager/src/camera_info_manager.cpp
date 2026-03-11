@@ -440,7 +440,11 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string & ur
     };
 
 
-  if (iequals(url.substr(0, 8), "file:///")) {
+  // Accept both "file:///" (Unix absolute path) and "file://X:/" (Windows
+  // drive letter), but reject bare "file://" with nothing after it.
+  if (iequals(url.substr(0, 7), "file://") && url.length() > 7 &&
+    (url[7] == '/' || (url.length() > 9 && std::isalpha(url[7]) && url[8] == ':')))
+  {
     return URL_file;
   }
   if (iequals(url.substr(0, 9), "flash:///")) {
@@ -538,7 +542,6 @@ CameraInfoManager::saveCalibrationFile(
 
   // Directory exists. Permissions might still be bad.
   // Currently, writeCalibration() always returns true no matter what
-  // (ros-pkg ticket #5010).
   return writeCalibration(filename.string(), cname, new_info);
 }
 
