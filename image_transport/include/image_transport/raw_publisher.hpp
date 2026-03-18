@@ -54,7 +54,8 @@ public:
 
   virtual std::string getTransportName() const
   {
-    return "raw";
+    const auto & stored = getStoredTransportName();
+    return stored.empty() ? "raw" : stored;
   }
 
   virtual bool supportsUniquePtrPub() const

@@ -62,6 +62,18 @@ public:
   virtual std::string getTransportName() const = 0;
 
   /**
+   * \brief Set the transport name, sourced from the plugin manifest XML.
+   *
+   * Plugins that delegate to getStoredTransportName() in their getTransportName()
+   * implementation will use this value, falling back to their compiled-in default
+   * when the stored name is empty.
+   */
+  void setTransportName(const std::string & name)
+  {
+    transport_name_ = name;
+  }
+
+  /**
    * \brief Check whether this plugin supports publishing using UniquePtr.
    */
   virtual bool supportsUniquePtrPub() const
@@ -193,6 +205,15 @@ protected:
     const std::string & base_topic,
     rclcpp::QoS custom_qos,
     rclcpp::PublisherOptions options) = 0;
+
+  /// Return the transport name stored via setTransportName(), or empty string if not set.
+  const std::string & getStoredTransportName() const
+  {
+    return transport_name_;
+  }
+
+private:
+  std::string transport_name_;
 };
 
 }  // namespace image_transport

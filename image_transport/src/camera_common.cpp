@@ -81,7 +81,37 @@ std::string erase_last_copy(const std::string & input, const std::string & searc
   return input_copy;
 }
 
-std::string get_message_type_from_manifest(
+namespace
+{
+/// Extract the value of @attr_name from a child element named @child_name.
+const char * get_child_attr(
+  tinyxml2::XMLElement * elem,
+  const char * child_name,
+  const char * attr_name)
+{
+  auto * child = elem->FirstChildElement(child_name);
+  return child ? child->Attribute(attr_name) : nullptr;
+}
+
+/// Return the first <library> element to iterate from, handling both
+/// <library> and <class_libraries> as the document root.
+tinyxml2::XMLElement * first_library(tinyxml2::XMLDocument & doc)
+{
+  auto * root = doc.RootElement();
+  if (!root) {
+    return nullptr;
+  }
+  if (std::string(root->Name()) == "class_libraries") {
+    return root->FirstChildElement("library");
+  }
+  if (std::string(root->Name()) == "library") {
+    return root;
+  }
+  return nullptr;
+}
+}  // namespace
+
+std::string get_transport_name_from_manifest(
   const std::string & manifest_path,
   const std::string & lookup_name)
 {
@@ -89,10 +119,12 @@ std::string get_message_type_from_manifest(
   if (doc.LoadFile(manifest_path.c_str()) != tinyxml2::XML_SUCCESS) {
     return "";
   }
-  for (auto * lib = doc.FirstChildElement("library");
-    lib != nullptr;
-    lib = lib->NextSiblingElement("library"))
-  {
+  for (auto * lib = first_library(doc); lib != nullptr; lib = lib->NextSiblingElement("library")) {
+    // <transport_name name="..."/> is declared at the library level.
+    const char * transport = get_child_attr(lib, "transport_name", "name");
+    if (!transport) {
+      continue;
+    }
     for (auto * cls = lib->FirstChildElement("class");
       cls != nullptr;
       cls = cls->NextSiblingElement("class"))
@@ -101,13 +133,37 @@ std::string get_message_type_from_manifest(
       if (!name || lookup_name != name) {
         continue;
       }
-      auto * msg_type_elem = cls->FirstChildElement("message_type");
-      if (msg_type_elem) {
-        const char * type_attr = msg_type_elem->Attribute("type");
-        if (type_attr) {
-          return type_attr;
-        }
+      return transport;
+    }
+  }
+  return "";
+}
+
+std::string get_message_type_from_manifest(
+  const std::string & manifest_path,
+  const std::string & lookup_name)
+{
+  tinyxml2::XMLDocument doc;
+  if (doc.LoadFile(manifest_path.c_str()) != tinyxml2::XML_SUCCESS) {
+    return "";
+  }
+  for (auto * lib = first_library(doc); lib != nullptr; lib = lib->NextSiblingElement("library")) {
+    // Library-level <message_type> acts as a fallback for all classes in this library.
+    const char * lib_type = get_child_attr(lib, "message_type", "type");
+    for (auto * cls = lib->FirstChildElement("class");
+      cls != nullptr;
+      cls = cls->NextSiblingElement("class"))
+    {
+      const char * name = cls->Attribute("name");
+      if (!name || lookup_name != name) {
+        continue;
       }
+      // Prefer <message_type> on the <class> itself; fall back to the library-level one.
+      const char * type = get_child_attr(cls, "message_type", "type");
+      if (!type) {
+        type = lib_type;
+      }
+      return type ? type : "";
     }
   }
   return "";

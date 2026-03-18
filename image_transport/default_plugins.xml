@@ -1,4 +1,5 @@
 <library path="image_transport_plugins">
+  <transport_name name="raw"/>
   <class
     name="image_transport/raw_pub"
     type="image_transport::RawPublisher"

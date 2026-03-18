@@ -52,8 +52,29 @@ IMAGE_TRANSPORT_PUBLIC
 std::string erase_last_copy(const std::string & input, const std::string & search);
 
 /**
+ * \brief Read the transport name declared in a plugin manifest XML for a given
+ * class lookup name.
+ *
+ * Parses the \c <transport_name name="..."/> child element of the matching
+ * \c <class> entry without instantiating the plugin.
+ *
+ * \param manifest_path Absolute path to the plugin XML manifest file.
+ * \param lookup_name  The \c name attribute of the target \c <class> element.
+ * \return The transport name string (e.g. "raw"), or an empty string
+ *         if the element is absent or the file cannot be parsed.
+ */
+IMAGE_TRANSPORT_PUBLIC
+std::string get_transport_name_from_manifest(
+  const std::string & manifest_path,
+  const std::string & lookup_name);
+
+/**
  * \brief Read the message type declared in a plugin manifest XML for a given
  * class lookup name.
+ *
+ * This should be a "representative" message type for this plugin. If it
+ * communicates over a single topic (the most common case), use
+ * the type of this topic.
  *
  * Parses the \c <message_type type="..."/> child element of the matching
  * \c <class> entry without instantiating the plugin.

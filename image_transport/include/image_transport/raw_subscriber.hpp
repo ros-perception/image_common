@@ -53,7 +53,8 @@ public:
 
   std::string getTransportName() const override
   {
-    return "raw";
+    const auto & stored = getStoredTransportName();
+    return stored.empty() ? "raw" : stored;
   }
 
 protected:

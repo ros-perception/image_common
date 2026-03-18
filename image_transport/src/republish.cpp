@@ -35,6 +35,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+#include "image_transport/camera_common.hpp"
 #include "image_transport/image_transport.hpp"
 #include "image_transport/publisher_plugin.hpp"
 
@@ -142,6 +143,8 @@ void Republisher::initialize()
     PublishMemFn pub_mem_fn = &Plugin::publishPtr;
 
     this->instance = loader->createUniqueInstance(lookup_name);
+    this->instance->setTransportName(
+      get_transport_name_from_manifest(loader->getPluginManifestPath(lookup_name), lookup_name));
 
     pub_options.event_callbacks.matched_callback =
       [this, in_transport, pub_mem_fn, sub_options](rclcpp::MatchedInfo & matched_info)

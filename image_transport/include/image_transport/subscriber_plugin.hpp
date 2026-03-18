@@ -63,6 +63,18 @@ public:
   virtual std::string getTransportName() const = 0;
 
   /**
+   * \brief Set the transport name, sourced from the plugin manifest XML.
+   *
+   * Plugins that delegate to getStoredTransportName() in their getTransportName()
+   * implementation will use this value, falling back to their compiled-in default
+   * when the stored name is empty.
+   */
+  void setTransportName(const std::string & name)
+  {
+    transport_name_ = name;
+  }
+
+  /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
   [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, .., rclcpp::QoS, ...) instead")]]
@@ -241,6 +253,15 @@ protected:
     const Callback & callback,
     rclcpp::QoS custom_qos,
     rclcpp::SubscriptionOptions options) = 0;
+
+  /// Return the transport name stored via setTransportName(), or empty string if not set.
+  const std::string & getStoredTransportName() const
+  {
+    return transport_name_;
+  }
+
+private:
+  std::string transport_name_;
 };
 
 }  // namespace image_transport
