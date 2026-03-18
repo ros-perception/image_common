@@ -63,6 +63,14 @@ public:
   virtual std::string getTransportName() const = 0;
 
   /**
+   * \brief Get the transport-specific message type subscribed to by this plugin.
+   */
+  virtual std::string getMessageType() const
+  {
+    return "";
+  }
+
+  /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
    */
   [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, .., rclcpp::QoS, ...) instead")]]

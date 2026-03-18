@@ -47,8 +47,10 @@ struct TransportDesc
   std::string package_name;
   std::string pub_name;
   PluginStatus pub_status;
+  std::string pub_message_type;
   std::string sub_name;
   PluginStatus sub_status;
+  std::string sub_message_type;
 };
 /// \endcond
 
@@ -68,6 +70,7 @@ int main(int /*argc*/, char ** /*argv*/)
     try {
       auto pub = pub_loader.createUniqueInstance(lookup_name);
       transports[transport_name].pub_status = SUCCESS;
+      transports[transport_name].pub_message_type = pub->getMessageType();
     } catch (const pluginlib::LibraryLoadException &) {
       transports[transport_name].pub_status = LIB_LOAD_FAILURE;
     } catch (const pluginlib::CreateClassException &) {
@@ -82,6 +85,7 @@ int main(int /*argc*/, char ** /*argv*/)
     try {
       auto sub = sub_loader.createUniqueInstance(lookup_name);
       transports[transport_name].sub_status = SUCCESS;
+      transports[transport_name].sub_message_type = sub->getMessageType();
     } catch (const pluginlib::LibraryLoadException &) {
       transports[transport_name].sub_status = LIB_LOAD_FAILURE;
     } catch (const pluginlib::CreateClassException &) {
@@ -118,11 +122,17 @@ int main(int /*argc*/, char ** /*argv*/)
       printf(" - No publisher provided\n");
     } else {
       printf(" - Publisher: %s\n", pub_loader.getClassDescription(td.pub_name).c_str());
+      if (!td.pub_message_type.empty()) {
+        printf(" - Publisher message type: %s\n", td.pub_message_type.c_str());
+      }
     }
     if (td.sub_status == DOES_NOT_EXIST) {
       printf(" - No subscriber provided\n");
     } else {
       printf(" - Subscriber: %s\n", sub_loader.getClassDescription(td.sub_name).c_str());
+      if (!td.sub_message_type.empty()) {
+        printf(" - Subscriber message type: %s\n", td.sub_message_type.c_str());
+      }
     }
   }
 
