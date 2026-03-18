@@ -65,31 +65,35 @@ int main(int /*argc*/, char ** /*argv*/)
 
   for (const std::string & lookup_name : pub_loader.getDeclaredClasses()) {
     std::string transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
-    transports[transport_name].pub_name = lookup_name;
-    transports[transport_name].package_name = pub_loader.getClassPackage(lookup_name);
+    auto & td = transports[transport_name];
+    td.pub_name = lookup_name;
+    td.package_name = pub_loader.getClassPackage(lookup_name);
+    td.pub_message_type = image_transport::get_message_type_from_manifest(
+      pub_loader.getPluginManifestPath(lookup_name), lookup_name);
     try {
-      auto pub = pub_loader.createUniqueInstance(lookup_name);
-      transports[transport_name].pub_status = SUCCESS;
-      transports[transport_name].pub_message_type = pub->getMessageType();
+      pub_loader.createUniqueInstance(lookup_name);
+      td.pub_status = SUCCESS;
     } catch (const pluginlib::LibraryLoadException &) {
-      transports[transport_name].pub_status = LIB_LOAD_FAILURE;
+      td.pub_status = LIB_LOAD_FAILURE;
     } catch (const pluginlib::CreateClassException &) {
-      transports[transport_name].pub_status = CREATE_FAILURE;
+      td.pub_status = CREATE_FAILURE;
     }
   }
 
   for (const std::string & lookup_name : sub_loader.getDeclaredClasses()) {
     std::string transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
-    transports[transport_name].sub_name = lookup_name;
-    transports[transport_name].package_name = sub_loader.getClassPackage(lookup_name);
+    auto & td = transports[transport_name];
+    td.sub_name = lookup_name;
+    td.package_name = sub_loader.getClassPackage(lookup_name);
+    td.sub_message_type = image_transport::get_message_type_from_manifest(
+      sub_loader.getPluginManifestPath(lookup_name), lookup_name);
     try {
-      auto sub = sub_loader.createUniqueInstance(lookup_name);
-      transports[transport_name].sub_status = SUCCESS;
-      transports[transport_name].sub_message_type = sub->getMessageType();
+      sub_loader.createUniqueInstance(lookup_name);
+      td.sub_status = SUCCESS;
     } catch (const pluginlib::LibraryLoadException &) {
-      transports[transport_name].sub_status = LIB_LOAD_FAILURE;
+      td.sub_status = LIB_LOAD_FAILURE;
     } catch (const pluginlib::CreateClassException &) {
-      transports[transport_name].sub_status = CREATE_FAILURE;
+      td.sub_status = CREATE_FAILURE;
     }
   }
 

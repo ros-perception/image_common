@@ -62,14 +62,6 @@ public:
   virtual std::string getTransportName() const = 0;
 
   /**
-   * \brief Get the transport-specific message type published by this plugin.
-   */
-  virtual std::string getMessageType() const
-  {
-    return "";
-  }
-
-  /**
    * \brief Check whether this plugin supports publishing using UniquePtr.
    */
   virtual bool supportsUniquePtrPub() const

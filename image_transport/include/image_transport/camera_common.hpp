@@ -51,6 +51,23 @@ std::string getCameraInfoTopic(const std::string & base_topic);
 IMAGE_TRANSPORT_PUBLIC
 std::string erase_last_copy(const std::string & input, const std::string & search);
 
+/**
+ * \brief Read the message type declared in a plugin manifest XML for a given
+ * class lookup name.
+ *
+ * Parses the \c <message_type type="..."/> child element of the matching
+ * \c <class> entry without instantiating the plugin.
+ *
+ * \param manifest_path Absolute path to the plugin XML manifest file.
+ * \param lookup_name  The \c name attribute of the target \c <class> element.
+ * \return The type string (e.g. "sensor_msgs/msg/Image"), or an empty string
+ *         if the element is absent or the file cannot be parsed.
+ */
+IMAGE_TRANSPORT_PUBLIC
+std::string get_message_type_from_manifest(
+  const std::string & manifest_path,
+  const std::string & lookup_name);
+
 }  // namespace image_transport
 
 #endif  // IMAGE_TRANSPORT__CAMERA_COMMON_HPP_

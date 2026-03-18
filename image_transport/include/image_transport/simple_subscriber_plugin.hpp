@@ -34,7 +34,6 @@
 #include <string>
 
 #include "rclcpp/subscription.hpp"
-#include "rosidl_runtime_cpp/traits.hpp"
 
 #include "image_transport/subscriber_plugin.hpp"
 #include "image_transport/visibility_control.hpp"
@@ -72,11 +71,6 @@ public:
       return impl_->sub_->get_topic_name();
     }
     return std::string();
-  }
-
-  std::string getMessageType() const override
-  {
-    return rosidl_generator_traits::name<M>();
   }
 
   size_t getNumPublishers() const override

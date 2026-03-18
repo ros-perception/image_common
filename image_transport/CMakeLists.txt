@@ -19,6 +19,7 @@ find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(tinyxml2 REQUIRED)
 
 # Build image_transport library
 add_library(${PROJECT_NAME}
@@ -39,7 +40,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   rclcpp::rclcpp
   ${sensor_msgs_TARGETS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  pluginlib::pluginlib)
+  pluginlib::pluginlib
+  tinyxml2::tinyxml2)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE "IMAGE_TRANSPORT_BUILDING_DLL")
 

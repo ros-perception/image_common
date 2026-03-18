@@ -6,6 +6,7 @@
     <description>
       This is the default publisher. It publishes the Image as-is on the base topic.
     </description>
+    <message_type type="sensor_msgs/msg/Image"/>
   </class>
 
   <class
@@ -15,5 +16,6 @@
     <description>
       This is the default pass-through subscriber for topics of type sensor_msgs/Image.
     </description>
+    <message_type type="sensor_msgs/msg/Image"/>
   </class>
 </library>

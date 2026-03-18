@@ -31,6 +31,8 @@
 #include <string>
 #include <vector>
 
+#include "tinyxml2.h"
+
 namespace image_transport
 {
 
@@ -77,6 +79,38 @@ std::string erase_last_copy(const std::string & input, const std::string & searc
     input_copy.replace(found, search.length(), "");
   }
   return input_copy;
+}
+
+std::string get_message_type_from_manifest(
+  const std::string & manifest_path,
+  const std::string & lookup_name)
+{
+  tinyxml2::XMLDocument doc;
+  if (doc.LoadFile(manifest_path.c_str()) != tinyxml2::XML_SUCCESS) {
+    return "";
+  }
+  for (auto * lib = doc.FirstChildElement("library");
+    lib != nullptr;
+    lib = lib->NextSiblingElement("library"))
+  {
+    for (auto * cls = lib->FirstChildElement("class");
+      cls != nullptr;
+      cls = cls->NextSiblingElement("class"))
+    {
+      const char * name = cls->Attribute("name");
+      if (!name || lookup_name != name) {
+        continue;
+      }
+      auto * msg_type_elem = cls->FirstChildElement("message_type");
+      if (msg_type_elem) {
+        const char * type_attr = msg_type_elem->Attribute("type");
+        if (type_attr) {
+          return type_attr;
+        }
+      }
+    }
+  }
+  return "";
 }
 
 }  // namespace image_transport

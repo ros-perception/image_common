@@ -37,7 +37,6 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/logger.hpp"
 #include "rclcpp/logging.hpp"
-#include "rosidl_runtime_cpp/traits.hpp"
 
 #include "image_transport/publisher_plugin.hpp"
 #include "image_transport/visibility_control.hpp"
@@ -80,11 +79,6 @@ public:
   {
     if (simple_impl_) {return simple_impl_->pub_->get_topic_name();}
     return std::string();
-  }
-
-  std::string getMessageType() const override
-  {
-    return rosidl_generator_traits::name<M>();
   }
 
   void publish(const sensor_msgs::msg::Image & message) const override
