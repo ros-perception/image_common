@@ -31,7 +31,7 @@
 #include <string>
 #include <vector>
 
-#include "tinyxml2.h"
+#include "tinyxml2.h"  // NOLINT(build/include_subdir)
 
 namespace image_transport
 {
