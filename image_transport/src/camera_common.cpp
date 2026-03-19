@@ -83,14 +83,13 @@ std::string erase_last_copy(const std::string & input, const std::string & searc
 
 namespace
 {
-/// Extract the value of @attr_name from a child element named @child_name.
-const char * get_child_attr(
+/// Extract the text content of a child element named @child_name.
+const char * get_child_text(
   tinyxml2::XMLElement * elem,
-  const char * child_name,
-  const char * attr_name)
+  const char * child_name)
 {
   auto * child = elem->FirstChildElement(child_name);
-  return child ? child->Attribute(attr_name) : nullptr;
+  return child ? child->GetText() : nullptr;
 }
 
 /// Return the first <library> element to iterate from, handling both
@@ -120,8 +119,8 @@ std::string get_transport_name_from_manifest(
     return "";
   }
   for (auto * lib = first_library(doc); lib != nullptr; lib = lib->NextSiblingElement("library")) {
-    // <transport_name name="..."/> is declared at the library level.
-    const char * transport = get_child_attr(lib, "transport_name", "name");
+    // <transport_name> text content is declared at the library level.
+    const char * transport = get_child_text(lib, "transport_name");
     if (!transport) {
       continue;
     }
@@ -149,7 +148,7 @@ std::string get_message_type_from_manifest(
   }
   for (auto * lib = first_library(doc); lib != nullptr; lib = lib->NextSiblingElement("library")) {
     // Library-level <message_type> acts as a fallback for all classes in this library.
-    const char * lib_type = get_child_attr(lib, "message_type", "type");
+    const char * lib_type = get_child_text(lib, "message_type");
     for (auto * cls = lib->FirstChildElement("class");
       cls != nullptr;
       cls = cls->NextSiblingElement("class"))
@@ -159,7 +158,7 @@ std::string get_message_type_from_manifest(
         continue;
       }
       // Prefer <message_type> on the <class> itself; fall back to the library-level one.
-      const char * type = get_child_attr(cls, "message_type", "type");
+      const char * type = get_child_text(cls, "message_type");
       if (!type) {
         type = lib_type;
       }
