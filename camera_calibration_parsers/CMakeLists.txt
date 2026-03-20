@@ -29,7 +29,7 @@ add_library(${PROJECT_NAME}
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  ${sensor_msgs_TARGETS})
+  sensor_msgs::sensor_msgs)
 target_link_libraries(${PROJECT_NAME} PRIVATE
   rclcpp::rclcpp
   yaml-cpp::yaml-cpp)
@@ -57,7 +57,7 @@ ament_export_targets(export_${PROJECT_NAME})
 #  src/parse_wrapper.cpp)
 #target_link_libraries(${PROJECT_NAME}_wrapper
 #  rclcpp::rclcpp
-#  ${sensor_msgs_TARGETS}
+#  sensor_msgs::sensor_msgs
 #)
 #target_include_directories(${PROJECT_NAME}_wrapper PUBLIC ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 #target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${YAML_CPP_LIBRARIES})

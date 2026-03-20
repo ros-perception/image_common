@@ -37,7 +37,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
   message_filters::message_filters
   rclcpp::rclcpp
-  ${sensor_msgs_TARGETS})
+  sensor_msgs::sensor_msgs)
 target_link_libraries(${PROJECT_NAME} PRIVATE
   pluginlib::pluginlib)
 

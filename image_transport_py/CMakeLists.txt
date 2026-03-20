@@ -56,7 +56,7 @@ target_include_directories(_image_transport PUBLIC
 target_link_libraries(_image_transport PUBLIC
   image_transport::image_transport
   rclcpp::rclcpp
-  ${sensor_msgs_TARGETS}
+  sensor_msgs::sensor_msgs
 )
 
 # Install cython modules as sub-modules of the project

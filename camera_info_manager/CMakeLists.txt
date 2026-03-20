@@ -35,7 +35,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_INFO_MANAGER_BUILDING
 target_link_libraries(${PROJECT_NAME} PUBLIC
   rclcpp::rclcpp
   rclcpp_lifecycle::rclcpp_lifecycle
-  ${sensor_msgs_TARGETS})
+  sensor_msgs::sensor_msgs)
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ament_index_cpp::ament_index_cpp
   camera_calibration_parsers::camera_calibration_parsers
@@ -64,7 +64,7 @@ if(BUILD_TESTING)
   )
   target_link_libraries(${PROJECT_NAME}-unit_test
     ${PROJECT_NAME}
-    ${sensor_msgs_TARGETS}
+    sensor_msgs::sensor_msgs
     ament_index_cpp::ament_index_cpp
     rclcpp::rclcpp
   )
