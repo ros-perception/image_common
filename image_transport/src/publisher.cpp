@@ -156,8 +156,6 @@ Publisher::Publisher(
     const auto & lookup_name = transport_name + "_pub";
     try {
       auto pub = loader->createUniqueInstance(lookup_name);
-      pub->setTransportName(
-        get_transport_name_from_manifest(loader->getPluginManifestPath(lookup_name), lookup_name));
       pub->advertise(node_interfaces, image_topic, custom_qos, options);
       impl_->publishers_.push_back(std::move(pub));
     } catch (const std::runtime_error & e) {

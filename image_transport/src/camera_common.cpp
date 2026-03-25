@@ -28,10 +28,22 @@
 
 #include "image_transport/camera_common.hpp"
 
+#include <cstdlib>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
+#if defined(__GNUC__) || defined(__clang__)
+#include <cxxabi.h>
+#endif
+
+#include "pluginlib/class_loader.hpp"
 #include "tinyxml2.h"  // NOLINT(build/include_subdir)
+
+// Forward declarations — full definitions are not needed here, but the
+// ClassLoader template requires the complete type at instantiation.
+#include "image_transport/publisher_plugin.hpp"
+#include "image_transport/subscriber_plugin.hpp"
 
 namespace image_transport
 {
@@ -147,8 +159,11 @@ std::string get_message_type_from_manifest(
     return "";
   }
   for (auto * lib = first_library(doc); lib != nullptr; lib = lib->NextSiblingElement("library")) {
-    // Library-level <message_type> acts as a fallback for all classes in this library.
-    const char * lib_type = get_child_text(lib, "message_type");
+    // <message_type> text content is declared at the library level.
+    const char * type = get_child_text(lib, "message_type");
+    if (!type) {
+      continue;
+    }
     for (auto * cls = lib->FirstChildElement("class");
       cls != nullptr;
       cls = cls->NextSiblingElement("class"))
@@ -157,15 +172,74 @@ std::string get_message_type_from_manifest(
       if (!name || lookup_name != name) {
         continue;
       }
-      // Prefer <message_type> on the <class> itself; fall back to the library-level one.
-      const char * type = get_child_text(cls, "message_type");
-      if (!type) {
-        type = lib_type;
-      }
-      return type ? type : "";
+      return type;
     }
   }
   return "";
+}
+
+}  // namespace image_transport
+
+// ---------------------------------------------------------------------------
+// Manifest auto-discovery helpers
+// ---------------------------------------------------------------------------
+
+namespace
+{
+
+template<class BaseT>
+image_transport::PluginManifestData search_manifest_for_type(
+  const std::string & package,
+  const std::string & base_class_type,
+  const std::string & cpp_type_name)
+{
+  try {
+    pluginlib::ClassLoader<BaseT> loader(package, base_class_type);
+    for (const auto & lookup_name : loader.getDeclaredClasses()) {
+      if (loader.getClassType(lookup_name) == cpp_type_name) {
+        const std::string manifest_path = loader.getPluginManifestPath(lookup_name);
+        return {
+          image_transport::get_transport_name_from_manifest(manifest_path, lookup_name),
+          image_transport::get_message_type_from_manifest(manifest_path, lookup_name),
+          lookup_name
+        };
+      }
+    }
+  } catch (const std::exception &) {
+    // Silently ignore: ament index unavailable, no plugins registered, etc.
+  }
+  return {};
+}
+
+}  // anonymous namespace
+
+namespace image_transport
+{
+
+std::string demangle_cpp_type_name(const char * mangled_name)
+{
+#if defined(__GNUC__) || defined(__clang__)
+  int status = 0;
+  char * d = abi::__cxa_demangle(mangled_name, nullptr, nullptr, &status);
+  std::string result = (status == 0 && d) ? d : mangled_name;
+  std::free(d);
+  return result;
+#else
+  // MSVC's typeid().name() is already human-readable.
+  return mangled_name;
+#endif
+}
+
+PluginManifestData get_pub_manifest_data_from_class_type(const std::string & cpp_type_name)
+{
+  return search_manifest_for_type<PublisherPlugin>(
+    "image_transport", "image_transport::PublisherPlugin", cpp_type_name);
+}
+
+PluginManifestData get_sub_manifest_data_from_class_type(const std::string & cpp_type_name)
+{
+  return search_manifest_for_type<SubscriberPlugin>(
+    "image_transport", "image_transport::SubscriberPlugin", cpp_type_name);
 }
 
 }  // namespace image_transport

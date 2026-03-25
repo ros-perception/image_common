@@ -25,7 +25,9 @@ find_package(tinyxml2 REQUIRED)
 add_library(${PROJECT_NAME}
   src/camera_common.cpp
   src/publisher.cpp
+  src/publisher_plugin.cpp
   src/subscriber.cpp
+  src/subscriber_plugin.cpp
   src/single_subscriber_publisher.cpp
   src/camera_publisher.cpp
   src/camera_subscriber.cpp
@@ -125,6 +127,8 @@ if(BUILD_TESTING)
   ament_add_gtest(test_${PROJECT_NAME}-camera_common test/test_camera_common.cpp)
   if(TARGET test_${PROJECT_NAME}-camera_common)
     target_link_libraries(test_${PROJECT_NAME}-camera_common ${PROJECT_NAME})
+    target_compile_definitions(test_${PROJECT_NAME}-camera_common PRIVATE
+      DEFAULT_PLUGINS_XML="${CMAKE_CURRENT_SOURCE_DIR}/default_plugins.xml")
   endif()
 
   ament_add_gtest(test_${PROJECT_NAME}-publisher test/test_publisher.cpp)

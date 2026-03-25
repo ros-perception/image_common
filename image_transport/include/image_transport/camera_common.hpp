@@ -36,6 +36,47 @@
 namespace image_transport
 {
 
+/// Data read from a plugin manifest XML for one class.
+struct PluginManifestData
+{
+  std::string transport_name;  ///< e.g. "raw"
+  std::string message_type;    ///< e.g. "sensor_msgs/msg/Image"
+  std::string lookup_name;     ///< e.g. "image_transport/raw_pub"
+};
+
+/**
+ * \brief Demangle a C++ ABI type name to its human-readable form.
+ *
+ * On GCC/Clang this calls __cxa_demangle; on other platforms the
+ * mangled name is returned unchanged.
+ */
+IMAGE_TRANSPORT_PUBLIC
+std::string demangle_cpp_type_name(const char * mangled_name);
+
+/**
+ * \brief Search the pluginlib publisher-plugin registry for the class whose
+ * concrete (derived) C++ type equals \p cpp_type_name and return its manifest
+ * data (transport name, message type, lookup name).
+ *
+ * The search scans all plugin XML files registered under the "image_transport"
+ * package for classes derived from image_transport::PublisherPlugin.  No plugin
+ * is instantiated; the function only parses XML.  Returns an empty
+ * PluginManifestData if no match is found.
+ */
+IMAGE_TRANSPORT_PUBLIC
+PluginManifestData get_pub_manifest_data_from_class_type(const std::string & cpp_type_name);
+
+/**
+ * \brief Search the pluginlib subscriber-plugin registry for the class whose
+ * concrete (derived) C++ type equals \p cpp_type_name and return its manifest
+ * data (transport name, message type, lookup name).
+ *
+ * Analogous to get_pub_manifest_data_from_class_type but searches
+ * image_transport::SubscriberPlugin classes.
+ */
+IMAGE_TRANSPORT_PUBLIC
+PluginManifestData get_sub_manifest_data_from_class_type(const std::string & cpp_type_name);
+
 /**
  * \brief Form the camera info topic name, sibling to the base topic.
  *
@@ -76,8 +117,9 @@ std::string get_transport_name_from_manifest(
  * communicates over a single topic (the most common case), use
  * the type of this topic.
  *
- * Parses the \c <message_type type="..."/> child element of the matching
- * \c <class> entry without instantiating the plugin.
+ * Parses the \c <message_type> child element of the enclosing \c <library>
+ * element without instantiating the plugin.  The element is shared by all
+ * classes in the same library, mirroring how \c <transport_name> works.
  *
  * \param manifest_path Absolute path to the plugin XML manifest file.
  * \param lookup_name  The \c name attribute of the target \c <class> element.

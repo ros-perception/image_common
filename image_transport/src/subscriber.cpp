@@ -109,9 +109,6 @@ Subscriber::Subscriber(
   impl_->lookup_name_ = SubscriberPlugin::getLookupName(transport);
   try {
     impl_->subscriber_ = loader->createSharedInstance(impl_->lookup_name_);
-    impl_->subscriber_->setTransportName(
-      get_transport_name_from_manifest(
-        loader->getPluginManifestPath(impl_->lookup_name_), impl_->lookup_name_));
   } catch (pluginlib::PluginlibException & e) {
     throw TransportLoadException(impl_->lookup_name_, e.what());
   }

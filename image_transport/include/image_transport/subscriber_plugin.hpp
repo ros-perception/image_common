@@ -59,20 +59,28 @@ public:
   /**
    * \brief Get a string identifier for the transport provided by
    * this plugin.
+   *
+   * The default implementation auto-discovers the name from the pluginlib
+   * manifest XML (without instantiating any plugin) by matching the demangled
+   * C++ type name of \c *this against the \c type attribute of each
+   * \c <class> element.  The result is cached after the first call.
+   *
+   * Plugins that override getTransportName() continue to work unchanged —
+   * user-supplied overrides always take precedence over the base implementation.
    */
-  virtual std::string getTransportName() const = 0;
+  IMAGE_TRANSPORT_PUBLIC
+  virtual std::string getTransportName() const;
 
   /**
-   * \brief Set the transport name, sourced from the plugin manifest XML.
+   * \brief Get the primary message type used by this plugin.
    *
-   * Plugins that delegate to getStoredTransportName() in their getTransportName()
-   * implementation will use this value, falling back to their compiled-in default
-   * when the stored name is empty.
+   * Returns the value of the \c <message_type> element from the plugin
+   * manifest XML (e.g. \c "sensor_msgs/msg/Image").  The result is cached
+   * after the first call.  Override this method if you need a different
+   * value at runtime.
    */
-  void setTransportName(const std::string & name)
-  {
-    transport_name_ = name;
-  }
+  IMAGE_TRANSPORT_PUBLIC
+  virtual std::string getMessageType() const;
 
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object.
@@ -254,14 +262,12 @@ protected:
     rclcpp::QoS custom_qos,
     rclcpp::SubscriptionOptions options) = 0;
 
-  /// Return the transport name stored via setTransportName(), or empty string if not set.
-  const std::string & getStoredTransportName() const
-  {
-    return transport_name_;
-  }
-
 private:
-  std::string transport_name_;
+  // Cache for manifest-discovered data (populated lazily by the base-class
+  // implementation of getTransportName() / getMessageType()).
+  mutable bool manifest_data_initialized_{false};
+  mutable std::string manifest_transport_name_;
+  mutable std::string manifest_message_type_;
 };
 
 }  // namespace image_transport

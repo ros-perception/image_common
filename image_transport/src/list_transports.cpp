@@ -67,48 +67,89 @@ int main(int /*argc*/, char ** /*argv*/)
   std::map<std::string, TransportDesc> transports;
 
   for (const std::string & lookup_name : pub_loader.getDeclaredClasses()) {
-    const std::string manifest = pub_loader.getPluginManifestPath(lookup_name);
-    std::string transport_hint = image_transport::get_transport_name_from_manifest(
-      manifest, lookup_name);
-    if (transport_hint.empty()) {
-      transport_hint = image_transport::erase_last_copy(lookup_name, "_pub");
-    }
-    auto & td = transports[transport_hint];
-    td.transport_hint = transport_hint;
-    td.transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
-    td.pub_name = lookup_name;
-    td.package_name = pub_loader.getClassPackage(lookup_name);
-    td.pub_message_type = image_transport::get_message_type_from_manifest(manifest, lookup_name);
+    std::string transport_hint;
+    std::string message_type;
     try {
-      pub_loader.createUniqueInstance(lookup_name);
+      auto pub = pub_loader.createUniqueInstance(lookup_name);
+      transport_hint = pub->getTransportName();
+      message_type = pub->getMessageType();
+      auto & td = transports[transport_hint];
       td.pub_status = SUCCESS;
+      td.pub_name = lookup_name;
+      td.transport_hint = transport_hint;
+      td.transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
+      td.package_name = pub_loader.getClassPackage(lookup_name);
+      td.pub_message_type = message_type;
     } catch (const pluginlib::LibraryLoadException &) {
+      // Fall back to manifest parsing so the entry still appears in the listing.
+      const std::string manifest = pub_loader.getPluginManifestPath(lookup_name);
+      transport_hint = image_transport::get_transport_name_from_manifest(manifest, lookup_name);
+      if (transport_hint.empty()) {
+        transport_hint = image_transport::erase_last_copy(lookup_name, "_pub");
+      }
+      auto & td = transports[transport_hint];
       td.pub_status = LIB_LOAD_FAILURE;
+      td.pub_name = lookup_name;
+      td.transport_hint = transport_hint;
+      td.transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
+      td.package_name = pub_loader.getClassPackage(lookup_name);
+      td.pub_message_type = image_transport::get_message_type_from_manifest(manifest, lookup_name);
     } catch (const pluginlib::CreateClassException &) {
+      const std::string manifest = pub_loader.getPluginManifestPath(lookup_name);
+      transport_hint = image_transport::get_transport_name_from_manifest(manifest, lookup_name);
+      if (transport_hint.empty()) {
+        transport_hint = image_transport::erase_last_copy(lookup_name, "_pub");
+      }
+      auto & td = transports[transport_hint];
       td.pub_status = CREATE_FAILURE;
+      td.pub_name = lookup_name;
+      td.transport_hint = transport_hint;
+      td.transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
+      td.package_name = pub_loader.getClassPackage(lookup_name);
+      td.pub_message_type = image_transport::get_message_type_from_manifest(manifest, lookup_name);
     }
   }
 
   for (const std::string & lookup_name : sub_loader.getDeclaredClasses()) {
-    const std::string manifest = sub_loader.getPluginManifestPath(lookup_name);
-    std::string transport_hint = image_transport::get_transport_name_from_manifest(
-      manifest, lookup_name);
-    if (transport_hint.empty()) {
-      transport_hint = image_transport::erase_last_copy(lookup_name, "_sub");
-    }
-    auto & td = transports[transport_hint];
-    td.transport_hint = transport_hint;
-    td.transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
-    td.sub_name = lookup_name;
-    td.package_name = sub_loader.getClassPackage(lookup_name);
-    td.sub_message_type = image_transport::get_message_type_from_manifest(manifest, lookup_name);
+    std::string transport_hint;
+    std::string message_type;
     try {
-      sub_loader.createUniqueInstance(lookup_name);
+      auto sub = sub_loader.createUniqueInstance(lookup_name);
+      transport_hint = sub->getTransportName();
+      message_type = sub->getMessageType();
+      auto & td = transports[transport_hint];
       td.sub_status = SUCCESS;
+      td.sub_name = lookup_name;
+      td.transport_hint = transport_hint;
+      td.transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
+      td.package_name = sub_loader.getClassPackage(lookup_name);
+      td.sub_message_type = message_type;
     } catch (const pluginlib::LibraryLoadException &) {
+      const std::string manifest = sub_loader.getPluginManifestPath(lookup_name);
+      transport_hint = image_transport::get_transport_name_from_manifest(manifest, lookup_name);
+      if (transport_hint.empty()) {
+        transport_hint = image_transport::erase_last_copy(lookup_name, "_sub");
+      }
+      auto & td = transports[transport_hint];
       td.sub_status = LIB_LOAD_FAILURE;
+      td.sub_name = lookup_name;
+      td.transport_hint = transport_hint;
+      td.transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
+      td.package_name = sub_loader.getClassPackage(lookup_name);
+      td.sub_message_type = image_transport::get_message_type_from_manifest(manifest, lookup_name);
     } catch (const pluginlib::CreateClassException &) {
+      const std::string manifest = sub_loader.getPluginManifestPath(lookup_name);
+      transport_hint = image_transport::get_transport_name_from_manifest(manifest, lookup_name);
+      if (transport_hint.empty()) {
+        transport_hint = image_transport::erase_last_copy(lookup_name, "_sub");
+      }
+      auto & td = transports[transport_hint];
       td.sub_status = CREATE_FAILURE;
+      td.sub_name = lookup_name;
+      td.transport_hint = transport_hint;
+      td.transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
+      td.package_name = sub_loader.getClassPackage(lookup_name);
+      td.sub_message_type = image_transport::get_message_type_from_manifest(manifest, lookup_name);
     }
   }
 

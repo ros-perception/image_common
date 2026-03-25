@@ -58,6 +58,52 @@ TEST(CameraCommon, getCameraInfoTopic2_empty) {
   EXPECT_EQ(info_topic, "/camera_info");
 }
 
+TEST(DefaultPluginsXml, raw_pub_transport_name) {
+  const std::string transport = image_transport::get_transport_name_from_manifest(
+    DEFAULT_PLUGINS_XML, "image_transport/raw_pub");
+  EXPECT_EQ(transport, "raw");
+}
+
+TEST(DefaultPluginsXml, raw_sub_transport_name) {
+  const std::string transport = image_transport::get_transport_name_from_manifest(
+    DEFAULT_PLUGINS_XML, "image_transport/raw_sub");
+  EXPECT_EQ(transport, "raw");
+}
+
+TEST(DefaultPluginsXml, raw_pub_message_type) {
+  const std::string msg_type = image_transport::get_message_type_from_manifest(
+    DEFAULT_PLUGINS_XML, "image_transport/raw_pub");
+  EXPECT_EQ(msg_type, "sensor_msgs/msg/Image");
+}
+
+TEST(DefaultPluginsXml, raw_sub_message_type) {
+  const std::string msg_type = image_transport::get_message_type_from_manifest(
+    DEFAULT_PLUGINS_XML, "image_transport/raw_sub");
+  EXPECT_EQ(msg_type, "sensor_msgs/msg/Image");
+}
+
+TEST(DefaultPluginsXml, unknown_lookup_name_returns_empty) {
+  EXPECT_EQ(
+    image_transport::get_transport_name_from_manifest(
+      DEFAULT_PLUGINS_XML, "image_transport/does_not_exist"),
+    "");
+  EXPECT_EQ(
+    image_transport::get_message_type_from_manifest(
+      DEFAULT_PLUGINS_XML, "image_transport/does_not_exist"),
+    "");
+}
+
+TEST(DefaultPluginsXml, bad_path_returns_empty) {
+  EXPECT_EQ(
+    image_transport::get_transport_name_from_manifest(
+      "/nonexistent/path/plugins.xml", "image_transport/raw_pub"),
+    "");
+  EXPECT_EQ(
+    image_transport::get_message_type_from_manifest(
+      "/nonexistent/path/plugins.xml", "image_transport/raw_pub"),
+    "");
+}
+
 TEST(CameraCommon, erase_last_copy) {
   EXPECT_EQ("image", image_transport::erase_last_copy("image_pub", "_pub"));
   EXPECT_EQ("/image_pub/image", image_transport::erase_last_copy("/image_pub/image_pub", "_pub"));
