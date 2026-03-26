@@ -30,12 +30,14 @@
 #define IMAGE_TRANSPORT__SUBSCRIBER_PLUGIN_HPP_
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "rclcpp/macros.hpp"
 #include "rclcpp/node.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
+#include "image_transport/camera_common.hpp"
 #include "image_transport/node_interfaces.hpp"
 #include "image_transport/visibility_control.hpp"
 
@@ -67,6 +69,7 @@ public:
    *
    * Plugins that override getTransportName() continue to work unchanged —
    * user-supplied overrides always take precedence over the base implementation.
+   * Returning a different value than what is in the manifest is considered problematic.
    */
   IMAGE_TRANSPORT_PUBLIC
   virtual std::string getTransportName() const;
@@ -78,6 +81,7 @@ public:
    * manifest XML (e.g. \c "sensor_msgs/msg/Image").  The result is cached
    * after the first call.  Override this method if you need a different
    * value at runtime.
+   * Returning a different value than what is in the manifest is considered problematic.
    */
   IMAGE_TRANSPORT_PUBLIC
   virtual std::string getMessageType() const;
@@ -265,9 +269,7 @@ protected:
 private:
   // Cache for manifest-discovered data (populated lazily by the base-class
   // implementation of getTransportName() / getMessageType()).
-  mutable bool manifest_data_initialized_{false};
-  mutable std::string manifest_transport_name_;
-  mutable std::string manifest_message_type_;
+  mutable std::optional<PluginManifestData> manifest_data_;
 };
 
 }  // namespace image_transport

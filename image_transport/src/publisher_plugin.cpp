@@ -28,6 +28,7 @@
 
 #include "image_transport/publisher_plugin.hpp"
 
+#include <optional>
 #include <string>
 #include <typeinfo>
 
@@ -40,52 +41,36 @@ namespace image_transport
 // Helpers shared by both getTransportName() and getMessageType().
 // ---------------------------------------------------------------------------
 
-/// Run the manifest search if not already done and store results in the cache.
-static void ensure_manifest_data(
-  bool & initialized,
-  std::string & transport_name_out,
-  std::string & message_type_out,
+/// Populate the manifest cache on first call and return a reference to it.
+static const PluginManifestData & ensure_manifest_data(
+  std::optional<PluginManifestData> & cache,
   const char * mangled_this_type)
 {
-  if (initialized) {
-    return;
+  if (!cache) {
+    const std::string demangled = demangle_cpp_type_name(mangled_this_type);
+    PluginManifestData data = get_pub_manifest_data_from_class_type(demangled);
+    // Derive a default transport name from the lookup name when the manifest
+    // does not declare <transport_name> (e.g. "image_transport/raw_pub" -> "raw").
+    if (data.transport_name.empty() && !data.lookup_name.empty()) {
+      const auto pos = data.lookup_name.rfind('/');
+      const std::string short_name = (pos != std::string::npos) ?
+        data.lookup_name.substr(pos + 1) :
+        data.lookup_name;
+      data.transport_name = erase_last_copy(short_name, "_pub");
+    }
+    cache = std::move(data);
   }
-  initialized = true;
-  const std::string demangled = demangle_cpp_type_name(mangled_this_type);
-  const PluginManifestData data = get_pub_manifest_data_from_class_type(demangled);
-  transport_name_out = data.transport_name;
-  // Derive a default transport name from the lookup name when the manifest
-  // does not declare <transport_name> (e.g. "image_transport/raw_pub" -> "raw").
-  if (transport_name_out.empty() && !data.lookup_name.empty()) {
-    const auto pos = data.lookup_name.rfind('/');
-    const std::string short_name = (pos != std::string::npos) ?
-      data.lookup_name.substr(pos + 1) :
-      data.lookup_name;
-    transport_name_out = erase_last_copy(short_name, "_pub");
-  }
-  message_type_out = data.message_type;
+  return *cache;
 }
 
 std::string PublisherPlugin::getTransportName() const
 {
-  ensure_manifest_data(
-    manifest_data_initialized_,
-    manifest_transport_name_,
-    manifest_message_type_,
-    typeid(*this).name());
-
-  return manifest_transport_name_;
+  return ensure_manifest_data(manifest_data_, typeid(*this).name()).transport_name;
 }
 
 std::string PublisherPlugin::getMessageType() const
 {
-  ensure_manifest_data(
-    manifest_data_initialized_,
-    manifest_transport_name_,
-    manifest_message_type_,
-    typeid(*this).name());
-
-  return manifest_message_type_;
+  return ensure_manifest_data(manifest_data_, typeid(*this).name()).message_type;
 }
 
 }  // namespace image_transport

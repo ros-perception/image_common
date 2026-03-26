@@ -131,11 +131,8 @@ std::string get_transport_name_from_manifest(
     return "";
   }
   for (auto * lib = first_library(doc); lib != nullptr; lib = lib->NextSiblingElement("library")) {
-    // <transport_name> text content is declared at the library level.
-    const char * transport = get_child_text(lib, "transport_name");
-    if (!transport) {
-      continue;
-    }
+    // Library-level <transport_name> acts as the default for all classes in this library.
+    const char * lib_transport = get_child_text(lib, "transport_name");
     for (auto * cls = lib->FirstChildElement("class");
       cls != nullptr;
       cls = cls->NextSiblingElement("class"))
@@ -144,7 +141,12 @@ std::string get_transport_name_from_manifest(
       if (!name || lookup_name != name) {
         continue;
       }
-      return transport;
+      // Prefer a <transport_name> on the <class> itself; fall back to the library-level one.
+      const char * cls_transport = get_child_text(cls, "transport_name");
+      if (cls_transport) {
+        return cls_transport;
+      }
+      return lib_transport ? lib_transport : "";
     }
   }
   return "";
@@ -159,11 +161,8 @@ std::string get_message_type_from_manifest(
     return "";
   }
   for (auto * lib = first_library(doc); lib != nullptr; lib = lib->NextSiblingElement("library")) {
-    // <message_type> text content is declared at the library level.
-    const char * type = get_child_text(lib, "message_type");
-    if (!type) {
-      continue;
-    }
+    // Library-level <message_type> acts as the default for all classes in this library.
+    const char * lib_type = get_child_text(lib, "message_type");
     for (auto * cls = lib->FirstChildElement("class");
       cls != nullptr;
       cls = cls->NextSiblingElement("class"))
@@ -172,7 +171,12 @@ std::string get_message_type_from_manifest(
       if (!name || lookup_name != name) {
         continue;
       }
-      return type;
+      // Prefer a <message_type> on the <class> itself; fall back to the library-level one.
+      const char * cls_type = get_child_text(cls, "message_type");
+      if (cls_type) {
+        return cls_type;
+      }
+      return lib_type ? lib_type : "";
     }
   }
   return "";

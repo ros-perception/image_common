@@ -1,0 +1,23 @@
+<library path="test_transport_plugins">
+  <!-- Library-level defaults — apply to any class that does not override them. -->
+  <transport_name>lib_transport</transport_name>
+  <message_type>sensor_msgs/msg/Image</message_type>
+
+  <!-- This class overrides both values at the class level. -->
+  <class
+    name="image_transport/class_override_pub"
+    type="Some::ClassOverridePublisher"
+    base_class_type="image_transport::PublisherPlugin">
+    <description>Publisher whose transport name and message type are declared per-class.</description>
+    <transport_name>class_transport</transport_name>
+    <message_type>sensor_msgs/msg/CompressedImage</message_type>
+  </class>
+
+  <!-- This class relies on the library-level defaults. -->
+  <class
+    name="image_transport/lib_fallback_pub"
+    type="Some::LibFallbackPublisher"
+    base_class_type="image_transport::PublisherPlugin">
+    <description>Publisher that inherits transport name and message type from the library.</description>
+  </class>
+</library>

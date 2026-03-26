@@ -47,8 +47,8 @@ struct PluginManifestData
 /**
  * \brief Demangle a C++ ABI type name to its human-readable form.
  *
- * On GCC/Clang this calls __cxa_demangle; on other platforms the
- * mangled name is returned unchanged.
+ * Returns the input name in case no specific demangling algorithm
+ * is known for the current platform.
  */
 IMAGE_TRANSPORT_PUBLIC
 std::string demangle_cpp_type_name(const char * mangled_name);
@@ -96,13 +96,41 @@ std::string erase_last_copy(const std::string & input, const std::string & searc
  * \brief Read the transport name declared in a plugin manifest XML for a given
  * class lookup name.
  *
- * Parses the \c <transport_name name="..."/> child element of the matching
- * \c <class> entry without instantiating the plugin.
+ * Searches the manifest for the \c <class> element whose \c name attribute
+ * matches \p lookup_name.  The transport name is resolved with the following
+ * precedence (highest first):
+ *
+ * 1. A \c <transport_name> text child of the matching \c <class> element.
+ * 2. A \c <transport_name> text child of the enclosing \c <library> element
+ *    (shared default for all classes in that library).
+ *
+ * This allows a single shared library that bundles two distinct transports to
+ * give each \c <class> its own \c <transport_name>, while still supporting the
+ * common case where all classes share the same name declared once at library
+ * level:
+ *
+ * \code{.xml}
+ * <library path="my_transport_plugins">
+ *   <!-- library-level fallback -->
+ *   <transport_name>my_transport</transport_name>
+ *
+ *   <!-- inherits library-level transport name -->
+ *   <class name="image_transport/my_transport_pub" ...> ... </class>
+ *
+ *   <!-- overrides with its own transport name -->
+ *   <class name="image_transport/other_transport_pub" ...>
+ *     <transport_name>other_transport</transport_name>
+ *   </class>
+ * </library>
+ * \endcode
+ *
+ * No plugin is instantiated during the search.
  *
  * \param manifest_path Absolute path to the plugin XML manifest file.
  * \param lookup_name  The \c name attribute of the target \c <class> element.
- * \return The transport name string (e.g. "raw"), or an empty string
- *         if the element is absent or the file cannot be parsed.
+ * \return The transport name string (e.g. \c "raw"), or an empty string
+ *         if neither \c <transport_name> element is present or the file
+ *         cannot be parsed.
  */
 IMAGE_TRANSPORT_PUBLIC
 std::string get_transport_name_from_manifest(
@@ -113,18 +141,40 @@ std::string get_transport_name_from_manifest(
  * \brief Read the message type declared in a plugin manifest XML for a given
  * class lookup name.
  *
- * This should be a "representative" message type for this plugin. If it
- * communicates over a single topic (the most common case), use
- * the type of this topic.
+ * Searches the manifest for the \c <class> element whose \c name attribute
+ * matches \p lookup_name.  The message type is the primary ROS message type
+ * used by the plugin and is resolved with the following precedence
+ * (highest first):
  *
- * Parses the \c <message_type> child element of the enclosing \c <library>
- * element without instantiating the plugin.  The element is shared by all
- * classes in the same library, mirroring how \c <transport_name> works.
+ * 1. A \c <message_type> text child of the matching \c <class> element.
+ * 2. A \c <message_type> text child of the enclosing \c <library> element
+ *    (shared default for all classes in that library).
+ *
+ * This mirrors the resolution rules for \c <transport_name> and allows a
+ * single shared library to bundle classes that publish different message types:
+ *
+ * \code{.xml}
+ * <library path="my_transport_plugins">
+ *   <!-- library-level fallback -->
+ *   <message_type>sensor_msgs/msg/CompressedImage</message_type>
+ *
+ *   <!-- inherits library-level message type -->
+ *   <class name="image_transport/my_transport_pub" ...> ... </class>
+ *
+ *   <!-- overrides with its own message type -->
+ *   <class name="image_transport/other_transport_pub" ...>
+ *     <message_type>sensor_msgs/msg/Image</message_type>
+ *   </class>
+ * </library>
+ * \endcode
+ *
+ * No plugin is instantiated during the search.
  *
  * \param manifest_path Absolute path to the plugin XML manifest file.
  * \param lookup_name  The \c name attribute of the target \c <class> element.
- * \return The type string (e.g. "sensor_msgs/msg/Image"), or an empty string
- *         if the element is absent or the file cannot be parsed.
+ * \return The type string (e.g. \c "sensor_msgs/msg/Image"), or an empty
+ *         string if neither \c <message_type> element is present or the file
+ *         cannot be parsed.
  */
 IMAGE_TRANSPORT_PUBLIC
 std::string get_message_type_from_manifest(

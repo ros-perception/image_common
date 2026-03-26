@@ -33,13 +33,13 @@
 TEST(CameraCommon, getCameraInfoTopic_namespaced_topic) {
   const auto topic_name = "/this/is/a/topic";
   const auto info_topic = image_transport::getCameraInfoTopic(topic_name);
-  EXPECT_EQ(info_topic, "/this/is/a/camera_info");
+  EXPECT_EQ("/this/is/a/camera_info", info_topic);
 }
 
 TEST(CameraCommon, getCameraInfoTopic_topic) {
   const auto topic_name = "/topic";
   const auto info_topic = image_transport::getCameraInfoTopic(topic_name);
-  EXPECT_EQ(info_topic, "/camera_info");
+  EXPECT_EQ("/camera_info", info_topic);
 }
 
 // Crashes in boost implementation
@@ -47,7 +47,7 @@ TEST(CameraCommon, getCameraInfoTopic2_slash) {
   // TODO(anyone): Check if this is the correct behavior
   const auto topic_name = "/";
   const auto info_topic = image_transport::getCameraInfoTopic(topic_name);
-  EXPECT_EQ(info_topic, "/camera_info");
+  EXPECT_EQ("/camera_info", info_topic);
 }
 
 // Crashes in boost implementation
@@ -55,31 +55,31 @@ TEST(CameraCommon, getCameraInfoTopic2_empty) {
   // TODO(anyone): Check if this is the correct behavior
   const auto topic_name = "";
   const auto info_topic = image_transport::getCameraInfoTopic(topic_name);
-  EXPECT_EQ(info_topic, "/camera_info");
+  EXPECT_EQ("/camera_info", info_topic);
 }
 
 TEST(DefaultPluginsXml, raw_pub_transport_name) {
   const std::string transport = image_transport::get_transport_name_from_manifest(
     DEFAULT_PLUGINS_XML, "image_transport/raw_pub");
-  EXPECT_EQ(transport, "raw");
+  EXPECT_EQ("raw", transport);
 }
 
 TEST(DefaultPluginsXml, raw_sub_transport_name) {
   const std::string transport = image_transport::get_transport_name_from_manifest(
     DEFAULT_PLUGINS_XML, "image_transport/raw_sub");
-  EXPECT_EQ(transport, "raw");
+  EXPECT_EQ("raw", transport);
 }
 
 TEST(DefaultPluginsXml, raw_pub_message_type) {
   const std::string msg_type = image_transport::get_message_type_from_manifest(
     DEFAULT_PLUGINS_XML, "image_transport/raw_pub");
-  EXPECT_EQ(msg_type, "sensor_msgs/msg/Image");
+  EXPECT_EQ("sensor_msgs/msg/Image", msg_type);
 }
 
 TEST(DefaultPluginsXml, raw_sub_message_type) {
   const std::string msg_type = image_transport::get_message_type_from_manifest(
     DEFAULT_PLUGINS_XML, "image_transport/raw_sub");
-  EXPECT_EQ(msg_type, "sensor_msgs/msg/Image");
+  EXPECT_EQ("sensor_msgs/msg/Image", msg_type);
 }
 
 TEST(DefaultPluginsXml, unknown_lookup_name_returns_empty) {
@@ -108,4 +108,37 @@ TEST(CameraCommon, erase_last_copy) {
   EXPECT_EQ("image", image_transport::erase_last_copy("image_pub", "_pub"));
   EXPECT_EQ("/image_pub/image", image_transport::erase_last_copy("/image_pub/image_pub", "_pub"));
   EXPECT_EQ("/image/image", image_transport::erase_last_copy("/image_pub/image", "_pub"));
+}
+
+// ---------------------------------------------------------------------------
+// Tests that verify per-class overrides take precedence over library defaults.
+// TEST_PLUGIN_MANIFEST_XML is injected as a compile definition from CMakeLists.txt.
+// ---------------------------------------------------------------------------
+
+TEST(PluginManifestXml, class_level_transport_name_overrides_library) {
+  EXPECT_EQ(
+    "class_transport",
+    image_transport::get_transport_name_from_manifest(
+      TEST_PLUGIN_MANIFEST_XML, "image_transport/class_override_pub"));
+}
+
+TEST(PluginManifestXml, class_level_message_type_overrides_library) {
+  EXPECT_EQ(
+    "sensor_msgs/msg/CompressedImage",
+    image_transport::get_message_type_from_manifest(
+      TEST_PLUGIN_MANIFEST_XML, "image_transport/class_override_pub"));
+}
+
+TEST(PluginManifestXml, library_level_transport_name_used_as_fallback) {
+  EXPECT_EQ(
+    "lib_transport",
+    image_transport::get_transport_name_from_manifest(
+      TEST_PLUGIN_MANIFEST_XML, "image_transport/lib_fallback_pub"));
+}
+
+TEST(PluginManifestXml, library_level_message_type_used_as_fallback) {
+  EXPECT_EQ(
+    "sensor_msgs/msg/Image",
+    image_transport::get_message_type_from_manifest(
+      TEST_PLUGIN_MANIFEST_XML, "image_transport/lib_fallback_pub"));
 }
