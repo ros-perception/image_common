@@ -1,23 +1,42 @@
-<library path="test_transport_plugins">
-  <!-- Library-level defaults — apply to any class that does not override them. -->
-  <transport_name>lib_transport</transport_name>
-  <message_type>sensor_msgs/msg/Image</message_type>
+<class_libraries>
+  <library path="test_transport_plugins">
+    <!-- Library-level defaults — apply to any class that does not override them. -->
+    <transport_name>lib_transport</transport_name>
+    <message_type>sensor_msgs/msg/Image</message_type>
 
-  <!-- This class overrides both values at the class level. -->
-  <class
-    name="image_transport/class_override_pub"
-    type="Some::ClassOverridePublisher"
-    base_class_type="image_transport::PublisherPlugin">
-    <description>Publisher whose transport name and message type are declared per-class.</description>
-    <transport_name>class_transport</transport_name>
-    <message_type>sensor_msgs/msg/CompressedImage</message_type>
-  </class>
+    <!-- This class overrides both values at the class level. -->
+    <class
+      name="image_transport/class_override_pub"
+      type="Some::ClassOverridePublisher"
+      base_class_type="image_transport::PublisherPlugin">
+      <description>Publisher whose transport name and message type are declared per-class.</description>
+      <transport_name>class_transport</transport_name>
+      <message_type>sensor_msgs/msg/CompressedImage</message_type>
+    </class>
 
-  <!-- This class relies on the library-level defaults. -->
-  <class
-    name="image_transport/lib_fallback_pub"
-    type="Some::LibFallbackPublisher"
-    base_class_type="image_transport::PublisherPlugin">
-    <description>Publisher that inherits transport name and message type from the library.</description>
-  </class>
-</library>
+    <!-- This class relies on the library-level defaults. -->
+    <class
+      name="image_transport/lib_fallback_pub"
+      type="Some::LibFallbackPublisher"
+      base_class_type="image_transport::PublisherPlugin">
+      <description>Publisher that inherits transport name and message type from the library.</description>
+    </class>
+  </library>
+
+  <library path="test_transport_plugins_no_tags">
+    <!-- This class relies on fallback to lookup name. -->
+    <class
+      name="image_transport/lookup_pub"
+      type="Some::LookupPublisher"
+      base_class_type="image_transport::PublisherPlugin">
+      <description>Publisher that gets transport name from its lookup name and has no message type.</description>
+    </class>
+    <!-- This class relies on fallback to lookup name. -->
+    <class
+      name="image_transport/lookup_sub"
+      type="Some::LookupSubscriber"
+      base_class_type="image_transport::SubscriberPlugin">
+      <description>Subscriber that gets transport name from its lookup name and has no message type.</description>
+    </class>
+  </library>
+</class_libraries>
