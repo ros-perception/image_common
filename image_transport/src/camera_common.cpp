@@ -146,7 +146,21 @@ std::string get_transport_name_from_manifest(
       if (cls_transport) {
         return cls_transport;
       }
-      return lib_transport ? lib_transport : "";
+      if (lib_transport) {
+        return lib_transport;
+      }
+      // Derive a default transport name from the lookup name when the manifest
+      // does not declare <transport_name> (e.g. "image_transport/raw_sub" -> "raw").
+      if (!lookup_name.empty()) {
+        const auto pos = lookup_name.rfind('/');
+        const std::string short_name = (pos != std::string::npos) ?
+          lookup_name.substr(pos + 1) :
+          lookup_name;
+        auto lookup_name_transport = erase_last_copy(short_name, "_sub");
+        lookup_name_transport = erase_last_copy(lookup_name_transport, "_pub");
+        return lookup_name_transport;
+      }
+      return "";
     }
   }
   return "";

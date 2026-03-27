@@ -165,3 +165,22 @@ TEST(PluginManifestXml, library_level_message_type_used_as_fallback) {
     image_transport::get_message_type_from_manifest(
       TEST_PLUGIN_MANIFEST_XML, "image_transport/lib_fallback_pub"));
 }
+
+// ---------------------------------------------------------------------------
+// Tests that verify fallback to lookup name parsing.
+// TEST_PLUGIN_MANIFEST_XML is injected as a compile definition from CMakeLists.txt.
+// ---------------------------------------------------------------------------
+
+TEST(PluginManifestXml, fallback_to_lookup_name_pub) {
+  EXPECT_EQ(
+    "lookup",
+    image_transport::get_transport_name_from_manifest(
+      TEST_PLUGIN_MANIFEST_XML, "image_transport/lookup_pub"));
+}
+
+TEST(PluginManifestXml, fallback_to_lookup_name_sub) {
+  EXPECT_EQ(
+    "lookup",
+    image_transport::get_transport_name_from_manifest(
+      TEST_PLUGIN_MANIFEST_XML, "image_transport/lookup_sub"));
+}
