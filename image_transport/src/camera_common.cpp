@@ -228,8 +228,17 @@ std::string demangle_cpp_type_name(const char * mangled_name)
   std::string result = (status == 0 && d) ? d : mangled_name;
   std::free(d);
   return result;
+#elif defined(_MSC_VER)
+  // MSVC's typeid().name() is already human-readable, but prepends 'class ' or 'struct '
+  std::string result = mangled_name;
+  if (result.size() > 6 && result.substr(0, 6) == "class ") {
+    result = result.substr(6);
+  }
+  if (result.size() > 7 && result.substr(0, 7) == "struct ") {
+    result = result.substr(7);
+  }
+  return result;
 #else
-  // MSVC's typeid().name() is already human-readable.
   return mangled_name;
 #endif
 }

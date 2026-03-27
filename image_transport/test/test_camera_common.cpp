@@ -28,6 +28,8 @@
 
 #include <gtest/gtest.h>
 
+#include <typeinfo>
+
 #include "image_transport/camera_common.hpp"
 
 TEST(CameraCommon, getCameraInfoTopic_namespaced_topic) {
@@ -108,6 +110,27 @@ TEST(CameraCommon, erase_last_copy) {
   EXPECT_EQ("image", image_transport::erase_last_copy("image_pub", "_pub"));
   EXPECT_EQ("/image_pub/image", image_transport::erase_last_copy("/image_pub/image_pub", "_pub"));
   EXPECT_EQ("/image/image", image_transport::erase_last_copy("/image_pub/image", "_pub"));
+}
+
+struct A
+{
+  virtual ~A() = default;
+};
+
+struct B : A {};
+
+TEST(CameraCommon, demangle) {
+  using image_transport::demangle_cpp_type_name;
+  using image_transport::PluginManifestData;
+
+  EXPECT_EQ("int", demangle_cpp_type_name(typeid(int).name()));  // NOLINT(readability/casting)
+  EXPECT_EQ("image_transport::PluginManifestData",
+    demangle_cpp_type_name(typeid(PluginManifestData{}).name()));
+  EXPECT_EQ("A", demangle_cpp_type_name(typeid(A{}).name()));
+  EXPECT_EQ("B", demangle_cpp_type_name(typeid(B{}).name()));
+  A * a = new B;
+  EXPECT_EQ("B", demangle_cpp_type_name(typeid(*a).name()));
+  delete a;
 }
 
 // ---------------------------------------------------------------------------
