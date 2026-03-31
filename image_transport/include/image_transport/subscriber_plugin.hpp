@@ -71,7 +71,6 @@ public:
    * user-supplied overrides always take precedence over the base implementation.
    * Returning a different value than what is in the manifest is considered problematic.
    */
-  IMAGE_TRANSPORT_PUBLIC
   virtual std::string getTransportName() const;
 
   /**
@@ -83,7 +82,6 @@ public:
    * value at runtime.
    * Returning a different value than what is in the manifest is considered problematic.
    */
-  IMAGE_TRANSPORT_PUBLIC
   virtual std::string getMessageType() const;
 
   /**

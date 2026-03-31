@@ -48,17 +48,7 @@ static const PluginManifestData & ensure_manifest_data(
 {
   if (!cache) {
     const std::string demangled = demangle_cpp_type_name(mangled_this_type);
-    PluginManifestData data = get_sub_manifest_data_from_class_type(demangled);
-    // Derive a default transport name from the lookup name when the manifest
-    // does not declare <transport_name> (e.g. "image_transport/raw_sub" -> "raw").
-    if (data.transport_name.empty() && !data.lookup_name.empty()) {
-      const auto pos = data.lookup_name.rfind('/');
-      const std::string short_name = (pos != std::string::npos) ?
-        data.lookup_name.substr(pos + 1) :
-        data.lookup_name;
-      data.transport_name = erase_last_copy(short_name, "_sub");
-    }
-    cache = std::move(data);
+    cache.emplace(get_sub_manifest_data_from_class_type(demangled));
   }
   return *cache;
 }
