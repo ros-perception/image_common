@@ -155,10 +155,7 @@ protected:
    */
   virtual void publish(
     const sensor_msgs::msg::Image & message,
-    const PublisherT & publisher) const
-  {
-    publish(message, publisher);
-  }
+    const PublisherT & publisher) const = 0;
 
   /**
    * \brief Publish an image using the specified publisher.
