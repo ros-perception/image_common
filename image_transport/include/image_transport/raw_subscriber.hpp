@@ -52,6 +52,11 @@ public:
   virtual ~RawSubscriber() {}
 
 protected:
+  /**
+   * \brief Pass the received raw Image message directly to the user callback.
+   * \param message The received Image message.
+   * \param user_cb The user-supplied subscriber callback.
+   */
   void internalCallback(
     const std::shared_ptr<const sensor_msgs::msg::Image> & message,
     const Callback & user_cb) override

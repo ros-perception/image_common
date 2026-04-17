@@ -68,6 +68,13 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher() = default;
 
+  /**
+   * \brief Constructor (deprecated).
+   * \deprecated Use CameraPublisher(RequiredInterfaces, ..., rclcpp::QoS) instead.
+   * \param node The node to use for advertising.
+   * \param base_topic The base image topic name.
+   * \param custom_qos QoS profile (rmw form).
+   */
   [[deprecated("Use CameraPublisher(RequiredInterfaces node_interfaces, ..., rclcpp::QoS) "
     "instead.")]]
   IMAGE_TRANSPORT_PUBLIC
@@ -77,6 +84,12 @@ public:
     rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
     rclcpp::PublisherOptions = rclcpp::PublisherOptions());
 
+  /**
+   * \brief Constructor.
+   * \param node_interfaces The node interfaces used for advertising.
+   * \param base_topic The base image topic name.
+   * \param custom_qos QoS profile.
+   */
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
     RequiredInterfaces node_interfaces,
@@ -160,15 +173,19 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   void shutdown();
 
+  /// \brief Returns non-null if this CameraPublisher is valid (i.e. advertised).
   IMAGE_TRANSPORT_PUBLIC
   operator void *() const;
 
+  /// \brief Less-than comparison based on internal implementation pointer.
   IMAGE_TRANSPORT_PUBLIC
   bool operator<(const CameraPublisher & rhs) const {return impl_ < rhs.impl_;}
 
+  /// \brief Inequality comparison based on internal implementation pointer.
   IMAGE_TRANSPORT_PUBLIC
   bool operator!=(const CameraPublisher & rhs) const {return impl_ != rhs.impl_;}
 
+  /// \brief Equality comparison based on internal implementation pointer.
   IMAGE_TRANSPORT_PUBLIC
   bool operator==(const CameraPublisher & rhs) const {return impl_ == rhs.impl_;}
 

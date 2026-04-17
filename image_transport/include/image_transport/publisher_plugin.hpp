@@ -64,7 +64,7 @@ public:
    * The default implementation auto-discovers the name from the pluginlib
    * manifest XML (without instantiating any plugin) by matching the demangled
    * C++ type name of \c *this against the \c type attribute of each
-   * \c <class> element.  The result is cached after the first call.
+   * \c &lt;class&gt; element.  The result is cached after the first call.
    *
    * Plugins that override getTransportName() continue to work unchanged —
    * user-supplied overrides always take precedence over the base implementation.
@@ -76,7 +76,7 @@ public:
   /**
    * \brief Get the primary message type used by this plugin.
    *
-   * Returns the value of the \c <message_type> element from the plugin
+   * Returns the value of the \c &lt;message_type&gt; element from the plugin
    * manifest XML (e.g. \c "sensor_msgs/msg/Image").  The result is cached
    * after the first call.  Override this method if you need a different
    * value at runtime.

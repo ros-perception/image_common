@@ -65,6 +65,7 @@ class SimpleSubscriberPlugin : public SubscriberPlugin
 public:
   virtual ~SimpleSubscriberPlugin() {}
 
+  /// \brief Returns the transport-specific topic name being subscribed to.
   std::string getTopic() const override
   {
     if (impl_) {
@@ -73,6 +74,7 @@ public:
     return std::string();
   }
 
+  /// \brief Returns the number of publishers on the transport-specific topic.
   size_t getNumPublishers() const override
   {
     if (impl_) {
@@ -81,6 +83,7 @@ public:
     return 0;
   }
 
+  /// \brief Destroy the internal subscription and release resources.
   void shutdown() override
   {
     impl_.reset();
@@ -108,6 +111,15 @@ protected:
     return base_topic + "/" + getTransportName();
   }
 
+  /**
+   * \brief Subscribe to the transport-specific topic (deprecated).
+   * \deprecated Use subscribeImpl(RequiredInterfaces, ..., rclcpp::QoS, ...) instead.
+   * \param node The node to subscribe on.
+   * \param base_topic The base image topic name.
+   * \param callback User callback for received images.
+   * \param custom_qos QoS profile (rmw form).
+   * \param options Additional subscription options.
+   */
   [[deprecated("Use subscribeImpl(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
     "instead")]]
   void subscribeImpl(
@@ -121,6 +133,14 @@ protected:
         rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), options);
   }
 
+  /**
+   * \brief Subscribe to the transport-specific topic.
+   * \param node_interfaces The node interfaces used for subscribing.
+   * \param base_topic The base image topic name.
+   * \param callback User callback for received images.
+   * \param custom_qos QoS profile.
+   * \param options Additional subscription options.
+   */
   void subscribeImpl(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,

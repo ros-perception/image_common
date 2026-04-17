@@ -154,20 +154,35 @@ std::vector<std::string> getLoadableTransports();
 class ImageTransport
 {
 public:
+  /// Shared void pointer, used internally by handle types.
   using VoidPtr = std::shared_ptr<void>;
+  /// Convenience alias for a const-shared Image pointer.
   using ImageConstPtr = sensor_msgs::msg::Image::ConstSharedPtr;
+  /// Convenience alias for a const-shared CameraInfo pointer.
   using CameraInfoConstPtr = sensor_msgs::msg::CameraInfo::ConstSharedPtr;
 
+  /**
+   * \brief Constructor (deprecated).
+   * \deprecated Use ImageTransport(RequiredInterfaces) instead.
+   * \param node Shared pointer to the node to bind to.
+   */
   [[deprecated("Use ImageTransport(RequiredInterfaces node_interfaces, ...) instead.")]]
   IMAGE_TRANSPORT_PUBLIC
   explicit ImageTransport(rclcpp::Node::SharedPtr node);
 
+  /**
+   * \brief Constructor.
+   * \param node_interfaces The node interfaces (parameters, topics, logging, timers, base)
+   *        used for all advertisements and subscriptions.
+   */
   IMAGE_TRANSPORT_PUBLIC
   explicit ImageTransport(RequiredInterfaces node_interfaces);
 
+  /// \brief Copy constructor.
   IMAGE_TRANSPORT_PUBLIC
   ImageTransport(const ImageTransport & other);
 
+  /// \brief Copy-assignment operator.
   IMAGE_TRANSPORT_PUBLIC
   ImageTransport & operator=(const ImageTransport & other);
 
@@ -497,10 +512,12 @@ private:
   std::unique_ptr<Impl> impl_;
 };
 
+/// \cond INTERNAL
 struct ImageTransport::Impl
 {
   RequiredInterfaces required_interfaces_;
 };
+/// \endcond
 
 }  // namespace image_transport
 

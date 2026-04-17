@@ -56,6 +56,7 @@ public:
 
   virtual ~SubscriberPlugin() {}
 
+  /// Callback signature: receives a const-shared Image pointer.
   typedef std::function<void (const sensor_msgs::msg::Image::ConstSharedPtr &)> Callback;
 
   /**
@@ -65,7 +66,7 @@ public:
    * The default implementation auto-discovers the name from the pluginlib
    * manifest XML (without instantiating any plugin) by matching the demangled
    * C++ type name of \c *this against the \c type attribute of each
-   * \c <class> element.  The result is cached after the first call.
+   * \c &lt;class&gt; element.  The result is cached after the first call.
    *
    * Plugins that override getTransportName() continue to work unchanged —
    * user-supplied overrides always take precedence over the base implementation.
@@ -76,7 +77,7 @@ public:
   /**
    * \brief Get the primary message type used by this plugin.
    *
-   * Returns the value of the \c <message_type> element from the plugin
+   * Returns the value of the \c &lt;message_type&gt; element from the plugin
    * manifest XML (e.g. \c "sensor_msgs/msg/Image").  The result is cached
    * after the first call.  Override this method if you need a different
    * value at runtime.
@@ -244,6 +245,15 @@ protected:
   /*
    * \brief Subscribe to an image transport topic. Must be implemented by the subclass.
    */
+  /**
+   * \brief Subscribe to a transport-specific topic (deprecated).
+   * \deprecated Use subscribeImpl(RequiredInterfaces, ..., rclcpp::QoS, ...) instead.
+   * \param node The node to subscribe on.
+   * \param base_topic The base image topic name.
+   * \param callback User callback for received images.
+   * \param custom_qos QoS profile (rmw form).
+   * \param options Additional subscription options.
+   */
   [[deprecated("Use subscribeImpl(RequiredInterfaces node_interfaces, .., rclcpp::QoS, ...) "
     "instead")]]
   virtual void subscribeImpl(
@@ -257,6 +267,14 @@ protected:
       rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), options);
   }
 
+  /**
+   * \brief Subscribe to a transport-specific topic. Must be implemented by the subclass.
+   * \param node_interfaces The node interfaces used for subscribing.
+   * \param base_topic The base image topic name.
+   * \param callback User callback for received images.
+   * \param custom_qos QoS profile.
+   * \param options Additional subscription options.
+   */
   virtual void subscribeImpl(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,

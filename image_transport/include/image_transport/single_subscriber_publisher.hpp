@@ -51,27 +51,41 @@ private:
   SingleSubscriberPublisher & operator=(const SingleSubscriberPublisher &) = delete;
 
 public:
+  /// Function type used to query the number of active subscribers.
   typedef std::function<size_t ()> GetNumSubscribersFn;
+  /// Function type used to publish a single Image message.
   typedef std::function<void (const sensor_msgs::msg::Image &)> PublishFn;
 
+  /**
+   * \brief Constructor. Intended for internal use by Publisher.
+   * \param caller_id Identifier of the subscriber this publisher targets.
+   * \param topic The topic name.
+   * \param num_subscribers_fn Callable that returns the current subscriber count.
+   * \param publish_fn Callable that performs the actual publish.
+   */
   IMAGE_TRANSPORT_PUBLIC
   SingleSubscriberPublisher(
     const std::string & caller_id, const std::string & topic,
     const GetNumSubscribersFn & num_subscribers_fn,
     const PublishFn & publish_fn);
 
+  /// \brief Returns the name (caller ID) of the targeted subscriber.
   IMAGE_TRANSPORT_PUBLIC
   std::string getSubscriberName() const;
 
+  /// \brief Returns the topic name.
   IMAGE_TRANSPORT_PUBLIC
   std::string getTopic() const;
 
+  /// \brief Returns the number of subscribers currently connected.
   IMAGE_TRANSPORT_PUBLIC
   size_t getNumSubscribers() const;
 
+  /// \brief Publish \p message to the targeted subscriber.
   IMAGE_TRANSPORT_PUBLIC
   void publish(const sensor_msgs::msg::Image & message) const;
 
+  /// \brief Publish \p message (shared pointer) to the targeted subscriber.
   IMAGE_TRANSPORT_PUBLIC
   void publish(const sensor_msgs::msg::Image::ConstSharedPtr & message) const;
 

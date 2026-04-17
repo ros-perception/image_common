@@ -54,9 +54,9 @@ public:
    * in the node's local namespace. For consistency across ROS applications, the
    * name of this parameter should not be changed without good reason.
    *
-   * @param node Node to use when looking up the transport parameter.
-   * @param default_transport Preferred transport to use
-   * @param parameter_name The name of the transport parameter
+   * @param node_interfaces Node interfaces used to look up the transport parameter.
+   * @param default_transport Preferred transport to use.
+   * @param parameter_name The name of the transport parameter.
    */
   IMAGE_TRANSPORT_PUBLIC
   TransportHints(
@@ -72,6 +72,13 @@ public:
     }
   }
 
+  /**
+   * \brief Constructor (deprecated).
+   * \deprecated Use TransportHints(RequiredInterfaces, ...) instead.
+   * \param node The node used to look up the transport parameter.
+   * \param default_transport Preferred transport if the parameter is not set.
+   * \param parameter_name Name of the ROS parameter holding the transport choice.
+   */
   [[deprecated("Use TransportHints(RequiredInterfaces node_interfaces, ...) instead.")]]
   IMAGE_TRANSPORT_PUBLIC
   TransportHints(
@@ -82,6 +89,7 @@ public:
     node->get_parameter_or<std::string>(parameter_name, transport_, default_transport);
   }
 
+  /// \brief Returns the transport name to use for subscribing.
   IMAGE_TRANSPORT_PUBLIC
   const std::string & getTransport() const
   {

@@ -41,6 +41,24 @@
 
 namespace image_transport
 {
+
+/**
+ * \brief ROS 2 composable node that republishes images between transports.
+ *
+ * Republisher subscribes to an image topic using one transport (controlled by
+ * the \c in_transport parameter, default \c "raw") and re-publishes it using
+ * another transport (controlled by the \c out_transport parameter).
+ *
+ * Typical use:
+ * \code{.bash}
+ * ros2 run image_transport republish \
+ *   --ros-args \
+ *   -p in_transport:=raw \
+ *   -p out_transport:=compressed \
+ *   --remap in:=/camera/image_raw \
+ *   --remap out:=/camera/image_raw
+ * \endcode
+ */
 class Republisher : public rclcpp::Node
 {
 public:

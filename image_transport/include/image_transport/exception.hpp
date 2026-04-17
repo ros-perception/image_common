@@ -43,6 +43,8 @@ namespace image_transport
 class Exception : public std::runtime_error
 {
 public:
+  /// \brief Construct with an error message.
+  /// \param message Human-readable description of the error.
   explicit Exception(const std::string & message)
   : std::runtime_error(message) {}
 };
@@ -53,15 +55,22 @@ public:
 class TransportLoadException : public Exception
 {
 public:
+  /**
+   * \brief Constructor.
+   * \param transport Name of the transport plugin that could not be loaded.
+   * \param message Detailed error string from pluginlib.
+   */
   TransportLoadException(const std::string & transport, const std::string & message)
   : Exception("Unable to load plugin for transport '" + transport + "', error string:\n" + message),
     transport_(transport.c_str())
   {
   }
 
+  /// \brief Returns the name of the transport that failed to load.
   std::string getTransport() const {return transport_;}
 
 protected:
+  /// \brief Name of the transport that could not be loaded.
   const char * transport_;
 };
 

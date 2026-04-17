@@ -96,20 +96,20 @@ std::string erase_last_copy(const std::string & input, const std::string & searc
  * \brief Read the transport name declared in a plugin manifest XML for a given
  * class lookup name.
  *
- * Searches the manifest for the \c <class> element whose \c name attribute
+ * Searches the manifest for the \c &lt;class&gt; element whose \c name attribute
  * matches \p lookup_name.  The transport name is resolved with the following
  * precedence (highest first):
  *
- * 1. A \c <transport_name> text child of the matching \c <class> element.
- * 2. A \c <transport_name> text child of the enclosing \c <library> element
+ * 1. A \c &lt;transport_name&gt; text child of the matching \c &lt;class&gt; element.
+ * 2. A \c &lt;transport_name&gt; text child of the enclosing \c &lt;library&gt; element
  *    (shared default for all classes in that library).
  *
  * This allows a single shared library that bundles two distinct transports to
- * give each \c <class> its own \c <transport_name>, while still supporting the
+ * give each \c &lt;class&gt; its own \c &lt;transport_name&gt;, while still supporting the
  * common case where all classes share the same name declared once at library
  * level:
  *
- * \code{.xml}
+ * \code{.none}
  * <library path="my_transport_plugins">
  *   <!-- library-level fallback -->
  *   <transport_name>my_transport</transport_name>
@@ -127,9 +127,9 @@ std::string erase_last_copy(const std::string & input, const std::string & searc
  * No plugin is instantiated during the search.
  *
  * \param manifest_path Absolute path to the plugin XML manifest file.
- * \param lookup_name  The \c name attribute of the target \c <class> element.
+ * \param lookup_name  The \c name attribute of the target \c &lt;class&gt; element.
  * \return The transport name string (e.g. \c "raw"), or an empty string
- *         if neither \c <transport_name> element is present or the file
+ *         if neither \c &lt;transport_name&gt; element is present or the file
  *         cannot be parsed.
  */
 IMAGE_TRANSPORT_PUBLIC
@@ -141,19 +141,19 @@ std::string get_transport_name_from_manifest(
  * \brief Read the message type declared in a plugin manifest XML for a given
  * class lookup name.
  *
- * Searches the manifest for the \c <class> element whose \c name attribute
+ * Searches the manifest for the \c &lt;class&gt; element whose \c name attribute
  * matches \p lookup_name.  The message type is the primary ROS message type
  * used by the plugin and is resolved with the following precedence
  * (highest first):
  *
- * 1. A \c <message_type> text child of the matching \c <class> element.
- * 2. A \c <message_type> text child of the enclosing \c <library> element
+ * 1. A \c &lt;message_type&gt; text child of the matching \c &lt;class&gt; element.
+ * 2. A \c &lt;message_type&gt; text child of the enclosing \c &lt;library&gt; element
  *    (shared default for all classes in that library).
  *
- * This mirrors the resolution rules for \c <transport_name> and allows a
+ * This mirrors the resolution rules for \c &lt;transport_name&gt; and allows a
  * single shared library to bundle classes that publish different message types:
  *
- * \code{.xml}
+ * \code{.none}
  * <library path="my_transport_plugins">
  *   <!-- library-level fallback -->
  *   <message_type>sensor_msgs/msg/CompressedImage</message_type>
@@ -171,9 +171,9 @@ std::string get_transport_name_from_manifest(
  * No plugin is instantiated during the search.
  *
  * \param manifest_path Absolute path to the plugin XML manifest file.
- * \param lookup_name  The \c name attribute of the target \c <class> element.
+ * \param lookup_name  The \c name attribute of the target \c &lt;class&gt; element.
  * \return The type string (e.g. \c "sensor_msgs/msg/Image"), or an empty
- *         string if neither \c <message_type> element is present or the file
+ *         string if neither \c &lt;message_type&gt; element is present or the file
  *         cannot be parsed.
  */
 IMAGE_TRANSPORT_PUBLIC
