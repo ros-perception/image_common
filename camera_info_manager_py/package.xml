@@ -5,12 +5,7 @@
 <package format="3">
   <name>camera_info_manager_py</name>
   <version>6.4.7</version>
-  <description>
-    Python interface for camera calibration information.
-
-    This ROS package provides a CameraInfo interface for Python camera
-    drivers similar to the C++ camera_info_manager package.
-  </description>
+  <description>Python interface for camera calibration information, providing CameraInfo support for camera drivers written in Python.</description>
   <maintainer email="jmastrangelo@clearpathrobotics.com">Jose Mastrangelo</maintainer>
   <maintainer email="mhosmar@clearpathrobotics.com">Mike Hosmar</maintainer>
   <license>BSD-3-Clause</license>
@@ -33,6 +28,7 @@
 
   <export>
     <build_type>ament_python</build_type>
+    <rosdoc2>rosdoc2.yaml</rosdoc2>
   </export>
 
 </package>
