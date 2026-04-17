@@ -44,11 +44,12 @@ namespace camera_calibration_parsers
 using CameraInfo = sensor_msgs::msg::CameraInfo;
 
 /**
- * \brief Write calibration parameters to a file in YAML format.
+ * \brief Write calibration parameters to a stream in YAML format.
  *
- * \param out Output stream to write to
- * \param camera_name Name of the camera
- * \param cam_info Camera parameters
+ * \param out         Output stream to write to.
+ * \param camera_name Name of the camera.
+ * \param cam_info    Camera parameters to serialise.
+ * \return \c true on success, \c false on write error.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool writeCalibrationYml(
@@ -56,11 +57,12 @@ bool writeCalibrationYml(
   const CameraInfo & cam_info);
 
 /**
- * \brief Read calibration parameters from a YAML file.
+ * \brief Read calibration parameters from a stream in YAML format.
  *
- * \param in Input stream to read from
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
+ * \param in               Input stream to read from.
+ * \param[out] camera_name Camera name read from the stream.
+ * \param[out] cam_info    Camera parameters read from the stream.
+ * \return \c true on success, \c false if the stream cannot be parsed.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool readCalibrationYml(
@@ -70,9 +72,10 @@ bool readCalibrationYml(
 /**
  * \brief Write calibration parameters to a file in YAML format.
  *
- * \param file_name File to write
- * \param camera_name Name of the camera
- * \param cam_info Camera parameters
+ * \param file_name   File path to write.
+ * \param camera_name Name of the camera.
+ * \param cam_info    Camera parameters to serialise.
+ * \return \c true on success, \c false on I/O error.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool writeCalibrationYml(
@@ -80,11 +83,12 @@ bool writeCalibrationYml(
   const CameraInfo & cam_info);
 
 /**
- * \brief Read calibration parameters from a YAML file.
+ * \brief Read calibration parameters from a file in YAML format.
  *
- * \param file_name File to read
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
+ * \param file_name        File path to read.
+ * \param[out] camera_name Camera name read from the file.
+ * \param[out] cam_info    Camera parameters read from the file.
+ * \return \c true on success, \c false if the file cannot be opened or parsed.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool readCalibrationYml(
@@ -92,11 +96,12 @@ bool readCalibrationYml(
   CameraInfo & cam_info);
 
 /**
- * \brief Parse calibration parameters from a string in memory of yaml format.
+ * \brief Parse calibration parameters from an in-memory string in YAML format.
  *
- * \param buffer Calibration string
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
+ * \param buffer           YAML-format calibration data as a string.
+ * \param[out] camera_name Camera name parsed from the buffer.
+ * \param[out] cam_info    Camera parameters parsed from the buffer.
+ * \return \c true on success, \c false if the buffer cannot be parsed.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool parseCalibrationYml(
