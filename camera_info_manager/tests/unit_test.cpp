@@ -57,7 +57,16 @@ class CameraInfoManagerTesting : public ::testing::Test
 protected:
   void SetUp()
   {
-    node = rclcpp::Node::make_shared("camera_info_manager_test");
+    const ::testing::TestInfo * const test_info =
+      ::testing::UnitTest::GetInstance()->current_test_info();
+    std::string node_name = "camera_info_manager_test_" + std::string(test_info->name());
+    // Sanitize node name: replace non-alphanumeric characters with underscores
+    for (char & c : node_name) {
+      if (!isalnum(c)) {
+        c = '_';
+      }
+    }
+    node = rclcpp::Node::make_shared(node_name);
     executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
     executor->add_node(node);
     executor_thread = std::thread([this]() {executor->spin();});
