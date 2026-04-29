@@ -32,7 +32,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <filesystem>
-#include <locale>
 #include <memory>
 #include <string>
 

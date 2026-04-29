@@ -78,7 +78,6 @@ struct Subscriber::Impl
   SubLoaderPtr loader_;
   std::shared_ptr<SubscriberPlugin> subscriber_;
   bool unsubscribed_;
-  // double constructed_;
 };
 
 Subscriber::Subscriber(

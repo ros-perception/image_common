@@ -44,8 +44,6 @@
 namespace image_transport
 {
 
-class ImageTransport;
-
 /**
  * \brief Manages a subscription callback on synchronized Image and CameraInfo topics.
  *

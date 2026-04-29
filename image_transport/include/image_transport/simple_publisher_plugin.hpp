@@ -198,23 +198,6 @@ private:
   };
 
   std::unique_ptr<SimplePublisherPluginImpl> simple_impl_;
-
-  typedef std::function<void (const sensor_msgs::msg::Image &)> ImagePublishFn;
-
-  /**
-   * Returns a function object for publishing the transport-specific message type
-   * through some ROS publisher type.
-   *
-   * @param pub An object with method void publish(const M&)
-   */
-  template<class PubT>
-  PublishFn bindInternalPublisher(PubT * pub) const
-  {
-    // Bind PubT::publish(const Message&) as PublishFn
-    typedef void (PubT::* InternalPublishMemFn)(const M &);
-    InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
-    return std::bind(internal_pub_mem_fn, pub, std::placeholders::_1);
-  }
 };
 
 }  // namespace image_transport

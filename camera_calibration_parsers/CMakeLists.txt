@@ -46,22 +46,6 @@ endif()
 
 ament_export_targets(export_${PROJECT_NAME})
 
-# TODO: Reenable Python Wrapper with new serialization technique.
-#find_package(PythonLibs REQUIRED)
-#if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
-#  find_package(Boost REQUIRED COMPONENTS python)
-#else()
-#  find_package(Boost REQUIRED COMPONENTS python3)
-#endif()
-#add_library(${PROJECT_NAME}_wrapper
-#  src/parse_wrapper.cpp)
-#target_link_libraries(${PROJECT_NAME}_wrapper
-#  rclcpp::rclcpp
-#  sensor_msgs::sensor_msgs
-#)
-#target_include_directories(${PROJECT_NAME}_wrapper PUBLIC ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
-#target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${YAML_CPP_LIBRARIES})
-
 # define the exe to convert
 add_executable(convert src/convert.cpp)
 target_link_libraries(convert PRIVATE

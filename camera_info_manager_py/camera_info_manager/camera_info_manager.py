@@ -221,7 +221,7 @@ class CameraInfoManager:
 
         :returns: Return string representation of :class:CameraInfoManager.
         """
-        return '[' + self.cname + ']' + str(self.utm)
+        return '[' + self.cname + ']' + str(self.url)
 
     def getCameraInfo(self):
         """

@@ -129,9 +129,6 @@ protected:
     rclcpp::SubscriptionOptions options) override
   {
     impl_ = std::make_unique<Impl>();
-    // Push each group of transport-specific parameters into a separate sub-namespace
-    // ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
-    //
     auto parameters_interface = node_interfaces.get_node_parameters_interface();
     auto topics_interface = node_interfaces.get_node_topics_interface();
     impl_->sub_ = rclcpp::create_subscription<M>(
