@@ -185,12 +185,12 @@ std::filesystem::path CameraInfoManager::getPackageFileName(const std::string & 
     pkgPath = ament_index_cpp::get_package_share_path(package);
   } catch (const ament_index_cpp::PackageNotFoundError & e) {
     RCLCPP_WARN(logger_, "unknown package: %s (ignored)", package.c_str());
-    return std::filesystem::path();
+    throw std::logic_error("unknown package: " + package);
   }
 
   if (pkgPath.empty()) {                // package not found?
     RCLCPP_WARN(logger_, "unknown package: %s (ignored)", package.c_str());
-    return pkgPath;
+    throw std::logic_error("unknown package: " + package);
   } else {
     // Construct file name from package location and remainder of URL.
     // url.substr(rest) starts with '/', use relative() to compose safely.
