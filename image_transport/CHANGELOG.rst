@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removed clang warning (`#399 <https://github.com/ros-perception/image_common/issues/399>`_)
+* Contributors: Alejandro Hernández Cordero
+
 6.4.7 (2026-04-01)
 ------------------
 * Include message type (`#394 <https://github.com/ros-perception/image_common/issues/394>`_)
