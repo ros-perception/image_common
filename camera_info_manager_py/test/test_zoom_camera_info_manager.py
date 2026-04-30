@@ -30,6 +30,8 @@
 import pytest
 import rclpy
 from rclpy.node import Node
+from sensor_msgs.msg import CameraInfo
+from sensor_msgs.srv import SetCameraInfo
 
 from camera_info_manager import (
     ApproximateZoomCameraInfoManager,
@@ -37,6 +39,8 @@ from camera_info_manager import (
     CameraInfoManager,
     CameraInfoMissingError,
     InterpolatingZoomCameraInfoManager,
+    loadCalibrationFile,
+    saveCalibrationFile,
     ZoomCameraInfoManager,
 )
 
@@ -154,3 +158,93 @@ def test_zoom_manager_context_exit_does_not_raise(node):
     z = ZoomCameraInfoManager(node, min_zoom=0, max_zoom=10, cname='zoom0')
     with z:
         pass
+
+
+def _make_camera_info(width=640, height=480, fx=500.0, fy=500.0, cx=320.0, cy=240.0):
+    ci = CameraInfo()
+    ci.width = width
+    ci.height = height
+    ci.distortion_model = 'plumb_bob'
+    ci.d = [0.0, 0.0, 0.0, 0.0, 0.0]
+    ci.k = [fx, 0.0, cx, 0.0, fy, cy, 0.0, 0.0, 1.0]
+    ci.r = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+    ci.p = [fx, 0.0, cx, 0.0, 0.0, fy, cy, 0.0, 0.0, 0.0, 1.0, 0.0]
+    return ci
+
+
+def test_yaml_round_trip(tmp_path):
+    cname = 'cam0'
+    src = _make_camera_info(width=1024, height=768, fx=900.0, fy=901.0)
+    yaml_file = tmp_path / 'cam0.yaml'
+    assert saveCalibrationFile(src, str(yaml_file), cname) is True
+
+    loaded = loadCalibrationFile(str(yaml_file), cname)
+    assert loaded.width == src.width
+    assert loaded.height == src.height
+    assert loaded.distortion_model == src.distortion_model
+    assert list(loaded.d) == list(src.d)
+    assert list(loaded.k) == list(src.k)
+    assert list(loaded.r) == list(src.r)
+    assert list(loaded.p) == list(src.p)
+
+
+def test_camera_info_manager_loads_from_file(node, tmp_path):
+    cname = 'cam0'
+    src = _make_camera_info(fx=777.0)
+    yaml_file = tmp_path / 'cam0.yaml'
+    saveCalibrationFile(src, str(yaml_file), cname)
+
+    cim = CameraInfoManager(node, cname=cname, url='file://' + str(yaml_file))
+    cim.loadCameraInfo()
+    assert cim.isCalibrated()
+    info = cim.getCameraInfo()
+    assert info.k[0] == 777.0
+
+
+def test_set_camera_info_service_round_trip(node, tmp_path):
+    cname = 'set_svc_cam'
+    yaml_file = tmp_path / (cname + '.yaml')
+    cim = CameraInfoManager(node, cname=cname, url='file://' + str(yaml_file))
+
+    client = node.create_client(SetCameraInfo, 'set_camera_info')
+    assert client.wait_for_service(timeout_sec=5.0)
+
+    req = SetCameraInfo.Request()
+    req.camera_info = _make_camera_info(fx=1234.0, fy=1234.0)
+    future = client.call_async(req)
+    rclpy.spin_until_future_complete(node, future, timeout_sec=5.0)
+    assert future.done()
+    rsp = future.result()
+    assert rsp.success
+    assert yaml_file.exists()
+
+    # Service callback updates the in-memory CameraInfo too
+    info = cim.getCameraInfo()
+    assert info.k[0] == 1234.0
+
+
+def test_interpolating_zoom_interpolates_k(node, tmp_path):
+    cname = 'izoom'
+    # Calibrate at zoom 0 (fx=400) and zoom 100 (fx=800)
+    low = _make_camera_info(fx=400.0, fy=400.0)
+    high = _make_camera_info(fx=800.0, fy=800.0)
+    saveCalibrationFile(low, str(tmp_path / 'cal_0.yaml'), cname)
+    saveCalibrationFile(high, str(tmp_path / 'cal_100.yaml'), cname)
+
+    template = 'file://' + str(tmp_path) + '/cal_%d.yaml'
+    iz = InterpolatingZoomCameraInfoManager(
+        node, calibration_url_template=template, zoom_levels=[0, 100], cname=cname,
+    )
+    iz.loadCameraInfo()
+
+    # Exact-zoom hit
+    iz.set_zoom(0)
+    assert iz.getCameraInfo().k[0] == pytest.approx(400.0)
+    iz.set_zoom(100)
+    assert iz.getCameraInfo().k[0] == pytest.approx(800.0)
+
+    # Midpoint interpolation: ratio = (50 - 0) / (100 - 0) = 0.5
+    # camera_info.k = ratio * low + (1 - ratio) * high = 0.5*400 + 0.5*800 = 600
+    iz.set_zoom(50)
+    assert iz.getCameraInfo().k[0] == pytest.approx(600.0)
+    assert iz.getCameraInfo().k[4] == pytest.approx(600.0)

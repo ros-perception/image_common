@@ -300,7 +300,10 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
         self._camera_infos = None
 
     def _update_camera_info(self):
-        if not self.isCalibrated() or self._camera_infos is None:
+        # Use the per-zoom calibrations as the source of truth: the base
+        # camera_info loaded by the parent may be empty (no top-level URL is
+        # required for InterpolatingZoom).
+        if not self._camera_infos:
             return
 
         if self._zoom in list(self._camera_infos.keys()):

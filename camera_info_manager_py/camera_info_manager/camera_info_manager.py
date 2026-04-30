@@ -221,7 +221,7 @@ class CameraInfoManager:
 
         :returns: Return string representation of :class:CameraInfoManager.
         """
-        return '[' + self.cname + ']' + str(self.utm)
+        return '[' + self.cname + ']' + str(self.url)
 
     def getCameraInfo(self):
         """
@@ -326,11 +326,12 @@ class CameraInfoManager:
         """
         self._loadCalibration(self.url, self.cname)
 
-    def setCameraInfo(self, req):
+    def setCameraInfo(self, req, rsp):
         """
         Set camera info request callback.
 
         :param req: SetCameraInfo request message.
+        :param rsp: SetCameraInfo response message to populate.
         :returns: SetCameraInfo response message, success is True if
                   message handled.
 
@@ -339,7 +340,6 @@ class CameraInfoManager:
         """
         self.node.get_logger().debug('SetCameraInfo received for ' + self.cname)
         self.camera_info = req.camera_info
-        rsp = SetCameraInfo.Response()
         rsp.success = saveCalibration(req.camera_info, self.url, self.cname)
         if not rsp.success:
             rsp.status_message = 'Error storing camera calibration.'
@@ -643,16 +643,21 @@ def saveCalibrationFile(ci, filename, cname):
     :param cname: Camera name.
     :returns: True if able to save the data.
     """
-    # make calibration dictionary from CameraInfo fields and camera name
+    # CameraInfo numeric fields are array.array or numpy arrays on the rclpy side,
+    # whose elements (numpy.float64) PyYAML's SafeDumper cannot represent; coerce
+    # to plain Python floats before dumping.
+    def _to_floats(seq):
+        return [float(x) for x in seq]
+
     calib = {
-        'image_width': ci.width,
-        'image_height': ci.height,
+        'image_width': int(ci.width),
+        'image_height': int(ci.height),
         'camera_name': cname,
         'distortion_model': ci.distortion_model,
-        'distortion_coefficients': {'data': ci.d, 'rows': 1, 'cols': len(ci.d)},
-        'camera_matrix': {'data': ci.k, 'rows': 3, 'cols': 3},
-        'rectification_matrix': {'data': ci.r, 'rows': 3, 'cols': 3},
-        'projection_matrix': {'data': ci.p, 'rows': 3, 'cols': 4},
+        'distortion_coefficients': {'data': _to_floats(ci.d), 'rows': 1, 'cols': len(ci.d)},
+        'camera_matrix': {'data': _to_floats(ci.k), 'rows': 3, 'cols': 3},
+        'rectification_matrix': {'data': _to_floats(ci.r), 'rows': 3, 'cols': 3},
+        'projection_matrix': {'data': _to_floats(ci.p), 'rows': 3, 'cols': 4},
     }
 
     # make sure the directory exists and the file is writable
