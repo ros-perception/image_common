@@ -30,7 +30,6 @@
 #include "camera_info_manager/camera_info_manager.hpp"
 
 #include <algorithm>
-#include <cstdlib>
 #include <filesystem>
 #include <memory>
 #include <string>

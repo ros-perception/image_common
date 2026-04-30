@@ -27,13 +27,8 @@
 #include <rclcpp/serialization.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
-using namespace std::chrono_literals;
-
 namespace image_transport_python
 {
-
-template<typename SubscriberType>
-using SubscriberMap = std::unordered_map<SubscriberType *, std::shared_ptr<SubscriberType>>;
 
 // Bindings for the image_transport classes
 PYBIND11_MODULE(_image_transport, m)
