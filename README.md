@@ -82,6 +82,8 @@ Topics covered include:
 | Distro  | Branch      |
 |---------|-------------|
 | Rolling | `rolling`   |
+| Lyrical | `lyrical`   |
+| Kilted  | `kilted`    |
 | Jazzy   | `jazzy`     |
 | Iron    | `iron`      |
 | Humble  | `humble`    |
