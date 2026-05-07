@@ -38,6 +38,7 @@
 
 #include "rcpputils/env.hpp"
 #include "camera_calibration_parsers/parse.hpp"
+#include "ament_index_cpp/get_package_prefix.hpp"
 #include "ament_index_cpp/get_package_share_path.hpp"
 
 
@@ -179,10 +180,17 @@ std::filesystem::path CameraInfoManager::getPackageFileName(const std::string & 
   std::string package(url.substr(prefix_len, rest - prefix_len));
 
   // Look up the ROS package path name.
-  std::filesystem::path pkgPath = ament_index_cpp::get_package_share_path(package);
+  std::filesystem::path pkgPath;
+  try {
+    pkgPath = ament_index_cpp::get_package_share_path(package);
+  } catch (const ament_index_cpp::PackageNotFoundError & e) {
+    RCLCPP_WARN(logger_, "unknown package: %s (ignored)", package.c_str());
+    throw std::logic_error("unknown package: " + package);
+  }
+
   if (pkgPath.empty()) {                // package not found?
     RCLCPP_WARN(logger_, "unknown package: %s (ignored)", package.c_str());
-    return pkgPath;
+    throw std::logic_error("unknown package: " + package);
   } else {
     // Construct file name from package location and remainder of URL.
     // url.substr(rest) starts with '/', use relative() to compose safely.
@@ -298,7 +306,7 @@ bool CameraInfoManager::loadCalibrationFile(
 {
   bool success = false;
 
-  RCLCPP_DEBUG(logger_, "reading camera calibration from %s", filename.c_str());
+  RCLCPP_DEBUG(logger_, "reading camera calibration from %s", filename.string().c_str());
   std::string cam_name;
   CameraInfo cam_info;
 
@@ -307,7 +315,7 @@ bool CameraInfoManager::loadCalibrationFile(
       RCLCPP_WARN(
         logger_,
         "[%s] does not match %s in file %s",
-        cname.c_str(), cam_name.c_str(), filename.c_str());
+        cname.c_str(), cam_name.c_str(), filename.string().c_str());
     }
     success = true;
     {
@@ -316,7 +324,7 @@ bool CameraInfoManager::loadCalibrationFile(
       cam_info_ = cam_info;
     }
   } else {
-    RCLCPP_WARN(logger_, "Camera calibration file %s not found", filename.c_str());
+    RCLCPP_WARN(logger_, "Camera calibration file %s not found", filename.string().c_str());
   }
 
   return success;
@@ -529,7 +537,7 @@ CameraInfoManager::saveCalibrationFile(
   const std::filesystem::path & filename,
   const std::string & cname)
 {
-  RCLCPP_INFO(logger_, "writing calibration data to %s", filename.c_str());
+  RCLCPP_INFO(logger_, "writing calibration data to %s", filename.string().c_str());
 
   std::filesystem::path parent = filename.parent_path();
 
