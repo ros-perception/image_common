@@ -82,20 +82,6 @@ struct Subscriber::Impl
 };
 
 Subscriber::Subscriber(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  const Callback & callback,
-  SubLoaderPtr loader,
-  const std::string & transport,
-  rmw_qos_profile_t custom_qos,
-  rclcpp::SubscriptionOptions options)
-: Subscriber(*node, base_topic, callback, loader, transport,
-    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
-    options)
-{
-}
-
-Subscriber::Subscriber(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   const Callback & callback,

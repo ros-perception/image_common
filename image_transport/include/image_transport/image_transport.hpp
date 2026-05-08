@@ -50,35 +50,12 @@ namespace image_transport
 /*!
  * \brief Advertise an image topic, free function version.
  */
-[[deprecated("Use create_publisher(RequiredInterfaces node_interfaces, ..., rclcpp::QoS) "
-  "instead.")]]
-IMAGE_TRANSPORT_PUBLIC
-Publisher create_publisher(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-  rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
-
 IMAGE_TRANSPORT_PUBLIC
 Publisher create_publisher(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   rclcpp::QoS custom_qos,
   rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
-
-/**
- * \brief Subscribe to an image topic, free function version.
- */
-[[deprecated("Use create_subscription(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
-  "instead")]]
-IMAGE_TRANSPORT_PUBLIC
-Subscriber create_subscription(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  const Subscriber::Callback & callback,
-  const std::string & transport,
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-  rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
 
 /**
  * \brief Subscribe to an image topic, free function version.
@@ -95,37 +72,12 @@ Subscriber create_subscription(
 /*!
  * \brief Advertise a camera, free function version.
  */
-[[deprecated("Use create_camera_publisher(RequiredInterfaces node_interfaces, ..., "
-  "rclcpp::QoS, ...) instead")]]
-IMAGE_TRANSPORT_PUBLIC
-CameraPublisher create_camera_publisher(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-  rclcpp::PublisherOptions pub_options = rclcpp::PublisherOptions());
-
-/*!
- * \brief Advertise a camera, free function version.
- */
 IMAGE_TRANSPORT_PUBLIC
 CameraPublisher create_camera_publisher(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   rclcpp::QoS custom_qos,
   rclcpp::PublisherOptions pub_options = rclcpp::PublisherOptions());
-
-/*!
- * \brief Subscribe to a camera, free function version.
- */
-[[deprecated("Use create_camera_subscription(RequiredInterfaces node_interfaces, ..., "
-  "rclcpp::QoS, ...) instead")]]
-IMAGE_TRANSPORT_PUBLIC
-CameraSubscriber create_camera_subscription(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  const CameraSubscriber::Callback & callback,
-  const std::string & transport,
-  rmw_qos_profile_t custom_qos = rmw_qos_profile_default);
 
 /*!
  * \brief Subscribe to a camera, free function version.
@@ -158,10 +110,6 @@ public:
   using ImageConstPtr = sensor_msgs::msg::Image::ConstSharedPtr;
   using CameraInfoConstPtr = sensor_msgs::msg::CameraInfo::ConstSharedPtr;
 
-  [[deprecated("Use ImageTransport(RequiredInterfaces node_interfaces, ...) instead.")]]
-  IMAGE_TRANSPORT_PUBLIC
-  explicit ImageTransport(rclcpp::Node::SharedPtr node);
-
   IMAGE_TRANSPORT_PUBLIC
   explicit ImageTransport(RequiredInterfaces node_interfaces);
 
@@ -179,15 +127,6 @@ public:
    */
   IMAGE_TRANSPORT_PUBLIC
   Publisher advertise(const std::string & base_topic, uint32_t queue_size, bool latch = false);
-
-  /*!
-   * \brief Advertise an image topic, simple version.
-   */
-  [[deprecated("Use advertise(..., rclcpp::QoS, ...) instead")]]
-  IMAGE_TRANSPORT_PUBLIC
-  Publisher advertise(
-    const std::string & base_topic, rmw_qos_profile_t custom_qos,
-    bool latch = false);
 
   /*!
    * \brief Advertise an image topic, simple version.
@@ -268,18 +207,6 @@ public:
   /**
    * \brief Subscribe to an image topic, version for arbitrary std::function object and QoS.
    */
-  [[deprecated("Use subscribe(..., rclcpp::QoS, ...) instead")]]
-  IMAGE_TRANSPORT_PUBLIC
-  Subscriber subscribe(
-    const std::string & base_topic, rmw_qos_profile_t custom_qos,
-    const Subscriber::Callback & callback,
-    const VoidPtr & tracked_object,
-    const TransportHints * transport_hints,
-    const rclcpp::SubscriptionOptions options);
-
-  /**
-   * \brief Subscribe to an image topic, version for arbitrary std::function object and QoS.
-   */
   IMAGE_TRANSPORT_PUBLIC
   Subscriber subscribe(
     const std::string & base_topic, rclcpp::QoS custom_qos,
@@ -287,23 +214,6 @@ public:
     const VoidPtr & tracked_object,
     const TransportHints * transport_hints,
     const rclcpp::SubscriptionOptions options);
-
-  /**
-   * \brief Subscribe to an image topic, version for bare function.
-   */
-  [[deprecated("Use subscribe(..., rclcpp::QoS, ...) instead")]]
-  IMAGE_TRANSPORT_PUBLIC
-  Subscriber subscribe(
-    const std::string & base_topic, rmw_qos_profile_t custom_qos,
-    void (* fp)(const ImageConstPtr &),
-    const TransportHints * transport_hints = nullptr,
-    const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
-  {
-    return subscribe(
-      base_topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
-      std::function<void(const ImageConstPtr &)>(fp),
-      VoidPtr(), transport_hints, options);
-  }
 
   /**
    * \brief Subscribe to an image topic, version for bare function.
@@ -325,23 +235,6 @@ public:
    * \brief Subscribe to an image topic, version for class member function with bare pointer.
    */
   template<class T>
-  [[deprecated("Use subscribe(..., rclcpp::QoS, ...) instead")]]
-  Subscriber subscribe(
-    const std::string & base_topic, rmw_qos_profile_t custom_qos,
-    void (T::* fp)(const ImageConstPtr &), T * obj,
-    const TransportHints * transport_hints = nullptr,
-    const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
-  {
-    return subscribe(
-      base_topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
-        std::bind(fp, obj, std::placeholders::_1),
-      VoidPtr(), transport_hints, options);
-  }
-
-  /**
-   * \brief Subscribe to an image topic, version for class member function with bare pointer.
-   */
-  template<class T>
   Subscriber subscribe(
     const std::string & base_topic, rclcpp::QoS custom_qos,
     void (T::* fp)(const ImageConstPtr &), T * obj,
@@ -351,25 +244,6 @@ public:
     return subscribe(
       base_topic, custom_qos, std::bind(fp, obj, std::placeholders::_1),
       VoidPtr(), transport_hints, options);
-  }
-
-  /**
-   * \brief Subscribe to an image topic, version for class member function with shared_ptr.
-   */
-  template<class T>
-  [[deprecated("Use subscribe(..., rclcpp::QoS, ...) instead")]]
-  Subscriber subscribe(
-    const std::string & base_topic, rmw_qos_profile_t custom_qos,
-    void (T::* fp)(const ImageConstPtr &),
-    const std::shared_ptr<T> & obj,
-    const TransportHints * transport_hints = nullptr,
-    const rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
-  {
-    return subscribe(
-      base_topic,
-      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
-      std::bind(fp, obj.get(), std::placeholders::_1),
-      obj, transport_hints, options);
   }
 
   /**

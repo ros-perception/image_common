@@ -108,19 +108,6 @@ protected:
     return base_topic + "/" + getTransportName();
   }
 
-  [[deprecated("Use subscribeImpl(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
-    "instead")]]
-  void subscribeImpl(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const Callback & callback,
-    rmw_qos_profile_t custom_qos,
-    rclcpp::SubscriptionOptions options) override
-  {
-    subscribeImpl(*node, base_topic, callback,
-        rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), options);
-  }
-
   void subscribeImpl(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,
