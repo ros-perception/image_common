@@ -105,3 +105,5 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
+
+ament_generate_version_header(${PROJECT_NAME})
