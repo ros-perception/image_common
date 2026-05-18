@@ -16,8 +16,8 @@ if(MSVC)
   add_compile_definitions(_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING)
 endif()
 
+find_package(ament_cmake_gen_version_h REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
-
 find_package(ament_index_cpp REQUIRED)
 find_package(camera_calibration_parsers REQUIRED)
 find_package(rclcpp REQUIRED)
