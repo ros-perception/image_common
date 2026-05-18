@@ -18,6 +18,7 @@
   <url type="repository">https://github.com/ros-perception/image_common</url>
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
+  <buildtool_depend>ament_cmake_gen_version_h</buildtool_depend>
 
   <depend>sensor_msgs</depend>
   <depend>rclcpp</depend>
