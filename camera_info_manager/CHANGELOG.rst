@@ -2,6 +2,14 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.1.4 (2026-05-29)
+------------------
+* Added version.h (`#415 <https://github.com/ros-perception/image_common/issues/415>`_) (`#417 <https://github.com/ros-perception/image_common/issues/417>`_)
+  (cherry picked from commit 2301484c02081398b70ba5b35c1f0d57669ca14f)
+  Co-authored-by: Martin Pecka <peci1@seznam.cz>
+  Co-authored-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>
+* Contributors: mergify[bot]
+
 6.1.3 (2025-10-16)
 ------------------
 * Fix cmake deprecation (`#367 <https://github.com/ros-perception/image_common/issues/367>`_) (`#368 <https://github.com/ros-perception/image_common/issues/368>`_)
