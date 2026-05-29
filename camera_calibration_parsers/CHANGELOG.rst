@@ -2,6 +2,11 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.13 (2026-05-29)
+-------------------
+* Added version.h (`#415 <https://github.com/ros-perception/image_common/issues/415>`_) (`#419 <https://github.com/ros-perception/image_common/issues/419>`_)
+* Contributors: mergify[bot]
+
 3.1.12 (2025-06-12)
 -------------------
 
