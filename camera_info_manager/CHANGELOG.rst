@@ -2,6 +2,11 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.1.8 (2026-05-29)
+------------------
+* Added version.h (`#415 <https://github.com/ros-perception/image_common/issues/415>`_) (`#418 <https://github.com/ros-perception/image_common/issues/418>`_)
+* Contributors: mergify[bot]
+
 5.1.7 (2025-06-12)
 ------------------
 
