@@ -88,57 +88,6 @@ Topics covered include:
 | Iron    | `iron`      |
 | Humble  | `humble`    |
 
-## Build Status
-
-### image_transport
-
-| ROS2 Distro | Build Status | Package build |
-|:---------:|:----:|:----------:|
-| Rolling | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rdev__image_transport__ubuntu_resolute_amd64)](https://build.ros2.org/job/Rdev__image_transport__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rbin_uR64__image_transport__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Rbin_uR64__image_transport__ubuntu_resolute_amd64__binary/) |
-| Lyrical | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Ldev__image_transport__ubuntu_resolute_amd64)](https://build.ros2.org/job/Ldev__image_transport__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Lbin_uR64__image_transport__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Lbin_uR64__image_transport__ubuntu_resolute_amd64__binary/) |
-| Kilted | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kdev__image_transport__ubuntu_noble_amd64)](https://build.ros2.org/job/Kdev__image_transport__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kbin_uN64__image_transport__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Kbin_uN64__image_transport__ubuntu_noble_amd64__binary/) |
-| Jazzy | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jdev__image_transport__ubuntu_noble_amd64)](https://build.ros2.org/job/Jdev__image_transport__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jbin_uN64__image_transport__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Jbin_uN64__image_transport__ubuntu_noble_amd64__binary/) |
-| Humble | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__image_transport__ubuntu_jammy_amd64)](https://build.ros2.org/job/Hdev__image_transport__ubuntu_jammy_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hbin_uJ64__image_transport__ubuntu_jammy_amd64__binary)](https://build.ros2.org/job/Hbin_uJ64__image_transport__ubuntu_jammy_amd64__binary/) |
-
-### image_transport_py
-
-| ROS2 Distro | Build Status | Package build |
-|:---------:|:----:|:----------:|
-| Rolling | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rdev__image_transport_py__ubuntu_resolute_amd64)](https://build.ros2.org/job/Rdev__image_transport_py__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rbin_uR64__image_transport_py__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Rbin_uR64__image_transport_py__ubuntu_resolute_amd64__binary/) |
-| Lyrical | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Ldev__image_transport_py__ubuntu_resolute_amd64)](https://build.ros2.org/job/Ldev__image_transport_py__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Lbin_uR64__image_transport_py__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Lbin_uR64__image_transport_py__ubuntu_resolute_amd64__binary/) |
-| Kilted | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kdev__image_transport_py__ubuntu_noble_amd64)](https://build.ros2.org/job/Kdev__image_transport_py__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kbin_uN64__image_transport_py__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Kbin_uN64__image_transport_py__ubuntu_noble_amd64__binary/) |
-| Jazzy | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jdev__image_transport_py__ubuntu_noble_amd64)](https://build.ros2.org/job/Jdev__image_transport_py__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jbin_uN64__image_transport_py__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Jbin_uN64__image_transport_py__ubuntu_noble_amd64__binary/) |
-| Humble | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__image_transport_py__ubuntu_jammy_amd64)](https://build.ros2.org/job/Hdev__image_transport_py__ubuntu_jammy_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hbin_uJ64__image_transport_py__ubuntu_jammy_amd64__binary)](https://build.ros2.org/job/Hbin_uJ64__image_transport_py__ubuntu_jammy_amd64__binary/) |
-
-### camera_calibration_parsers
-
-| ROS2 Distro | Build Status | Package build |
-|:---------:|:----:|:----------:|
-| Rolling | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rdev__camera_calibration_parsers__ubuntu_resolute_amd64)](https://build.ros2.org/job/Rdev__camera_calibration_parsers__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rbin_uR64__camera_calibration_parsers__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Rbin_uR64__camera_calibration_parsers__ubuntu_resolute_amd64__binary/) |
-| Lyrical | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Ldev__camera_calibration_parsers__ubuntu_resolute_amd64)](https://build.ros2.org/job/Ldev__camera_calibration_parsers__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Lbin_uR64__camera_calibration_parsers__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Lbin_uR64__camera_calibration_parsers__ubuntu_resolute_amd64__binary/) |
-| Kilted | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kdev__camera_calibration_parsers__ubuntu_noble_amd64)](https://build.ros2.org/job/Kdev__camera_calibration_parsers__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kbin_uN64__camera_calibration_parsers__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Kbin_uN64__camera_calibration_parsers__ubuntu_noble_amd64__binary/) |
-| Jazzy | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jdev__camera_calibration_parsers__ubuntu_noble_amd64)](https://build.ros2.org/job/Jdev__camera_calibration_parsers__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jbin_uN64__camera_calibration_parsers__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Jbin_uN64__camera_calibration_parsers__ubuntu_noble_amd64__binary/) |
-| Humble | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__camera_calibration_parsers__ubuntu_jammy_amd64)](https://build.ros2.org/job/Hdev__camera_calibration_parsers__ubuntu_jammy_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hbin_uJ64__camera_calibration_parsers__ubuntu_jammy_amd64__binary)](https://build.ros2.org/job/Hbin_uJ64__camera_calibration_parsers__ubuntu_jammy_amd64__binary/) |
-
-### camera_info_manager
-
-| ROS2 Distro | Build Status | Package build |
-|:---------:|:----:|:----------:|
-| Rolling | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rdev__camera_info_manager__ubuntu_resolute_amd64)](https://build.ros2.org/job/Rdev__camera_info_manager__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rbin_uR64__camera_info_manager__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Rbin_uR64__camera_info_manager__ubuntu_resolute_amd64__binary/) |
-| Lyrical | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Ldev__camera_info_manager__ubuntu_resolute_amd64)](https://build.ros2.org/job/Ldev__camera_info_manager__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Lbin_uR64__camera_info_manager__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Lbin_uR64__camera_info_manager__ubuntu_resolute_amd64__binary/) |
-| Kilted | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kdev__camera_info_manager__ubuntu_noble_amd64)](https://build.ros2.org/job/Kdev__camera_info_manager__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kbin_uN64__camera_info_manager__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Kbin_uN64__camera_info_manager__ubuntu_noble_amd64__binary/) |
-| Jazzy | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jdev__camera_info_manager__ubuntu_noble_amd64)](https://build.ros2.org/job/Jdev__camera_info_manager__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jbin_uN64__camera_info_manager__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Jbin_uN64__camera_info_manager__ubuntu_noble_amd64__binary/) |
-| Humble | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__camera_info_manager__ubuntu_jammy_amd64)](https://build.ros2.org/job/Hdev__camera_info_manager__ubuntu_jammy_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hbin_uJ64__camera_info_manager__ubuntu_jammy_amd64__binary)](https://build.ros2.org/job/Hbin_uJ64__camera_info_manager__ubuntu_jammy_amd64__binary/) |
-
-### camera_info_manager_py
-
-| ROS2 Distro | Build Status | Package build |
-|:---------:|:----:|:----------:|
-| Rolling | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rdev__camera_info_manager_py__ubuntu_resolute_amd64)](https://build.ros2.org/job/Rdev__camera_info_manager_py__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rbin_uR64__camera_info_manager_py__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Rbin_uR64__camera_info_manager_py__ubuntu_resolute_amd64__binary/) |
-| Lyrical | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Ldev__camera_info_manager_py__ubuntu_resolute_amd64)](https://build.ros2.org/job/Ldev__camera_info_manager_py__ubuntu_resolute_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Lbin_uR64__camera_info_manager_py__ubuntu_resolute_amd64__binary)](https://build.ros2.org/job/Lbin_uR64__camera_info_manager_py__ubuntu_resolute_amd64__binary/) |
-| Kilted | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kdev__camera_info_manager_py__ubuntu_noble_amd64)](https://build.ros2.org/job/Kdev__camera_info_manager_py__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Kbin_uN64__camera_info_manager_py__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Kbin_uN64__camera_info_manager_py__ubuntu_noble_amd64__binary/) |
-| Jazzy | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jdev__camera_info_manager_py__ubuntu_noble_amd64)](https://build.ros2.org/job/Jdev__camera_info_manager_py__ubuntu_noble_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jbin_uN64__camera_info_manager_py__ubuntu_noble_amd64__binary)](https://build.ros2.org/job/Jbin_uN64__camera_info_manager_py__ubuntu_noble_amd64__binary/) |
-| Humble | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__camera_info_manager_py__ubuntu_jammy_amd64)](https://build.ros2.org/job/Hdev__camera_info_manager_py__ubuntu_jammy_amd64/) | [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hbin_uJ64__camera_info_manager_py__ubuntu_jammy_amd64__binary)](https://build.ros2.org/job/Hbin_uJ64__camera_info_manager_py__ubuntu_jammy_amd64__binary/) |
 
 ## Contributing
 
