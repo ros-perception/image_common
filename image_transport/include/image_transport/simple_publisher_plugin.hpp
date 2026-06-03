@@ -118,35 +118,6 @@ public:
   }
 
 protected:
-  /**
-   * \brief Advertise the transport-specific topic (deprecated).
-   * \deprecated Use advertiseImpl(RequiredInterfaces, ...) instead.
-   * \param node The node to advertise on.
-   * \param base_topic The base image topic name.
-   * \param custom_qos QoS profile (rmw form).
-   * \param options Additional publisher options.
-   */
-  [[deprecated("Use advertiseImpl(RequiredInterfaces node_interfaces, ...) instead.")]]
-  void advertiseImpl(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    rmw_qos_profile_t custom_qos,
-    rclcpp::PublisherOptions options) override
-  {
-    advertiseImpl(
-      *node,
-      base_topic,
-      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
-      options);
-  }
-
-  /**
-   * \brief Advertise the transport-specific topic.
-   * \param node_interfaces The node interfaces used for advertising.
-   * \param base_topic The base image topic name.
-   * \param custom_qos QoS profile.
-   * \param options Additional publisher options.
-   */
   void advertiseImpl(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,
@@ -219,23 +190,6 @@ private:
   };
 
   std::unique_ptr<SimplePublisherPluginImpl> simple_impl_;
-
-  typedef std::function<void (const sensor_msgs::msg::Image &)> ImagePublishFn;
-
-  /**
-   * Returns a function object for publishing the transport-specific message type
-   * through some ROS publisher type.
-   *
-   * @param pub An object with method void publish(const M&)
-   */
-  template<class PubT>
-  PublishFn bindInternalPublisher(PubT * pub) const
-  {
-    // Bind PubT::publish(const Message&) as PublishFn
-    typedef void (PubT::* InternalPublishMemFn)(const M &);
-    InternalPublishMemFn internal_pub_mem_fn = &PubT::publish;
-    return std::bind(internal_pub_mem_fn, pub, std::placeholders::_1);
-  }
 };
 
 }  // namespace image_transport

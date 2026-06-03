@@ -78,22 +78,7 @@ struct Subscriber::Impl
   SubLoaderPtr loader_;
   std::shared_ptr<SubscriberPlugin> subscriber_;
   bool unsubscribed_;
-  // double constructed_;
 };
-
-Subscriber::Subscriber(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  const Callback & callback,
-  SubLoaderPtr loader,
-  const std::string & transport,
-  rmw_qos_profile_t custom_qos,
-  rclcpp::SubscriptionOptions options)
-: Subscriber(*node, base_topic, callback, loader, transport,
-    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
-    options)
-{
-}
 
 Subscriber::Subscriber(
   RequiredInterfaces node_interfaces,
