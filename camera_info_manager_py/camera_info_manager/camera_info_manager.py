@@ -473,7 +473,7 @@ def loadCalibrationFile(filename, cname):
             calib = yaml.safe_load(f)
             if calib is not None:
                 if calib['camera_name'] != cname:
-                    rclpy.logging.get_logger('camera_info_manager').warn(
+                    rclpy.logging.get_logger('camera_info_manager').warning(
                         '['
                         + cname
                         + '] does not match name '
@@ -510,7 +510,7 @@ def parseURL(url):
     if not url:
         return URL_empty
 
-    if url[0:8].upper() == 'FILE:///':
+    if url[0:7].upper() == 'FILE://':
         return URL_file
 
     if url[0:10].upper() == 'PACKAGE://':
@@ -564,7 +564,7 @@ def resolveURL(url, cname):
             if ros_home is None:
                 ros_home = os.environ.get('HOME')
                 if ros_home is None:
-                    rclpy.logging.get_logger('camera_info_manager').warn(
+                    rclpy.logging.get_logger('camera_info_manager').warning(
                         '[CameraInfoManager]' + ' unable to resolve ${ROS_HOME}'
                     )
                     ros_home = '${ROS_HOME}'  # retain it unresolved
@@ -575,7 +575,7 @@ def resolveURL(url, cname):
 
         else:
             # not a valid substitution variable
-            rclpy.logging.get_logger('camera_info_manager').warn(
+            rclpy.logging.get_logger('camera_info_manager').warning(
                 '[CameraInfoManager] invalid URL substitution (not resolved): ' + url
             )
             resolved += '$'  # keep the bogus '$'
@@ -602,6 +602,8 @@ def saveCalibration(new_info, url, cname):
     url_type = parseURL(resolved_url)
 
     if url_type == URL_empty:
+        if url == default_camera_info_url:
+            return False
         return saveCalibration(new_info, default_camera_info_url, cname)
 
     rclpy.logging.get_logger('camera_info_manager').info(
@@ -618,7 +620,10 @@ def saveCalibration(new_info, url, cname):
                 'Calibration package missing: ' + resolved_url + ' (ignored)'
             )
             # treat it like an empty URL
-            success = saveCalibration(new_info, default_camera_info_url, cname)
+            if url == default_camera_info_url:
+                success = False
+            else:
+                success = saveCalibration(new_info, default_camera_info_url, cname)
         else:
             success = saveCalibrationFile(new_info, filename, cname)
 
@@ -627,7 +632,10 @@ def saveCalibration(new_info, url, cname):
             'Invalid camera calibration URL: ' + resolved_url
         )
         # treat it like an empty URL
-        success = saveCalibration(new_info, default_camera_info_url, cname)
+        if url == default_camera_info_url:
+            success = False
+        else:
+            success = saveCalibration(new_info, default_camera_info_url, cname)
     return success
 
 
