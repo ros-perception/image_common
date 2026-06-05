@@ -2,6 +2,11 @@
 Changelog for package image_transport_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.4.10 (2026-06-05)
+-------------------
+* Removed build status
+* Contributors: Alejandro Hernandez Cordero
+
 6.4.9 (2026-05-29)
 ------------------
 

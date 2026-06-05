@@ -2,6 +2,11 @@
 Changelog for package camera_info_manager_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.4.10 (2026-06-05)
+-------------------
+* Zoom Camera Info manager properly ported to ROS 2 (backport `#407 <https://github.com/ros-perception/image_common/issues/407>`_) (`#422 <https://github.com/ros-perception/image_common/issues/422>`_)
+* Contributors: mergify[bot]
+
 6.4.9 (2026-05-29)
 ------------------
 
