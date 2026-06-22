@@ -72,10 +72,10 @@ protected:
     executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
     executor->add_node(node);
     executor_thread = std::thread([this]() {
-      while (rclcpp::ok() && !canceled_.load()) {
-        executor->spin_once(std::chrono::milliseconds(10));
-      }
-    });
+          while (rclcpp::ok() && !canceled_.load()) {
+            executor->spin_once(std::chrono::milliseconds(10));
+          }
+        });
   }
 
   void TearDown()
