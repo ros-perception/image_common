@@ -215,16 +215,16 @@ public:
 
 private:
   // recognized URL types
-  typedef enum
+  enum class url_type_t
   {
     // supported URLs
-    URL_empty = 0,               // empty string
-    URL_file,                    // file:
-    URL_package,                 // package:
-    // URLs not supported
-    URL_invalid,                 // anything >= is invalid
-    URL_flash,                   // flash:
-  } url_type_t;
+    Empty = 0,                   ///< empty string
+    File,                        ///< file:
+    Package,                     ///< package:
+    // URLs not supported (ordered >= Invalid)
+    Invalid,                     ///< anything ordered >= here is invalid
+    Flash,                       ///< flash:
+  };
 
   // private methods
   std::filesystem::path getPackageFileName(const std::string & url);

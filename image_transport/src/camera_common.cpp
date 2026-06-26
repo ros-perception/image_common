@@ -216,10 +216,12 @@ image_transport::PluginManifestData search_manifest_for_type(
     for (const auto & lookup_name : loader.getDeclaredClasses()) {
       if (loader.getClassType(lookup_name) == cpp_type_name) {
         const std::string manifest_path = loader.getPluginManifestPath(lookup_name);
-        return {
-          image_transport::get_transport_name_from_manifest(manifest_path, lookup_name),
-          image_transport::get_message_type_from_manifest(manifest_path, lookup_name),
-          lookup_name
+        return image_transport::PluginManifestData{
+          .transport_name =
+            image_transport::get_transport_name_from_manifest(manifest_path, lookup_name),
+          .message_type =
+            image_transport::get_message_type_from_manifest(manifest_path, lookup_name),
+          .lookup_name = lookup_name,
         };
       }
     }

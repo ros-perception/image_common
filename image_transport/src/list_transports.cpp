@@ -36,29 +36,29 @@
 #include "image_transport/publisher_plugin.hpp"
 #include "image_transport/subscriber_plugin.hpp"
 
-enum PluginStatus {SUCCESS, CREATE_FAILURE, LIB_LOAD_FAILURE, DOES_NOT_EXIST};
+enum class PluginStatus {Success, CreateFailure, LibLoadFailure, DoesNotExist};
 
 /// \cond
 struct TransportDesc
 {
-  TransportDesc()
-  : pub_status(DOES_NOT_EXIST), sub_status(DOES_NOT_EXIST)
-  {}
-
   std::string package_name;
   std::string transport_name;   // e.g. "image_transport/raw"
   std::string transport_hint;   // e.g. "raw"
   std::string pub_name;
-  PluginStatus pub_status;
+  PluginStatus pub_status{PluginStatus::DoesNotExist};
   std::string pub_message_type;
   std::string sub_name;
-  PluginStatus sub_status;
+  PluginStatus sub_status{PluginStatus::DoesNotExist};
   std::string sub_message_type;
 };
 /// \endcond
 
 int main(int /*argc*/, char ** /*argv*/)
 {
+  // Bring the PluginStatus enumerators into scope so they can be named
+  // unqualified throughout main() (C++20 using-enum-declaration).
+  using enum PluginStatus;
+
   pluginlib::ClassLoader<image_transport::PublisherPlugin> pub_loader(
     "image_transport", "image_transport::PublisherPlugin");
   pluginlib::ClassLoader<image_transport::SubscriberPlugin> sub_loader(
@@ -74,7 +74,7 @@ int main(int /*argc*/, char ** /*argv*/)
       transport_hint = pub->getTransportName();
       message_type = pub->getMessageType();
       auto & td = transports[transport_hint];
-      td.pub_status = SUCCESS;
+      td.pub_status = Success;
       td.pub_name = lookup_name;
       td.transport_hint = transport_hint;
       td.transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
@@ -88,7 +88,7 @@ int main(int /*argc*/, char ** /*argv*/)
         transport_hint = image_transport::erase_last_copy(lookup_name, "_pub");
       }
       auto & td = transports[transport_hint];
-      td.pub_status = LIB_LOAD_FAILURE;
+      td.pub_status = LibLoadFailure;
       td.pub_name = lookup_name;
       td.transport_hint = transport_hint;
       td.transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
@@ -101,7 +101,7 @@ int main(int /*argc*/, char ** /*argv*/)
         transport_hint = image_transport::erase_last_copy(lookup_name, "_pub");
       }
       auto & td = transports[transport_hint];
-      td.pub_status = CREATE_FAILURE;
+      td.pub_status = CreateFailure;
       td.pub_name = lookup_name;
       td.transport_hint = transport_hint;
       td.transport_name = image_transport::erase_last_copy(lookup_name, "_pub");
@@ -118,7 +118,7 @@ int main(int /*argc*/, char ** /*argv*/)
       transport_hint = sub->getTransportName();
       message_type = sub->getMessageType();
       auto & td = transports[transport_hint];
-      td.sub_status = SUCCESS;
+      td.sub_status = Success;
       td.sub_name = lookup_name;
       td.transport_hint = transport_hint;
       td.transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
@@ -131,7 +131,7 @@ int main(int /*argc*/, char ** /*argv*/)
         transport_hint = image_transport::erase_last_copy(lookup_name, "_sub");
       }
       auto & td = transports[transport_hint];
-      td.sub_status = LIB_LOAD_FAILURE;
+      td.sub_status = LibLoadFailure;
       td.sub_name = lookup_name;
       td.transport_hint = transport_hint;
       td.transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
@@ -144,7 +144,7 @@ int main(int /*argc*/, char ** /*argv*/)
         transport_hint = image_transport::erase_last_copy(lookup_name, "_sub");
       }
       auto & td = transports[transport_hint];
-      td.sub_status = CREATE_FAILURE;
+      td.sub_status = CreateFailure;
       td.sub_name = lookup_name;
       td.transport_hint = transport_hint;
       td.transport_name = image_transport::erase_last_copy(lookup_name, "_sub");
@@ -156,8 +156,8 @@ int main(int /*argc*/, char ** /*argv*/)
   std::cout << "Declared transports:\n";
   for (const auto & [name, td] : transports) {
     std::cout << td.transport_name;
-    if ((td.pub_status == CREATE_FAILURE || td.pub_status == LIB_LOAD_FAILURE) ||
-      (td.sub_status == CREATE_FAILURE || td.sub_status == LIB_LOAD_FAILURE))
+    if ((td.pub_status == CreateFailure || td.pub_status == LibLoadFailure) ||
+      (td.sub_status == CreateFailure || td.sub_status == LibLoadFailure))
     {
       std::cout << " (*): Not available.";
     }
@@ -168,11 +168,11 @@ int main(int /*argc*/, char ** /*argv*/)
   for (const auto & [name, td] : transports) {
     std::cout << "----------\n";
     std::cout << "\"" << td.transport_name << "\"\n";
-    if (td.pub_status == CREATE_FAILURE || td.sub_status == CREATE_FAILURE) {
+    if (td.pub_status == CreateFailure || td.sub_status == CreateFailure) {
       std::cout <<
         "*** Plugins are built, but could not be loaded. The package may need to be rebuilt or may "
         "not be compatible with this release of image_common. ***\n";
-    } else if (td.pub_status == LIB_LOAD_FAILURE || td.sub_status == LIB_LOAD_FAILURE) {
+    } else if (td.pub_status == LibLoadFailure || td.sub_status == LibLoadFailure) {
       std::cout << "*** Plugins are not built. ***\n";
     }
     std::cout << " - Provided by package: " << td.package_name << "\n";
@@ -182,7 +182,7 @@ int main(int /*argc*/, char ** /*argv*/)
     if (!td.transport_hint.empty()) {
       std::cout << " - Transport hint: " << td.transport_hint << "\n";
     }
-    if (td.pub_status == DOES_NOT_EXIST) {
+    if (td.pub_status == DoesNotExist) {
       std::cout << " - No publisher provided\n";
     } else {
       std::cout << " - Publisher";
@@ -191,7 +191,7 @@ int main(int /*argc*/, char ** /*argv*/)
       }
       std::cout << ": " << pub_loader.getClassDescription(td.pub_name) << "\n";
     }
-    if (td.sub_status == DOES_NOT_EXIST) {
+    if (td.sub_status == DoesNotExist) {
       std::cout << " - No subscriber provided\n";
     } else {
       std::cout << " - Subscriber";

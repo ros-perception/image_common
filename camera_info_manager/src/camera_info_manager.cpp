@@ -207,29 +207,29 @@ bool CameraInfoManager::loadCalibration(
   const std::string resURL(resolveURL(url, cname));
   url_type_t url_type = parseURL(resURL);
 
-  if (url_type != URL_empty) {
+  if (url_type != url_type_t::Empty) {
     RCLCPP_INFO(logger_, "camera calibration URL: %s", resURL.c_str());
   }
 
   switch (url_type) {
-    case URL_empty:
+    case url_type_t::Empty:
       {
         RCLCPP_INFO(logger_, "using default calibration URL");
         success = loadCalibration(default_camera_info_url, cname);
         break;
       }
-    case URL_file:
+    case url_type_t::File:
       {
         success = loadCalibrationFile(
           std::filesystem::path(resURL.substr(7)), cname);
         break;
       }
-    case URL_flash:
+    case url_type_t::Flash:
       {
         RCLCPP_WARN(logger_, "reading from flash not implemented yet");
         break;
       }
-    case URL_package:
+    case url_type_t::Package:
       {
         std::filesystem::path filename(getPackageFileName(resURL));
         if (!filename.empty()) {
@@ -385,12 +385,12 @@ std::string CameraInfoManager::resolveURL(
  * @param url string to parse
  * @return URL type
  *
- * @note Recognized but unsupported URL types have enum values >= URL_invalid.
+ * @note Recognized but unsupported URL types have enum values >= url_type_t::Invalid.
  */
 CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string & url)
 {
   if (url == "") {
-    return URL_empty;
+    return url_type_t::Empty;
   }
 
   // Easy C++14 replacement for boost::iequals from :
@@ -410,20 +410,20 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string & ur
   if (iequals(url.substr(0, 7), "file://") && url.length() > 7 &&
     (url[7] == '/' || (url.length() > 9 && std::isalpha(url[7]) && url[8] == ':')))
   {
-    return URL_file;
+    return url_type_t::File;
   }
   if (iequals(url.substr(0, 9), "flash:///")) {
-    return URL_flash;
+    return url_type_t::Flash;
   }
   if (iequals(url.substr(0, 10), "package://")) {
     // look for a '/' following the package name, make sure it is
     // there, the name is not empty, and something follows it
     size_t rest = url.find('/', 10);
     if (rest < url.length() - 1 && rest > 10) {
-      return URL_package;
+      return url_type_t::Package;
     }
   }
-  return URL_invalid;
+  return url_type_t::Invalid;
 }
 
 /** Save CameraInfo calibration data.
@@ -447,19 +447,19 @@ CameraInfoManager::saveCalibration(
   const std::string resURL(resolveURL(url, cname));
 
   switch (parseURL(resURL)) {
-    case URL_empty:
+    case url_type_t::Empty:
       {
         // store using default file name
         success = saveCalibration(new_info, default_camera_info_url, cname);
         break;
       }
-    case URL_file:
+    case url_type_t::File:
       {
         success = saveCalibrationFile(
           new_info, std::filesystem::path(resURL.substr(7)), cname);
         break;
       }
-    case URL_package:
+    case url_type_t::Package:
       {
         std::filesystem::path filename(getPackageFileName(resURL));
         if (!filename.empty()) {
@@ -617,6 +617,6 @@ bool CameraInfoManager::validateURL(const std::string & url)
   }  // release the lock
 
   url_type_t url_type = parseURL(resolveURL(url, cname));
-  return url_type < URL_invalid;
+  return url_type < url_type_t::Invalid;
 }
 }  // namespace camera_info_manager
