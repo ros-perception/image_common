@@ -27,37 +27,75 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""End-to-end test for the ``convert`` calibration-format executable."""
+
 import os
+import shutil
 import subprocess
-import unittest
 
-from camera_calibration_parsers import readCalibration
-import rosunit
+from ament_index_python.packages import get_package_prefix
+from ament_index_python.packages import PackageNotFoundError
+import pytest
+import yaml
 
-
-class TestParser(unittest.TestCase):
-
-    def test_ini(self):
-        for files in [('calib5.ini', 'calib5.yaml'), ('calib8.ini', 'calib8.yaml')]:
-            for directory in ['', './']:
-                p = subprocess.Popen(
-                    'rosrun camera_calibration_parsers convert '
-                    '$(rospack find camera_calibration_parsers)/test/%s %s%s' % (
-                        files[0], directory, files[1]), shell=True, stderr=subprocess.PIPE)
-                out, err = p.communicate()
-                self.assertEqual(err, '')
-
-    def test_readCalibration(self):
-        script_dir = os.path.dirname(os.path.realpath(__file__))
-        camera_name, camera_info = readCalibration(os.path.join(script_dir, 'calib5.ini'))
-        self.assertEqual(camera_name, 'mono_left')
-        self.assertEqual(camera_info.height, 480)
-        self.assertEqual(camera_info.width, 640)
-        self.assertEqual(camera_info.P[0], 262.927429)
-
-        camera_name, camera_info = readCalibration(os.path.join(script_dir, 'calib8.ini'))
-        self.assertEqual(camera_info.distortion_model, 'rational_polynomial')
+THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-if __name__ == '__main__':
-    rosunit.unitrun('camera_calibration_parsers', 'parser', TestParser)
+def _find_convert():
+    """Locate the camera_calibration_parsers ``convert`` executable."""
+    # Preferred: absolute path injected by CMake at test time.
+    env_path = os.environ.get('CONVERT_EXECUTABLE')
+    if env_path and os.path.isfile(env_path):
+        return env_path
+
+    # Fallback: resolve it from the installed package prefix.
+    try:
+        candidate = os.path.join(
+            get_package_prefix('camera_calibration_parsers'),
+            'lib', 'camera_calibration_parsers', 'convert',
+        )
+        if os.path.isfile(candidate):
+            return candidate
+    except PackageNotFoundError:
+        pass
+
+    # Last resort: search the PATH.
+    return shutil.which('convert')
+
+
+def _convert(ini_name, tmp_path):
+    """Convert a fixture ``.ini`` to ``.yaml`` and return the parsed YAML."""
+    convert = _find_convert()
+    assert convert is not None, 'convert executable not found'
+
+    ini_path = os.path.join(THIS_DIR, ini_name)
+    yaml_path = os.path.join(str(tmp_path), 'out.yaml')
+    result = subprocess.run(
+        [convert, ini_path, yaml_path],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    assert os.path.isfile(yaml_path)
+
+    with open(yaml_path, encoding='utf-8') as f:
+        return yaml.safe_load(f)
+
+
+def test_convert_calib5_ini(tmp_path):
+    """Convert the plumb_bob fixture and check the recovered calibration."""
+    calib = _convert('calib5.ini', tmp_path)
+    assert calib['camera_name'] == 'mono_left'
+    assert calib['image_width'] == 640
+    assert calib['image_height'] == 480
+    assert calib['distortion_model'] == 'plumb_bob'
+    assert calib['projection_matrix']['data'][0] == pytest.approx(262.927429)
+
+
+def test_convert_calib8_ini(tmp_path):
+    """Convert the rational_polynomial fixture and check the distortion model."""
+    calib = _convert('calib8.ini', tmp_path)
+    assert calib['camera_name'] == 'mono_left'
+    assert calib['image_width'] == 640
+    assert calib['image_height'] == 480
+    assert calib['distortion_model'] == 'rational_polynomial'

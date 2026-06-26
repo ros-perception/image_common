@@ -86,6 +86,11 @@ if(BUILD_TESTING)
   if(TARGET ${PROJECT_NAME}-parse_yml)
     target_link_libraries(${PROJECT_NAME}-parse_yml ${PROJECT_NAME})
   endif()
+
+  # End-to-end test of the `convert` executable, driven from Python.
+  find_package(ament_cmake_pytest REQUIRED)
+  ament_add_pytest_test(${PROJECT_NAME}-parser test/parser.py
+    ENV "CONVERT_EXECUTABLE=$<TARGET_FILE:convert>")
 endif()
 
 ament_package()
