@@ -1,17 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 project(image_transport_py)
 
-# Default to C99
-if(NOT CMAKE_C_STANDARD)
-  set(CMAKE_C_STANDARD 99)
-endif()
-
-# Default to C++17
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
-
+# The C++/C standard comes from ament_ros_defaults (cxx_std_20 / c_std_17),
+# provided by the ament_cmake_ros_core::ament_ros_defaults INTERFACE target and
+# linked into the pybind module below.
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
@@ -19,6 +11,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
+find_package(ament_cmake_ros_core REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -54,6 +47,7 @@ target_include_directories(_image_transport PUBLIC
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
 target_link_libraries(_image_transport PUBLIC
+  ament_cmake_ros_core::ament_ros_defaults
   image_transport::image_transport
   rclcpp::rclcpp
   sensor_msgs::sensor_msgs
