@@ -35,7 +35,10 @@ A similar C++ API does not exist yet.
 
 from copy import deepcopy
 from math import radians, tan
+from types import TracebackType
+from typing import Self
 
+from rclpy.node import Node
 from sensor_msgs.msg import CameraInfo
 
 from camera_info_manager import (
@@ -64,7 +67,15 @@ class ZoomCameraInfoManager(CameraInfoManager):
     calibrate a zoom camera.
     """
 
-    def __init__(self, node, min_zoom, max_zoom, cname='camera', url='', namespace=''):
+    def __init__(
+        self,
+        node: Node,
+        min_zoom: int,
+        max_zoom: int,
+        cname: str = 'camera',
+        url: str = '',
+        namespace: str = '',
+    ) -> None:
         """
         Construct the manager.
 
@@ -86,11 +97,11 @@ class ZoomCameraInfoManager(CameraInfoManager):
         self._max_zoom = max_zoom
         self._zoom = min_zoom
 
-    def _update_camera_info(self):
+    def _update_camera_info(self) -> None:
         """Update the camera info after zoom or calibration has changed."""
         raise NotImplementedError()
 
-    def set_zoom(self, zoom):
+    def set_zoom(self, zoom: int) -> None:
         """
         Set zoom to the given level and update the camera info.
 
@@ -106,10 +117,15 @@ class ZoomCameraInfoManager(CameraInfoManager):
 
         self._update_camera_info()
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         self.node.destroy_service(self.svc)
 
 
@@ -140,17 +156,17 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
 
     def __init__(
         self,
-        node,
-        min_fov,
-        max_fov,
-        initial_image_width,
-        initial_image_height,
-        min_zoom,
-        max_zoom,
-        cname='camera',
-        url='',
-        namespace='',
-    ):
+        node: Node,
+        min_fov: float,
+        max_fov: float,
+        initial_image_width: int,
+        initial_image_height: int,
+        min_zoom: int,
+        max_zoom: int,
+        cname: str = 'camera',
+        url: str = '',
+        namespace: str = '',
+    ) -> None:
         """
         Construct the manager.
 
@@ -180,15 +196,15 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
         self._image_width = initial_image_width
         self._image_height = initial_image_height
 
-        self._loaded_camera_info = None
+        self._loaded_camera_info: CameraInfo | None = None
         """Camera info loaded from the calibration URL."""
 
-    def loadCameraInfo(self):
+    def loadCameraInfo(self) -> None:
         super().loadCameraInfo()
 
         self._loaded_camera_info = deepcopy(self.camera_info)
 
-    def set_resolution(self, width, height):
+    def set_resolution(self, width: int, height: int) -> None:
         """
         Set resolution of the image plane and updates the camera info.
 
@@ -200,7 +216,7 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
 
         self._update_camera_info()
 
-    def _update_camera_info(self):
+    def _update_camera_info(self) -> None:
         if self._loaded_camera_info is None:
             return
 
@@ -269,9 +285,14 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
     """
 
     def __init__(
-        self, node, calibration_url_template, zoom_levels,
-        cname='camera', url='', namespace=''
-    ):
+        self,
+        node: Node,
+        calibration_url_template: str,
+        zoom_levels: list[int],
+        cname: str = 'camera',
+        url: str = '',
+        namespace: str = '',
+    ) -> None:
         """
         Construct the manager.
 
@@ -296,9 +317,9 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
         self._calibration_url_template = calibration_url_template
         self._zoom_levels = zoom_levels
 
-        self._camera_infos = None
+        self._camera_infos: dict[int, CameraInfo] | None = None
 
-    def _update_camera_info(self):
+    def _update_camera_info(self) -> None:
         # Use the per-zoom calibrations as the source of truth: the base
         # camera_info loaded by the parent may be empty (no top-level URL is
         # required for InterpolatingZoom).
@@ -345,7 +366,7 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
             )
         ]
 
-    def loadCameraInfo(self):
+    def loadCameraInfo(self) -> None:
         super().loadCameraInfo()
 
         # load all calibration files for all zoom levels
