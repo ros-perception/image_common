@@ -29,6 +29,7 @@
 #ifndef IMAGE_TRANSPORT__CAMERA_PUBLISHER_HPP_
 #define IMAGE_TRANSPORT__CAMERA_PUBLISHER_HPP_
 
+#include <compare>
 #include <memory>
 #include <string>
 
@@ -153,17 +154,11 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   operator void *() const;
 
-  /// \brief Less-than comparison based on internal implementation pointer.
+  /// \brief Total ordering and equality based on the internal implementation
+  ///   pointer.  The single defaulted three-way comparison synthesizes all six
+  ///   relational operators (==, !=, <, <=, >, >=).
   IMAGE_TRANSPORT_PUBLIC
-  bool operator<(const CameraPublisher & rhs) const {return impl_ < rhs.impl_;}
-
-  /// \brief Inequality comparison based on internal implementation pointer.
-  IMAGE_TRANSPORT_PUBLIC
-  bool operator!=(const CameraPublisher & rhs) const {return impl_ != rhs.impl_;}
-
-  /// \brief Equality comparison based on internal implementation pointer.
-  IMAGE_TRANSPORT_PUBLIC
-  bool operator==(const CameraPublisher & rhs) const {return impl_ == rhs.impl_;}
+  auto operator<=>(const CameraPublisher & rhs) const = default;
 
 private:
   struct Impl;

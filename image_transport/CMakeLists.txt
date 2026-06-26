@@ -2,18 +2,18 @@ cmake_minimum_required(VERSION 3.20)
 
 project(image_transport)
 
-# Default to C++17
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
-
+# The C++/C standard comes from ament_ros_defaults (cxx_std_20 / c_std_17),
+# provided by the ament_cmake_ros_core::ament_ros_defaults INTERFACE target and
+# linked into the library's public interface below. Because the public headers
+# now use C++20 features (e.g. the defaulted operator<=> on the handle classes),
+# the requirement is propagated to consumers as a minimum standard.
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 find_package(ament_cmake_gen_version_h REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
+find_package(ament_cmake_ros_core REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -38,6 +38,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 target_link_libraries(${PROJECT_NAME} PUBLIC
+  ament_cmake_ros_core::ament_ros_defaults
   message_filters::message_filters
   rclcpp::rclcpp
   sensor_msgs::sensor_msgs)
@@ -109,7 +110,7 @@ install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
 ament_export_targets(export_${PROJECT_NAME})
 
-ament_export_dependencies(message_filters rclcpp sensor_msgs pluginlib)
+ament_export_dependencies(ament_cmake_ros_core message_filters rclcpp sensor_msgs pluginlib)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

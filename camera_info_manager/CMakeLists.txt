@@ -2,12 +2,10 @@ cmake_minimum_required(VERSION 3.20)
 
 project(camera_info_manager)
 
-# Default to C++17
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
-
+# The C++/C standard comes from ament_ros_defaults (cxx_std_20 / c_std_17),
+# provided by the ament_cmake_ros_core::ament_ros_defaults INTERFACE target and
+# linked into the library's public interface below, propagating to consumers as
+# a minimum standard.
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
@@ -18,6 +16,7 @@ endif()
 
 find_package(ament_cmake_gen_version_h REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
+find_package(ament_cmake_ros_core REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(camera_calibration_parsers REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -33,6 +32,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 target_compile_definitions(${PROJECT_NAME} PRIVATE "CAMERA_INFO_MANAGER_BUILDING_DLL")
 target_link_libraries(${PROJECT_NAME} PUBLIC
+  ament_cmake_ros_core::ament_ros_defaults
   rclcpp::rclcpp
   rclcpp_lifecycle::rclcpp_lifecycle
   sensor_msgs::sensor_msgs)
@@ -51,7 +51,7 @@ install(
 
 install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})
 
-ament_export_dependencies(ament_index_cpp camera_calibration_parsers rclcpp rclcpp_lifecycle rcpputils sensor_msgs)
+ament_export_dependencies(ament_cmake_ros_core ament_index_cpp camera_calibration_parsers rclcpp rclcpp_lifecycle rcpputils sensor_msgs)
 ament_export_targets(export_${PROJECT_NAME})
 
 if(BUILD_TESTING)
