@@ -30,9 +30,11 @@
 #include "camera_info_manager/camera_info_manager.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "rcpputils/env.hpp"
 #include "camera_calibration_parsers/parse.hpp"
@@ -340,14 +342,15 @@ std::string CameraInfoManager::resolveURL(
     // copy characters up to the next '$'
     resolved += url.substr(rest, dollar - rest);
 
-    if (url.substr(dollar + 1, 1) != "{") {
+    const std::string_view tail = std::string_view{url}.substr(dollar + 1);
+    if (!tail.starts_with('{')) {
       // no '{' follows, so keep the '$'
       resolved += "$";
-    } else if (url.substr(dollar + 1, 6) == "{NAME}") {
+    } else if (tail.starts_with("{NAME}")) {
       // substitute camera name
       resolved += cname;
       dollar += 6;
-    } else if (url.substr(dollar + 1, 10) == "{ROS_HOME}") {
+    } else if (tail.starts_with("{ROS_HOME}")) {
       // substitute $ROS_HOME
       std::string ros_home;
       std::string ros_home_env = rcpputils::get_env_var("ROS_HOME");
@@ -393,33 +396,38 @@ CameraInfoManager::url_type_t CameraInfoManager::parseURL(const std::string & ur
     return url_type_t::Empty;
   }
 
-  // Easy C++14 replacement for boost::iequals from :
-  // https://stackoverflow.com/a/4119881
-  auto iequals = [](const std::string & a, const std::string & b) {
-      return std::equal(
-        a.begin(), a.end(),
-        b.begin(), b.end(),
-        [](char a, char b) {
-          return tolower(a) == tolower(b);
+  // Case-insensitive prefix test over string views: no per-check allocation
+  // (unlike substr()), and tolower() is fed an unsigned char to avoid the
+  // undefined behaviour it has for bytes with the high bit set (non-ASCII URLs).
+  constexpr auto ci_starts_with = [](std::string_view s, std::string_view prefix) {
+      if (s.size() < prefix.size()) {
+        return false;
+      }
+      return std::ranges::equal(
+        s.substr(0, prefix.size()), prefix,
+        [](unsigned char a, unsigned char b) {
+          return std::tolower(a) == std::tolower(b);
         });
     };
 
+  const std::string_view u{url};
 
   // Accept both "file:///" (Unix absolute path) and "file://X:/" (Windows
   // drive letter), but reject bare "file://" with nothing after it.
-  if (iequals(url.substr(0, 7), "file://") && url.length() > 7 &&
-    (url[7] == '/' || (url.length() > 9 && std::isalpha(url[7]) && url[8] == ':')))
+  if (ci_starts_with(u, "file://") && u.size() > 7 &&
+    (u[7] == '/' ||
+    (u.size() > 9 && std::isalpha(static_cast<unsigned char>(u[7])) && u[8] == ':')))
   {
     return url_type_t::File;
   }
-  if (iequals(url.substr(0, 9), "flash:///")) {
+  if (ci_starts_with(u, "flash:///")) {
     return url_type_t::Flash;
   }
-  if (iequals(url.substr(0, 10), "package://")) {
+  if (ci_starts_with(u, "package://")) {
     // look for a '/' following the package name, make sure it is
     // there, the name is not empty, and something follows it
-    size_t rest = url.find('/', 10);
-    if (rest < url.length() - 1 && rest > 10) {
+    size_t rest = u.find('/', 10);
+    if (rest < u.size() - 1 && rest > 10) {
       return url_type_t::Package;
     }
   }
