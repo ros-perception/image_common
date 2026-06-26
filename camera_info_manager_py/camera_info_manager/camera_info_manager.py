@@ -414,13 +414,7 @@ def genCameraName(from_string):
     if not from_string:
         return '_'  # name may not be empty
 
-    retval = ''
-    for i in range(len(from_string)):
-        if not from_string[i].isalnum() and from_string[i] != '_':
-            retval += '_'
-        else:
-            retval += from_string[i]
-    return retval
+    return ''.join(c if c.isalnum() or c == '_' else '_' for c in from_string)
 
 
 def getPackageFileName(url):

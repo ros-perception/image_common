@@ -80,7 +80,7 @@ class ZoomCameraInfoManager(CameraInfoManager):
                                  If a namespace is specified, the '/' separator required between it
                                  and ``set_camera_info`` will be supplied automatically.
         """
-        CameraInfoManager.__init__(self, node, cname, url, namespace)
+        super().__init__(node, cname, url, namespace)
 
         self._min_zoom = min_zoom
         self._max_zoom = max_zoom
@@ -172,7 +172,7 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
             If a namespace is specified, the '/' separator required between it and
             ``set_camera_info`` will be supplied automatically.
         """
-        ZoomCameraInfoManager.__init__(self, node, min_zoom, max_zoom, cname, url, namespace)
+        super().__init__(node, min_zoom, max_zoom, cname, url, namespace)
 
         self._min_fov = min_fov
         self._max_fov = max_fov
@@ -184,7 +184,7 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
         """Camera info loaded from the calibration URL."""
 
     def loadCameraInfo(self):
-        CameraInfoManager.loadCameraInfo(self)
+        super().loadCameraInfo()
 
         self._loaded_camera_info = deepcopy(self.camera_info)
 
@@ -346,7 +346,7 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
         ]
 
     def loadCameraInfo(self):
-        CameraInfoManager.loadCameraInfo(self)
+        super().loadCameraInfo()
 
         # load all calibration files for all zoom levels
         self._camera_infos = {}
