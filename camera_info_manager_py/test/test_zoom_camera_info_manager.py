@@ -194,7 +194,7 @@ def test_camera_info_manager_loads_from_file(node, tmp_path):
     yaml_file = tmp_path / 'cam0.yaml'
     saveCalibrationFile(src, str(yaml_file), cname)
 
-    cim = CameraInfoManager(node, cname=cname, url='file://' + str(yaml_file))
+    cim = CameraInfoManager(node, cname=cname, url=f'file://{yaml_file}')
     cim.loadCameraInfo()
     assert cim.isCalibrated()
     info = cim.getCameraInfo()
@@ -203,8 +203,8 @@ def test_camera_info_manager_loads_from_file(node, tmp_path):
 
 def test_set_camera_info_service_round_trip(node, tmp_path):
     cname = 'set_svc_cam'
-    yaml_file = tmp_path / (cname + '.yaml')
-    cim = CameraInfoManager(node, cname=cname, url='file://' + str(yaml_file))
+    yaml_file = tmp_path / f'{cname}.yaml'
+    cim = CameraInfoManager(node, cname=cname, url=f'file://{yaml_file}')
 
     client = node.create_client(SetCameraInfo, 'set_camera_info')
     assert client.wait_for_service(timeout_sec=5.0)
@@ -231,7 +231,7 @@ def test_interpolating_zoom_interpolates_k(node, tmp_path):
     saveCalibrationFile(low, str(tmp_path / 'cal_0.yaml'), cname)
     saveCalibrationFile(high, str(tmp_path / 'cal_100.yaml'), cname)
 
-    template = 'file://' + str(tmp_path) + '/cal_%d.yaml'
+    template = f'file://{tmp_path}/cal_%d.yaml'
     iz = InterpolatingZoomCameraInfoManager(
         node, calibration_url_template=template, zoom_levels=[0, 100], cname=cname,
     )

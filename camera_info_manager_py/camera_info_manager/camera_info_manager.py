@@ -671,7 +671,7 @@ def saveCalibrationFile(ci, filename, cname):
                 f'file [{filename}] not accessible'
             )
             return False  # unable to write this file
-        if e.errno in {errno.ENOENT}:
+        if e.errno == errno.ENOENT:
             # Find last slash in the name.  The URL parser ensures
             # there is at least one '/', at the beginning.
             last_slash = filename.rfind('/')
