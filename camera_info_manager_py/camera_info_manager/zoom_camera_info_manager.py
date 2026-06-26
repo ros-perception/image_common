@@ -32,7 +32,6 @@
 
 A similar C++ API does not exist yet.
 """
-# enable some python3 compatibility options:
 
 from copy import deepcopy
 from math import radians, tan
@@ -306,7 +305,7 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
         if not self._camera_infos:
             return
 
-        if self._zoom in list(self._camera_infos.keys()):
+        if self._zoom in self._camera_infos:
             self.camera_info = deepcopy(self._camera_infos[self._zoom])
             return
 
@@ -359,7 +358,7 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
                 raise CameraInfoError('Zoom camera cannot use default calibration URLs.')
 
             self.node.get_logger().info(
-                'camera calibration URL for zoom level %d: %s' % (zoom_level, resolved_url)
+                f'camera calibration URL for zoom level {zoom_level}: {resolved_url}'
             )
 
             if url_type == URL_file:
@@ -372,10 +371,10 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
                 self._camera_infos[zoom_level] = loadCalibrationFile(filename, self.cname)
 
             else:
-                self.node.get_logger().error('Invalid camera calibration URL: ' + resolved_url)
+                self.node.get_logger().error(f'Invalid camera calibration URL: {resolved_url}')
                 self._camera_infos[zoom_level] = CameraInfo()
 
-        if len(list(self._camera_infos.keys())) < 2:
+        if len(self._camera_infos) < 2:
             raise CameraInfoError(
                 'Interpolating zoom camera info manager needs at least two calibrations to exist.'
             )

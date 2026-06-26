@@ -211,8 +211,8 @@ class CameraInfoManager:
         # advertise set_camera_info service
         service_name = 'set_camera_info'
         if namespace:
-            service_name = namespace + '/' + service_name
-        self.node.get_logger().debug(service_name + ' service declared')
+            service_name = f'{namespace}/{service_name}'
+        self.node.get_logger().debug(f'{service_name} service declared')
         self.svc = self.node.create_service(SetCameraInfo, service_name, self.setCameraInfo)
 
     def __str__(self):
@@ -221,7 +221,7 @@ class CameraInfoManager:
 
         :returns: Return string representation of :class:CameraInfoManager.
         """
-        return '[' + self.cname + ']' + str(self.url)
+        return f'[{self.cname}]{self.url}'
 
     def getCameraInfo(self):
         """
@@ -271,7 +271,7 @@ class CameraInfoManager:
 
         """
         if self.camera_info is None:
-            raise CameraInfoMissingError('Calibration missing, ' + 'loadCameraInfo() needed.')
+            raise CameraInfoMissingError('Calibration missing, loadCameraInfo() needed.')
         return self.camera_info.k[0] != 0.0
 
     def _loadCalibration(self, url, cname):
@@ -297,7 +297,7 @@ class CameraInfoManager:
             self._loadCalibration(default_camera_info_url, cname)
             return
 
-        self.node.get_logger().info('camera calibration URL: ' + resolved_url)
+        self.node.get_logger().info(f'camera calibration URL: {resolved_url}')
 
         if url_type == URL_file:
             self.camera_info = loadCalibrationFile(resolved_url[7:], cname)
@@ -309,7 +309,7 @@ class CameraInfoManager:
             self.camera_info = loadCalibrationFile(filename, cname)
 
         else:
-            self.node.get_logger().error('Invalid camera calibration URL: ' + resolved_url)
+            self.node.get_logger().error(f'Invalid camera calibration URL: {resolved_url}')
             self.camera_info = CameraInfo()
 
     def loadCameraInfo(self):
@@ -338,7 +338,7 @@ class CameraInfoManager:
         :post: camera_info updated, can be used immediately without
                reloading.
         """
-        self.node.get_logger().debug('SetCameraInfo received for ' + self.cname)
+        self.node.get_logger().debug(f'SetCameraInfo received for {self.cname}')
         self.camera_info = req.camera_info
         rsp.success = saveCalibration(req.camera_info, self.url, self.cname)
         if not rsp.success:
@@ -445,7 +445,7 @@ def getPackageFileName(url):
 
     except PackageNotFoundError:
         rclpy.logging.get_logger('camera_info_manager').warning(
-            'unknown package: ' + package + ' (ignored)'
+            f'unknown package: {package} (ignored)'
         )
 
     return pkgPath
@@ -474,12 +474,7 @@ def loadCalibrationFile(filename, cname):
             if calib is not None:
                 if calib['camera_name'] != cname:
                     rclpy.logging.get_logger('camera_info_manager').warning(
-                        '['
-                        + cname
-                        + '] does not match name '
-                        + calib['camera_name']
-                        + ' in file '
-                        + filename
+                        f"[{cname}] does not match name {calib['camera_name']} in file {filename}"
                     )
 
                 # fill in CameraInfo fields
@@ -565,7 +560,7 @@ def resolveURL(url, cname):
                 ros_home = os.environ.get('HOME')
                 if ros_home is None:
                     rclpy.logging.get_logger('camera_info_manager').warning(
-                        '[CameraInfoManager]' + ' unable to resolve ${ROS_HOME}'
+                        '[CameraInfoManager] unable to resolve ${ROS_HOME}'
                     )
                     ros_home = '${ROS_HOME}'  # retain it unresolved
                 else:
@@ -576,7 +571,7 @@ def resolveURL(url, cname):
         else:
             # not a valid substitution variable
             rclpy.logging.get_logger('camera_info_manager').warning(
-                '[CameraInfoManager] invalid URL substitution (not resolved): ' + url
+                f'[CameraInfoManager] invalid URL substitution (not resolved): {url}'
             )
             resolved += '$'  # keep the bogus '$'
 
@@ -607,7 +602,7 @@ def saveCalibration(new_info, url, cname):
         return saveCalibration(new_info, default_camera_info_url, cname)
 
     rclpy.logging.get_logger('camera_info_manager').info(
-        'writing calibration data to URL: ' + resolved_url
+        f'writing calibration data to URL: {resolved_url}'
     )
 
     if url_type == URL_file:
@@ -617,7 +612,7 @@ def saveCalibration(new_info, url, cname):
         filename = getPackageFileName(resolved_url)
         if not filename:  # package not resolved
             rclpy.logging.get_logger('camera_info_manager').error(
-                'Calibration package missing: ' + resolved_url + ' (ignored)'
+                f'Calibration package missing: {resolved_url} (ignored)'
             )
             # treat it like an empty URL
             if url == default_camera_info_url:
@@ -629,7 +624,7 @@ def saveCalibration(new_info, url, cname):
 
     else:
         rclpy.logging.get_logger('camera_info_manager').error(
-            'Invalid camera calibration URL: ' + resolved_url
+            f'Invalid camera calibration URL: {resolved_url}'
         )
         # treat it like an empty URL
         if url == default_camera_info_url:
@@ -679,7 +674,7 @@ def saveCalibrationFile(ci, filename, cname):
     except OSError as e:
         if e.errno in {errno.EACCES, errno.EPERM}:
             rclpy.logging.get_logger('camera_info_manager').error(
-                'file [' + filename + '] not accessible'
+                f'file [{filename}] not accessible'
             )
             return False  # unable to write this file
         if e.errno in {errno.ENOENT}:
@@ -688,7 +683,7 @@ def saveCalibrationFile(ci, filename, cname):
             last_slash = filename.rfind('/')
             if last_slash < 0:
                 rclpy.logging.get_logger('camera_info_manager').error(
-                    'filename [' + filename + "] has no '/'"
+                    f"filename [{filename}] has no '/'"
                 )
                 return False  # not a valid URL
 
@@ -698,7 +693,7 @@ def saveCalibrationFile(ci, filename, cname):
                 Path(dirname).mkdir(parents=True)
             except OSError:
                 rclpy.logging.get_logger('camera_info_manager').error(
-                    'unable to create path to directory [' + dirname + ']'
+                    f'unable to create path to directory [{dirname}]'
                 )
                 return False
 
@@ -710,6 +705,6 @@ def saveCalibrationFile(ci, filename, cname):
 
                 except OSError:
                     rclpy.logging.get_logger('camera_info_manager').error(
-                        'file [' + filename + '] not accessible'
+                        f'file [{filename}] not accessible'
                     )
                     return False  # fail if unable to write file
