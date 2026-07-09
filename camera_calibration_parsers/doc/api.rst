@@ -7,9 +7,9 @@ High-Level API (``parse.hpp``)
 The recommended entry point for most callers.  The format is inferred from
 the file extension (``.yaml`` / ``.yml`` → YAML, ``.ini`` → Videre INI).
 
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1ab1426265c50ad5f1d2812ab900e201ec` — ``writeCalibration``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1a4242ca29511127c36ea71303b13c70cb` — ``readCalibration``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1a75f5ad9712a3de93e8523ac0c81a43b7` — ``parseCalibration``
+- :cpp:func:`~camera_calibration_parsers::writeCalibration` — write to a file (format inferred from extension)
+- :cpp:func:`~camera_calibration_parsers::readCalibration` — read from a file (format auto-detected)
+- :cpp:func:`~camera_calibration_parsers::parseCalibration` — parse from an in-memory string
 
 Browse the full namespace:
 :ref:`namespace_camera_calibration_parsers`.
@@ -20,22 +20,18 @@ YAML API (``parse_yml.hpp``)
 Format-specific overloads for YAML.  Use these when reading from or writing
 to an arbitrary stream rather than a named file.
 
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1afa6d0c688357d7c01d474d01377d532d` — ``writeCalibrationYml(ostream)``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1a3d98138bf170b225af61515296315ef5` — ``readCalibrationYml(istream)``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1ad818651db64b842660e74e72bfc9c714` — ``writeCalibrationYml(filename)``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1aceea3789c0817cf94a2a24a04122f320` — ``readCalibrationYml(filename)``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1ab8b17fb67c52ebe800ff2021f6e6ae95` — ``parseCalibrationYml``
+- :cpp:func:`~camera_calibration_parsers::writeCalibrationYml` — write to an output stream or a named file (overloaded)
+- :cpp:func:`~camera_calibration_parsers::readCalibrationYml` — read from an input stream or a named file (overloaded)
+- :cpp:func:`~camera_calibration_parsers::parseCalibrationYml` — parse from an in-memory string
 
 Videre INI API (``parse_ini.hpp``)
 -----------------------------------
 
 Format-specific overloads for the Videre INI format.
 
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1a4c25d94528aa8e4e551e2c6e89a53520` — ``writeCalibrationIni(ostream)``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1a3e89f85a374d92d7976087ab2a3f0f68` — ``readCalibrationIni(istream)``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1a0334c84f46853d8c472132166a22e897` — ``writeCalibrationIni(filename)``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1afaae91efdebd11870baf40459c46e141` — ``readCalibrationIni(filename)``
-- :ref:`exhale_function_namespacecamera__calibration__parsers_1a7642240533c0a270f72baf3272d693a6` — ``parseCalibrationIni``
+- :cpp:func:`~camera_calibration_parsers::writeCalibrationIni` — write to an output stream or a named file (overloaded)
+- :cpp:func:`~camera_calibration_parsers::readCalibrationIni` — read from an input stream or a named file (overloaded)
+- :cpp:func:`~camera_calibration_parsers::parseCalibrationIni` — parse from an in-memory string
 
 Type Alias
 ----------
