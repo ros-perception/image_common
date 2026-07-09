@@ -45,8 +45,6 @@
 namespace image_transport
 {
 
-class ImageTransport;
-
 /**
  * \brief Manages advertisements for publishing camera images.
  *
@@ -68,28 +66,6 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher() = default;
 
-  /**
-   * \brief Constructor (deprecated).
-   * \deprecated Use CameraPublisher(RequiredInterfaces, ..., rclcpp::QoS) instead.
-   * \param node The node to use for advertising.
-   * \param base_topic The base image topic name.
-   * \param custom_qos QoS profile (rmw form).
-   */
-  [[deprecated("Use CameraPublisher(RequiredInterfaces node_interfaces, ..., rclcpp::QoS) "
-    "instead.")]]
-  IMAGE_TRANSPORT_PUBLIC
-  CameraPublisher(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    rclcpp::PublisherOptions = rclcpp::PublisherOptions());
-
-  /**
-   * \brief Constructor.
-   * \param node_interfaces The node interfaces used for advertising.
-   * \param base_topic The base image topic name.
-   * \param custom_qos QoS profile.
-   */
   IMAGE_TRANSPORT_PUBLIC
   CameraPublisher(
     RequiredInterfaces node_interfaces,

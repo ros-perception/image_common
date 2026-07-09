@@ -69,33 +69,6 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Publisher() = default;
 
-  /**
-   * \brief Constructor (deprecated).
-   * \deprecated Use Publisher(RequiredInterfaces, ..., rclcpp::QoS, ...) instead.
-   * \param node The node to advertise on.
-   * \param base_topic The base image topic name.
-   * \param loader Plugin loader for publisher plugins.
-   * \param custom_qos QoS profile (rmw form).
-   * \param options Additional publisher options.
-   */
-  [[deprecated("Use Publisher(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
-    "instead.")]]
-  IMAGE_TRANSPORT_PUBLIC
-  Publisher(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    PubLoaderPtr loader,
-    rmw_qos_profile_t custom_qos,
-    rclcpp::PublisherOptions options = rclcpp::PublisherOptions());
-
-  /**
-   * \brief Constructor.
-   * \param node_interfaces The node interfaces used for advertising.
-   * \param base_topic The base image topic name.
-   * \param loader Plugin loader for publisher plugins.
-   * \param custom_qos QoS profile.
-   * \param options Additional publisher options.
-   */
   IMAGE_TRANSPORT_PUBLIC
   Publisher(
     RequiredInterfaces node_interfaces,

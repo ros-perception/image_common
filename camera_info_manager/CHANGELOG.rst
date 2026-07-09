@@ -2,6 +2,22 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.0.2 (2026-06-05)
+------------------
+* Cleanups and removed unused files (`#406 <https://github.com/ros-perception/image_common/issues/406>`_)
+* Contributors: Alejandro Hernández Cordero
+
+7.0.1 (2026-05-29)
+------------------
+* Removed deprecated API (`#413 <https://github.com/ros-perception/image_common/issues/413>`_)
+* Added version.h (`#415 <https://github.com/ros-perception/image_common/issues/415>`_)
+* Contributors: Alejandro Hernández Cordero, Martin Pecka
+
+7.0.0 (2026-05-06)
+------------------
+* Fix camera_info_manager flakiness and Windows crashes (`#405 <https://github.com/ros-perception/image_common/issues/405>`_)
+* Contributors: Michael Carroll
+
 6.4.7 (2026-04-01)
 ------------------
 

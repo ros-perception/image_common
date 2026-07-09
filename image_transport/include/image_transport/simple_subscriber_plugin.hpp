@@ -111,36 +111,6 @@ protected:
     return base_topic + "/" + getTransportName();
   }
 
-  /**
-   * \brief Subscribe to the transport-specific topic (deprecated).
-   * \deprecated Use subscribeImpl(RequiredInterfaces, ..., rclcpp::QoS, ...) instead.
-   * \param node The node to subscribe on.
-   * \param base_topic The base image topic name.
-   * \param callback User callback for received images.
-   * \param custom_qos QoS profile (rmw form).
-   * \param options Additional subscription options.
-   */
-  [[deprecated("Use subscribeImpl(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
-    "instead")]]
-  void subscribeImpl(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const Callback & callback,
-    rmw_qos_profile_t custom_qos,
-    rclcpp::SubscriptionOptions options) override
-  {
-    subscribeImpl(*node, base_topic, callback,
-        rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), options);
-  }
-
-  /**
-   * \brief Subscribe to the transport-specific topic.
-   * \param node_interfaces The node interfaces used for subscribing.
-   * \param base_topic The base image topic name.
-   * \param callback User callback for received images.
-   * \param custom_qos QoS profile.
-   * \param options Additional subscription options.
-   */
   void subscribeImpl(
     RequiredInterfaces node_interfaces,
     const std::string & base_topic,
@@ -149,9 +119,6 @@ protected:
     rclcpp::SubscriptionOptions options) override
   {
     impl_ = std::make_unique<Impl>();
-    // Push each group of transport-specific parameters into a separate sub-namespace
-    // ros::NodeHandle param_nh(transport_hints.getParameterNH(), getTransportName());
-    //
     auto parameters_interface = node_interfaces.get_node_parameters_interface();
     auto topics_interface = node_interfaces.get_node_topics_interface();
     impl_->sub_ = rclcpp::create_subscription<M>(
