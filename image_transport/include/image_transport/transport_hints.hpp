@@ -72,24 +72,6 @@ public:
     }
   }
 
-  /**
-   * \brief Constructor (deprecated).
-   * \deprecated Use TransportHints(RequiredInterfaces, ...) instead.
-   * \param node The node used to look up the transport parameter.
-   * \param default_transport Preferred transport if the parameter is not set.
-   * \param parameter_name Name of the ROS parameter holding the transport choice.
-   */
-  [[deprecated("Use TransportHints(RequiredInterfaces node_interfaces, ...) instead.")]]
-  IMAGE_TRANSPORT_PUBLIC
-  TransportHints(
-    const rclcpp::Node * node,
-    const std::string & default_transport = "raw",
-    const std::string & parameter_name = "image_transport")
-  {
-    node->get_parameter_or<std::string>(parameter_name, transport_, default_transport);
-  }
-
-  /// \brief Returns the transport name to use for subscribing.
   IMAGE_TRANSPORT_PUBLIC
   const std::string & getTransport() const
   {

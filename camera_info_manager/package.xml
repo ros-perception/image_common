@@ -1,7 +1,14 @@
 <package format="2">
   <name>camera_info_manager</name>
-  <version>6.4.7</version>
-  <description>C++ interface for camera calibration information: loads, stores and serves CameraInfo via the SetCameraInfo service.</description>
+  <version>7.0.2</version>
+  <description>
+
+     This package provides a C++ interface for camera calibration
+     information.  It provides CameraInfo, and handles SetCameraInfo
+     service requests, saving and restoring the camera calibration
+     data.
+
+  </description>
 
   <author>Jack O'Quin</author>
   <author email="michael@openrobotics.org">Michael Carroll</author>
@@ -16,6 +23,7 @@
   <url type="repository">https://github.com/ros-perception/image_common</url>
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
+  <buildtool_depend>ament_cmake_gen_version_h</buildtool_depend>
 
   <depend>ament_index_cpp</depend>
   <depend>camera_calibration_parsers</depend>

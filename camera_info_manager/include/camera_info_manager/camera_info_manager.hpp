@@ -36,7 +36,6 @@
 #include <string>
 
 #include "rclcpp/node.hpp"
-#include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "sensor_msgs/srv/set_camera_info.hpp"
 #include "camera_info_manager/visibility_control.h"
@@ -116,51 +115,6 @@ using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
 class CameraInfoManager
 {
 public:
-  /// \brief Construct from a raw rclcpp::Node pointer (deprecated).
-  [[deprecated("Use CameraInfoManager(rclcpp::node_interfaces::NodeBaseInterface::SharedPtr, ...)"
-    " instead.")]]
-  CAMERA_INFO_MANAGER_PUBLIC
-  CameraInfoManager(
-    rclcpp::Node * node,
-    const std::string & cname = "camera",
-    const std::string & url = "",
-    const std::string & ns = "");
-
-  /// \brief Construct from a raw rclcpp_lifecycle::LifecycleNode pointer (deprecated).
-  [[deprecated("Use CameraInfoManager(rclcpp::node_interfaces::NodeBaseInterface::SharedPtr, ...)"
-    " instead.")]]
-  CAMERA_INFO_MANAGER_PUBLIC
-  CameraInfoManager(
-    rclcpp_lifecycle::LifecycleNode * node,
-    const std::string & cname = "camera",
-    const std::string & url = "",
-    const std::string & ns = "");
-
-  /// \brief Construct from node interfaces with legacy rmw_qos_profile_t QoS (deprecated).
-  [[deprecated("Use CameraInfoManager(..., rclcpp::QoS, ...) instead")]]
-  CAMERA_INFO_MANAGER_PUBLIC
-  CameraInfoManager(
-    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
-    rclcpp::node_interfaces::NodeServicesInterface::SharedPtr node_services_interface,
-    rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr node_logger_interface,
-    const std::string & cname = "camera", const std::string & url = "",
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    const std::string & ns = "");
-
-  /**
-   * \brief Preferred constructor — takes node interfaces and an rclcpp::QoS.
-   *
-   * \param node_base_interface      Base interface of the owning node.
-   * \param node_services_interface  Services interface of the owning node.
-   * \param node_logger_interface    Logging interface of the owning node.
-   * \param cname   Camera name used for URL variable substitution and
-   *                calibration file validation.
-   * \param url     URL of the calibration file to load on first access.
-   *                Defaults to \c file://${ROS_HOME}/camera_info/${NAME}.yaml.
-   * \param custom_qos  QoS profile for the \c set_camera_info service.
-   * \param ns      ROS 2 namespace for the \c set_camera_info service.
-   *                Defaults to the node's private namespace.
-   */
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfoManager(
     rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,

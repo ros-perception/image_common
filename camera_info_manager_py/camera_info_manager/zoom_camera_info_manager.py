@@ -65,10 +65,11 @@ class ZoomCameraInfoManager(CameraInfoManager):
     calibrate a zoom camera.
     """
 
-    def __init__(self, min_zoom, max_zoom, cname='camera', url='', namespace=''):
+    def __init__(self, node, min_zoom, max_zoom, cname='camera', url='', namespace=''):
         """
         Construct the manager.
 
+        :param node: rclpy Node used to create the ``set_camera_info`` service and logger.
         :param int min_zoom: The minimum zoom level.
                              The zoom values should linearly affect the focal distance.
         :param int max_zoom: The maximum zoom level.
@@ -80,7 +81,7 @@ class ZoomCameraInfoManager(CameraInfoManager):
                                  If a namespace is specified, the '/' separator required between it
                                  and ``set_camera_info`` will be supplied automatically.
         """
-        CameraInfoManager.__init__(self, cname, url, namespace)
+        CameraInfoManager.__init__(self, node, cname, url, namespace)
 
         self._min_zoom = min_zoom
         self._max_zoom = max_zoom
@@ -110,7 +111,7 @@ class ZoomCameraInfoManager(CameraInfoManager):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.svc.shutdown()
+        self.node.destroy_service(self.svc)
 
 
 class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
@@ -140,6 +141,7 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
 
     def __init__(
         self,
+        node,
         min_fov,
         max_fov,
         initial_image_width,
@@ -153,6 +155,7 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
         """
         Construct the manager.
 
+        :param node: rclpy Node used to create the ``set_camera_info`` service and logger.
         :param float min_fov: The minimum horizontal field of view. Corresponds to
             maximum zoom level.
         :param float max_fov: The maximum horizontal field of view. Corresponds to
@@ -170,7 +173,7 @@ class ApproximateZoomCameraInfoManager(ZoomCameraInfoManager):
             If a namespace is specified, the '/' separator required between it and
             ``set_camera_info`` will be supplied automatically.
         """
-        ZoomCameraInfoManager.__init__(self, min_zoom, max_zoom, cname, url, namespace)
+        ZoomCameraInfoManager.__init__(self, node, min_zoom, max_zoom, cname, url, namespace)
 
         self._min_fov = min_fov
         self._max_fov = max_fov
@@ -267,11 +270,13 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
     """
 
     def __init__(
-        self, calibration_url_template, zoom_levels, cname='camera', url='', namespace=''
+        self, node, calibration_url_template, zoom_levels,
+        cname='camera', url='', namespace=''
     ):
         """
         Construct the manager.
 
+        :param node: rclpy Node used to create the ``set_camera_info`` service and logger.
         :param string calibration_url_template: Template of the URL that contains the
             calibration files. The template string should contain a single '%d'
             substitution, which will be substituted with zoom level.
@@ -286,7 +291,7 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
             ``set_camera_info`` will be supplied automatically.
         """
         ZoomCameraInfoManager.__init__(
-            self, min(zoom_levels), max(zoom_levels), cname, url, namespace
+            self, node, min(zoom_levels), max(zoom_levels), cname, url, namespace
         )
 
         self._calibration_url_template = calibration_url_template
@@ -295,7 +300,10 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
         self._camera_infos = None
 
     def _update_camera_info(self):
-        if not self.isCalibrated() or self._camera_infos is None:
+        # Use the per-zoom calibrations as the source of truth: the base
+        # camera_info loaded by the parent may be empty (no top-level URL is
+        # required for InterpolatingZoom).
+        if not self._camera_infos:
             return
 
         if self._zoom in list(self._camera_infos.keys()):

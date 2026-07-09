@@ -68,38 +68,6 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   Subscriber() = default;
 
-  /**
-   * \brief Constructor (deprecated).
-   * \deprecated Use Subscriber(RequiredInterfaces, ..., rclcpp::QoS) instead.
-   * \param node The node to subscribe on.
-   * \param base_topic The base image topic name.
-   * \param callback User callback invoked for each received image.
-   * \param loader Plugin loader for subscriber plugins.
-   * \param transport Transport hint string.
-   * \param custom_qos QoS profile (rmw form).
-   * \param options Additional subscription options.
-   */
-  [[deprecated("Use Subscriber(RequiredInterfaces node_interfaces, ..., rclcpp::QoS) instead.")]]
-  IMAGE_TRANSPORT_PUBLIC
-  Subscriber(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const Callback & callback,
-    SubLoaderPtr loader,
-    const std::string & transport,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions());
-
-  /**
-   * \brief Constructor.
-   * \param node_interfaces The node interfaces used for subscribing.
-   * \param base_topic The base image topic name.
-   * \param callback User callback invoked for each received image.
-   * \param loader Plugin loader for subscriber plugins.
-   * \param transport Transport hint string.
-   * \param custom_qos QoS profile.
-   * \param options Additional subscription options.
-   */
   IMAGE_TRANSPORT_PUBLIC
   Subscriber(
     RequiredInterfaces node_interfaces,
