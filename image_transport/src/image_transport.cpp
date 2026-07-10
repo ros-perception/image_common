@@ -57,38 +57,12 @@ struct Impl
 static Impl * kImpl = new Impl();
 
 Publisher create_publisher(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  rmw_qos_profile_t custom_qos,
-  rclcpp::PublisherOptions options)
-{
-  return Publisher(
-    *node,
-    base_topic,
-    kImpl->pub_loader_,
-    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
-    options);
-}
-
-Publisher create_publisher(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
   rclcpp::QoS custom_qos,
   rclcpp::PublisherOptions options)
 {
   return Publisher(node_interfaces, base_topic, kImpl->pub_loader_, custom_qos, options);
-}
-
-Subscriber create_subscription(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  const Subscriber::Callback & callback,
-  const std::string & transport,
-  rmw_qos_profile_t custom_qos,
-  rclcpp::SubscriptionOptions options)
-{
-  return Subscriber(*node, base_topic, callback, kImpl->sub_loader_, transport,
-      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), options);
 }
 
 Subscriber create_subscription(
@@ -103,17 +77,6 @@ Subscriber create_subscription(
       custom_qos, options);
 }
 
-
-CameraPublisher create_camera_publisher(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  rmw_qos_profile_t custom_qos,
-  rclcpp::PublisherOptions pub_options)
-{
-  return CameraPublisher(*node, base_topic,
-      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), pub_options);
-}
-
 CameraPublisher create_camera_publisher(
   RequiredInterfaces node_interfaces,
   const std::string & base_topic,
@@ -121,17 +84,6 @@ CameraPublisher create_camera_publisher(
   rclcpp::PublisherOptions pub_options)
 {
   return CameraPublisher(node_interfaces, base_topic, custom_qos, pub_options);
-}
-
-CameraSubscriber create_camera_subscription(
-  rclcpp::Node * node,
-  const std::string & base_topic,
-  const CameraSubscriber::Callback & callback,
-  const std::string & transport,
-  rmw_qos_profile_t custom_qos)
-{
-  return CameraSubscriber(*node, base_topic, callback, transport,
-      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos));
 }
 
 CameraSubscriber create_camera_subscription(
@@ -180,12 +132,6 @@ std::vector<std::string> getLoadableTransports()
 ImageTransport::ImageTransport(const ImageTransport & other)
 : impl_(std::make_unique<Impl>(*other.impl_)) {}
 
-ImageTransport::ImageTransport(rclcpp::Node::SharedPtr node)
-: impl_(std::make_unique<ImageTransport::Impl>())
-{
-  impl_->required_interfaces_ = RequiredInterfaces(*node);
-}
-
 ImageTransport::ImageTransport(RequiredInterfaces node_interfaces)
 : impl_(std::make_unique<ImageTransport::Impl>())
 {
@@ -204,34 +150,12 @@ Publisher ImageTransport::advertise(const std::string & base_topic, uint32_t que
 }
 
 Publisher ImageTransport::advertise(
-  const std::string & base_topic, rmw_qos_profile_t custom_qos,
-  bool latch)
-{
-  // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
-  (void) latch;
-  return create_publisher(impl_->required_interfaces_, base_topic,
-      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos));
-}
-
-Publisher ImageTransport::advertise(
   const std::string & base_topic, rclcpp::QoS custom_qos,
   bool latch)
 {
   // TODO(ros2) implement when resolved: https://github.com/ros2/ros2/issues/464
   (void) latch;
   return create_publisher(impl_->required_interfaces_, base_topic, custom_qos);
-}
-
-Subscriber ImageTransport::subscribe(
-  const std::string & base_topic, rmw_qos_profile_t custom_qos,
-  const Subscriber::Callback & callback,
-  const VoidPtr & tracked_object,
-  const TransportHints * transport_hints,
-  const rclcpp::SubscriptionOptions options)
-{
-  return subscribe(base_topic,
-      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos),
-    callback, tracked_object, transport_hints, options);
 }
 
 Subscriber ImageTransport::subscribe(

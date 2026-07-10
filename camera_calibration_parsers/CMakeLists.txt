@@ -12,8 +12,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+find_package(ament_cmake_gen_version_h REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
-
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(yaml_cpp_vendor REQUIRED)
@@ -45,22 +45,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 ament_export_targets(export_${PROJECT_NAME})
-
-# TODO: Reenable Python Wrapper with new serialization technique.
-#find_package(PythonLibs REQUIRED)
-#if(PYTHONLIBS_VERSION_STRING VERSION_LESS 3)
-#  find_package(Boost REQUIRED COMPONENTS python)
-#else()
-#  find_package(Boost REQUIRED COMPONENTS python3)
-#endif()
-#add_library(${PROJECT_NAME}_wrapper
-#  src/parse_wrapper.cpp)
-#target_link_libraries(${PROJECT_NAME}_wrapper
-#  rclcpp::rclcpp
-#  sensor_msgs::sensor_msgs
-#)
-#target_include_directories(${PROJECT_NAME}_wrapper PUBLIC ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
-#target_link_libraries(${PROJECT_NAME}_wrapper ${PROJECT_NAME} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 # define the exe to convert
 add_executable(convert src/convert.cpp)
@@ -105,3 +89,5 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
+
+ament_generate_version_header(${PROJECT_NAME})

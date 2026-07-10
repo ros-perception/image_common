@@ -2,6 +2,19 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.0.2 (2026-06-05)
+------------------
+* Cleanups and removed unused files (`#406 <https://github.com/ros-perception/image_common/issues/406>`_)
+* Contributors: Alejandro Hernández Cordero
+
+7.0.1 (2026-05-29)
+------------------
+* Added version.h (`#415 <https://github.com/ros-perception/image_common/issues/415>`_)
+* Contributors: Martin Pecka
+
+7.0.0 (2026-05-06)
+------------------
+
 6.4.7 (2026-04-01)
 ------------------
 

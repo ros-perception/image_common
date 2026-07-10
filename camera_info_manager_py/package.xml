@@ -4,8 +4,13 @@
   schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>camera_info_manager_py</name>
-  <version>6.4.7</version>
-  <description>Python interface for camera calibration information, providing CameraInfo support for camera drivers written in Python.</description>
+  <version>7.0.2</version>
+  <description>
+    Python interface for camera calibration information.
+
+    This ROS package provides a CameraInfo interface for Python camera
+    drivers similar to the C++ camera_info_manager package.
+  </description>
   <maintainer email="jmastrangelo@clearpathrobotics.com">Jose Mastrangelo</maintainer>
   <maintainer email="mhosmar@clearpathrobotics.com">Mike Hosmar</maintainer>
   <license>BSD-3-Clause</license>

@@ -1,7 +1,13 @@
 <package format="2">
   <name>image_transport</name>
-  <version>6.4.7</version>
-  <description>Transparent publish and subscribe for images with support for compressed transports via plugins.</description>
+  <version>7.0.2</version>
+  <description>
+
+     image_transport should always be used to subscribe to and publish images. It provides transparent
+     support for transporting images in low-bandwidth compressed formats. Examples (provided by separate
+     plugin packages) include JPEG/PNG compression and Theora streaming video.
+
+  </description>
 
   <author email="michael@openrobotics.org">Michael Carroll</author>
   <author>Patrick Mihelich</author>
@@ -16,6 +22,7 @@
   <url type="repository">https://github.com/ros-perception/image_common</url>
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
+  <buildtool_depend>ament_cmake_gen_version_h</buildtool_depend>
 
   <depend>message_filters</depend>
   <depend>pluginlib</depend>

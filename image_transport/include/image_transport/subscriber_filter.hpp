@@ -74,22 +74,6 @@ public:
    * \param base_topic The topic to subscribe to.
    * \param transport The transport hint to pass along.
    */
-  [[deprecated("Use SubscriberFilter(RequiredInterfaces node_interfaces, ...) instead.")]]
-  IMAGE_TRANSPORT_PUBLIC
-  SubscriberFilter(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const std::string & transport)
-  : SubscriberFilter(*node, base_topic, transport)
-  {
-  }
-
-  /**
-   * \brief Constructor. Subscribes immediately to \p base_topic.
-   * \param required_interfaces The node interfaces used to create the subscription.
-   * \param base_topic The base image topic to subscribe to.
-   * \param transport The transport hint to use.
-   */
   IMAGE_TRANSPORT_PUBLIC
   SubscriberFilter(
     RequiredInterfaces required_interfaces,
@@ -124,31 +108,6 @@ public:
    * \param base_topic The topic to subscribe to.
    * \param transport The transport hint to use.
    * \param custom_qos QoS profile to use (rmw_qos_profile_t form).
-   * \param options Additional subscription options.
-   */
-  [[deprecated("Use subscribe(RequiredInterfaces node_interfaces, ..., rclcpp::QoS, ...) "
-    "instead.")]]
-  IMAGE_TRANSPORT_PUBLIC
-  void subscribe(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const std::string & transport,
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default,
-    rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
-  {
-    subscribe(*node, base_topic, transport,
-      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(custom_qos), custom_qos), options);
-  }
-
-  /**
-   * \brief Subscribe to a topic.
-   *
-   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
-   *
-   * \param required_interfaces The node interfaces used to create the subscription.
-   * \param base_topic The topic to subscribe to.
-   * \param transport The transport hint to use.
-   * \param custom_qos QoS profile to use.
    * \param options Additional subscription options.
    */
   IMAGE_TRANSPORT_PUBLIC

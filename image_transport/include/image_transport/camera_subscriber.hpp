@@ -44,8 +44,6 @@
 namespace image_transport
 {
 
-class ImageTransport;
-
 /**
  * \brief Manages a subscription callback on synchronized Image and CameraInfo topics.
  *
@@ -71,32 +69,6 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber() = default;
 
-  /**
-   * \brief Constructor (deprecated).
-   * \deprecated Use CameraSubscriber(RequiredInterfaces, ..., rclcpp::QoS) instead.
-   * \param node The node to subscribe on.
-   * \param base_topic The base image topic name.
-   * \param callback User callback invoked for each (image, info) pair.
-   * \param transport Transport hint string.
-   */
-  [[deprecated("Use CameraSubscriber(RequiredInterfaces node_interfaces, ..., rclcpp::QoS instead) "
-    "instead.")]]
-  IMAGE_TRANSPORT_PUBLIC
-  CameraSubscriber(
-    rclcpp::Node * node,
-    const std::string & base_topic,
-    const Callback & callback,
-    const std::string & transport,
-    rmw_qos_profile_t = rmw_qos_profile_default);
-
-  /**
-   * \brief Constructor.
-   * \param node_interfaces The node interfaces used for subscribing.
-   * \param base_topic The base image topic name.
-   * \param callback User callback invoked for each (image, info) pair.
-   * \param transport Transport hint string.
-   * \param custom_qos QoS profile.
-   */
   IMAGE_TRANSPORT_PUBLIC
   CameraSubscriber(
     RequiredInterfaces node_interfaces,
