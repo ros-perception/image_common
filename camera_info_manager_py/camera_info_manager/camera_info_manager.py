@@ -41,6 +41,7 @@ This is very similar to the
 
 """
 
+import array
 import errno
 import locale
 import os
@@ -48,11 +49,21 @@ from pathlib import Path
 
 from ament_index_python import get_package_share_directory
 from ament_index_python import PackageNotFoundError
+import numpy as np
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import CameraInfo
 from sensor_msgs.srv import SetCameraInfo
 import yaml
+
+
+def _ndarray_representer(dumper: yaml.Dumper, array: np.ndarray) -> yaml.Node:
+    """Make yaml output a numpy array as though it were a simple list."""
+    return dumper.represent_list(array.tolist())
+
+
+yaml.SafeDumper.add_representer(np.ndarray, _ndarray_representer)
+yaml.SafeDumper.add_representer(array.array, yaml.representer.Representer.represent_list)
 
 default_camera_info_url = 'file://${ROS_HOME}/camera_info/${NAME}.yaml'
 # parseURL() type codes:
