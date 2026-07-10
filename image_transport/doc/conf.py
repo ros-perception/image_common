@@ -1,4 +1,4 @@
-# Copyright 2026, Open Source Robotics Foundation, Inc.
+# Copyright 2026 Open Source Robotics Foundation, Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -11,7 +11,7 @@
 #      notice, this list of conditions and the following disclaimer in the
 #      documentation and/or other materials provided with the distribution.
 #
-#    * Neither the name of the the copyright holder nor the names of its
+#    * Neither the name of the copyright holder nor the names of its
 #      contributors may be used to endorse or promote products derived from
 #      this software without specific prior written permission.
 #
@@ -35,7 +35,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 # -- Project information (overridden by rosdoc2 from package.xml) ----------
 project = 'image_transport'
-copyright = '2024, Open Robotics'  # noqa: A001
+copyright = '2026, Open Robotics'  # noqa: A001
 author = 'Alejandro Hernandez Cordero, Geoffrey Biggs'
 
 # -- General configuration -------------------------------------------------
