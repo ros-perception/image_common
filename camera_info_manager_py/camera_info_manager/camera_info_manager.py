@@ -83,8 +83,8 @@ class CameraInfoManager:
     CameraInfoManager class.
 
     :class:`CameraInfoManager` provides ROS CameraInfo support for
-    Python camera drivers. It handles the `sensor_msgs/SetCameraInfo`_
-    service requests, saving and restoring `sensor_msgs/CameraInfo`_
+    Python camera drivers. It handles the ``sensor_msgs/SetCameraInfo``
+    service requests, saving and restoring ``sensor_msgs/CameraInfo``
     data.
 
     :param cname: camera name.
@@ -100,7 +100,7 @@ class CameraInfoManager:
 
     **ROS Service**
 
-    - set_camera_info (`sensor_msgs/SetCameraInfo`_) stores
+    - set_camera_info (``sensor_msgs/SetCameraInfo``) stores
                       calibration information
 
     Typically, these service requests are made by a calibration
@@ -191,7 +191,7 @@ class CameraInfoManager:
 
     **Loading Calibration Data**
 
-    Unlike the `C++ camera_info_manager`_, this Python implementation
+    Unlike the C++ camera_info_manager, this Python implementation
     loads nothing until the :py:meth:`loadCameraInfo` method is
     called.  It is an error to call :py:meth:`getCameraInfo`, or
     :py:meth:`isCalibrated` before that is done.
@@ -204,7 +204,16 @@ class CameraInfoManager:
     def __init__(
         self, node: Node, cname: str = 'camera', url: str = '', namespace: str = ''
     ) -> None:
-        """Call the Constructor."""
+        """
+        Initialise the manager and advertise the set_camera_info service.
+
+        :param node: ROS 2 node used to create the service server.
+        :param cname: Camera name (alphanumeric and underscores only).
+        :param url: Calibration URL.  Defaults to
+            ``file://${ROS_HOME}/camera_info/${NAME}.yaml``.
+        :param namespace: Optional ROS namespace prefix for the
+            ``set_camera_info`` service name.
+        """    
         self.node = node
         self.cname = cname
         self.url = url
@@ -232,7 +241,7 @@ class CameraInfoManager:
         The :py:meth:`loadCameraInfo` must have been called since the
         last time the camera name or URL changed.
 
-        :returns: `sensor_msgs/CameraInfo`_ message.
+        :returns: ``sensor_msgs/CameraInfo`` message.
 
         :raises: :exc:`CameraInfoMissingError` if camera info not up
                  to date.
@@ -283,7 +292,7 @@ class CameraInfoManager:
         This method updates self.camera_info, if possible, based on
         the url and cname parameters.  An empty or non-existent
         calibration is *not* considered an error, a null
-        `sensor_msgs/CameraInfo`_ being provided in that case.
+        ``sensor_msgs/CameraInfo`` being provided in that case.
 
         :param url: Uniform Resource Locator for calibration data.
         :param cname: Camera name.
@@ -321,7 +330,7 @@ class CameraInfoManager:
         This method updates camera_info, if possible, based on the
         currently-configured URL and camera name.  An empty or
         non-existent calibration is *not* considered an error; a null
-        `sensor_msgs/CameraInfo`_ being provided in that case.
+        ``sensor_msgs/CameraInfo`` being provided in that case.
 
         :raises: :exc:`IOError` if an existing calibration is unreadable.
 
@@ -380,9 +389,9 @@ class CameraInfoManager:
         """
         Set the calibration URL.
 
-        :param cname: camera name to use for saving calibration data
+        :param url: new calibration URL to use.
 
-        :returns: True if new name has valid syntax.
+        :returns: True if the URL has valid syntax.
 
         :post: URL updated, if valid. A new value may change the
                camera_info, so it will have to be reloaded before
@@ -423,11 +432,10 @@ def genCameraName(from_string: str) -> str:
 
 def getPackageFileName(url: str) -> str:
     """
-    Get file name corresponding to a `package:` URL.
+    Get the filesystem path corresponding to a ``package:`` URL.
 
-    `param url` fully-resolved Uniform Resource Locator
-    `returns` file name if package found, "" otherwise
-
+    :param url: Fully-resolved ``package://`` Uniform Resource Locator.
+    :returns: Absolute file path if the package is found, empty string otherwise.
     """
     # Scan URL from after "package://" until next '/' and extract
     # package name.  The parseURL() already checked that it's present.
@@ -453,14 +461,14 @@ def loadCalibrationFile(filename: str, cname: str) -> CameraInfo:
     """
     Load calibration data from a file.
 
-    This function returns a `sensor_msgs/CameraInfo`_ message, based
+    This function returns a ``sensor_msgs/CameraInfo`` message, based
     on the filename parameter.  An empty or non-existent file is *not*
     considered an error; a null CameraInfo being provided in that
     case.
 
     :param filename: location of CameraInfo to read
     :param cname: Camera name.
-    :returns: `sensor_msgs/CameraInfo`_ message containing calibration,
+    :returns: ``sensor_msgs/CameraInfo`` message containing calibration,
               if file readable; null calibration message otherwise.
     :raises: :exc:`IOError` if an existing calibration file is unreadable.
 
@@ -492,13 +500,11 @@ def loadCalibrationFile(filename: str, cname: str) -> CameraInfo:
 
 def parseURL(url: str) -> int:
     """
-    Parse calibration Uniform Resource Locator.
+    Parse a calibration URL and return its type code.
 
-    `param url`: string to parse
-    `returns` URL type code
-
-    `note`: Unsupported URL types have codes >= URL_invalid.
-
+    :param url: URL string to classify.
+    :returns: One of ``URL_empty``, ``URL_file``, ``URL_package``, or
+        ``URL_invalid`` (any value >= ``URL_invalid`` is unsupported).
     """
     if not url:
         return URL_empty
@@ -584,7 +590,7 @@ def saveCalibration(new_info: CameraInfo, url: str, cname: str) -> bool:
     This function writes new calibration information to the
     location defined by the url and cname parameters, if possible.
 
-    :param new_info: `sensor_msgs/CameraInfo`_ to save.
+    :param new_info: ``sensor_msgs/CameraInfo`` to save.
     :param url: Uniform Resource Locator for calibration data (if
                 empty use file://${ROS_HOME}/camera_info/${NAME}.yaml).
     :param cname: Camera name.
@@ -639,7 +645,7 @@ def saveCalibrationFile(ci: CameraInfo, filename: str, cname: str) -> bool:
     This function writes the new calibration information to a YAML
     file, if possible.
 
-    :param ci: `sensor_msgs/CameraInfo`_ to save.
+    :param ci: ``sensor_msgs/CameraInfo`` to save.
     :param filename: local file to store data.
     :param cname: Camera name.
     :returns: True if able to save the data.

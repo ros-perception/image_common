@@ -27,46 +27,50 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import inspect
 import os
+import re
 import sys
 
-# Allow Sphinx extensions to find local modules
-sys.path.insert(0, os.path.abspath('.'))
+# When rosdoc2 runs sphinx-build, it exec's this file from a generated wrapper.
+# The wrapper contains: exec(open("/abs/path/to/doc/conf.py").read())
+# Parse that line from the call stack to find the package root and add it to
+# sys.path so that autodoc can import camera_info_manager.
+try:
+    import camera_info_manager  # noqa: F401
+except ImportError:
+    for _fi in inspect.stack():
+        for _line in (_fi.code_context or []):
+            _m = re.search(r'exec\(open\("([^"]+)"\)', _line)
+            if _m:
+                _pkg_root = os.path.dirname(os.path.dirname(_m.group(1)))
+                if os.path.isdir(_pkg_root):
+                    sys.path.insert(0, _pkg_root)
+                break
 
-# -- Project information (overridden by rosdoc2 from package.xml) ----------
-project = 'image_transport'
+project = 'camera_info_manager_py'
 copyright = '2026, Open Robotics'  # noqa: A001
-author = 'Alejandro Hernandez Cordero, Geoffrey Biggs'
+author = "Jack O'Quin, Jose Mastrangelo, Mike Hosmar"
 
-# -- General configuration -------------------------------------------------
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'breathe',
+    'sphinx.ext.viewcode',
     'myst_parser',
 ]
 
-# breathe_projects and breathe_default_project are overridden by rosdoc2 at build time.
-breathe_default_project = 'image_transport Doxygen Project'
-breathe_default_members = ('members', 'undoc-members')
+autodoc_member_order = 'bysource'
 
-# myst_parser — allow .md files in toctrees
 source_suffix = {
     '.rst': 'restructuredtext',
     '.md': 'markdown',
 }
 
 templates_path = ['_templates']
-# Exclude root-level copies of user docs (rosdoc2 copies them to user_docs/ too,
-# where they are included via the user_docs.rst glob toctree).
 exclude_patterns = [
     '_build',
-    'camera_api.rst',
-    'filter_api.rst',
     'overview.rst',
-    'plugin_api.rst',
-    'user_api.rst',
+    'api.rst',
 ]
 
-# -- HTML output options ---------------------------------------------------
 html_theme = 'sphinx_rtd_theme'

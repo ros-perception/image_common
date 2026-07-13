@@ -47,9 +47,10 @@ using CameraInfo = sensor_msgs::msg::CameraInfo;
  *
  * The file name extension (.yml, .yaml, or .ini) determines the output format.
  *
- * \param file_name File to write
- * \param camera_name Name of the camera
- * \param cam_info Camera parameters
+ * \param file_name   File to write.
+ * \param camera_name Name of the camera.
+ * \param cam_info    Camera parameters to serialise.
+ * \return \c true on success, \c false on I/O or format error.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool writeCalibration(
@@ -59,11 +60,12 @@ bool writeCalibration(
 /**
  * \brief Read calibration parameters from a file.
  *
- * The file may be YAML or INI format.
+ * The file format (YAML or INI) is detected automatically from the extension.
  *
- * \param file_name File to read
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
+ * \param file_name        File to read.
+ * \param[out] camera_name Camera name read from the file.
+ * \param[out] cam_info    Camera parameters read from the file.
+ * \return \c true on success, \c false if the file cannot be opened or parsed.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool readCalibration(
@@ -73,10 +75,11 @@ bool readCalibration(
 /**
  * \brief Parse calibration parameters from a string in memory.
  *
- * \param buffer Calibration string
- * \param format Format of calibration string, "yml" or "ini"
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
+ * \param buffer           Calibration data as a string.
+ * \param format           Format of the data: \c "yml" or \c "ini".
+ * \param[out] camera_name Camera name parsed from the buffer.
+ * \param[out] cam_info    Camera parameters parsed from the buffer.
+ * \return \c true on success, \c false if the buffer cannot be parsed.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool parseCalibration(

@@ -30,15 +30,12 @@
 import os
 import sys
 
-# Allow Sphinx extensions to find local modules
 sys.path.insert(0, os.path.abspath('.'))
 
-# -- Project information (overridden by rosdoc2 from package.xml) ----------
-project = 'image_transport'
+project = 'camera_calibration_parsers'
 copyright = '2026, Open Robotics'  # noqa: A001
-author = 'Alejandro Hernandez Cordero, Geoffrey Biggs'
+author = 'Alejandro Hernandez Cordero, Geoffrey Biggs, Michael Carroll, Patrick Mihelich'
 
-# -- General configuration -------------------------------------------------
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
@@ -47,26 +44,21 @@ extensions = [
 ]
 
 # breathe_projects and breathe_default_project are overridden by rosdoc2 at build time.
-breathe_default_project = 'image_transport Doxygen Project'
+breathe_default_project = 'camera_calibration_parsers Doxygen Project'
 breathe_default_members = ('members', 'undoc-members')
 
-# myst_parser — allow .md files in toctrees
 source_suffix = {
     '.rst': 'restructuredtext',
     '.md': 'markdown',
 }
 
 templates_path = ['_templates']
-# Exclude root-level copies of user docs (rosdoc2 copies them to user_docs/ too,
-# where they are included via the user_docs.rst glob toctree).
+# Exclude root-level copies of user docs (rosdoc2 also copies them to user_docs/
+# where they are covered by the user_docs.rst glob toctree).
 exclude_patterns = [
     '_build',
-    'camera_api.rst',
-    'filter_api.rst',
     'overview.rst',
-    'plugin_api.rst',
-    'user_api.rst',
+    'api.rst',
 ]
 
-# -- HTML output options ---------------------------------------------------
 html_theme = 'sphinx_rtd_theme'
