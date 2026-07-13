@@ -213,7 +213,7 @@ class CameraInfoManager:
             ``file://${ROS_HOME}/camera_info/${NAME}.yaml``.
         :param namespace: Optional ROS namespace prefix for the
             ``set_camera_info`` service name.
-        """    
+        """
         self.node = node
         self.cname = cname
         self.url = url
