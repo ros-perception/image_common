@@ -41,6 +41,7 @@ This is very similar to the
 
 """
 
+from collections.abc import Iterable
 import errno
 import locale
 import os
@@ -283,7 +284,7 @@ class CameraInfoManager:
         """
         if self.camera_info is None:
             raise CameraInfoMissingError('Calibration missing, loadCameraInfo() needed.')
-        return self.camera_info.k[0] != 0.0
+        return bool(self.camera_info.k[0] != 0.0)
 
     def _loadCalibration(self, url: str, cname: str) -> None:
         """
@@ -653,7 +654,7 @@ def saveCalibrationFile(ci: CameraInfo, filename: str, cname: str) -> bool:
     # CameraInfo numeric fields are array.array or numpy arrays on the rclpy side,
     # whose elements (numpy.float64) PyYAML's SafeDumper cannot represent; coerce
     # to plain Python floats before dumping.
-    def _to_floats(seq) -> list[float]:
+    def _to_floats(seq: Iterable[float]) -> list[float]:
         return [float(x) for x in seq]
 
     calib = {
