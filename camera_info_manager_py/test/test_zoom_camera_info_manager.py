@@ -27,6 +27,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from collections.abc import Iterator
+from pathlib import Path
+
 import pytest
 import rclpy
 from rclpy.node import Node
@@ -46,37 +49,37 @@ from camera_info_manager import (
 
 
 @pytest.fixture(scope='module', autouse=True)
-def rclpy_context():
+def rclpy_context() -> Iterator[None]:
     rclpy.init()
     yield
     rclpy.shutdown()
 
 
 @pytest.fixture
-def node():
+def node() -> Iterator[Node]:
     n = Node('test_camera_info_manager')
     yield n
     n.destroy_node()
 
 
-def test_camera_info_manager_constructs(node):
+def test_camera_info_manager_constructs(node: Node) -> None:
     cim = CameraInfoManager(node, cname='cam0', url='', namespace='')
     assert cim.getCameraName() == 'cam0'
     assert cim.getURL() == ''
 
 
-def test_camera_info_manager_str_does_not_reference_undefined_attrs(node):
+def test_camera_info_manager_str_does_not_reference_undefined_attrs(node: Node) -> None:
     cim = CameraInfoManager(node, cname='cam0', url='file:///tmp/x.yaml')
     assert str(cim) == '[cam0]file:///tmp/x.yaml'
 
 
-def test_get_camera_info_raises_before_load(node):
+def test_get_camera_info_raises_before_load(node: Node) -> None:
     cim = CameraInfoManager(node, cname='cam0')
     with pytest.raises(CameraInfoMissingError):
         cim.getCameraInfo()
 
 
-def test_set_camera_name_validation(node):
+def test_set_camera_name_validation(node: Node) -> None:
     cim = CameraInfoManager(node, cname='cam0')
     assert cim.setCameraName('new_name') is True
     assert cim.getCameraName() == 'new_name'
@@ -84,7 +87,7 @@ def test_set_camera_name_validation(node):
     assert cim.setCameraName('bad name') is False
 
 
-def test_zoom_manager_constructs_with_node(node):
+def test_zoom_manager_constructs_with_node(node: Node) -> None:
     z = ZoomCameraInfoManager(node, min_zoom=0, max_zoom=10, cname='zoom0')
     assert z.getCameraName() == 'zoom0'
     assert z._min_zoom == 0
@@ -92,7 +95,7 @@ def test_zoom_manager_constructs_with_node(node):
     assert z._zoom == 0
 
 
-def test_zoom_manager_set_zoom_in_range(node):
+def test_zoom_manager_set_zoom_in_range(node: Node) -> None:
     z = ApproximateZoomCameraInfoManager(
         node, min_fov=30.0, max_fov=70.0,
         initial_image_width=640, initial_image_height=480,
@@ -102,7 +105,7 @@ def test_zoom_manager_set_zoom_in_range(node):
     assert z._zoom == 50
 
 
-def test_zoom_manager_set_zoom_out_of_range_raises(node):
+def test_zoom_manager_set_zoom_out_of_range_raises(node: Node) -> None:
     z = ApproximateZoomCameraInfoManager(
         node, min_fov=30.0, max_fov=70.0,
         initial_image_width=640, initial_image_height=480,
@@ -114,7 +117,7 @@ def test_zoom_manager_set_zoom_out_of_range_raises(node):
         z.set_zoom(-1)
 
 
-def test_approximate_zoom_updates_k_without_calibration(node):
+def test_approximate_zoom_updates_k_without_calibration(node: Node) -> None:
     z = ApproximateZoomCameraInfoManager(
         node, min_fov=30.0, max_fov=70.0,
         initial_image_width=640, initial_image_height=480,
@@ -131,7 +134,7 @@ def test_approximate_zoom_updates_k_without_calibration(node):
     assert info.k[5] == 240.0
 
 
-def test_approximate_zoom_set_resolution(node):
+def test_approximate_zoom_set_resolution(node: Node) -> None:
     z = ApproximateZoomCameraInfoManager(
         node, min_fov=30.0, max_fov=70.0,
         initial_image_width=640, initial_image_height=480,
@@ -144,7 +147,7 @@ def test_approximate_zoom_set_resolution(node):
     assert info.height == 720
 
 
-def test_interpolating_zoom_constructs(node):
+def test_interpolating_zoom_constructs(node: Node) -> None:
     iz = InterpolatingZoomCameraInfoManager(
         node, calibration_url_template='file:///tmp/cal_%d.yaml',
         zoom_levels=[0, 50, 100], cname='zoom0',
@@ -154,13 +157,20 @@ def test_interpolating_zoom_constructs(node):
     assert iz._calibration_url_template == 'file:///tmp/cal_%d.yaml'
 
 
-def test_zoom_manager_context_exit_does_not_raise(node):
+def test_zoom_manager_context_exit_does_not_raise(node: Node) -> None:
     z = ZoomCameraInfoManager(node, min_zoom=0, max_zoom=10, cname='zoom0')
     with z:
         pass
 
 
-def _make_camera_info(width=640, height=480, fx=500.0, fy=500.0, cx=320.0, cy=240.0):
+def _make_camera_info(
+    width: int = 640,
+    height: int = 480,
+    fx: float = 500.0,
+    fy: float = 500.0,
+    cx: float = 320.0,
+    cy: float = 240.0,
+) -> CameraInfo:
     ci = CameraInfo()
     ci.width = width
     ci.height = height
@@ -172,7 +182,7 @@ def _make_camera_info(width=640, height=480, fx=500.0, fy=500.0, cx=320.0, cy=24
     return ci
 
 
-def test_yaml_round_trip(tmp_path):
+def test_yaml_round_trip(tmp_path: Path) -> None:
     cname = 'cam0'
     src = _make_camera_info(width=1024, height=768, fx=900.0, fy=901.0)
     yaml_file = tmp_path / 'cam0.yaml'
@@ -188,23 +198,23 @@ def test_yaml_round_trip(tmp_path):
     assert list(loaded.p) == list(src.p)
 
 
-def test_camera_info_manager_loads_from_file(node, tmp_path):
+def test_camera_info_manager_loads_from_file(node: Node, tmp_path: Path) -> None:
     cname = 'cam0'
     src = _make_camera_info(fx=777.0)
     yaml_file = tmp_path / 'cam0.yaml'
     saveCalibrationFile(src, str(yaml_file), cname)
 
-    cim = CameraInfoManager(node, cname=cname, url='file://' + str(yaml_file))
+    cim = CameraInfoManager(node, cname=cname, url=f'file://{yaml_file}')
     cim.loadCameraInfo()
     assert cim.isCalibrated()
     info = cim.getCameraInfo()
     assert info.k[0] == 777.0
 
 
-def test_set_camera_info_service_round_trip(node, tmp_path):
+def test_set_camera_info_service_round_trip(node: Node, tmp_path: Path) -> None:
     cname = 'set_svc_cam'
-    yaml_file = tmp_path / (cname + '.yaml')
-    cim = CameraInfoManager(node, cname=cname, url='file://' + str(yaml_file))
+    yaml_file = tmp_path / f'{cname}.yaml'
+    cim = CameraInfoManager(node, cname=cname, url=f'file://{yaml_file}')
 
     client = node.create_client(SetCameraInfo, 'set_camera_info')
     assert client.wait_for_service(timeout_sec=5.0)
@@ -215,6 +225,7 @@ def test_set_camera_info_service_round_trip(node, tmp_path):
     rclpy.spin_until_future_complete(node, future, timeout_sec=5.0)
     assert future.done()
     rsp = future.result()
+    assert rsp is not None
     assert rsp.success
     assert yaml_file.exists()
 
@@ -223,7 +234,7 @@ def test_set_camera_info_service_round_trip(node, tmp_path):
     assert info.k[0] == 1234.0
 
 
-def test_interpolating_zoom_interpolates_k(node, tmp_path):
+def test_interpolating_zoom_interpolates_k(node: Node, tmp_path: Path) -> None:
     cname = 'izoom'
     # Calibrate at zoom 0 (fx=400) and zoom 100 (fx=800)
     low = _make_camera_info(fx=400.0, fy=400.0)
@@ -231,7 +242,7 @@ def test_interpolating_zoom_interpolates_k(node, tmp_path):
     saveCalibrationFile(low, str(tmp_path / 'cal_0.yaml'), cname)
     saveCalibrationFile(high, str(tmp_path / 'cal_100.yaml'), cname)
 
-    template = 'file://' + str(tmp_path) + '/cal_%d.yaml'
+    template = f'file://{tmp_path}/cal_%d.yaml'
     iz = InterpolatingZoomCameraInfoManager(
         node, calibration_url_template=template, zoom_levels=[0, 100], cname=cname,
     )

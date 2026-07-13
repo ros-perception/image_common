@@ -94,7 +94,7 @@ Converts an image stream from one transport to another.
      -p in_transport:=raw \
      -p out_transport:=compressed \
      --remap in:=/camera/image_raw \
-     --remap out:=/camera/image_raw
+     --remap out:=/camera/image_raw_out
 
 list_transports
 ^^^^^^^^^^^^^^^
