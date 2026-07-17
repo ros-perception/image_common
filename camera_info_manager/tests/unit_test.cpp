@@ -33,6 +33,7 @@
 #include <unistd.h>
 #endif
 
+#include <atomic>
 #include <chrono>
 #include <filesystem>
 #include <memory>
@@ -57,6 +58,7 @@ class CameraInfoManagerTesting : public ::testing::Test
 protected:
   void SetUp()
   {
+    canceled_ = false;
     const ::testing::TestInfo * const test_info =
       ::testing::UnitTest::GetInstance()->current_test_info();
     std::string node_name = "camera_info_manager_test_" + std::string(test_info->name());
@@ -69,11 +71,16 @@ protected:
     node = rclcpp::Node::make_shared(node_name);
     executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
     executor->add_node(node);
-    executor_thread = std::thread([this]() {executor->spin();});
+    executor_thread = std::thread([this]() {
+          while (rclcpp::ok() && !canceled_.load()) {
+            executor->spin_once(std::chrono::milliseconds(10));
+          }
+        });
   }
 
   void TearDown()
   {
+    canceled_ = true;
     executor->cancel();
     if (executor_thread.joinable()) {
       executor_thread.join();
@@ -102,6 +109,7 @@ protected:
   std::string g_camera_name = "08144361026320a0";
   std::thread executor_thread;
   rclcpp::executors::SingleThreadedExecutor::SharedPtr executor;
+  std::atomic<bool> canceled_;
 };
 
 ///////////////////////////////////////////////////////////////

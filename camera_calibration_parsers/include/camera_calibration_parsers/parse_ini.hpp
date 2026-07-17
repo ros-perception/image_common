@@ -43,11 +43,12 @@ namespace camera_calibration_parsers
 using CameraInfo = sensor_msgs::msg::CameraInfo;
 
 /**
- * \brief Write calibration parameters to a file in INI format.
+ * \brief Write calibration parameters to a stream in Videre INI format.
  *
- * \param out Output stream to write to
- * \param camera_name Name of the camera
- * \param cam_info Camera parameters
+ * \param out         Output stream to write to.
+ * \param camera_name Name of the camera.
+ * \param cam_info    Camera parameters to serialise.
+ * \return \c true on success, \c false on write error.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool writeCalibrationIni(
@@ -55,11 +56,12 @@ bool writeCalibrationIni(
   const CameraInfo & cam_info);
 
 /**
- * \brief Read calibration parameters from an INI file.
+ * \brief Read calibration parameters from a stream in Videre INI format.
  *
- * \param in Input stream to read from
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
+ * \param in               Input stream to read from.
+ * \param[out] camera_name Camera name read from the stream.
+ * \param[out] cam_info    Camera parameters read from the stream.
+ * \return \c true on success, \c false if the stream cannot be parsed.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool readCalibrationIni(
@@ -67,11 +69,12 @@ bool readCalibrationIni(
   CameraInfo & cam_info);
 
 /**
- * \brief Write calibration parameters to a file in INI format.
+ * \brief Write calibration parameters to a file in Videre INI format.
  *
- * \param file_name File to write
- * \param camera_name Name of the camera
- * \param cam_info Camera parameters
+ * \param file_name   File path to write.
+ * \param camera_name Name of the camera.
+ * \param cam_info    Camera parameters to serialise.
+ * \return \c true on success, \c false on I/O error.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool writeCalibrationIni(
@@ -79,11 +82,12 @@ bool writeCalibrationIni(
   const CameraInfo & cam_info);
 
 /**
- * \brief Read calibration parameters from an INI file.
+ * \brief Read calibration parameters from a file in Videre INI format.
  *
- * \param file_name File to read
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
+ * \param file_name        File path to read.
+ * \param[out] camera_name Camera name read from the file.
+ * \param[out] cam_info    Camera parameters read from the file.
+ * \return \c true on success, \c false if the file cannot be opened or parsed.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool readCalibrationIni(
@@ -91,11 +95,12 @@ bool readCalibrationIni(
   CameraInfo & cam_info);
 
 /**
- * \brief Parse calibration parameters from a string in memory of INI format.
+ * \brief Parse calibration parameters from an in-memory string in Videre INI format.
  *
- * \param buffer Calibration string
- * \param[out] camera_name Name of the camera
- * \param[out] cam_info Camera parameters
+ * \param buffer           INI-format calibration data as a string.
+ * \param[out] camera_name Camera name parsed from the buffer.
+ * \param[out] cam_info    Camera parameters parsed from the buffer.
+ * \return \c true on success, \c false if the buffer cannot be parsed.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool parseCalibrationIni(
