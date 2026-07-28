@@ -32,7 +32,8 @@
 
 #include "gtest/gtest.h"
 
-#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/node.hpp"
+#include "rclcpp/utilities.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
 #include "image_transport/single_subscriber_publisher.hpp"

@@ -37,7 +37,10 @@
 
 #include <image_transport/image_transport.hpp>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/executors.hpp>
+#include <rclcpp/node_options.hpp>
+#include <rclcpp/qos.hpp>
+#include <rclcpp/utilities.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 
 #include "utils.hpp"

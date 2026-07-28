@@ -44,7 +44,8 @@ Usage Example
 
 .. code-block:: cpp
 
-   #include <rclcpp/rclcpp.hpp>
+   #include <rclcpp/logging.hpp>
+   #include <rclcpp/node.hpp>
    #include <image_transport/image_transport.hpp>
    #include <sensor_msgs/msg/camera_info.hpp>
 

@@ -47,7 +47,11 @@
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "sensor_msgs/distortion_models.hpp"
 
-#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/executors.hpp"
+#include "rclcpp/logging.hpp"
+#include "rclcpp/node.hpp"
+#include "rclcpp/qos.hpp"
+#include "rclcpp/utilities.hpp"
 
 ///////////////////////////////////////////////////////////////
 // global test data

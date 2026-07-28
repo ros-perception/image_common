@@ -32,7 +32,8 @@
 #include <memory>
 #include <string>
 
-#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/qos.hpp"
+#include "rclcpp/subscription_options.hpp"
 #include "sensor_msgs/msg/image.hpp"
 #include "message_filters/simple_filter.hpp"
 

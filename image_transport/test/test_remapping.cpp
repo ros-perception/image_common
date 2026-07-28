@@ -33,8 +33,11 @@
 #include <memory>
 #include <vector>
 
-#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/executors.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp/node_options.hpp"
+#include "rclcpp/qos.hpp"
+#include "rclcpp/utilities.hpp"
 #include "utils.hpp"
 
 #include "image_transport/image_transport.hpp"

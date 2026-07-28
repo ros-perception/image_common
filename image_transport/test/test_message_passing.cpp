@@ -31,8 +31,10 @@
 
 #include "gtest/gtest.h"
 
-#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/executors.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp/qos.hpp"
+#include "rclcpp/utilities.hpp"
 
 #include "image_transport/image_transport.hpp"
 #include "sensor_msgs/msg/image.hpp"

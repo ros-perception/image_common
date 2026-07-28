@@ -23,7 +23,8 @@ using ``message_filters::TimeSynchronizer``.
 
 .. code-block:: cpp
 
-   #include <rclcpp/rclcpp.hpp>
+   #include <rclcpp/logging.hpp>
+   #include <rclcpp/node.hpp>
    #include <image_transport/subscriber_filter.hpp>
    #include <message_filters/subscriber.h>
    #include <message_filters/time_synchronizer.h>

@@ -35,7 +35,7 @@
 #include "camera_calibration_parsers/parse_ini.hpp"
 #include "camera_calibration_parsers/parse_yml.hpp"
 
-#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/logging.hpp"
 
 namespace camera_calibration_parsers
 {

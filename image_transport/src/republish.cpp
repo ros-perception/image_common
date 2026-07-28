@@ -33,7 +33,13 @@
 
 #include <pluginlib/class_loader.hpp>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/event_handler.hpp>
+#include <rclcpp/logging.hpp>
+#include <rclcpp/node_options.hpp>
+#include <rclcpp/publisher_options.hpp>
+#include <rclcpp/qos.hpp>
+#include <rclcpp/qos_overriding_options.hpp>
+#include <rclcpp/subscription_options.hpp>
 
 #include "image_transport/image_transport.hpp"
 #include "image_transport/publisher_plugin.hpp"
