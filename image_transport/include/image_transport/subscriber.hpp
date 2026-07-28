@@ -34,7 +34,8 @@
 #include <memory>
 #include <string>
 
-#include "rclcpp/node.hpp"
+#include "rclcpp/qos.hpp"
+#include "rclcpp/subscription_options.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
 #include "image_transport/exception.hpp"

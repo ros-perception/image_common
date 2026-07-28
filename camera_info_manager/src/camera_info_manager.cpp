@@ -36,6 +36,9 @@
 #include <string>
 #include <string_view>
 
+#include "rclcpp/create_service.hpp"
+#include "rclcpp/logging.hpp"
+#include "rclcpp/utilities.hpp"
 #include "rcpputils/env.hpp"
 #include "camera_calibration_parsers/parse.hpp"
 #include "ament_index_cpp/get_package_prefix.hpp"

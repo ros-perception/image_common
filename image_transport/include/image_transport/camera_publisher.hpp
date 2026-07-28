@@ -34,7 +34,9 @@
 #include <string>
 
 #include "rclcpp/macros.hpp"
-#include "rclcpp/node.hpp"
+#include "rclcpp/publisher_options.hpp"
+#include "rclcpp/qos.hpp"
+#include "rclcpp/time.hpp"
 
 #include "sensor_msgs/msg/image.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"

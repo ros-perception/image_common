@@ -35,7 +35,12 @@
 #include <mutex>
 #include <string>
 
-#include "rclcpp/node.hpp"
+#include "rclcpp/logger.hpp"
+#include "rclcpp/node_interfaces/node_base_interface.hpp"
+#include "rclcpp/node_interfaces/node_logging_interface.hpp"
+#include "rclcpp/node_interfaces/node_services_interface.hpp"
+#include "rclcpp/qos.hpp"
+#include "rclcpp/service.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
 #include "sensor_msgs/srv/set_camera_info.hpp"
 #include "camera_info_manager/visibility_control.h"

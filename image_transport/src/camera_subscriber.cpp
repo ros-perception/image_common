@@ -31,6 +31,10 @@
 #include <memory>
 #include <string>
 
+#include "rclcpp/create_timer.hpp"
+#include "rclcpp/logging.hpp"
+#include "rclcpp/timer.hpp"
+
 // TODO(ahcorde): Remove this #ifdef when message_filters remove the
 // deprecations
 #ifdef _WIN32
