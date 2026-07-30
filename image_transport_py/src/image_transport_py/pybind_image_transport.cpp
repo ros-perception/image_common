@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include "./pybind11.hpp"
 #include "image_transport_py/cast_image.hpp"
@@ -23,8 +24,10 @@
 #include <image_transport/image_transport.hpp>
 #include <image_transport/publisher.hpp>
 #include <image_transport/subscriber.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp/serialization.hpp>
+#include <rclcpp/executors/multi_threaded_executor.hpp>
+#include <rclcpp/node.hpp>
+#include <rclcpp/node_options.hpp>
+#include <rclcpp/utilities.hpp>
 #include <sensor_msgs/msg/image.hpp>
 
 namespace image_transport_python
