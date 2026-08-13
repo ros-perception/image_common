@@ -360,7 +360,7 @@ bool readCalibrationIni(
   const std::string & file_name, std::string & camera_name,
   CameraInfo & cam_info)
 {
-  std::fstream fs(file_name);
+  std::ifstream fs(file_name);
   return readCalibrationIni(fs, camera_name, cam_info);
 }
 

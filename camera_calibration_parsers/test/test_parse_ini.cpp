@@ -15,7 +15,15 @@
 #include <gtest/gtest.h>
 
 #include <cstdio>
+#include <fstream>
 #include <string>
+#include <utility>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <sys/stat.h>
+#endif
 
 #include "camera_calibration_parsers/parse_ini.hpp"
 #include "sensor_msgs/distortion_models.hpp"
@@ -39,6 +47,57 @@ std::string custom_tmpnam()
   return std::string(temp);
 #endif
 }
+
+class ScopedReadOnlyFile
+{
+public:
+  explicit ScopedReadOnlyFile(std::string path)
+  : path_(std::move(path))
+  {}
+
+  ScopedReadOnlyFile(const ScopedReadOnlyFile &) = delete;
+  ScopedReadOnlyFile & operator=(const ScopedReadOnlyFile &) = delete;
+
+  ~ScopedReadOnlyFile()
+  {
+#ifdef _WIN32
+    if (original_attributes_ != INVALID_FILE_ATTRIBUTES) {
+      SetFileAttributesA(path_.c_str(), original_attributes_);
+    }
+#else
+    if (has_original_mode_) {
+      chmod(path_.c_str(), original_mode_);
+    }
+#endif
+    std::remove(path_.c_str());
+  }
+
+  bool make_read_only()
+  {
+#ifdef _WIN32
+    original_attributes_ = GetFileAttributesA(path_.c_str());
+    return original_attributes_ != INVALID_FILE_ATTRIBUTES &&
+           SetFileAttributesA(path_.c_str(), original_attributes_ | FILE_ATTRIBUTE_READONLY) != 0;
+#else
+    struct stat file_info;
+    has_original_mode_ = stat(path_.c_str(), &file_info) == 0;
+    if (has_original_mode_) {
+      original_mode_ = file_info.st_mode;
+    }
+    return has_original_mode_ &&
+           chmod(path_.c_str(), S_IRUSR | S_IRGRP | S_IROTH) == 0;
+#endif
+  }
+
+private:
+  std::string path_;
+#ifdef _WIN32
+  DWORD original_attributes_{INVALID_FILE_ATTRIBUTES};
+#else
+  mode_t original_mode_{};
+  bool has_original_mode_{false};
+#endif
+};
 
 static const char * kValidCalib5 =
   R"(
@@ -235,6 +294,34 @@ TEST(ParseIni, roundtrip_calib5) {
     camera_calibration_parsers::readCalibrationIni(calib_file, camera_name2, cam_info2);
   ASSERT_EQ(ret_read, true);
   ASSERT_EQ(camera_name2, camera_name);
+  check_calib(cam_info2);
+}
+
+TEST(ParseIni, read_only_calib5) {
+  std::string calib_file = custom_tmpnam();
+  ScopedReadOnlyFile read_only_file(calib_file);
+
+  std::string camera_name = "read_only_calib5";
+  auto cam_info = make_calib(sensor_msgs::distortion_models::PLUMB_BOB);
+  ASSERT_TRUE(
+    camera_calibration_parsers::writeCalibrationIni(calib_file, camera_name, cam_info));
+
+  ASSERT_TRUE(read_only_file.make_read_only());
+
+  std::ifstream read_probe(calib_file);
+  ASSERT_TRUE(read_probe.is_open());
+  read_probe.close();
+
+  std::fstream read_write_probe(calib_file);
+  if (read_write_probe.is_open()) {
+    GTEST_SKIP() << "Environment does not enforce read-only file permissions";
+  }
+
+  std::string camera_name2;
+  sensor_msgs::msg::CameraInfo cam_info2;
+  ASSERT_TRUE(
+    camera_calibration_parsers::readCalibrationIni(calib_file, camera_name2, cam_info2));
+  EXPECT_EQ(camera_name2, camera_name);
   check_calib(cam_info2);
 }
 
