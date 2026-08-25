@@ -325,6 +325,16 @@ TEST(ParseIni, read_only_calib5) {
   check_calib(cam_info2);
 }
 
+TEST(ParseIni, cant_read_missing_file) {
+  std::string calib_file = custom_tmpnam();
+  std::remove(calib_file.c_str());
+
+  std::string camera_name;
+  sensor_msgs::msg::CameraInfo cam_info;
+  ASSERT_FALSE(
+    camera_calibration_parsers::readCalibrationIni(calib_file, camera_name, cam_info));
+}
+
 TEST(ParseIni, cant_write_calib8) {
   std::string calib_file = custom_tmpnam();
 

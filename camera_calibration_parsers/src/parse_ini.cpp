@@ -361,6 +361,12 @@ bool readCalibrationIni(
   CameraInfo & cam_info)
 {
   std::ifstream fs(file_name);
+  if (!fs.good()) {
+    RCLCPP_ERROR(
+      kIniLogger, "Unable to open camera calibration file [%s]",
+      file_name.c_str());
+    return false;
+  }
   return readCalibrationIni(fs, camera_name, cam_info);
 }
 
