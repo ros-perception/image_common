@@ -2,6 +2,12 @@
 Changelog for package camera_calibration_parsers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.0.4 (2026-09-03)
+------------------
+* Optimize includes (`#430 <https://github.com/ros-perception/image_common/issues/430>`_)
+* camera_calibration_parsers: allow reading read-only INI files (`#431 <https://github.com/ros-perception/image_common/issues/431>`_)
+* Contributors: Alejandro Hernández Cordero, ktyang
+
 7.0.3 (2026-07-17)
 ------------------
 * camera_calibration_parsers: re-enable parser.py tests (`#428 <https://github.com/ros-perception/image_common/issues/428>`_)

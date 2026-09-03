@@ -2,6 +2,9 @@
 Changelog for package camera_info_manager_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.0.4 (2026-09-03)
+------------------
+
 7.0.3 (2026-07-17)
 ------------------
 * Type annotations for camenra_info_manager_py (`#426 <https://github.com/ros-perception/image_common/issues/426>`_)

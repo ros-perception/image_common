@@ -2,6 +2,11 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.0.4 (2026-09-03)
+------------------
+* Optimize includes (`#430 <https://github.com/ros-perception/image_common/issues/430>`_)
+* Contributors: Alejandro Hernández Cordero
+
 7.0.3 (2026-07-17)
 ------------------
 * camera_info_manager: Use string_view in URL parsing (`#427 <https://github.com/ros-perception/image_common/issues/427>`_)

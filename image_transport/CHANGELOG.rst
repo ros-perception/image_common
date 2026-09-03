@@ -2,6 +2,11 @@
 Changelog for package image_transport
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.0.4 (2026-09-03)
+------------------
+* Optimize includes (`#430 <https://github.com/ros-perception/image_common/issues/430>`_)
+* Contributors: Alejandro Hernández Cordero
+
 7.0.3 (2026-07-17)
 ------------------
 * Added rosdoc2 documentation to camera_info_manager_py (`#404 <https://github.com/ros-perception/image_common/issues/404>`_)
