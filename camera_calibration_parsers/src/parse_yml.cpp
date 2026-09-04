@@ -33,6 +33,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <span>  // NOLINT(build/include_order) cpplint misclassifies <span>
 #include <string>
 
 #include "rclcpp/logging.hpp"
@@ -74,18 +75,23 @@ static const char ROI_X_OFFSET_YML_NAME[] = "x_offset";
 static const char ROI_Y_OFFSET_YML_NAME[] = "y_offset";
 static const char ROI_DO_RECTIFY_YML_NAME[] = "do_rectify";
 
+// Read-only view of a matrix, used when emitting calibration data.
+struct ConstMatrix
+{
+  int rows;
+  int cols;
+  std::span<const double> data;
+};
+
+// Mutable view of a matrix, used when parsing calibration data into a message.
 struct SimpleMatrix
 {
   int rows;
   int cols;
-  double * data;
-
-  SimpleMatrix(int rows, int cols, double * data)
-  : rows(rows), cols(cols), data(data)
-  {}
+  std::span<double> data;
 };
 
-YAML::Emitter & operator<<(YAML::Emitter & out, const SimpleMatrix & m)
+YAML::Emitter & operator<<(YAML::Emitter & out, const ConstMatrix & m)
 {
   out << YAML::BeginMap;
   out << YAML::Key << "rows" << YAML::Value << m.rows;
@@ -94,8 +100,8 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const SimpleMatrix & m)
   out << YAML::Key << "data" << YAML::Value;
   out << YAML::Flow;
   out << YAML::BeginSeq;
-  for (int i = 0; i < m.rows * m.cols; ++i) {
-    out << m.data[i];
+  for (double v : m.data) {
+    out << v;
   }
   out << YAML::EndSeq;
   out << YAML::EndMap;
@@ -136,17 +142,12 @@ bool writeCalibrationYml(
 
   // Camera name and intrinsics
   emitter << YAML::Key << CAM_YML_NAME << YAML::Value << camera_name;
-  emitter << YAML::Key << K_YML_NAME << YAML::Value <<
-    SimpleMatrix(3, 3, const_cast<double *>(&cam_info.k[0]));
+  emitter << YAML::Key << K_YML_NAME << YAML::Value << ConstMatrix{3, 3, cam_info.k};
   emitter << YAML::Key << DMODEL_YML_NAME << YAML::Value << cam_info.distortion_model;
-  emitter << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(
-    1,
-    static_cast<int>(cam_info.d.size()),
-    const_cast<double *>(&cam_info.d[0]));
-  emitter << YAML::Key << R_YML_NAME << YAML::Value <<
-    SimpleMatrix(3, 3, const_cast<double *>(&cam_info.r[0]));
-  emitter << YAML::Key << P_YML_NAME << YAML::Value <<
-    SimpleMatrix(3, 4, const_cast<double *>(&cam_info.p[0]));
+  emitter << YAML::Key << D_YML_NAME << YAML::Value <<
+    ConstMatrix{1, static_cast<int>(cam_info.d.size()), cam_info.d};
+  emitter << YAML::Key << R_YML_NAME << YAML::Value << ConstMatrix{3, 3, cam_info.r};
+  emitter << YAML::Key << P_YML_NAME << YAML::Value << ConstMatrix{3, 4, cam_info.p};
 
   // Binning
   emitter << YAML::Key << BINNING_X_YML_NAME << YAML::Value << cam_info.binning_x;
@@ -207,11 +208,11 @@ bool readCalibrationYml(
     doc[HEIGHT_YML_NAME] >> cam_info.height;
 
     // Read in fixed-size matrices
-    SimpleMatrix K_(3, 3, &cam_info.k[0]);
+    SimpleMatrix K_{3, 3, cam_info.k};
     doc[K_YML_NAME] >> K_;
-    SimpleMatrix R_(3, 3, &cam_info.r[0]);
+    SimpleMatrix R_{3, 3, cam_info.r};
     doc[R_YML_NAME] >> R_;
-    SimpleMatrix P_(3, 4, &cam_info.p[0]);
+    SimpleMatrix P_{3, 4, cam_info.p};
     doc[P_YML_NAME] >> P_;
 
     // Different distortion models may have different numbers of parameters

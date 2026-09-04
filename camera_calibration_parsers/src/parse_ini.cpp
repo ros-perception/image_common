@@ -36,11 +36,14 @@
 
 #include <algorithm>
 #include <array>
+#include <charconv>
 #include <filesystem>
 #include <fstream>
 #include <limits>
+#include <span>  // NOLINT(build/include_order) cpplint misclassifies <span>
 #include <sstream>
 #include <string>
+#include <system_error>
 #include <vector>
 
 #include "rclcpp/logging.hpp"
@@ -55,11 +58,7 @@ struct SimpleMatrix
 {
   int rows;
   int cols;
-  const double * data;
-
-  SimpleMatrix(int rows, int cols, const double * data)
-  : rows(rows), cols(cols), data(data)
-  {}
+  std::span<const double> data;   // non-owning view; carries its own length
 };
 
 std::ostream & operator<<(std::ostream & out, const SimpleMatrix & m)
@@ -76,16 +75,13 @@ std::ostream & operator<<(std::ostream & out, const SimpleMatrix & m)
 // Remove whitespace from both ends of a string.
 void trim(std::string & s)
 {
-  s.erase(
-    s.begin(), std::find_if(
-      s.begin(), s.end(), [](int ch) {
-        return !std::isspace(ch);
-      }));
-  s.erase(
-    std::find_if(
-      s.rbegin(), s.rend(), [](int ch) {
-        return !std::isspace(ch);
-      }).base(), s.end());
+  // isspace() is fed an unsigned char to avoid undefined behaviour on bytes
+  // with the high bit set.
+  const auto not_space = [](char ch) {
+      return !std::isspace(static_cast<unsigned char>(ch));
+    };
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), not_space));
+  s.erase(std::find_if(s.rbegin(), s.rend(), not_space).base(), s.end());
 }
 
 // Determine if a given string is an INI section header
@@ -143,14 +139,24 @@ template<size_t rows, size_t cols>
 std::array<double, rows * cols> parse_matrix(std::vector<std::string>::const_iterator & begin)
 {
   std::array<double, rows * cols> ret;
+  ret.fill(std::numeric_limits<double>::quiet_NaN());
   for (size_t ii = 0; ii < rows; ++ii) {
-    auto ss = std::stringstream(*(begin++));
+    const std::string & row = *(begin++);
+    const char * ptr = row.data();
+    const char * const end = row.data() + row.size();
     for (size_t jj = 0; jj < cols; ++jj) {
-      double val = std::numeric_limits<double>::quiet_NaN();
-      if (!ss.eof()) {
-        ss >> val;
+      // from_chars() does not skip leading whitespace; do it explicitly.
+      while (ptr != end && std::isspace(static_cast<unsigned char>(*ptr))) {
+        ++ptr;
       }
-      ret[ii * cols + jj] = val;
+      // Locale-independent parse (unlike stringstream, which honours the
+      // global locale and could misread e.g. "1,5"). Unparsed cells stay NaN.
+      double val = std::numeric_limits<double>::quiet_NaN();
+      const auto [next, ec] = std::from_chars(ptr, end, val);
+      if (ec == std::errc{}) {
+        ret[ii * cols + jj] = val;
+        ptr = next;
+      }
     }
   }
   return ret;
@@ -290,10 +296,10 @@ bool writeCalibrationIni(
   out << "height\n" << cam_info.height << "\n\n";
   out << "[" << camera_name << "]\n\n";
 
-  out << "camera matrix\n" << SimpleMatrix(3, 3, &cam_info.k[0]);
-  out << "\ndistortion\n" << SimpleMatrix(1, 5, &cam_info.d[0]);
-  out << "\n\nrectification\n" << SimpleMatrix(3, 3, &cam_info.r[0]);
-  out << "\nprojection\n" << SimpleMatrix(3, 4, &cam_info.p[0]);
+  out << "camera matrix\n" << SimpleMatrix{3, 3, cam_info.k};
+  out << "\ndistortion\n" << SimpleMatrix{1, 5, cam_info.d};
+  out << "\n\nrectification\n" << SimpleMatrix{3, 3, cam_info.r};
+  out << "\nprojection\n" << SimpleMatrix{3, 4, cam_info.p};
 
   return true;
 }

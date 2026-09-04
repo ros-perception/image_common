@@ -576,8 +576,10 @@ bool CameraInfoManager::setCameraName(const std::string & cname)
   }
 
   // validate the camera name characters
-  for (unsigned i = 0; i < cname.size(); ++i) {
-    if (!isalnum(cname[i]) && cname[i] != '_') {
+  for (const char c : cname) {
+    // isalnum() is fed an unsigned char to avoid undefined behaviour on bytes
+    // with the high bit set.
+    if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_') {
       return false;
     }
   }
