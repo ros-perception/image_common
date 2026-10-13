@@ -112,6 +112,48 @@ public:
   }
 };
 
+// Python object -> std::vector<uint8_t> via the buffer protocol,
+// falling back to the generic (element-wise) sequence conversion.
+static inline std::vector<
+  uint8_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<uint8_t>>
+py_data_to_vector(handle src)
+{
+  using Vector = std::vector<
+    uint8_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<uint8_t>>;
+
+  Py_buffer buf;
+  if (PyObject_GetBuffer(src.ptr(), &buf, PyBUF_SIMPLE) == 0) {
+    if (PyBuffer_IsContiguous(&buf, 'C') && buf.ndim <= 1) {
+      Vector out;
+      const auto * begin = static_cast<const uint8_t *>(buf.buf);
+      out.assign(begin, begin + buf.len);
+      PyBuffer_Release(&buf);
+      return out;
+    }
+    PyBuffer_Release(&buf);
+    // non-contiguous buffer: fall through to the generic path
+  } else {
+    PyErr_Clear();  // object doesn't support the buffer protocol
+  }
+
+  return src.cast<Vector>();  // generic element-wise conversion (lists, etc.)
+}
+
+// std::vector<uint8_t> -> object with buffer protocol assignable to array.array('B̈́')
+static inline pybind11::object
+vector_to_py_data(std::vector<
+  uint8_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<uint8_t>> data)
+{
+  object mod = module::import("array");
+  object arr = mod.attr("array")("B");
+  handle resize = arr.attr("frombytes");
+  // data.size() can exceed ssize_t range only in absurd cases; keep it simple:
+  resize(pybind11::bytes(
+      reinterpret_cast<const char *>(data.data()),
+      static_cast<pybind11::ssize_t>(data.size())));
+  return arr;
+}
+
 template<>
 struct type_caster<sensor_msgs::msg::Image_<ContainerAllocator>>
 {
@@ -134,11 +176,8 @@ public:
           typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<char>>>();
     value.is_bigendian = src.attr("is_bigendian").cast<uint8_t>();
     value.step = src.attr("step").cast<uint32_t>();
-    value.data =
-      src.attr("data")
-      .cast<std::vector<
-          uint8_t,
-          typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<uint8_t>>>();
+    value.data = py_data_to_vector(src.attr("data"));
+
     return true;
   }
 
@@ -155,7 +194,7 @@ public:
     msg.attr("encoding") = pybind11::cast(cpp_msg.encoding);
     msg.attr("is_bigendian") = pybind11::cast(cpp_msg.is_bigendian);
     msg.attr("step") = pybind11::cast(cpp_msg.step);
-    msg.attr("data") = pybind11::cast(cpp_msg.data);
+    msg.attr("data") = vector_to_py_data(std::move(cpp_msg.data));
     msg.inc_ref();
     return msg;
   }
