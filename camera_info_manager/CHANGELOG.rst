@@ -2,6 +2,9 @@
 Changelog for package camera_info_manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.0.5 (2026-10-22)
+------------------
+
 7.0.4 (2026-09-03)
 ------------------
 * Optimize includes (`#430 <https://github.com/ros-perception/image_common/issues/430>`_)

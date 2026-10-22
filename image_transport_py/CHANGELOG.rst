@@ -2,6 +2,11 @@
 Changelog for package image_transport_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.0.5 (2026-10-22)
+------------------
+* image_transport_py: Improve Image CPP<->PY conversion efficiency (`#436 <https://github.com/ros-perception/image_common/issues/436>`_)
+* Contributors: Martin Pecka
+
 7.0.4 (2026-09-03)
 ------------------
 * Optimize includes (`#430 <https://github.com/ros-perception/image_common/issues/430>`_)
