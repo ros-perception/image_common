@@ -71,10 +71,9 @@ TEST_F(TestSubscriber, shutdown) {
 
   auto sub = image_transport::create_subscription(*node_, "camera/image", fcn, "raw",
     rclcpp::SystemDefaultsQoS());
-  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 1u);
+  EXPECT_TRUE(test_rclcpp::wait_for_subscriber_count(node_, "camera/image", 1u));
   sub.shutdown();
-  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
-    0u);
+  EXPECT_TRUE(test_rclcpp::wait_for_subscriber_count(node_, "camera/image", 0u));
 }
 
 TEST_F(TestSubscriber, camera_sub_shutdown) {
@@ -85,13 +84,11 @@ TEST_F(TestSubscriber, camera_sub_shutdown) {
 
   auto sub = image_transport::create_camera_subscription(*node_, "camera/image", fcn, "raw",
     rclcpp::SystemDefaultsQoS());
-  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"), 1u);
-  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/camera_info"), 1u);
+  EXPECT_TRUE(test_rclcpp::wait_for_subscriber_count(node_, "camera/image", 1u));
+  EXPECT_TRUE(test_rclcpp::wait_for_subscriber_count(node_, "camera/camera_info", 1u));
   sub.shutdown();
-  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers("camera/image"),
-    0u);
-  EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers(
-    "camera/camera_info"), 0u);
+  EXPECT_TRUE(test_rclcpp::wait_for_subscriber_count(node_, "camera/image", 0u));
+  EXPECT_TRUE(test_rclcpp::wait_for_subscriber_count(node_, "camera/camera_info", 0u));
 }
 
 TEST_F(TestSubscriber, callback_groups) {

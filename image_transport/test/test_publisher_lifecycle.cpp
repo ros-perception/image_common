@@ -53,11 +53,9 @@ protected:
 
 TEST_F(TestPublisherLifecycle, publisher) {
   auto pub = image_transport::create_publisher(*node_, "camera/image", rclcpp::SystemDefaultsQoS());
-  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"),
-    1u);
+  EXPECT_TRUE(test_rclcpp::wait_for_publisher_count(node_, "camera/image", 1u));
   pub.shutdown();
-  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"),
-    0u);
+  EXPECT_TRUE(test_rclcpp::wait_for_publisher_count(node_, "camera/image", 0u));
   // coverage tests: invalid publisher should fail but not crash
   pub.publish(sensor_msgs::msg::Image());
   pub.publish(sensor_msgs::msg::Image::ConstSharedPtr());
@@ -71,15 +69,11 @@ TEST_F(TestPublisherLifecycle, image_transport_publisher) {
 TEST_F(TestPublisherLifecycle, camera_publisher) {
   auto camera_pub = image_transport::create_camera_publisher(*node_,
     "camera/image", rclcpp::SystemDefaultsQoS());
-  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"),
-    1u);
-  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers(
-    "camera/camera_info"), 1u);
+  EXPECT_TRUE(test_rclcpp::wait_for_publisher_count(node_, "camera/image", 1u));
+  EXPECT_TRUE(test_rclcpp::wait_for_publisher_count(node_, "camera/camera_info", 1u));
   camera_pub.shutdown();
-  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers("camera/image"),
-    0u);
-  EXPECT_EQ(node_->get_node_graph_interface()->count_publishers(
-    "camera/camera_info"), 0u);
+  EXPECT_TRUE(test_rclcpp::wait_for_publisher_count(node_, "camera/image", 0u));
+  EXPECT_TRUE(test_rclcpp::wait_for_publisher_count(node_, "camera/camera_info", 0u));
   // coverage tests: invalid publisher should fail but not crash
   camera_pub.publish(sensor_msgs::msg::Image(), sensor_msgs::msg::CameraInfo());
   camera_pub.publish(

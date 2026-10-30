@@ -19,8 +19,10 @@
 #include <cinttypes>
 #include <cstdio>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
+#include <thread>
 
 #include "gtest/gtest.h"
 
@@ -88,6 +90,83 @@ void wait_for_subscriber(
     time_slept_count,
     to_be_available ? "connect to" : "disconnect from",
     topic_name.c_str());
+}
+
+// The RMW may update the ROS graph asynchronously (e.g. rmw_cyclonedds adds
+// local endpoints from a builtin-topic listener), so a graph query made right
+// after creating or destroying an entity can be stale. Poll until the
+// predicate holds or the timeout expires.
+template<typename PredicateT>
+bool wait_for_graph(
+  PredicateT && predicate,
+  std::chrono::milliseconds timeout = std::chrono::seconds(5))
+{
+  const auto deadline = std::chrono::steady_clock::now() + timeout;
+  while (!predicate()) {
+    if (std::chrono::steady_clock::now() >= deadline) {
+      return false;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+  return true;
+}
+
+template<typename NodeT>
+bool wait_for_publisher_count(
+  const NodeT & node, const std::string & topic_name, size_t count)
+{
+  auto graph = node->get_node_graph_interface();
+  return wait_for_graph(
+    [&graph, &topic_name, count]() {return graph->count_publishers(topic_name) == count;});
+}
+
+template<typename NodeT>
+bool wait_for_subscriber_count(
+  const NodeT & node, const std::string & topic_name, size_t count)
+{
+  auto graph = node->get_node_graph_interface();
+  return wait_for_graph(
+    [&graph, &topic_name, count]() {return graph->count_subscribers(topic_name) == count;});
+}
+
+// Wait until topic_name has exactly one publisher and it belongs to node,
+// then return its endpoint info.
+template<typename NodeT>
+std::optional<rclcpp::TopicEndpointInfo> wait_for_publisher_info(
+  const NodeT & node, const std::string & topic_name)
+{
+  auto graph = node->get_node_graph_interface();
+  std::optional<rclcpp::TopicEndpointInfo> info;
+  wait_for_graph(
+    [&]() {
+      auto infos = graph->get_publishers_info_by_topic(topic_name);
+      if (infos.size() == 1 && infos[0].node_name() == node->get_name()) {
+        info = infos[0];
+        return true;
+      }
+      return false;
+    });
+  return info;
+}
+
+// Wait until topic_name has exactly one subscription and it belongs to node,
+// then return its endpoint info.
+template<typename NodeT>
+std::optional<rclcpp::TopicEndpointInfo> wait_for_subscription_info(
+  const NodeT & node, const std::string & topic_name)
+{
+  auto graph = node->get_node_graph_interface();
+  std::optional<rclcpp::TopicEndpointInfo> info;
+  wait_for_graph(
+    [&]() {
+      auto infos = graph->get_subscriptions_info_by_topic(topic_name);
+      if (infos.size() == 1 && infos[0].node_name() == node->get_name()) {
+        info = infos[0];
+        return true;
+      }
+      return false;
+    });
+  return info;
 }
 
 }  // namespace test_rclcpp
