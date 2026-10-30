@@ -114,13 +114,7 @@ ament_export_dependencies(ament_cmake_ros_core message_filters rclcpp sensor_msg
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-
-  list(APPEND AMENT_LINT_AUTO_EXCLUDE
-    ament_cmake_cppcheck
-  )
   ament_lint_auto_find_test_dependencies()
-
-  ament_cppcheck(LANGUAGE "c++")
 
   find_package(ament_cmake_gtest)
   find_package(rclcpp_lifecycle REQUIRED)
