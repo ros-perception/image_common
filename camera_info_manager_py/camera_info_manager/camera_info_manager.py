@@ -217,7 +217,7 @@ class CameraInfoManager:
 
         :returns: Return string representation of :class:CameraInfoManager.
         """
-        return '[' + self.cname + ']' + str(self.utm)
+        return '[' + self.cname + ']' + str(self.url)
 
     def getCameraInfo(self):
         """Get the current camera calibration.
@@ -316,14 +316,8 @@ class CameraInfoManager:
         """
         self._loadCalibration(self.url, self.cname)
 
-<<<<<<< HEAD
-    def setCameraInfo(self, req):
-        """Set camera info request callback.
-=======
     def setCameraInfo(self, req, rsp):
-        """
-        Set camera info request callback.
->>>>>>> d696e9b (Zoom Camera Info manager properly ported to ROS 2 (#407))
+        """Set camera info request callback.
 
         :param req: SetCameraInfo request message.
         :param rsp: SetCameraInfo response message to populate.
