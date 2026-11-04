@@ -602,8 +602,6 @@ def saveCalibration(new_info: CameraInfo, url: str, cname: str) -> bool:
     url_type = parseURL(resolved_url)
 
     if url_type == URL_empty:
-        if url == default_camera_info_url:
-            return False
         return saveCalibration(new_info, default_camera_info_url, cname)
 
     rclpy.logging.get_logger('camera_info_manager').info(
@@ -620,10 +618,7 @@ def saveCalibration(new_info: CameraInfo, url: str, cname: str) -> bool:
                 f'Calibration package missing: {resolved_url} (ignored)'
             )
             # treat it like an empty URL
-            if url == default_camera_info_url:
-                success = False
-            else:
-                success = saveCalibration(new_info, default_camera_info_url, cname)
+            success = saveCalibration(new_info, default_camera_info_url, cname)
         else:
             success = saveCalibrationFile(new_info, filename, cname)
 
@@ -632,10 +627,7 @@ def saveCalibration(new_info: CameraInfo, url: str, cname: str) -> bool:
             f'Invalid camera calibration URL: {resolved_url}'
         )
         # treat it like an empty URL
-        if url == default_camera_info_url:
-            success = False
-        else:
-            success = saveCalibration(new_info, default_camera_info_url, cname)
+        success = saveCalibration(new_info, default_camera_info_url, cname)
     return success
 
 
