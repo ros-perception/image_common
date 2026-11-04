@@ -36,6 +36,7 @@
 #include <atomic>
 #include <chrono>
 #include <filesystem>
+#include <fstream>
 #include <memory>
 #include <thread>
 #include <cstdlib>
@@ -512,6 +513,40 @@ TEST_F(CameraInfoManagerTesting, setCalibration)
   std::filesystem::path home_path(rcpputils::get_env_var("HOME"));
 #endif
   delete_file((home_path / ".ros" / "camera_info" / "camera.yaml").string());
+}
+
+// Test that saving to an unknown package is reported to the service client
+TEST_F(CameraInfoManagerTesting, setCalibrationUnknownPackage)
+{
+  auto cinfo = make_cinfo("camera", "package://no_such_package/calibration.yaml");
+
+  sensor_msgs::msg::CameraInfo exp(expected_calibration());
+  EXPECT_FALSE(set_calibration(node, exp));
+
+  // the current calibration is updated, even if it could not be saved
+  sensor_msgs::msg::CameraInfo ci = cinfo.getCameraInfo();
+  compare_calibration(exp, ci);
+}
+
+// Test that failing to create the directory is reported to the service client
+TEST_F(CameraInfoManagerTesting, setCalibrationUncreatableDirectory)
+{
+  // a regular file in the path prevents creating any directory below it
+  std::filesystem::path blocker(
+    std::filesystem::temp_directory_path() / "camera_info_manager_test_blocker");
+  std::ofstream(blocker).close();
+
+  auto cinfo = make_cinfo(
+    "camera", "file://" + (blocker / "subdir" / "calibration.yaml").generic_string());
+
+  sensor_msgs::msg::CameraInfo exp(expected_calibration());
+  EXPECT_FALSE(set_calibration(node, exp));
+
+  // the current calibration is updated, even if it could not be saved
+  sensor_msgs::msg::CameraInfo ci = cinfo.getCameraInfo();
+  compare_calibration(exp, ci);
+
+  delete_file(blocker.string());
 }
 
 // Test ability to save calibrated CameraInfo in default URL
