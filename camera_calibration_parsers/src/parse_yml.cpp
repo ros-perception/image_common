@@ -34,6 +34,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <system_error>
 
 #include "rclcpp/logging.hpp"
 #include "sensor_msgs/distortion_models.hpp"
@@ -142,7 +143,7 @@ bool writeCalibrationYml(
   emitter << YAML::Key << D_YML_NAME << YAML::Value << SimpleMatrix(
     1,
     static_cast<int>(cam_info.d.size()),
-    const_cast<double *>(&cam_info.d[0]));
+    const_cast<double *>(cam_info.d.data()));
   emitter << YAML::Key << R_YML_NAME << YAML::Value <<
     SimpleMatrix(3, 3, const_cast<double *>(&cam_info.r[0]));
   emitter << YAML::Key << P_YML_NAME << YAML::Value <<
@@ -173,12 +174,15 @@ bool writeCalibrationYml(
   const CameraInfo & cam_info)
 {
   std::filesystem::path dir(std::filesystem::path(file_name).parent_path());
-  if (!dir.empty() && !std::filesystem::exists(dir) &&
-    !std::filesystem::create_directories(dir))
-  {
+  std::error_code error;
+  if (!dir.empty()) {
+    std::filesystem::create_directories(dir, error);
+  }
+  if (error) {
     RCLCPP_ERROR(
-      kYmlLogger, "Unable to create directory for camera calibration file [%s]",
-      dir.string().c_str());
+      kYmlLogger, "Unable to create directory for camera calibration file [%s]: %s",
+      dir.string().c_str(), error.message().c_str());
+    return false;
   }
   std::ofstream out(file_name.c_str());
   if (!out.is_open()) {
