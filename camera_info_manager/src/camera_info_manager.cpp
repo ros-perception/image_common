@@ -31,10 +31,12 @@
 
 #include <algorithm>
 #include <cctype>
+#include <exception>
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <system_error>
 
 #include "rclcpp/create_service.hpp"
 #include "rclcpp/logging.hpp"
@@ -499,11 +501,14 @@ CameraInfoManager::saveCalibrationFile(
 
   std::filesystem::path parent = filename.parent_path();
 
-  if (!std::filesystem::exists(parent)) {
-    if (!std::filesystem::create_directories(parent)) {
-      RCLCPP_ERROR(logger_, "unable to create path directory [%s]", parent.string().c_str());
-      return false;
-    }
+  // Succeeds without doing anything if the directory already exists.
+  std::error_code error;
+  std::filesystem::create_directories(parent, error);
+  if (error) {
+    RCLCPP_ERROR(
+      logger_, "unable to create path directory [%s]: %s",
+      parent.string().c_str(), error.message().c_str());
+    return false;
   }
 
   // Directory exists. Permissions might still be bad.
@@ -542,7 +547,14 @@ CameraInfoManager::setCameraInfoService(
     return;
   }
 
-  rsp->success = saveCalibration(req->camera_info, url_copy, cname);
+  try {
+    rsp->success = saveCalibration(req->camera_info, url_copy, cname);
+  } catch (const std::exception & e) {
+    // An exception leaving this callback would stop the executor spinning the
+    // node, and the client would never get a response.
+    RCLCPP_ERROR(logger_, "unable to save camera calibration: %s", e.what());
+    rsp->success = false;
+  }
   if (!rsp->success) {
     rsp->status_message = "Error storing camera calibration.";
   }
