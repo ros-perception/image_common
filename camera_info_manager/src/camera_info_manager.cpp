@@ -129,7 +129,8 @@ CameraInfo CameraInfoManager::getCameraInfo(void)
 /** Get file name corresponding to a @c package: URL.
  *
  * @param url a copy of the Uniform Resource Locator
- * @return file name if package found, "" otherwise
+ * @return file name in the package
+ * @throws std::logic_error if the package is not found
  */
 std::filesystem::path CameraInfoManager::getPackageFileName(const std::string & url)
 {
@@ -150,14 +151,9 @@ std::filesystem::path CameraInfoManager::getPackageFileName(const std::string & 
     throw std::logic_error("unknown package: " + package);
   }
 
-  if (pkgPath.empty()) {                // package not found?
-    RCLCPP_WARN(logger_, "unknown package: %s (ignored)", package.c_str());
-    throw std::logic_error("unknown package: " + package);
-  } else {
-    // Construct file name from package location and remainder of URL.
-    // url.substr(rest) starts with '/', use relative() to compose safely.
-    return pkgPath / std::filesystem::path(url.substr(rest + 1));
-  }
+  // Construct file name from package location and remainder of URL.
+  // url.substr(rest) starts with '/', use relative() to compose safely.
+  return pkgPath / std::filesystem::path(url.substr(rest + 1));
 }
 
 /** Is the current CameraInfo calibrated?
@@ -236,10 +232,7 @@ bool CameraInfoManager::loadCalibration(
       }
     case url_type_t::Package:
       {
-        std::filesystem::path filename(getPackageFileName(resURL));
-        if (!filename.empty()) {
-          success = loadCalibrationFile(filename, cname);
-        }
+        success = loadCalibrationFile(getPackageFileName(resURL), cname);
         break;
       }
     default:
@@ -472,10 +465,7 @@ CameraInfoManager::saveCalibration(
       }
     case url_type_t::Package:
       {
-        std::filesystem::path filename(getPackageFileName(resURL));
-        if (!filename.empty()) {
-          success = saveCalibrationFile(new_info, filename, cname);
-        }
+        success = saveCalibrationFile(new_info, getPackageFileName(resURL), cname);
         break;
       }
     default:
