@@ -36,6 +36,8 @@
 
 #include <algorithm>
 #include <array>
+#include <charconv>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <limits>
@@ -140,20 +142,44 @@ std::vector<std::vector<std::string>> split_sections(
 }
 
 template<size_t rows, size_t cols>
-std::array<double, rows * cols> parse_matrix(std::vector<std::string>::const_iterator & begin)
+std::array<double, rows * cols> parse_matrix(
+  std::vector<std::string>::const_iterator & begin,
+  const std::vector<std::string>::const_iterator & end)
 {
   std::array<double, rows * cols> ret;
   for (size_t ii = 0; ii < rows; ++ii) {
-    auto ss = std::stringstream(*(begin++));
+    // Rows missing from the section stay empty, and so they are read as NaN.
+    std::stringstream ss;
+    if (begin != end) {
+      ss.str(*(begin++));
+    }
     for (size_t jj = 0; jj < cols; ++jj) {
       double val = std::numeric_limits<double>::quiet_NaN();
       if (!ss.eof()) {
         ss >> val;
+        if (ss.fail()) {
+          val = std::numeric_limits<double>::quiet_NaN();
+        }
       }
       ret[ii * cols + jj] = val;
     }
   }
   return ret;
+}
+
+// Read the unsigned integer in the line after `key`.
+bool parse_size(
+  const std::vector<std::string> & section,
+  std::vector<std::string>::const_iterator key,
+  uint32_t & value)
+{
+  if (++key == section.end()) {
+    return false;
+  }
+  const char * const first = key->data();
+  const char * const last = first + key->size();
+  const auto result = std::from_chars(first, last, value);
+  return result.ec == std::errc() && result.ptr == last;
 }
 
 bool parse_image_section(const std::vector<std::string> & section, CameraInfo & cam_info)
@@ -170,8 +196,15 @@ bool parse_image_section(const std::vector<std::string> & section, CameraInfo & 
     return false;
   }
 
-  cam_info.width = stoi(*(++width));
-  cam_info.height = stoi(*(++height));
+  if (!parse_size(section, width, cam_info.width)) {
+    RCLCPP_ERROR(kIniLogger, "Error parsing 'width' in section '[image]'");
+    return false;
+  }
+
+  if (!parse_size(section, height, cam_info.height)) {
+    RCLCPP_ERROR(kIniLogger, "Error parsing 'height' in section '[image]'");
+    return false;
+  }
   return true;
 }
 
@@ -180,6 +213,10 @@ bool parse_camera_section(
   std::string & camera_name,
   CameraInfo & cam_info)
 {
+  if (section[0].size() < 2) {
+    RCLCPP_ERROR(kIniLogger, "Invalid camera section '%s'", section[0].c_str());
+    return false;
+  }
   camera_name = std::string(section[0].begin() + 1, section[0].end() - 1);
 
   auto camera_matrix = std::find(section.begin(), section.end(), "camera matrix");
@@ -206,15 +243,6 @@ bool parse_camera_section(
     return false;
   }
 
-  auto d = parse_matrix<1, 8>(++distortion);
-  if (std::isnan(d[5])) {
-    cam_info.d = std::vector<double>(d.begin(), d.begin() + 5);
-    cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
-  } else {
-    cam_info.d = std::vector<double>(d.begin(), d.end());
-    cam_info.distortion_model = sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL;
-  }
-
   auto array_has_nan = [](auto a) {
       return std::end(a) != std::find_if(
         std::begin(a), std::end(a), [](double v) {
@@ -222,19 +250,32 @@ bool parse_camera_section(
         });
     };
 
-  cam_info.k = parse_matrix<3, 3>(++camera_matrix);
+  auto d = parse_matrix<1, 8>(++distortion, section.end());
+  if (std::isnan(d[5])) {
+    cam_info.d = std::vector<double>(d.begin(), d.begin() + 5);
+    cam_info.distortion_model = sensor_msgs::distortion_models::PLUMB_BOB;
+  } else {
+    cam_info.d = std::vector<double>(d.begin(), d.end());
+    cam_info.distortion_model = sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL;
+  }
+  if (array_has_nan(cam_info.d)) {
+    RCLCPP_ERROR(kIniLogger, "Error parsing 'distortion', incorrect size");
+    return false;
+  }
+
+  cam_info.k = parse_matrix<3, 3>(++camera_matrix, section.end());
   if (array_has_nan(cam_info.k)) {
     RCLCPP_ERROR(kIniLogger, "Error parsing 'camera matrix', incorrect size");
     return false;
   }
 
-  cam_info.r = parse_matrix<3, 3>(++rectification);
+  cam_info.r = parse_matrix<3, 3>(++rectification, section.end());
   if (array_has_nan(cam_info.r)) {
     RCLCPP_ERROR(kIniLogger, "Error parsing 'rectification', incorrect size");
     return false;
   }
 
-  cam_info.p = parse_matrix<3, 4>(++projection);
+  cam_info.p = parse_matrix<3, 4>(++projection, section.end());
   if (array_has_nan(cam_info.p)) {
     RCLCPP_ERROR(kIniLogger, "Error parsing 'projection', incorrect size");
     return false;
