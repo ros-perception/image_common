@@ -36,10 +36,13 @@
 #include <atomic>
 #include <chrono>
 #include <filesystem>
+#include <fstream>
 #include <memory>
+#include <random>
 #include <thread>
 #include <cstdlib>
 #include <string>
+#include <system_error>
 
 #include "ament_index_cpp/get_package_share_path.hpp"
 #include "camera_info_manager/camera_info_manager.hpp"
@@ -72,6 +75,13 @@ protected:
         c = '_';
       }
     }
+    // Keep each test away from the real ${ROS_HOME}, and from all the other tests.
+    ros_home = std::filesystem::temp_directory_path() /
+      (node_name + "_" + std::to_string(std::random_device{}()));
+    std::filesystem::create_directories(ros_home);
+    rcpputils::set_env_var("ROS_HOME", ros_home.generic_string().c_str());
+    ament_prefix_path = rcpputils::get_env_var("AMENT_PREFIX_PATH");
+
     node = rclcpp::Node::make_shared(node_name);
     executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
     executor->add_node(node);
@@ -89,6 +99,9 @@ protected:
     if (executor_thread.joinable()) {
       executor_thread.join();
     }
+    rcpputils::set_env_var("AMENT_PREFIX_PATH", ament_prefix_path.c_str());
+    std::error_code error;
+    std::filesystem::remove_all(ros_home, error);
   }
 
   camera_info_manager::CameraInfoManager make_cinfo(
@@ -103,6 +116,8 @@ protected:
       cname, url, rclcpp::SystemDefaultsQoS(), ns);
   }
 
+  std::filesystem::path ros_home;
+  std::string ament_prefix_path;
   rclcpp::Node::SharedPtr node;
   std::string g_package_name = "camera_info_manager";
   std::string g_test_name = "test_calibration";
@@ -156,40 +171,6 @@ void compare_calibration(
 void delete_file(std::string filename)
 {
   std::filesystem::remove(filename);
-}
-
-void delete_default_file(void)
-{
-  std::filesystem::path ros_home;
-  std::string ros_home_env = rcpputils::get_env_var("ROS_HOME");
-  if (!ros_home_env.empty()) {
-    ros_home = ros_home_env;
-  } else {
-#ifdef _WIN32
-    std::string home_env = rcpputils::get_env_var("USERPROFILE");
-#else
-    std::string home_env = rcpputils::get_env_var("HOME");
-#endif
-    if (!home_env.empty()) {
-      ros_home = std::filesystem::path(home_env) / ".ros";
-    }
-  }
-
-  if (ros_home.empty()) {
-    return;
-  }
-  std::filesystem::remove(ros_home / "camera_info" / "camera.yaml");
-}
-
-void delete_tmp_camera_info_directory(void)
-{
-  std::filesystem::remove_all(std::filesystem::temp_directory_path() / "camera_info");
-}
-
-void make_tmp_camera_info_directory(void)
-{
-  std::filesystem::create_directories(
-    std::filesystem::temp_directory_path() / "camera_info");
 }
 
 // These data must match the contents of test_calibration.yaml.
@@ -359,8 +340,6 @@ TEST_F(CameraInfoManagerTesting, invalidURLs)
 // Test ability to provide uncalibrated CameraInfo
 TEST_F(CameraInfoManagerTesting, uncalibrated)
 {
-  delete_default_file();
-
   auto cinfo = make_cinfo();
   EXPECT_FALSE(cinfo.isCalibrated());
 
@@ -372,8 +351,6 @@ TEST_F(CameraInfoManagerTesting, uncalibrated)
 // Test ability to load calibrated CameraInfo
 TEST_F(CameraInfoManagerTesting, calibrated)
 {
-  delete_default_file();
-
   auto cinfo = make_cinfo();
   EXPECT_FALSE(cinfo.isCalibrated());
 
@@ -505,13 +482,6 @@ TEST_F(CameraInfoManagerTesting, setCalibration)
     sensor_msgs::msg::CameraInfo ci = cinfo.getCameraInfo();
     compare_calibration(exp, ci);
   }
-
-#ifdef _WIN32
-  std::filesystem::path home_path(rcpputils::get_env_var("USERPROFILE"));
-#else
-  std::filesystem::path home_path(rcpputils::get_env_var("HOME"));
-#endif
-  delete_file((home_path / ".ros" / "camera_info" / "camera.yaml").string());
 }
 
 // Test ability to save calibrated CameraInfo in default URL
@@ -519,14 +489,6 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationDefault)
 {
   sensor_msgs::msg::CameraInfo exp(expected_calibration());
   bool success;
-
-  // Set ${ROS_HOME} to temp dir, then delete the camera_info
-  // directory and everything in it.
-  std::string tmp_dir =
-    std::filesystem::temp_directory_path().generic_string();
-  rcpputils::set_env_var("ROS_HOME", tmp_dir.c_str());
-  delete_tmp_camera_info_directory();
-  make_tmp_camera_info_directory();
 
   {
     // create instance to save calibrated data
@@ -558,15 +520,7 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationCameraName)
   sensor_msgs::msg::CameraInfo exp(expected_calibration());
   bool success;
 
-  // set ${ROS_HOME} to temp dir, delete the calibration file
-  std::string tmp_dir =
-    std::filesystem::temp_directory_path().generic_string();
-  rcpputils::set_env_var("ROS_HOME", tmp_dir.c_str());
-
-  std::string tmpFile = (std::filesystem::temp_directory_path() / "camera_info" /
-    (g_camera_name + ".yaml")).generic_string();
-  delete_file(tmpFile);
-  make_tmp_camera_info_directory();
+  std::string tmpFile = (ros_home / "camera_info" / (g_camera_name + ".yaml")).generic_string();
   {
     // create instance to save calibrated data
     auto cinfo = make_cinfo(g_camera_name);
@@ -587,72 +541,50 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationCameraName)
       compare_calibration(exp, ci);
     }
   }
-  delete_file(tmpFile);
 }
 
-// // Test ability to save calibrated CameraInfo in a file
-// TEST_F(CameraInfoManagerTesting, saveCalibrationFile)
-// {
-//   return;
-
-//   ros::NodeHandle node;
-//   sensor_msgs::msg::CameraInfo exp(expected_calibration());
-//   std::string cname("camera");
-//   std::string tmpFile("/tmp/camera_info_manager_calibration_test.yaml");
-//   std::string url = "file://" + tmpFile;
-//   bool success;
-
-//   // first, delete the file
-//   delete_file(tmpFile);
-
-//   {
-//     // create instance to save calibrated data
-//     camera_info_manager::CameraInfoManager cinfo(node, cname, url);
-//     success = set_calibration(node, exp);
-//     EXPECT_TRUE(cinfo.isCalibrated());
-//   }
-
-//   // only check results if the service succeeded, avoiding confusing
-//   // and redundant failure messages
-//   if (success) {
-//     // create a new instance to load saved calibration
-//     camera_info_manager::CameraInfoManager cinfo2(node, cname, url);
-//     EXPECT_TRUE(cinfo2.isCalibrated());
-//     if (cinfo2.isCalibrated()) {
-//       sensor_msgs::msg::CameraInfo ci(cinfo2.getCameraInfo());
-//       compare_calibration(exp, ci);
-//     }
-//   }
-// }
-
-// Test ability to save calibrated CameraInfo in a package
-// (needs write access).
+// Test ability to save calibrated CameraInfo in a package. The package is created
+// in the temporary directory, so that the installed one is left untouched.
 TEST_F(CameraInfoManagerTesting, saveCalibrationPackage)
 {
-  sensor_msgs::msg::CameraInfo exp(expected_calibration());
-  std::string filename(g_package_filename);
-  bool success;
+  const std::string package_name = "camera_info_manager_writable_test_package";
+  const std::string url = "package://" + package_name + "/tests/calibration.yaml";
+  const std::filesystem::path prefix = ros_home / "prefix";
+  const std::filesystem::path share = prefix / "share";
+  const std::filesystem::path index = share / "ament_index" / "resource_index" / "packages";
+  const std::filesystem::path calibration = share / package_name / "tests" / "calibration.yaml";
 
-  // first, delete the file
-  delete_file(filename);
+  std::filesystem::create_directories(index);
+  std::filesystem::create_directories(share / package_name);
+  std::ofstream(index / package_name).close();
+#ifdef _WIN32
+  const std::string separator = ";";
+#else
+  const std::string separator = ":";
+#endif
+  const std::string search_path = prefix.generic_string() + separator + ament_prefix_path;
+  rcpputils::set_env_var("AMENT_PREFIX_PATH", search_path.c_str());
+
+  sensor_msgs::msg::CameraInfo exp(expected_calibration());
+  bool success;
 
   {
     // create instance to save calibrated data
-    auto cinfo = make_cinfo(g_camera_name, g_package_url);
+    auto cinfo = make_cinfo(g_camera_name, url);
+    EXPECT_FALSE(cinfo.isCalibrated());
     success = set_calibration(node, exp);
     EXPECT_TRUE(cinfo.isCalibrated());
   }
 
-  // only check results if the service succeeded, avoiding confusing
-  // and redundant failure messages
-  if (success) {
-    // create a new instance to load saved calibration
-    auto cinfo2 = make_cinfo(g_camera_name, g_package_url);
-    EXPECT_TRUE(cinfo2.isCalibrated());
-    if (cinfo2.isCalibrated()) {
-      sensor_msgs::msg::CameraInfo ci(cinfo2.getCameraInfo());
-      compare_calibration(exp, ci);
-    }
+  ASSERT_TRUE(success);
+  ASSERT_TRUE(std::filesystem::exists(calibration));
+
+  // create a new instance to load saved calibration
+  auto cinfo2 = make_cinfo(g_camera_name, url);
+  EXPECT_TRUE(cinfo2.isCalibrated());
+  if (cinfo2.isCalibrated()) {
+    sensor_msgs::msg::CameraInfo ci(cinfo2.getCameraInfo());
+    compare_calibration(exp, ci);
   }
 }
 
