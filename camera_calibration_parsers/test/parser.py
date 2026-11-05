@@ -63,18 +63,23 @@ def _find_convert():
     return shutil.which('convert')
 
 
-def _convert(ini_name, tmp_path):
-    """Convert a fixture ``.ini`` to ``.yaml`` and return the parsed YAML."""
+def _run_convert(*args):
+    """Run ``convert`` with the given arguments."""
     convert = _find_convert()
     assert convert is not None, 'convert executable not found'
 
-    ini_path = os.path.join(THIS_DIR, ini_name)
-    yaml_path = os.path.join(str(tmp_path), 'out.yaml')
-    result = subprocess.run(
-        [convert, ini_path, yaml_path],
+    return subprocess.run(
+        [convert, *args],
         capture_output=True,
         text=True,
     )
+
+
+def _convert(ini_name, tmp_path):
+    """Convert a fixture ``.ini`` to ``.yaml`` and return the parsed YAML."""
+    ini_path = os.path.join(THIS_DIR, ini_name)
+    yaml_path = os.path.join(str(tmp_path), 'out.yaml')
+    result = _run_convert(ini_path, yaml_path)
     assert result.returncode == 0, result.stderr
     assert os.path.isfile(yaml_path)
 
@@ -99,3 +104,43 @@ def test_convert_calib8_ini(tmp_path):
     assert calib['image_width'] == 640
     assert calib['image_height'] == 480
     assert calib['distortion_model'] == 'rational_polynomial'
+
+
+def test_convert_yaml_to_ini(tmp_path):
+    """Convert a ``.yaml`` back to ``.ini``, keeping the camera name."""
+    _convert('calib5.ini', tmp_path)
+    ini_path = os.path.join(str(tmp_path), 'out.ini')
+    result = _run_convert(os.path.join(str(tmp_path), 'out.yaml'), ini_path)
+    assert result.returncode == 0, result.stderr
+    with open(ini_path, encoding='utf-8') as f:
+        assert '[mono_left]' in f.read()
+
+
+def test_convert_without_arguments_prints_usage():
+    """Print the usage when the file names are missing."""
+    result = _run_convert()
+    assert result.returncode == 0
+    assert 'Usage' in result.stdout
+
+
+def test_convert_missing_input(tmp_path):
+    """Fail when the input file does not exist."""
+    yaml_path = os.path.join(str(tmp_path), 'out.yaml')
+    result = _run_convert(os.path.join(str(tmp_path), 'missing.ini'), yaml_path)
+    assert result.returncode != 0
+    assert not os.path.exists(yaml_path)
+
+
+def test_convert_unknown_output_format(tmp_path):
+    """Fail when the extension of the output file is unknown."""
+    output_path = os.path.join(str(tmp_path), 'out.txt')
+    result = _run_convert(os.path.join(THIS_DIR, 'calib5.ini'), output_path)
+    assert result.returncode != 0
+    assert not os.path.exists(output_path)
+
+
+def test_convert_output_format_cannot_store_calibration(tmp_path):
+    """Fail when saving rational_polynomial distortion as ``.ini``."""
+    output_path = os.path.join(str(tmp_path), 'out.ini')
+    result = _run_convert(os.path.join(THIS_DIR, 'calib8.ini'), output_path)
+    assert result.returncode != 0

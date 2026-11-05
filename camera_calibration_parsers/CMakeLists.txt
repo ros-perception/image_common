@@ -77,6 +77,11 @@ if(BUILD_TESTING)
 
   find_package(ament_cmake_gtest)
 
+  ament_add_gtest(${PROJECT_NAME}-parse test/test_parse.cpp)
+  if(TARGET ${PROJECT_NAME}-parse)
+    target_link_libraries(${PROJECT_NAME}-parse ${PROJECT_NAME})
+  endif()
+
   ament_add_gtest(${PROJECT_NAME}-parse_ini test/test_parse_ini.cpp)
   if(TARGET ${PROJECT_NAME}-parse_ini)
     target_link_libraries(${PROJECT_NAME}-parse_ini ${PROJECT_NAME})

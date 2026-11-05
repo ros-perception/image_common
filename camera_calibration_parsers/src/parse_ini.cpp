@@ -41,6 +41,7 @@
 #include <limits>
 #include <sstream>
 #include <string>
+#include <system_error>
 #include <vector>
 
 #include "rclcpp/logging.hpp"
@@ -243,7 +244,7 @@ bool parse_camera_section(
 }
 
 
-bool parse_externals_section(const std::vector<std::string> & section)
+void parse_externals_section(const std::vector<std::string> & section)
 {
   auto translation = std::find(section.begin(), section.end(), "translation");
   if (translation == section.end()) {
@@ -256,8 +257,6 @@ bool parse_externals_section(const std::vector<std::string> & section)
     RCLCPP_ERROR(kIniLogger, "Failed to find key 'rotation' in section '[externals]'");
     // Don't error, because nothing is done with this anyway
   }
-
-  return true;
 }
 
 bool writeCalibrationIni(
@@ -303,12 +302,14 @@ bool writeCalibrationIni(
   const CameraInfo & cam_info)
 {
   std::filesystem::path dir(std::filesystem::path(file_name).parent_path());
-  if (!dir.empty() && !std::filesystem::exists(dir) &&
-    !std::filesystem::create_directories(dir))
-  {
+  std::error_code error;
+  if (!dir.empty()) {
+    std::filesystem::create_directories(dir, error);
+  }
+  if (error) {
     RCLCPP_ERROR(
-      kIniLogger, "Unable to create directory for camera calibration file [%s]",
-      dir.string().c_str());
+      kIniLogger, "Unable to create directory for camera calibration file [%s]: %s",
+      dir.string().c_str(), error.message().c_str());
     return false;
   }
   std::ofstream out(file_name);
@@ -344,9 +345,7 @@ bool readCalibrationIni(
         return false;
       }
     } else if (section[0] == "[externals]") {
-      if (!parse_externals_section(section)) {
-        return false;
-      }
+      parse_externals_section(section);
     } else {
       if (!parse_camera_section(section, camera_name, cam_info)) {
         return false;
