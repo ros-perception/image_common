@@ -252,7 +252,8 @@ sensor_msgs::msg::CameraInfo expected_calibration(void)
 // issue SetCameraInfo service request
 bool set_calibration(
   std::shared_ptr<rclcpp::Node> node,
-  const sensor_msgs::msg::CameraInfo & calib)
+  const sensor_msgs::msg::CameraInfo & calib,
+  std::string * status_message = nullptr)
 {
   auto client = node->create_client<sensor_msgs::srv::SetCameraInfo>("set_camera_info");
   while (!client->wait_for_service(std::chrono::seconds(1))) {
@@ -275,7 +276,11 @@ bool set_calibration(
     client->remove_pending_request(result_future);
     return false;
   }
-  return result_future.get()->success;
+  auto response = result_future.get();
+  if (status_message != nullptr) {
+    *status_message = response->status_message;
+  }
+  return response->success;
 }
 
 // resolve URL string, result should be as expected
@@ -337,6 +342,8 @@ TEST_F(CameraInfoManagerTesting, validURLs)
   EXPECT_TRUE(cinfo.validateURL(std::string("file:///tmp/url.yaml")));
   EXPECT_TRUE(cinfo.validateURL(std::string("File:///tmp/url.ini")));
   EXPECT_TRUE(cinfo.validateURL(std::string("FILE:///tmp/url.yaml")));
+  EXPECT_TRUE(cinfo.validateURL(std::string("file://C:/tmp/url.yaml")));
+  EXPECT_TRUE(cinfo.validateURL(std::string("file://c:/tmp/url.ini")));
   EXPECT_TRUE(cinfo.validateURL(g_default_url));
   EXPECT_TRUE(cinfo.validateURL(g_package_url));
   EXPECT_TRUE(cinfo.validateURL(std::string("package://no_such_package/calibration.yaml")));
@@ -349,6 +356,9 @@ TEST_F(CameraInfoManagerTesting, invalidURLs)
   auto cinfo = make_cinfo();
 
   EXPECT_FALSE(cinfo.validateURL(std::string("file://")));
+  EXPECT_FALSE(cinfo.validateURL(std::string("file://relative/url.yaml")));
+  EXPECT_FALSE(cinfo.validateURL(std::string("file://C:")));
+  EXPECT_FALSE(cinfo.validateURL(std::string("file://1:/tmp/url.yaml")));
   EXPECT_FALSE(cinfo.validateURL(std::string("flash:///")));
   EXPECT_FALSE(cinfo.validateURL(std::string("html://ros.org/wiki/camera_info_manager")));
   EXPECT_FALSE(cinfo.validateURL(std::string("package://")));
@@ -801,6 +811,56 @@ TEST_F(CameraInfoManagerTesting, invalidVariables)
   // no exception thrown for single "$" at end of string
   name_url = "file:///$";
   check_url_substitution(node, name_url, name_url, g_camera_name);
+}
+
+// Test that getCameraInfo() loads the calibration if nothing has loaded it yet
+TEST_F(CameraInfoManagerTesting, getCameraInfoLoadsCalibration)
+{
+  auto cinfo = make_cinfo(g_test_name, g_package_name_url);
+
+  sensor_msgs::msg::CameraInfo ci(cinfo.getCameraInfo());
+  sensor_msgs::msg::CameraInfo exp(expected_calibration());
+  compare_calibration(exp, ci);
+}
+
+// Test that saving to an invalid URL uses the default location instead
+TEST_F(CameraInfoManagerTesting, saveCalibrationInvalidURL)
+{
+  const std::string cname("invalid_url_camera");
+
+  // set ${ROS_HOME} to temp dir, delete the calibration file
+  std::string tmp_dir =
+    std::filesystem::temp_directory_path().generic_string();
+  rcpputils::set_env_var("ROS_HOME", tmp_dir.c_str());
+
+  std::filesystem::path tmp_file(
+    std::filesystem::temp_directory_path() / "camera_info" / (cname + ".yaml"));
+  delete_file(tmp_file.string());
+
+  auto cinfo = make_cinfo(cname, "html://ros.org/wiki/camera_info_manager");
+  sensor_msgs::msg::CameraInfo exp(expected_calibration());
+  EXPECT_TRUE(set_calibration(node, exp));
+  EXPECT_TRUE(std::filesystem::exists(tmp_file));
+
+  delete_file(tmp_file.string());
+}
+
+// Test that a failed save is reported to the service client
+TEST_F(CameraInfoManagerTesting, setCalibrationSaveFailure)
+{
+  // calibration files must be .ini, .yml or .yaml, so this one cannot be saved
+  std::filesystem::path tmp_file(
+    std::filesystem::temp_directory_path() / "camera_info_manager_test_calibration.txt");
+  auto cinfo = make_cinfo("camera", "file://" + tmp_file.generic_string());
+
+  sensor_msgs::msg::CameraInfo exp(expected_calibration());
+  std::string status_message;
+  EXPECT_FALSE(set_calibration(node, exp, &status_message));
+  EXPECT_EQ("Error storing camera calibration.", status_message);
+
+  // the current calibration is updated, even if it could not be saved
+  sensor_msgs::msg::CameraInfo ci(cinfo.getCameraInfo());
+  compare_calibration(exp, ci);
 }
 
 // Run all the tests that were declared with TEST_F()
