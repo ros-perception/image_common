@@ -34,13 +34,9 @@
 
 #include "camera_calibration_parsers/parse_yml.hpp"
 
-<<<<<<< HEAD
-#include <cassert>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
-=======
-#include <cstdint>
->>>>>>> 8aea807 (Reject YAML calibrations with invalid matrix sizes (#453))
 
 #include <filesystem>
 #include <fstream>
