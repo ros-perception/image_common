@@ -233,3 +233,59 @@ TEST(ParseYml, roundtrip_calib_roi) {
   ASSERT_EQ(camera_name2, camera_name);
   check_calib(cam_info2);
 }
+
+// Build a valid calibration, except for the matrix called `name`.
+static std::string yml_with_matrix(const std::string & name, int rows, int cols, int count)
+{
+  const auto matrix = [&](const std::string & key, int r, int c, int n) {
+      if (key == name) {
+        r = rows;
+        c = cols;
+        n = count;
+      }
+      std::string out = key + ":\n  rows: " + std::to_string(r) + "\n  cols: " +
+        std::to_string(c) + "\n  data: [";
+      for (int i = 0; i < n; ++i) {
+        out += i == 0 ? "1" : ", 1";
+      }
+      return out + "]\n";
+    };
+  return "image_width: 640\nimage_height: 480\ncamera_name: mono_left\n"
+         "distortion_model: plumb_bob\n" +
+         matrix("camera_matrix", 3, 3, 9) +
+         matrix("distortion_coefficients", 1, 5, 5) +
+         matrix("rectification_matrix", 3, 3, 9) +
+         matrix("projection_matrix", 3, 4, 12);
+}
+
+static bool parses(const std::string & yml)
+{
+  std::string camera_name;
+  sensor_msgs::msg::CameraInfo cam_info;
+  return camera_calibration_parsers::parseCalibrationYml(yml, camera_name, cam_info);
+}
+
+TEST(ParseYml, valid_matrix_sizes) {
+  ASSERT_TRUE(parses(yml_with_matrix("camera_matrix", 3, 3, 9)));
+}
+
+TEST(ParseYml, matrix_of_the_wrong_size) {
+  for (const std::string name : {"camera_matrix", "rectification_matrix", "projection_matrix"}) {
+    EXPECT_FALSE(parses(yml_with_matrix(name, 100, 100, 10000))) << name;
+    EXPECT_FALSE(parses(yml_with_matrix(name, 2, 2, 4))) << name;
+    EXPECT_FALSE(parses(yml_with_matrix(name, -1, -1, 1))) << name;
+  }
+  // Same number of elements, in the wrong shape.
+  EXPECT_FALSE(parses(yml_with_matrix("camera_matrix", 1, 9, 9)));
+  EXPECT_FALSE(parses(yml_with_matrix("projection_matrix", 4, 3, 12)));
+}
+
+TEST(ParseYml, distortion_size_does_not_match_the_data) {
+  const std::string name = "distortion_coefficients";
+  EXPECT_FALSE(parses(yml_with_matrix(name, -1, 5, 5)));
+  EXPECT_FALSE(parses(yml_with_matrix(name, 5, -1, 5)));
+  EXPECT_FALSE(parses(yml_with_matrix(name, -1, -5, 5)));
+  EXPECT_FALSE(parses(yml_with_matrix(name, 1, 8, 5)));
+  EXPECT_FALSE(parses(yml_with_matrix(name, 65536, 65536, 5)));
+  EXPECT_FALSE(parses(yml_with_matrix(name, 2147483647, 2147483647, 5)));
+}
