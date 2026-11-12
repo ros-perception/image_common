@@ -87,6 +87,11 @@ struct CameraSubscriber::Impl
   {
     if (!unsubscribed_) {
       unsubscribed_ = true;
+      // The sync check reads the subscribers' topic names, which no longer
+      // exist once unsubscribed; a tick after this would dereference null.
+      if (check_synced_timer_) {
+        check_synced_timer_->cancel();
+      }
       image_sub_.unsubscribe();
       info_sub_.unsubscribe();
     }

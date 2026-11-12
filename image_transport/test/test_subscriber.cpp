@@ -28,6 +28,7 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <string>
 #include <memory>
 
@@ -92,6 +93,46 @@ TEST_F(TestSubscriber, camera_sub_shutdown) {
     0u);
   EXPECT_EQ(node_->get_node_graph_interface()->count_subscribers(
     "camera/camera_info"), 0u);
+}
+
+TEST_F(TestSubscriber, camera_sub_shutdown_stops_sync_check) {
+  using namespace std::chrono_literals;
+
+  // Publish CameraInfo with no matching Image, so the sync check's next tick
+  // takes its warning path, which reads both subscribers' topic names.
+  auto info_pub = node_->create_publisher<sensor_msgs::msg::CameraInfo>(
+    "camera/camera_info", rclcpp::SystemDefaultsQoS());
+  size_t infos_seen = 0;
+  auto info_probe = node_->create_subscription<sensor_msgs::msg::CameraInfo>(
+    "camera/camera_info", rclcpp::SystemDefaultsQoS(),
+    [&](const sensor_msgs::msg::CameraInfo &) {++infos_seen;});
+
+  std::function<void(
+      const sensor_msgs::msg::Image::ConstSharedPtr &,
+      const sensor_msgs::msg::CameraInfo::ConstSharedPtr &)> fcn =
+    [](const auto &, const auto &) {};
+  auto sub = image_transport::create_camera_subscription(*node_, "camera/image", fcn, "raw",
+    rclcpp::SystemDefaultsQoS());
+
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node_);
+
+  // Deliver camera_info well inside the sync check's first 1 s window.
+  auto deadline = std::chrono::steady_clock::now() + 500ms;
+  while (std::chrono::steady_clock::now() < deadline) {
+    info_pub->publish(sensor_msgs::msg::CameraInfo());
+    executor.spin_some(20ms);
+  }
+  ASSERT_GT(infos_seen, 0u);
+
+  // Unsubscribe with those counts pending, then spin past the next tick. A
+  // sync-check timer left running dereferences the released subscribers.
+  sub.shutdown();
+  deadline = std::chrono::steady_clock::now() + 1500ms;
+  while (std::chrono::steady_clock::now() < deadline) {
+    executor.spin_some(50ms);
+  }
+  EXPECT_FALSE(sub);
 }
 
 TEST_F(TestSubscriber, callback_groups) {
