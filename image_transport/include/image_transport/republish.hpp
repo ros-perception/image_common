@@ -68,6 +68,14 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   explicit Republisher(const rclcpp::NodeOptions & options);
 
+  /// Destructor, defined inline to not change the exported symbols of the library
+  ~Republisher() override
+  {
+    // The plugin instance must be destroyed before its loader; members are destroyed in
+    // reverse declaration order, which would destroy `loader` first.
+    instance.reset();
+  }
+
 private:
   void initialize();
 
