@@ -68,6 +68,10 @@ public:
   IMAGE_TRANSPORT_PUBLIC
   explicit Republisher(const rclcpp::NodeOptions & options);
 
+  /// Destructor
+  IMAGE_TRANSPORT_PUBLIC
+  ~Republisher() override;
+
 private:
   void initialize();
 

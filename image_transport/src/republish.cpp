@@ -65,6 +65,13 @@ Republisher::Republisher(const rclcpp::NodeOptions & options)
     });
 }
 
+Republisher::~Republisher()
+{
+  // The plugin instance must be destroyed before its loader; members are destroyed in
+  // reverse declaration order, which would destroy `loader` first.
+  instance.reset();
+}
+
 void Republisher::initialize()
 {
   std::string in_transport = "raw";
