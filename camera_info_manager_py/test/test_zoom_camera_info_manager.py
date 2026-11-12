@@ -250,7 +250,7 @@ def test_interpolating_zoom_interpolates_k(node, tmp_path):
     assert iz.getCameraInfo().k[4] == pytest.approx(600.0)
 
 
-def test_interpolating_zoom_weights_closest_calibration_most(node: Node, tmp_path: Path) -> None:
+def test_interpolating_zoom_weights_closest_calibration_most(node, tmp_path):
     cname = 'izoom'
     low = _make_camera_info(fx=400.0, fy=400.0)
     low.d = [0.1, 0.0, 0.0, 0.0, 0.0]
