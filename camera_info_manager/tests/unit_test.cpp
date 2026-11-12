@@ -554,15 +554,22 @@ TEST_F(CameraInfoManagerTesting, saveCalibrationPackage)
   const std::filesystem::path index = share / "ament_index" / "resource_index" / "packages";
   const std::filesystem::path calibration = share / package_name / "tests" / "calibration.yaml";
 
+  // Create a minimal package: a marker in the ament resource index, and its share directory.
   std::filesystem::create_directories(index);
   std::filesystem::create_directories(share / package_name);
   std::ofstream(index / package_name).close();
+
+  // CameraInfoManager resolves package:// URLs with ament_index_cpp, which searches the
+  // prefixes in AMENT_PREFIX_PATH. Put the temporary prefix first so the package above is
+  // found, and keep the rest so everything else still resolves. TearDown() restores it.
+  // AMENT_PREFIX_PATH is a list of paths, not a path, so std::filesystem can't join it. Use
+  // the same separator that ament_index_cpp splits on.
 #ifdef _WIN32
-  const std::string separator = ";";
+  const char separator = ';';
 #else
-  const std::string separator = ":";
+  const char separator = ':';
 #endif
-  const std::string search_path = prefix.generic_string() + separator + ament_prefix_path;
+  const std::string search_path = prefix.string() + separator + ament_prefix_path;
   rcpputils::set_env_var("AMENT_PREFIX_PATH", search_path.c_str());
 
   sensor_msgs::msg::CameraInfo exp(expected_calibration());
