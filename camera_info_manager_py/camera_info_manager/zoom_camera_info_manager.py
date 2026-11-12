@@ -342,25 +342,25 @@ class InterpolatingZoomCameraInfoManager(ZoomCameraInfoManager):
         # linearly interpolate all the matrices
         self.camera_info = deepcopy(self._camera_infos[closest_lower_zoom])
         self.camera_info.k = [
-            (ratio * low + (1 - ratio) * high)
+            ((1 - ratio) * low + ratio * high)
             for (low, high) in zip(
                 self._camera_infos[closest_lower_zoom].k, self._camera_infos[closest_higher_zoom].k
             )
         ]
         self.camera_info.p = [
-            (ratio * low + (1 - ratio) * high)
+            ((1 - ratio) * low + ratio * high)
             for (low, high) in zip(
                 self._camera_infos[closest_lower_zoom].p, self._camera_infos[closest_higher_zoom].p
             )
         ]
         self.camera_info.r = [
-            (ratio * low + (1 - ratio) * high)
+            ((1 - ratio) * low + ratio * high)
             for (low, high) in zip(
                 self._camera_infos[closest_lower_zoom].r, self._camera_infos[closest_higher_zoom].r
             )
         ]
         self.camera_info.d = [
-            (ratio * low + (1 - ratio) * high)
+            ((1 - ratio) * low + ratio * high)
             for (low, high) in zip(
                 self._camera_infos[closest_lower_zoom].d, self._camera_infos[closest_higher_zoom].d
             )
