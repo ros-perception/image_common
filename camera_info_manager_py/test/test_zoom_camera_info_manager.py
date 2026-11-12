@@ -243,7 +243,39 @@ def test_interpolating_zoom_interpolates_k(node, tmp_path):
     assert iz.getCameraInfo().k[0] == pytest.approx(800.0)
 
     # Midpoint interpolation: ratio = (50 - 0) / (100 - 0) = 0.5
-    # camera_info.k = ratio * low + (1 - ratio) * high = 0.5*400 + 0.5*800 = 600
+    # camera_info.k = (1 - ratio) * low + ratio * high = 0.5*400 + 0.5*800 = 600
     iz.set_zoom(50)
     assert iz.getCameraInfo().k[0] == pytest.approx(600.0)
     assert iz.getCameraInfo().k[4] == pytest.approx(600.0)
+
+
+def test_interpolating_zoom_weights_closest_calibration_most(node: Node, tmp_path: Path) -> None:
+    cname = 'izoom'
+    low = _make_camera_info(fx=400.0, fy=400.0)
+    low.d = [0.1, 0.0, 0.0, 0.0, 0.0]
+    low.r = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+    high = _make_camera_info(fx=800.0, fy=800.0)
+    high.d = [0.5, 0.0, 0.0, 0.0, 0.0]
+    high.r = [0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+    saveCalibrationFile(low, str(tmp_path / 'cal_0.yaml'), cname)
+    saveCalibrationFile(high, str(tmp_path / 'cal_100.yaml'), cname)
+
+    template = f'file://{tmp_path}/cal_%d.yaml'
+    iz = InterpolatingZoomCameraInfoManager(
+        node, calibration_url_template=template, zoom_levels=[0, 100], cname=cname,
+    )
+    iz.loadCameraInfo()
+
+    # A quarter of the way from the lower calibration to the higher one
+    iz.set_zoom(25)
+    info = iz.getCameraInfo()
+    assert info.k[0] == pytest.approx(500.0)
+    assert info.p[0] == pytest.approx(500.0)
+    assert info.r[0] == pytest.approx(0.875)
+    assert info.d[0] == pytest.approx(0.2)
+
+    # Close to a calibrated zoom level, the result is close to that calibration
+    iz.set_zoom(1)
+    assert iz.getCameraInfo().k[0] == pytest.approx(404.0)
+    iz.set_zoom(99)
+    assert iz.getCameraInfo().k[0] == pytest.approx(796.0)
