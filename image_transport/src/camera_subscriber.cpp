@@ -141,7 +141,7 @@ CameraSubscriber::CameraSubscriber(
     required_test_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  impl_->image_sub_.subscribe(required_test_interfaces, image_topic, transport, custom_qos);
+  impl_->image_sub_.subscribe(required_test_interfaces, base_topic, transport, custom_qos);
   impl_->info_sub_.subscribe(required_test_interfaces, info_topic, custom_qos);
 
   impl_->sync_.connectInput(impl_->image_sub_, impl_->info_sub_);
