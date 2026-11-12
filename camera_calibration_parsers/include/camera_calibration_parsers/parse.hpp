@@ -79,7 +79,7 @@ bool readCalibration(
  * \param format           Format of the data: \c "yml" or \c "ini".
  * \param[out] camera_name Camera name parsed from the buffer.
  * \param[out] cam_info    Camera parameters parsed from the buffer.
- * \return \c true on success, \c false if the buffer cannot be parsed.
+ * \return \c true on success, \c false if the format is unknown or the buffer cannot be parsed.
  */
 CAMERA_CALIBRATION_PARSERS_PUBLIC
 bool parseCalibration(
