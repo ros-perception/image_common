@@ -34,7 +34,7 @@
 
 #include "camera_calibration_parsers/parse_yml.hpp"
 
-#include <cassert>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 
@@ -119,9 +119,14 @@ void operator>>(const YAML::Node & node, SimpleMatrix & m)
 {
   int rows, cols;
   node["rows"] >> rows;
-  assert(rows == m.rows);
   node["cols"] >> cols;
-  assert(cols == m.cols);
+  // m.data only has room for the expected size, so don't trust the size in the file.
+  if (rows != m.rows || cols != m.cols) {
+    throw YAML::Exception(
+            YAML::Mark::null_mark(),
+            "Matrix is " + std::to_string(rows) + "x" + std::to_string(cols) + ", expected " +
+            std::to_string(m.rows) + "x" + std::to_string(m.cols));
+  }
   const YAML::Node & data = node["data"];
   for (int i = 0; i < rows * cols; ++i) {
     data[i] >> m.data[i];
@@ -245,6 +250,15 @@ bool readCalibrationYml(
     D_node["rows"] >> D_rows;
     D_node["cols"] >> D_cols;
     const YAML::Node & D_data = D_node["data"];
+    // Check the size in the file before using it to allocate memory.
+    if (D_rows < 0 || D_cols < 0 ||
+      static_cast<std::uint64_t>(D_rows) * static_cast<std::uint64_t>(D_cols) > D_data.size())
+    {
+      throw YAML::Exception(
+              YAML::Mark::null_mark(),
+              "Distortion coefficients of size " + std::to_string(D_rows) + "x" +
+              std::to_string(D_cols) + " do not match the data");
+    }
     cam_info.d.resize(D_rows * D_cols);
     for (int i = 0; i < D_rows * D_cols; ++i) {
       D_data[i] >> cam_info.d[i];
