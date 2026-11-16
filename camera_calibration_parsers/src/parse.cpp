@@ -83,11 +83,13 @@ bool parseCalibration(
   const std::string & buffer, const std::string & format,
   std::string & camera_name, CameraInfo & cam_info)
 {
-  if (format != "ini") {
-    return false;
+  if (format == "ini") {
+    return parseCalibrationIni(buffer, camera_name, cam_info);
+  } else if (format == "yml") {
+    return parseCalibrationYml(buffer, camera_name, cam_info);
   }
 
-  return parseCalibrationIni(buffer, camera_name, cam_info);
+  return false;
 }
 
 }  // namespace camera_calibration_parsers
