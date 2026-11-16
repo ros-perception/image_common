@@ -69,6 +69,13 @@ if(BUILD_TESTING)
     rclcpp::rclcpp
   )
 
+  ament_add_gtest(${PROJECT_NAME}-shutdown_test tests/shutdown_test.cpp)
+  target_link_libraries(${PROJECT_NAME}-shutdown_test
+    ${PROJECT_NAME}
+    sensor_msgs::sensor_msgs
+    rclcpp::rclcpp
+  )
+
   # copy the file in the installation folder to test with package://
   install(FILES tests/test_calibration.yaml DESTINATION share/${PROJECT_NAME}/tests)
 endif()
