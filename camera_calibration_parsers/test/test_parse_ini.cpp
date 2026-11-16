@@ -344,3 +344,81 @@ TEST(ParseIni, cant_write_calib8) {
     camera_calibration_parsers::writeCalibrationIni(calib_file, camera_name, cam_info);
   ASSERT_EQ(ret_write, false);
 }
+
+static bool parses(const std::string & ini)
+{
+  std::string camera_name;
+  sensor_msgs::msg::CameraInfo cam_info;
+  return camera_calibration_parsers::parseCalibrationIni(ini, camera_name, cam_info);
+}
+
+static const char * kImage = "[image]\nwidth\n640\nheight\n480\n";
+static const char * kHeader = "[camera]\n";
+static const char * kCameraMatrix = "camera matrix\n1 0 0\n0 1 0\n0 0 1\n";
+static const char * kDistortion = "distortion\n0 0 0 0 0\n";
+static const char * kRectification = "rectification\n1 0 0\n0 1 0\n0 0 1\n";
+static const char * kProjection = "projection\n1 0 0 0\n0 1 0 0\n0 0 1 0\n";
+
+static std::string camera_section()
+{
+  return std::string(kHeader) + kCameraMatrix + kDistortion + kRectification + kProjection;
+}
+
+TEST(ParseIni, valid_pieces_parse) {
+  ASSERT_TRUE(parses(kImage + camera_section()));
+}
+
+TEST(ParseIni, invalid_image_size) {
+  for (const std::string value : {"abc", "640abc", "-1", "4294967296", "99999999999999"}) {
+    EXPECT_FALSE(parses("[image]\nwidth\n" + value + "\nheight\n480\n")) << value;
+    EXPECT_FALSE(parses("[image]\nwidth\n640\nheight\n" + value + "\n")) << value;
+  }
+}
+
+TEST(ParseIni, image_key_without_value) {
+  EXPECT_FALSE(parses("[image]\nheight\n480\nwidth\n"));
+  EXPECT_FALSE(parses("[image]\nwidth\n640\nheight\n"));
+  EXPECT_FALSE(parses("[image]\nwidth\nheight\n480\n"));
+}
+
+TEST(ParseIni, section_name_too_short) {
+  EXPECT_FALSE(parses("x\n"));
+}
+
+TEST(ParseIni, matrix_key_without_rows) {
+  const std::string header(kHeader);
+  EXPECT_FALSE(parses(header + kDistortion + kRectification + kProjection + "camera matrix\n"));
+  EXPECT_FALSE(parses(header + kCameraMatrix + kRectification + kProjection + "distortion\n"));
+  EXPECT_FALSE(parses(header + kCameraMatrix + kDistortion + kProjection + "rectification\n"));
+  EXPECT_FALSE(parses(header + kCameraMatrix + kDistortion + kRectification + "projection\n"));
+}
+
+TEST(ParseIni, matrix_cut_short) {
+  const std::string header(kHeader);
+  EXPECT_FALSE(
+    parses(
+      header + kDistortion + kRectification + kProjection + "camera matrix\n1 0 0\n0 1 0\n"));
+  EXPECT_FALSE(
+    parses(
+      header + kCameraMatrix + kDistortion + kProjection + "rectification\n1 0 0\n"));
+  EXPECT_FALSE(
+    parses(
+      header + kCameraMatrix + kDistortion + kRectification + "projection\n1 0 0 0\n"));
+}
+
+TEST(ParseIni, distortion_of_the_wrong_size) {
+  const std::string others = std::string(kHeader) + kCameraMatrix + kRectification + kProjection;
+  EXPECT_FALSE(parses(others + "distortion\n0 0 0\n"));
+  EXPECT_FALSE(parses(others + "distortion\n0 0 0 0 0 0\n"));
+}
+
+TEST(ParseIni, value_is_not_a_number) {
+  const std::string header(kHeader);
+  EXPECT_FALSE(
+    parses(
+      header + kDistortion + kRectification + kProjection +
+      "camera matrix\n1 0 0\n0 1 0\n0 0 x\n"));
+  EXPECT_FALSE(
+    parses(
+      header + kCameraMatrix + kRectification + kProjection + "distortion\n0 0 0 0 x\n"));
+}
