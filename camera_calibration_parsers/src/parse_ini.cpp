@@ -169,11 +169,11 @@ std::array<double, rows * cols> parse_matrix(
 
 // Read the unsigned integer in the line after `key`.
 bool parse_size(
-  const std::vector<std::string> & section,
   std::vector<std::string>::const_iterator key,
+  const std::vector<std::string>::const_iterator & end,
   uint32_t & value)
 {
-  if (++key == section.end()) {
+  if (++key == end) {
     return false;
   }
   const char * const first = key->data();
@@ -196,12 +196,12 @@ bool parse_image_section(const std::vector<std::string> & section, CameraInfo & 
     return false;
   }
 
-  if (!parse_size(section, width, cam_info.width)) {
+  if (!parse_size(width, section.end(), cam_info.width)) {
     RCLCPP_ERROR(kIniLogger, "Error parsing 'width' in section '[image]'");
     return false;
   }
 
-  if (!parse_size(section, height, cam_info.height)) {
+  if (!parse_size(height, section.end(), cam_info.height)) {
     RCLCPP_ERROR(kIniLogger, "Error parsing 'height' in section '[image]'");
     return false;
   }
