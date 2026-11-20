@@ -1,111 +1,81 @@
-## Overview
+# camera_info_manager
 
-This package contains no ROS nodes or utility commands.
+This package provides `camera_info_manager::CameraInfoManager`, a C++ class used by camera drivers to manage the camera calibration data (`sensor_msgs/msg/CameraInfo`) required by the ROS image pipeline.
 
-It provides a C++ class used by many camera drivers to manage the
-[camera calibration data](https://index.ros.org/p/image_pipeline)
-required by the
-[ROS image pipeline](https://index.ros.org/p/image_pipeline).
+It contains no ROS nodes or command line tools.
+For camera drivers written in Python, the [camera_info_manager_py](https://docs.ros.org/en/rolling/p/camera_info_manager_py/) package provides a similar interface.
 
-For camera drivers written in Python, the
-[camera_info_manager_py](https://index.ros.org/p/camera_info_manager_py)
-package provides a similar interface.
+When instantiated in a camera driver node, the class:
 
-## Roadmap
+- loads the calibration from a URL the first time it is needed,
+- provides the current `CameraInfo` to publish together with every image,
+- advertises a `set_camera_info` service, and saves the calibration it receives.
 
-For ROS Diamondback, this package moved to the
-[image_common](https://index.ros.org/p/image_common) stack. For C
-Turtle, it was part of [camera_drivers](camera_drivers).
+## Usage
 
-In ROS Diamondback the `CameraInfoManager` class moved to the
-`camera_info_manager` namespace. For compatibility with ROS C Turtle,
-the global `CameraInfoManager` class name is still supported. It is
-deprecated in Electric Emys and removed in Fuerte.
+```cpp
+#include "camera_info_manager/camera_info_manager.hpp"
 
-## Camera Names
+// In the constructor of the driver node
+cinfo_ = std::make_shared<camera_info_manager::CameraInfoManager>(
+  get_node_base_interface(),
+  get_node_services_interface(),
+  get_node_logging_interface(),
+  "my_camera",                                      // camera name
+  "package://my_driver/config/my_camera.yaml");     // calibration URL
 
-The API includes a camera name, which is written when `CameraInfo` is
-saved, and checked when data are loaded, with a warning logged if the
-name read does not match.
+// For every image
+sensor_msgs::msg::CameraInfo info = cinfo_->getCameraInfo();
+info.header = image.header;
+```
 
-Camera driver authors should refer to the
-[API documentation](http://www.ros.org/doc/api/camera_info_manager/html/classcamera__info__manager_1_1CameraInfoManager.html#_details)
-for syntax details and recommendations for assigning camera names.
+`getCameraInfo()` does not fill in the header: the driver has to set the time stamp and the frame ID, normally to the same values as the corresponding image.
 
-## URL Names
-
-The location for getting and saving calibration data is expressed by
-Uniform Resource Locator (URL). These URLs are commonly used in the APIs
-of this package and may also contain substitution variables to refer to
-common locations. Please see the
-[API documentation](http://www.ros.org/doc/api/camera_info_manager/html/classcamera__info__manager_1_1CameraInfoManager.html#_details)
-for supported URLs, file formats and substitution variables.: the URL
-may now contain substitution variables, including the camera name and
-`\${ROS_HOME}`.
+```cmake
+find_package(camera_info_manager REQUIRED)
+target_link_libraries(my_driver PUBLIC camera_info_manager::camera_info_manager)
+```
 
 ## ROS API
 
-### CameraInfoManager
+### Services
 
-This C++ class provides the following ROS interfaces, when instantiated
-in a camera driver node:
+- `set_camera_info` ([sensor_msgs/srv/SetCameraInfo](https://docs.ros.org/en/rolling/p/sensor_msgs/srv/SetCameraInfo.html)): sets the calibration and saves it to the calibration URL.
+  The response reports whether the calibration could be saved.
 
-#### Services
+The service name is `<ns>/set_camera_info`, where `ns` is the last argument of the constructor.
+It is empty by default, which results in the absolute name `/set_camera_info`.
+Pass a namespace (for example `"~"`, or the name of the camera) when the node is in a namespace or when it manages several cameras.
 
-- `set_camera_info`
-  ([sensor_msgs/srv/SetCameraInfo](https://docs.ros.org/en/rolling/p/sensor_msgs/srv/SetCameraInfo.html))
-  for calibration information
+### Parameters
 
-#### Parameters
+This package does not read ROS parameters.
+Where appropriate, we recommend that drivers provide a `camera_info_url` parameter for the URL given to `CameraInfoManager`, and a `camera_name` parameter for the camera name.
 
-This package does not read ROS parameters directly. Where appropriate,
-we recommend that drivers provide a `camera_info_url` parameter for
-the URL string passed to !CameraInfoManager.
+## Camera names
 
-## C++ API
+The camera name is written when the calibration is saved, and checked when it is loaded: a warning is logged if the name in the file does not match.
 
-[camera_info_manager::CameraInfoManager](http://www.ros.org/doc/api/camera_info_manager/html/classcamera__info__manager_1_1CameraInfoManager.html)
-class
+A valid name contains any combination of alphabetic, numeric and `_` characters, and case is significant.
+The name should be unique for each device, so consider a GUID or a combination of the make, model and serial number.
 
-For compatibility with C Turtle, the global `CameraInfoManager` class
-name was still supported, but it was **deprecated** in Electric.: the
-global `CameraInfoManager` class is no longer available, use
-`camera_info_manager::CameraInfoManager` instead.: a new
-`setCameraInfo()` method allows the caller to set `CameraInfo`
-parameters directly.
+## Calibration URLs
 
-### Examples
+The location for loading and saving the calibration is expressed as a URL:
 
-The camera_info_manager is used in the
-[camera1394](https://index.ros.org/p/camera1394) driver. Search for
-`cinfo_` in the source code to see where the !CameraInfoManager class
-is used. In particular, note the handling of Header time stamps and
-transform frame IDs.
+- `file:///full/path/to/my_camera.yaml`
+- `package://my_package/relative/path/to/my_camera.yaml`, relative to the share directory of the package
 
-- [camera1394](https://github.com/ros-drivers/camera1394/blob/master/src/nodes/driver1394.cpp#L80)
+The format of the file is selected by its extension: `.yaml` or `.yml` (recommended), or `.ini` (Videre INI format).
+See [camera_calibration_parsers](https://docs.ros.org/en/rolling/p/camera_calibration_parsers/) for a description of the formats.
 
-## Tutorials
+The URL may contain substitution variables:
 
-- [Using camera_info_manager in a Camera Driver (C++)](#using-camera_info_manager-in-a-camera-driver-c):
-  This tutorial shows how to provide calibration information while
-  publishing images.
+- `${NAME}` is replaced by the camera name
+- `${ROS_HOME}` is replaced by the `ROS_HOME` environment variable, or by `~/.ros` if it is not set
 
-## Using camera_info_manager in a Camera Driver (C++)
+If the URL is empty, `file://${ROS_HOME}/camera_info/${NAME}.yaml` is used.
 
-- **Note:** This tutorial assumes that you have completed the previous
-  tutorials: [ROS tutorials](ROS/Tutorials),
-  [Writing a Simple Image Publisher (C++)](https://index.ros.org/p/image_transport).
-- **Description:** This tutorial shows how to provide calibration
-  information while publishing images.
-- **Keywords:** camera_calibration, image_transport, image_pipeline
-- **Tutorial Level:** BEGINNER
+## Documentation
 
-### Example code
-
-Until I have time to write up a good tutorial, here is an example of a
-driver using camera_info_manager.
-Search for `cinfo_` in the source code to see where the
-!CameraInfoManager class is used. Note the handling of Header time
-stamps and transform frame IDs.
-
-- [camera1394](http://docs.ros.org/indigo/api/camera1394/html/driver1394_8cpp_source.html).
+The full documentation, including a tutorial and the C++ API reference, is in the [doc](https://github.com/ros-perception/image_common/tree/rolling/camera_info_manager/doc) directory, and it is published at [docs.ros.org](https://docs.ros.org/en/rolling/p/camera_info_manager/).

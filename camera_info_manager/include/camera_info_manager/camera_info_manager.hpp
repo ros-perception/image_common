@@ -67,8 +67,10 @@ using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
  *
  * \par ROS 2 Service
  *
- * - \b set_camera_info (sensor_msgs/SetCameraInfo) — stores calibration
- *   information sent by a calibration tool.
+ * - \b set_camera_info (sensor_msgs/srv/SetCameraInfo) — stores calibration
+ *   information sent by a calibration tool.  The current CameraInfo is always
+ *   updated; the response reports whether it could also be saved to the
+ *   calibration URL.
  *
  * \par Camera Name
  *
@@ -88,8 +90,11 @@ using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
  * - \c file:///full/path/to/calibration.yaml
  * - \c package://ros_package_name/calibrations/camera.yaml
  *
- * The \c package: scheme resolves the path relative to the install prefix of
+ * The \c package: scheme resolves the path relative to the share directory of
  * the named ROS package.
+ *
+ * The format of the file is selected by its extension: \c .yaml, \c .yml or
+ * \c .ini (see camera_calibration_parsers).
  *
  * URL variables (resolved in a single pass, not recursively):
  *
@@ -112,14 +117,32 @@ using SetCameraInfo = sensor_msgs::srv::SetCameraInfo;
  *
  * \par Namespace
  *
- * The optional \p ns constructor argument overrides the ROS 2 namespace used
- * for the \c set_camera_info service.  The default is the node's private
- * namespace (\c ~/set_camera_info).
+ * The optional \p ns constructor argument sets the namespace of the
+ * \c set_camera_info service, which is advertised as
+ * \c \<ns\>/set_camera_info.  With the default empty value the name is the
+ * absolute \c /set_camera_info, which does not depend on the namespace of the
+ * node.  Use for example \c "~" to advertise the service in the private
+ * namespace of the node (\c ~/set_camera_info), or a different value for each
+ * camera when a node manages several of them.
  */
 
 class CameraInfoManager
 {
 public:
+  /**
+   * \brief Construct a manager and advertise the \c set_camera_info service.
+   *
+   * No calibration data are loaded here, see the class documentation.
+   *
+   * \param node_base_interface      Base interface of the node.
+   * \param node_services_interface  Services interface of the node.
+   * \param node_logger_interface    Logging interface of the node.
+   * \param cname       Camera name.  It is not validated, see setCameraName().
+   * \param url         URL of the calibration file.  If empty, the default
+   *                    URL is used.
+   * \param custom_qos  QoS of the \c set_camera_info service.
+   * \param ns          Namespace of the \c set_camera_info service.
+   */
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfoManager(
     rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface,
@@ -135,6 +158,13 @@ public:
    * \return A copy of the current \c sensor_msgs::msg::CameraInfo.
    *         If calibration has not been loaded yet this call triggers the load.
    *         Returns an empty (uncalibrated) CameraInfo on load failure.
+   *
+   * \warning The caller must fill in the header of the returned message.  The
+   *          time stamp and frame ID should normally be the same as those of
+   *          the corresponding Image message.
+   *
+   * \throws std::logic_error if the load is triggered and a \c package: URL
+   *         refers to a package which is not found.
    */
   CAMERA_INFO_MANAGER_PUBLIC
   CameraInfo getCameraInfo(void);
@@ -145,16 +175,25 @@ public:
    * Triggers a lazy load if calibration has not been attempted yet.
    *
    * \return \c true if calibration data are available.
+   * \throws std::logic_error if the load is triggered and a \c package: URL
+   *         refers to a package which is not found.
    */
   CAMERA_INFO_MANAGER_PUBLIC
   bool isCalibrated(void);
 
   /**
-   * \brief Load calibration data from a URL, replacing any previously loaded data.
+   * \brief Set a new calibration URL and load its calibration data.
+   *
+   * The URL is also used to save the calibration received by the
+   * \c set_camera_info service.  If the load fails, the previously loaded
+   * data are kept.
    *
    * \param url  URL of the calibration file to load (see class documentation
-   *             for supported URL schemes and variable substitution).
+   *             for supported URL schemes and variable substitution).  If
+   *             empty, the default URL is used.
    * \return \c true on success.
+   * \throws std::logic_error if a \c package: URL refers to a package which is
+   *         not found.
    */
   CAMERA_INFO_MANAGER_PUBLIC
   bool loadCameraInfo(const std::string & url);
@@ -177,23 +216,26 @@ public:
   /**
    * \brief Set the camera name used for URL variable substitution.
    *
-   * Updates the stored camera name.  If calibration data have already been
-   * loaded, this does not automatically reload them.
+   * Updates the stored camera name.  Since the new name may change the file
+   * the URL resolves to, the calibration data are loaded again the next time
+   * they are needed.  The name is not changed if it is not valid.
    *
-   * \param cname  New camera name (alphanumeric and underscores only).
+   * \param cname  New camera name (alphanumeric and underscores only, not
+   *               empty).
    * \return \c true if \p cname is a syntactically valid camera name.
    */
   CAMERA_INFO_MANAGER_PUBLIC
   bool setCameraName(const std::string & cname);
 
   /**
-   * \brief Directly set (and save) camera calibration data.
+   * \brief Directly set camera calibration data.
    *
-   * Stores \p camera_info as the current calibration and attempts to write it
-   * to the configured URL.
+   * Stores \p camera_info as the current calibration.  Unlike the
+   * \c set_camera_info service, it does not save the data to the configured
+   * URL.
    *
    * \param camera_info  Calibration data to store.
-   * \return \c true if the data were saved successfully.
+   * \return \c true, always.
    */
   CAMERA_INFO_MANAGER_PUBLIC
   bool setCameraInfo(const CameraInfo & camera_info);
@@ -201,10 +243,12 @@ public:
   /**
    * \brief Check whether a URL string has a supported scheme.
    *
-   * Does not attempt to open or read the resource.
+   * Does not attempt to open or read the resource, which need not exist.
+   * Substitution variables are resolved before checking the URL.
    *
    * \param url  URL to validate.
-   * \return \c true if the URL scheme is recognised (\c file: or \c package:).
+   * \return \c true if the URL is empty (the default URL is used) or its
+   *         scheme is supported (\c file: or \c package:).
    */
   CAMERA_INFO_MANAGER_PUBLIC
   bool validateURL(const std::string & url);
