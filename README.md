@@ -33,7 +33,7 @@ Read and write `sensor_msgs/CameraInfo` calibration data to/from disk.
 
 C++ `CameraInfoManager` class for camera drivers that need to load, save, and serve calibration data.
 
-- Loads calibration from `file://`, `package://`, and other URL schemes
+- Loads calibration from `file://` and `package://` URLs
 - Handles `sensor_msgs/SetCameraInfo` service requests
 - Thread-safe; supports lifecycle nodes
 
