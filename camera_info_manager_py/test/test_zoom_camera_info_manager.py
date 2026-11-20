@@ -27,7 +27,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -46,20 +45,7 @@ from camera_info_manager import (
     saveCalibrationFile,
     ZoomCameraInfoManager,
 )
-
-
-@pytest.fixture(scope='module', autouse=True)
-def rclpy_context() -> Iterator[None]:
-    rclpy.init()
-    yield
-    rclpy.shutdown()
-
-
-@pytest.fixture
-def node() -> Iterator[Node]:
-    n = Node('test_camera_info_manager')
-    yield n
-    n.destroy_node()
+from camera_info_manager import camera_info_manager as cim_module
 
 
 def test_camera_info_manager_constructs(node: Node) -> None:
@@ -161,6 +147,96 @@ def test_zoom_manager_context_exit_does_not_raise(node: Node) -> None:
     z = ZoomCameraInfoManager(node, min_zoom=0, max_zoom=10, cname='zoom0')
     with z:
         pass
+
+
+def test_zoom_manager_base_class_set_zoom_not_implemented(node: Node) -> None:
+    z = ZoomCameraInfoManager(node, min_zoom=0, max_zoom=10, cname='zoom0')
+    with pytest.raises(NotImplementedError):
+        z.set_zoom(5)
+
+
+def test_approximate_zoom_scales_principal_point_of_calibration(
+    node: Node, tmp_path: Path
+) -> None:
+    cname = 'zoom0'
+    yaml_file = tmp_path / 'zoom0.yaml'
+    saveCalibrationFile(_make_camera_info(cx=300.0, cy=200.0), yaml_file.as_posix(), cname)
+
+    z = ApproximateZoomCameraInfoManager(
+        node, min_fov=30.0, max_fov=70.0,
+        initial_image_width=1280, initial_image_height=960,
+        min_zoom=0, max_zoom=100, cname=cname, url=f'file://{yaml_file.as_posix()}',
+    )
+    z.loadCameraInfo()
+    z.set_zoom(50)
+    assert z.getCameraInfo().k[2] == pytest.approx(600.0)
+    assert z.getCameraInfo().k[5] == pytest.approx(400.0)
+
+
+def test_interpolating_zoom_set_zoom_before_load_does_nothing(
+    node: Node, tmp_path: Path
+) -> None:
+    iz = InterpolatingZoomCameraInfoManager(
+        node, calibration_url_template=f'file://{tmp_path.as_posix()}/cal_%d.yaml',
+        zoom_levels=[0, 100], cname='izoom',
+    )
+    iz.set_zoom(50)
+    with pytest.raises(CameraInfoMissingError):
+        iz.getCameraInfo()
+
+
+def test_interpolating_zoom_loads_from_package(
+    node: Node, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cname = 'izoom'
+    monkeypatch.setattr(cim_module, 'get_package_share_directory', lambda _: str(tmp_path))
+    saveCalibrationFile(_make_camera_info(fx=400.0), (tmp_path / 'cal_0.yaml').as_posix(), cname)
+    saveCalibrationFile(_make_camera_info(fx=800.0), (tmp_path / 'cal_100.yaml').as_posix(), cname)
+
+    iz = InterpolatingZoomCameraInfoManager(
+        node, calibration_url_template='package://some_package/cal_%d.yaml',
+        zoom_levels=[0, 100], cname=cname,
+    )
+    iz.loadCameraInfo()
+    iz.set_zoom(100)
+    assert iz.getCameraInfo().k[0] == pytest.approx(800.0)
+
+
+def test_interpolating_zoom_unknown_package_raises(node: Node) -> None:
+    iz = InterpolatingZoomCameraInfoManager(
+        node, calibration_url_template='package://no_such_package/cal_%d.yaml',
+        zoom_levels=[0, 100], cname='izoom',
+    )
+    with pytest.raises(CameraInfoMissingError):
+        iz.loadCameraInfo()
+
+
+def test_interpolating_zoom_invalid_url_is_uncalibrated(node: Node) -> None:
+    iz = InterpolatingZoomCameraInfoManager(
+        node, calibration_url_template='html://ros.org/cal_%d.yaml',
+        zoom_levels=[0, 100], cname='izoom',
+    )
+    iz.loadCameraInfo()
+    iz.set_zoom(0)
+    assert iz.getCameraInfo().k[0] == 0.0
+
+
+def test_interpolating_zoom_empty_url_raises(node: Node) -> None:
+    # This template formats to an empty string
+    iz = InterpolatingZoomCameraInfoManager(
+        node, calibration_url_template='%.0s', zoom_levels=[0, 100], cname='izoom',
+    )
+    with pytest.raises(CameraInfoError):
+        iz.loadCameraInfo()
+
+
+def test_interpolating_zoom_needs_two_calibrations(node: Node, tmp_path: Path) -> None:
+    iz = InterpolatingZoomCameraInfoManager(
+        node, calibration_url_template=f'file://{tmp_path.as_posix()}/cal_%d.yaml',
+        zoom_levels=[0], cname='izoom',
+    )
+    with pytest.raises(CameraInfoError):
+        iz.loadCameraInfo()
 
 
 def _make_camera_info(
