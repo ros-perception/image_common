@@ -59,6 +59,7 @@ exclude_patterns = [
     '_build',
     'overview.rst',
     'api.rst',
+    'tutorial.rst',
 ]
 
 html_theme = 'sphinx_rtd_theme'
