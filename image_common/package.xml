@@ -24,7 +24,6 @@
   <exec_depend>camera_calibration_parsers</exec_depend>
   <exec_depend>camera_info_manager</exec_depend>
   <exec_depend>image_transport</exec_depend>
-  <!-- exec_depend>polled_camera</exec_depend -->
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
