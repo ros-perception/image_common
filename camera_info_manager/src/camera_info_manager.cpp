@@ -88,7 +88,7 @@ CameraInfoManager::CameraInfoManager(
 {
   // register callback for camera calibration service request
   info_service_ = node->create_service<SetCameraInfo>(
-    "set_camera_info",
+    cname + "/set_camera_info",
     std::bind(
       &CameraInfoManager::setCameraInfoService, this, std::placeholders::_1,
       std::placeholders::_2));
@@ -617,3 +617,4 @@ bool CameraInfoManager::validateURL(const std::string & url)
   return url_type < URL_invalid;
 }
 }  // namespace camera_info_manager
+
