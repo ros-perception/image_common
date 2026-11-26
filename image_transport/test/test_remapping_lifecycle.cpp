@@ -126,6 +126,89 @@ TEST_F(TestPublisherLifecycle, RemappedPublisher) {
   EXPECT_TRUE(received);
 }
 
+TEST_F(TestPublisherLifecycle, ChainedRemappingNonRecursive) {
+  std::vector<std::string> arguments{
+    "--ros-args",
+    "-r", "out:=asd",
+    "-r", "asd:=foo",
+    "-r", "foo:=bar",
+    "-r", "bar:=baz"
+  };
+  rclcpp::NodeOptions node_options;
+  node_options.arguments(arguments);
+
+  auto node = rclcpp_lifecycle::LifecycleNode::make_shared(
+    "chained_node", "namespace", node_options);
+
+  // Subscribe on base topic "out"
+  bool received{false};
+  auto sub = image_transport::create_subscription(
+    *node, "out",
+    [&received](const sensor_msgs::msg::Image::ConstSharedPtr & msg) {
+      (void)msg;
+      received = true;
+    }, "raw", rclcpp::SystemDefaultsQoS());
+
+  // Remapping should only be applied once (out -> asd), not recursed through chained rules
+  EXPECT_EQ("/namespace/asd", sub.getTopic());
+
+  // Publish on base topic "out"
+  auto pub = image_transport::create_publisher(*node, "out", rclcpp::SystemDefaultsQoS());
+  EXPECT_EQ("/namespace/asd", pub.getTopic());
+
+  test_rclcpp::wait_for_subscriber(*node, sub.getTopic());
+
+  rclcpp::executors::SingleThreadedExecutor executor;
+  auto image = std::make_shared<sensor_msgs::msg::Image>();
+
+  const size_t max_retries = 3;
+  const size_t max_loops = 200;
+  const std::chrono::milliseconds sleep_per_loop = std::chrono::milliseconds(10);
+
+  size_t retry = 0;
+  while (retry < max_retries && !received) {
+    pub.publish(image);
+    executor.spin_node_some(node->get_node_base_interface());
+
+    size_t loop = 0;
+    while (!received && loop++ < max_loops) {
+      std::this_thread::sleep_for(sleep_per_loop);
+      executor.spin_node_some(node->get_node_base_interface());
+    }
+    retry++;
+  }
+
+  EXPECT_TRUE(received);
+}
+
+TEST_F(TestPublisherLifecycle, ChainedRemappingCamera) {
+  std::vector<std::string> arguments{
+    "--ros-args",
+    "-r", "cam/image:=head/image",
+    "-r", "head/image:=sensor/image",
+    "-r", "sensor/image:=final/image"
+  };
+  rclcpp::NodeOptions node_options;
+  node_options.arguments(arguments);
+
+  auto node = rclcpp_lifecycle::LifecycleNode::make_shared(
+    "chained_cam_node", "namespace", node_options);
+
+  auto sub = image_transport::create_camera_subscription(
+    *node, "cam/image",
+    [](const sensor_msgs::msg::Image::ConstSharedPtr &,
+    const sensor_msgs::msg::CameraInfo::ConstSharedPtr &) {},
+    "raw", rclcpp::SystemDefaultsQoS());
+
+  EXPECT_EQ("/namespace/head/image", sub.getTopic());
+  EXPECT_EQ("/namespace/head/camera_info", sub.getInfoTopic());
+
+  auto pub = image_transport::create_camera_publisher(*node, "cam/image",
+    rclcpp::SystemDefaultsQoS());
+  EXPECT_EQ("/namespace/head/image", pub.getTopic());
+  EXPECT_EQ("/namespace/head/camera_info", pub.getInfoTopic());
+}
+
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);

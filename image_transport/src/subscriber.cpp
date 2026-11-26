@@ -124,7 +124,7 @@ Subscriber::Subscriber(
 
   // Tell plugin to subscribe.
   RCLCPP_DEBUG(impl_->logger_, "Subscribing to: %s\n", image_topic.c_str());
-  impl_->subscriber_->subscribe(node_interfaces, image_topic, callback, custom_qos, options);
+  impl_->subscriber_->subscribe(node_interfaces, base_topic, callback, custom_qos, options);
 }
 
 std::string Subscriber::getTopic() const

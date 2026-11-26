@@ -90,7 +90,7 @@ CameraPublisher::CameraPublisher(
     node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
   std::string info_topic = getCameraInfoTopic(image_topic);
 
-  impl_->image_pub_ = image_transport::create_publisher(node_interfaces, image_topic, custom_qos,
+  impl_->image_pub_ = image_transport::create_publisher(node_interfaces, base_topic, custom_qos,
       pub_options);
 
   auto parameters_interface = node_interfaces.get_node_parameters_interface();

@@ -103,9 +103,13 @@ public:
     rclcpp::QoS custom_qos,
     rclcpp::PublisherOptions options = rclcpp::PublisherOptions())
   {
-    std::string image_topic =
-      node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
-    advertiseImpl(node_interfaces, image_topic, custom_qos, options);
+    if (getTransportName() == "raw") {
+      advertiseImpl(node_interfaces, base_topic, custom_qos, options);
+    } else {
+      std::string image_topic =
+        node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
+      advertiseImpl(node_interfaces, image_topic, custom_qos, options);
+    }
   }
 
   /**

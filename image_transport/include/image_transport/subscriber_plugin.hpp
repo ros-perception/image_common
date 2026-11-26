@@ -95,7 +95,13 @@ public:
     rclcpp::QoS custom_qos,
     rclcpp::SubscriptionOptions options = rclcpp::SubscriptionOptions())
   {
-    return subscribeImpl(node_interfaces, base_topic, callback, custom_qos, options);
+    if (getTransportName() == "raw") {
+      return subscribeImpl(node_interfaces, base_topic, callback, custom_qos, options);
+    } else {
+      std::string image_topic =
+        node_interfaces.get_node_topics_interface()->resolve_topic_name(base_topic);
+      return subscribeImpl(node_interfaces, image_topic, callback, custom_qos, options);
+    }
   }
 
   /**
