@@ -18,9 +18,13 @@
 #include <chrono>
 #include <cinttypes>
 #include <cstdio>
+#include <functional>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
+#include <thread>
+#include <vector>
 
 #include "gtest/gtest.h"
 
@@ -88,6 +92,30 @@ void wait_for_subscriber(
     time_slept_count,
     to_be_available ? "connect to" : "disconnect from",
     topic_name.c_str());
+}
+
+
+// Return the endpoint that the node named `node_name` created, once discovery lists it.
+// Discovery adds endpoints to the graph asynchronously,
+// and an endpoint shut down earlier in a test can still be listed for a while,
+// so the first entry of a lookup made right after creating an endpoint can be missing or stale.
+inline std::optional<rclcpp::TopicEndpointInfo> wait_for_endpoint(
+  const std::function<std::vector<rclcpp::TopicEndpointInfo>()> & get_endpoints,
+  const std::string & node_name,
+  std::chrono::milliseconds timeout = std::chrono::seconds(10))
+{
+  const auto deadline = std::chrono::steady_clock::now() + timeout;
+  while (true) {
+    for (const auto & endpoint : get_endpoints()) {
+      if (endpoint.node_name() == node_name) {
+        return endpoint;
+      }
+    }
+    if (std::chrono::steady_clock::now() >= deadline) {
+      return std::nullopt;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
 }
 
 }  // namespace test_rclcpp
