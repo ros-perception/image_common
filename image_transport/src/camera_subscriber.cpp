@@ -35,17 +35,7 @@
 #include "rclcpp/logging.hpp"
 #include "rclcpp/timer.hpp"
 
-// TODO(ahcorde): Remove this #ifdef when message_filters remove the
-// deprecations
-#ifdef _WIN32
-# pragma warning(push)
-# pragma warning(disable : 4996)
-#endif
 #include "message_filters/subscriber.hpp"
-#ifdef _WIN32
-# pragma warning(pop)
-#endif
-
 #include "message_filters/time_synchronizer.hpp"
 
 #include "image_transport/camera_common.hpp"
@@ -111,14 +101,7 @@ struct CameraSubscriber::Impl
 
   rclcpp::Logger logger_;
   SubscriberFilter image_sub_;
-#ifdef _WIN32
-# pragma warning(push)
-# pragma warning(disable : 4996)
-#endif
   message_filters::Subscriber<CameraInfo> info_sub_;
-#ifdef _WIN32
-# pragma warning(pop)
-#endif
   TimeSync sync_;
 
   bool unsubscribed_;
